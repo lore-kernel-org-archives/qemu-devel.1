@@ -2,81 +2,84 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B6CC55178
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 19:55:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56727C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 19:56:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6776020825
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 19:55:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BECA220825
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 19:56:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AbeYoNiv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6776020825
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A9ktbpLd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BECA220825
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYE1M-0006HD-Md
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 15:55:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45392)
+	id 1kYE2U-0007Hm-OR
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 15:56:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kYE0e-0005r8-8V
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 15:54:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30622)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kYE1n-0006qi-31
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 15:56:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46890)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kYE0b-0007cy-FW
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 15:54:55 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kYE1l-0007v9-CC
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 15:56:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604001291;
+ s=mimecast20190719; t=1604001364;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+GZezBL9p9/kUmg1vUhDMUQyZljjZZkc9oKX7dqdzKw=;
- b=AbeYoNiv4aFG6xLoVWZJgJ2+LlLZ+uUIUU6MrHwWHNJ1Tk1ILHjNRs5RMVKww96RwB6MNw
- wnQcu2iDIgNRG5KmzJ7zKyFFQ5/zPQnoxPYx7MZtQX3gb8R87Gxp2JUWmZfT3ejJEOvvJE
- DP2TR30XrXYdupqBKki5+Si8H90XB0g=
+ bh=3CU3QPSbcLEWgDkO5xIhjLe9IXSspEV802pFK9p3YH8=;
+ b=A9ktbpLd3NFh3Kh9oExzqJE+LS69bj6/uOolyL1LblqKitboCNJd0dCYIEtbt+bKXN+2aX
+ AsPh8kAGrnGpQLpMqxhMoKJ89Hm/PO+EuDJtefk+9oHyeqzuPJKjTN0I2C7XGEOf+zhD64
+ UCZfCB+1Uehgm6YbYMb27WdMbegKVuI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-q_LVFiGIMy-f0ZoEpciocA-1; Thu, 29 Oct 2020 15:54:48 -0400
-X-MC-Unique: q_LVFiGIMy-f0ZoEpciocA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-328-u2ateHGNOFWBMYJpvdSvmQ-1; Thu, 29 Oct 2020 15:56:02 -0400
+X-MC-Unique: u2ateHGNOFWBMYJpvdSvmQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 457F6802B63;
- Thu, 29 Oct 2020 19:54:46 +0000 (UTC)
-Received: from [10.3.112.145] (ovpn-112-145.phx2.redhat.com [10.3.112.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8833D60C17;
- Thu, 29 Oct 2020 19:54:39 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20201029133833.3450220-1-armbru@redhat.com>
- <20201029133833.3450220-12-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Subject: Re: [PATCH 11/11] sockets: Make abstract UnixSocketAddress depend on
- CONFIG_LINUX
-Message-ID: <77c4d3b2-44f0-2bf8-feb6-bc760b2b8c46@redhat.com>
-Date: Thu, 29 Oct 2020 14:54:38 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DF631074642;
+ Thu, 29 Oct 2020 19:56:01 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-23.ams2.redhat.com [10.36.112.23])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8AD6F196FB;
+ Thu, 29 Oct 2020 19:55:59 +0000 (UTC)
+Subject: Re: Migrating to the gitlab issue tracker
+To: John Snow <jsnow@redhat.com>, Alistair Francis <alistair23@gmail.com>,
+ Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <bda4f471-8ed6-3832-29ac-279a6d3bb7cc@redhat.com>
+ <20201029174114.47e2b351.cohuck@redhat.com>
+ <CAKmqyKOY+5WcxUg3Rvq2t3vYWOHrHQdhcv8PkiqZX2zVMdqJ3Q@mail.gmail.com>
+ <3713093e-bf3b-bf23-a8d0-70fe429032ba@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c7308133-cf29-8668-f781-6d025eb16722@redhat.com>
+Date: Thu, 29 Oct 2020 20:55:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201029133833.3450220-12-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <3713093e-bf3b-bf23-a8d0-70fe429032ba@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 01:47:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -100,158 +103,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, zxq_yx_007@163.com,
- kraxel@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/29/20 8:38 AM, Markus Armbruster wrote:
-> The abstract socket namespace is a non-portable Linux extension.  An
-> attempt to use it elsewhere should fail with ENOENT (the abstract
-> address looks like a "" pathname, which does not resolve).  We report
-> this failure like
+On 29/10/2020 18.12, John Snow wrote:
+> On 10/29/20 12:49 PM, Alistair Francis wrote:
+>> On Thu, Oct 29, 2020 at 9:41 AM Cornelia Huck <cohuck@redhat.com> wrote:
+>>>
+>>> On Thu, 29 Oct 2020 12:01:27 -0400
+>>> John Snow <jsnow@redhat.com> wrote:
+>>>
+>>>> If you're in the CC list, it's because you are listed in MAINTAINERS.
+>>>
+>>> <cleared the cc: list except for qemu-devel :)>
+>>>
+>>>>
+>>>> Paolo's QEMU keynote this morning mentioned the possible use of the
+>>>> Gitlab issue tracker instead of using Launchpad.
+>>>>
+>>>> I'm quite fond of the gitlab issue tracker, I think it works quite well
+>>>> and it has pretty good and uncomplicated API access to it in order to
+>>>> customize your workflow if you'd really like to.
+>>>>
+>>>> In experimenting with my mirror on gitlab though, I was unable to find a
+>>>> way to configure it to send issue tracker notifications to the email
+>>>> list. A move to gitlab would likely mean, then:
+>>>>
+>>>> 1. The cessation of (automatic) issue tracker mails to the list
+>>>> 2. The loss of the ability to update the issue tracker by replying to
+>>>> said emails
+>>>> 3. Anyone listed in MAINTAINERS would be expected to have a gitlab
+>>>> account in order to interact with the issue tracker.
+>>>
+>>> The gitlab issue tracker is almost certainly is an improvement over
+>>> launchpad (and I do have a gitlab account); but not being able to
+>>> interact via email is at least annoying. I expect that not only
+>>> maintainers will want to interact with bug reports?
+>>>
+>>>>
+>>>> However, once you have a gitlab account, you DO gain the ability to
+>>>> receive emails for issues; possibly only those tagged with labels that
+>>>> you cared about -- giving a nice filtering mechanism to receive only
+>>>> bugs you care about.
+>>>>
+>>>> Gitlab also does support individual accounts updating issues using a
+>>>> generated personalized email address, so if the email workflow is
+>>>> crucial to you, it is still available.
+>>>
+>>> You mean that I can update via email, provided it's an address
+>>> associated with my account?
+>>>
+>>>>
+>>>> I'm for it, or at least for beginning a pilot program where we
+>>>> experiment with the idea for interested parties. I wanted to send up a
+>>>> trial balloon to see how we were feeling about this.
+>>
+>> I'm not sure if you want Acks, but it sounds good to me.
+>>
+>> Alistair
+>>
 > 
->     Failed to connect socket abc: No such file or directory
+> Mostly I was looking for any hard objections over the idea of issues not
+> necessarily being sent to the list anymore, if there were any.
 > 
-> Tolerable, although ENOTSUP would be better.
-> 
-> However, introspection lies: it has @abstract regardless of host
-> support.  Easy enough to fix: since Linux provides them since 2.2,
-> 'if': 'defined(CONFIG_LINUX)' should do.
-> 
-> The above failure becomes
-> 
->     Parameter 'backend.data.addr.data.abstract' is unexpected
-> 
-> I consider this an improvement.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+> I want to hear from Thomas Huth too, but maybe we can work out a pilot
+> migration and give it a test-run and find more concrete objections that way.
 
-> +++ b/qapi/sockets.json
-> @@ -74,18 +74,20 @@
->  # Captures a socket address in the local ("Unix socket") namespace.
->  #
->  # @path: filesystem path to use
-> -# @tight: pass a socket address length confined to the minimum length of the
-> -#         abstract string, rather than the full sockaddr_un record length
-> -#         (only matters for abstract sockets, default true). (Since 5.1)
-> -# @abstract: whether this is an abstract address, default false. (Since 5.1)
-> +# @abstract: if true, this is a Linux abstract socket address.  @path
-> +#            will be prefixed by a null byte, and optionally padded
-> +#            with null bytes.  Defaults to false.  (Since 5.1)
-> +# @tight: if false, pad an abstract socket address with enough null
-> +#         bytes to make it fill struct sockaddr_un member sun_path.
-> +#         Defaults to true.  (Since 5.1)
+I'd certainly give it a try! Launchpad is IMHO really a pain (let me know if
+I should elaborate on that topic again...), and the email bridge is often
+also not working correctly (replies to bug mails sometimes get put into the
+bug tracker, sometimes not), so this is not something I would really miss
+when we quite Launchpad.
 
-Do we need to mention that @tight is ignored (or even make it an error)
-if @abstract is false?
+So could somebody please enable the issue tracker there, so we can give it a
+try? Phil? Alex? Stefan? ...?
 
->  #
->  # Since: 1.3
->  ##
->  { 'struct': 'UnixSocketAddress',
->    'data': {
->      'path': 'str',
-> -    '*tight': 'bool',
-> -    '*abstract': 'bool' } }
-> +    '*tight': { 'type': 'bool', 'if': 'defined(CONFIG_LINUX)' },
-> +    '*abstract': { 'type': 'bool', 'if': 'defined(CONFIG_LINUX)' } } }
+If it works well, I can certainly help to get the links etc. in our website
+fixed.
 
-So we document @abstract before @tight, but declare them in reverse
-order.  I guess our doc generator doesn't care?
-
->  
->  ##
->  # @VsockSocketAddress:
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index dc1cf86ecf..1d2b2efb13 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -444,14 +444,20 @@ static char *qemu_chr_socket_address(SocketChardev *s, const char *prefix)
->          break;
->      case SOCKET_ADDRESS_TYPE_UNIX:
->      {
-> +#ifdef CONFIG_LINUX
->          UnixSocketAddress *sa = &s->addr->u.q_unix;
-> +#endif
->  
->          return g_strdup_printf("%sunix:%s%s%s%s", prefix,
->                                 s->addr->u.q_unix.path,
-
-Why did we need the #ifdef above, which means we can't we use sa here?
-
-> +#ifdef CONFIG_LINUX
->                                 sa->has_abstract && sa->abstract
-
-I hate mid-()-expression #ifdefs.  If g_strdup_printf() were itself a
-macro expansion, things break.  Can you come up with a saner way of
-writing this?
-
->                                 ? ",abstract" : "",
->                                 sa->has_tight && sa->tight
->                                 ? ",tight" : "",
-> +#else
-> +                               "", "",
-> +#endif
->                                 s->is_listen ? ",server" : "");
-
-I suggest:
-
-    const char *tight = "", *abstract = "";
-    UnixSocketAddress *sa = &s->addr->u.q_unix;
-
-#ifdef CONFIG_LINUX
-    if (sa->has_abstract && sa->abstract) {
-        abstract = ",abstract";
-        if (sa->has_tight && sa->tight) {
-            tight = ",tight";
-        }
-    }
-#endif
-
-    return g_strdup_printf("%sunix:%s%s%s%s", prefix, sa->path,
-                           abstract, tight,
-                           s->is_listen ? ", server" : "");
-
-
-> +++ b/util/qemu-sockets.c
-> @@ -854,10 +854,29 @@ static int vsock_parse(VsockSocketAddress *addr, const char *str,
->  
->  #ifndef _WIN32
->  
-> +static bool saddr_is_abstract(UnixSocketAddress *saddr)
-> +{
-> +#ifdef CONFIG_LINUX
-> +    return saddr->abstract;
-> +#else
-> +    return false;
-> +#endif
-> +}
-> +
-> +static bool saddr_is_tight(UnixSocketAddress *saddr)
-> +{
-> +#ifdef CONFIG_LINUX
-> +    return !saddr->has_tight || saddr->tight;
-
-Should this also look at abstract?
-
-> +#else
-> +    return false;
-> +#endif
-> +}
-> +
-
-Is it any easier to split the patch, first into the introduction of
-saddr_is_* and adjusting all clients, and second into adding the 'if' to
-the QAPI declaration?
-
-But the idea makes sense.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+ Thomas
 
 
