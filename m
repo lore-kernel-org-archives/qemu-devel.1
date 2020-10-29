@@ -2,86 +2,111 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 078A6C55179
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 12:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A107FC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 12:22:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D0542076E
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 12:10:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC1862064B
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 12:22:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YcUnzCTi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D0542076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Stw3+BJf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC1862064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY6kj-0001wm-5V
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 08:10:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48350)
+	id 1kY6wU-0004Sg-E3
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 08:22:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kY6jm-0001TX-FH
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 08:09:02 -0400
-Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:36455)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kY6jk-0005TW-8w
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 08:09:02 -0400
-Received: by mail-pl1-x62f.google.com with SMTP id r10so1203746plx.3
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 05:08:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=XZcUXEYR1pGU/kBjqiNK33tItNrFn5H9WVWH5egvSxQ=;
- b=YcUnzCTiMBA4CEnQq3cnY2RmP2n+FUSzUsQ8vOL6F0Y81YzdfxtU3hwnBmiSOgfHPd
- I2ROv6JVF5/DTe6T4G/1PpIKJB+gOJbRjrDt1yYFE0A1TizMv7Tk4SFywzm+Me5aZr7p
- M7K19S+A3XC6kwqRGJJVSqAHgHFP23mV48mmDLmAX/GIRTfretxRL4q6DPScX/qJ6IyN
- DcRDrMrxrY63WkkmoW2Ax7lkE5qcT6BVeJ6LVfEyCRC64XFxp39KXcg6XB/n5oiOBuGt
- fRJyZ0vmtGg1OBBUCYOUM4vhwoY9lMZvYpxFJx90u7LY6gdbX1VrLk32t9VhrJ/NRQB+
- qfbw==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kY6vP-0003uu-Qy
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 08:21:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55398)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kY6vI-0001lg-AJ
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 08:21:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603974054;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Fk/t1rrNpcfIVsxJ7w6rs1cWcgU/UYgWjcom2H8raMM=;
+ b=Stw3+BJfeGulXaHj2EZ/uoO73BSD+MhkZAWlv/PnkXZcVwWmY1ZLzg4iV2nEa/O7aiqVWB
+ Vlg5GBhgnVBFxfmWwFKRx9FZxKafed7mw9ZvSTul/f/aOdF39PhC2/bD6O4jQ8opF0ko+B
+ WuA5kLPC2GKGjXc4KcfljMhJB+Dsnk0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-o3lZYeTEPlODuydm0jfmkw-1; Thu, 29 Oct 2020 08:20:52 -0400
+X-MC-Unique: o3lZYeTEPlODuydm0jfmkw-1
+Received: by mail-ej1-f69.google.com with SMTP id p6so1097246ejj.5
+ for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 05:20:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=XZcUXEYR1pGU/kBjqiNK33tItNrFn5H9WVWH5egvSxQ=;
- b=joPaALjHrIVPkDIyjfR5DA3ltmlXsGe5iqV6yNRzbiJHpVl8SR+5jfp3Nms7E5Mutb
- pwJZnCfEPNo3qpU9byarprckRaYiCvTffocaZRi/FW0mygtvfzRZTiW7gbrMN6iAMheH
- us9JQyCYFlVgDBqNK13DsQutSeCLK4nd+HOpz38GTUY4k7AL2+wkLZpPvLAd9G8cSaJG
- QHBMYVvm7XpSbuSODYO35arV+ebpT/dedisjFM8ZAzMulGdFr7ElqmJ4ZbpO4u6uxC54
- 4lzjl9EGbyOz4aaM3mBBke0Yc/CUPUqNqqpxCJHCv6mnY3+zqcMbujyYsWLVW0FDCysd
- MxiQ==
-X-Gm-Message-State: AOAM531VLRxddm+AYEiC56Sjcp9mY38ZrNBk2C32gkPhd9Tnd11p7gMp
- Iss3isKLfdTh+W2chysbrgmllKZhBin2Vo4uSqo=
-X-Google-Smtp-Source: ABdhPJwsP21pvq2MJ3ZjEWdmX4iiCAuhdHFQ+/DcTDbMbew8z8tszCUlExGLs36r8HSftj3WISjjMOT/1Vjon5QP1co=
-X-Received: by 2002:a17:902:b90c:b029:d6:868d:f566 with SMTP id
- bf12-20020a170902b90cb02900d6868df566mr3496587plb.2.1603973328848; Thu, 29
- Oct 2020 05:08:48 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Fk/t1rrNpcfIVsxJ7w6rs1cWcgU/UYgWjcom2H8raMM=;
+ b=AtQSniWESetoV23I/WSGXU3TEw7YxIK5co9VBM5ndbnSENLvyrFeI8OQ9rqlNcf/8X
+ DjkEMwvspxderJYElomzVlAwqCpjCn5Ar1t2dLvlNCu403d5GhZeTotaqX77rbhI4Z4W
+ rBiu0u6xna89nLP1UBnKjKpAn6kxHMvTnhjspODphPmEyDMhXj4AgAqLguRMQ3C2lRMp
+ y1nU24gdgqDoZnNmTRWwx/s156e5u8V0Rxo/A3GB/hz4Fx0IzMiLl8v5XsxyGTz2DW8c
+ rwuwdXEwGPzlyjVrIt688ELIbFIVJmuTKOs8mCe9LRGb3/7CcEMwjY0BAprfp+Fhcx7/
+ EDJg==
+X-Gm-Message-State: AOAM530B9hNd0rnasT+T/Dzi5Ih2NptkdS61Fg2Mp/pcWtwTazVZX1XS
+ IqdBGF354QNAGFZ2rNzut3opBz/m8I3tJlVJ33LmJzBXIq+bf4u6cX7wX/3+PAvZNNbrixjpjh6
+ 7y2z/80aRJp/i9jw=
+X-Received: by 2002:a17:906:728f:: with SMTP id
+ b15mr1155206ejl.210.1603974051051; 
+ Thu, 29 Oct 2020 05:20:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyI3TqSjjO6LuznM1OweCJg2jOlXz6Ygi5HXFueaEwGM5oWhDGjYglxfToU73nY42Vy3HG+JA==
+X-Received: by 2002:a17:906:728f:: with SMTP id
+ b15mr1155191ejl.210.1603974050854; 
+ Thu, 29 Oct 2020 05:20:50 -0700 (PDT)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id dm8sm1427395edb.57.2020.10.29.05.20.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 29 Oct 2020 05:20:49 -0700 (PDT)
+Subject: Re: [PULL 00/30] nvme emulation patches for 5.2
+To: Klaus Jensen <its@irrelevant.dk>, Peter Maydell <peter.maydell@linaro.org>
+References: <20201027104932.558087-1-its@irrelevant.dk>
+ <CAFEAcA8EcEfaFZYUicbL5ShA5y5sTP7hmNNX5Ot=3ZyAGnV81A@mail.gmail.com>
+ <20201029115254.GA777050@apples.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1cd6447c-66f2-df28-a3ce-94456a17fcf4@redhat.com>
+Date: Thu, 29 Oct 2020 13:20:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <20201027151400.GA138065@stefanha-x1.localdomain>
-In-Reply-To: <20201027151400.GA138065@stefanha-x1.localdomain>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 29 Oct 2020 12:08:37 +0000
-Message-ID: <CAJSP0QWrmNN1Ci-M-4WDFZBOGHyeZvF71utg0w2ajCbOLtynJw@mail.gmail.com>
-Subject: Re: Out-of-Process Device Emulation session at KVM Forum 2020
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::62f;
- envelope-from=stefanha@gmail.com; helo=mail-pl1-x62f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20201029115254.GA777050@apples.localdomain>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 00:47:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.261, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,80 +119,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- "mst@redhat.com" <mtsirkin@redhat.com>,
- Janosch Frank <frankja@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
- Kirti Wankhede <kwankhede@nvidia.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Yan Vugenfirer <yan@daynix.com>,
- Jag Raman <jag.raman@oracle.com>, Anup Patel <anup@brainfault.org>,
- Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Roman Kagan <rkagan@virtuozzo.com>, Felipe Franciosi <felipe@nutanix.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Jens Freimann <jfreimann@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Kashyap Chamarthy <kchamart@redhat.com>,
- Darren Kenny <darren.kenny@oracle.com>, Liran Alon <liran.alon@oracle.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
- Halil Pasic <pasic@linux.vnet.ibm.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>, fam <fam@euphon.net>
+Cc: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Here are notes from the session:
+On 10/29/20 12:52 PM, Klaus Jensen wrote:
+> On Oct 29 11:39, Peter Maydell wrote:
+>> On Tue, 27 Oct 2020 at 10:49, Klaus Jensen <its@irrelevant.dk> wrote:
+>>>
+>>> From: Klaus Jensen <k.jensen@samsung.com>
+>>>
+>>> Hi Peter,
+>>>
+>>> The following changes since commit 1dc887329a10903940501b43e8c0cc67af7c06d5:
+>>>
+>>>   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/sd-next-20201026' into staging (2020-10-26 17:19:26 +0000)
+>>>
+>>> are available in the Git repository at:
+>>>
+>>>   git://git.infradead.org/qemu-nvme.git tags/nvme-next-pull-request
+>>>
+>>> for you to fetch changes up to 843c8f91a7ad63f8f3e4e564d3f41f3d030ab8a9:
+>>>
+>>>   hw/block/nvme: fix queue identifer validation (2020-10-27 11:29:25 +0100)
+>>>
+>>> ----------------------------------------------------------------
+>>> nvme emulation patches for 5.2
+>>>
+>>>   - lots of cleanups
+>>>   - add support for scatter/gather lists
+>>>   - add support for multiple namespaces (adds new nvme-ns device)
+>>>   - change default pci vendor/device id
+>>>   - add support for per-namespace smart log
+>>
+>> Hi. This tag appears to have been signed with a GPG key
+>> which isn't one that's been used before for an nvme pullreq
+>> and which isn't on the public GPG servers...
+>>
+> 
+> Uhm. Keith, can we coordinate a keysigning?
+> 
+> Would a signature by Keith on my key be acceptable to you Peter? That
+> way Keith doesn't have to create a new tag and bomb the list again.
 
-protocol stability:
-    * vhost-user already exists for existing third-party applications
-    * vfio-user is more general but will take more time to develop
-    * libvfio-user can be provided to allow device implementations
+Although list bombing isn't really a problem, if you don't modify
+the patches, then you can simply post the cover (as v2) without
+the patches.
 
-management:
-    * Should QEMU launch device emulation processes?
-        * Nicer user experience
-        * Technical blockers: forking, hotplug, security is hard once
-QEMU has started running
-        * Probably requires a new process model with a long-running
-QEMU management process proxying QMP requests to the emulator process
+You can also get your key signed and ask Peter to retry your tag,
+or push a different tag and ask again, replying to this cover.
 
-migration:
-    * dbus-vmstate
-    * VFIO live migration ioctls
-        * Source device can continue if migration fails
-        * Opaque blobs are transferred to destination, destination can
-fail migration if it decides the blobs are incompatible
-        * How does the VMM share the migration data region with the
-device emulation process?
-            * The vfio-user protocol can trap or mmap
-    * device versioning (like versioned machine types) needed to pin
-the guest-visible device ABI
-    * Felipe will investigate live migration
+Regards,
 
-reconnection:
-    * How to support reconnection?
-        * QEMU has relatively little state of a vfio-user device
-        * vhost-user has more state so it's a little easier to
-reconnect or migrate
-    * Build in reconnection and live migration from the start to avoid
-difficulties in the future
-    * Relationship between migration and reconnection?
-        * VFIO has a mechanism for saving/loading device state
-        * Lots of different reconnection cases that need to be thought through
+Phil.
 
-security & sandboxing:
-    * Goal: make it easy to lock down the process so developers don't
-need to reinvent sandboxing
-    * minijail
-        * in-process
-    * firecracker jailer
-    * bubblewrap
-        * launcher tool
-    * systemd-run
-        * launcher tool
 
