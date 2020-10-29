@@ -2,95 +2,87 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD177C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 16:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A1DFC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 16:34:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC9CF20756
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 16:16:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BA4E20790
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 16:34:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="szutzjLb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC9CF20756
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faOx57Y9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BA4E20790
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYAbL-0003Oo-Ci
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 12:16:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50726)
+	id 1kYAsv-0008AG-3H
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 12:34:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kYAaP-0002tz-BD
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 12:15:37 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43489)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kYAaN-0003jz-Mb
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 12:15:37 -0400
-Received: by mail-wr1-x444.google.com with SMTP id g12so3381838wrp.10
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 09:15:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dme-org.20150623.gappssmtp.com; s=20150623;
- h=to:cc:subject:in-reply-to:references:from:date:message-id
- :mime-version; bh=dh9IyI2p23eAOqUvdylXgZPVhbK41AleOweQvA3gGOg=;
- b=szutzjLbYanm32i4po/INbZSjaK5A83ci9rE9nr8F1zt9cAnJmbGIhqyY2eK7slpPM
- PViBgKQN9PW/q1BCvtQ/2GPMOb+bk4qI44KeI0yjrijKj4hFDYeB+XERB0NypE4TIocH
- FgtF6fa3ahYM1IzhYongqIE4iDsb7bHCiZpgiroMDIt5+j6lNV2q79W4VPOxiwFUZxXe
- h0ahd37l4pPonq/E6zfJo7O5DKrYwBWdKCS9l8JqbR1QOM+3bQakg9/sHn0j9SbfksiY
- qfw+Ev5zf+42e67q/xBHp2ZtDHtTsJmgGsRrJS2GRhmb11EFlCCN1iBkjOlaVK+l+vGx
- wH8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
- :message-id:mime-version;
- bh=dh9IyI2p23eAOqUvdylXgZPVhbK41AleOweQvA3gGOg=;
- b=S3iCJ7bWEs9q3+viMiDNjaXaKQg0zhzJbqI0IWVU5zRVZ9+1rCG/R/P+HsxRaXSTat
- v660EObPdPnGQq9FiM7QHDPbeurIa7tvxre8BZT1u1qsoIhAubnUY6PMdggU7HK2xLxw
- ArIqFjjx/dZ7fVBqzUo8WDAFtRU+AmenK+le6tYkE/8MztU8zDYigLIyI7vk9QcrvmxF
- veCXfE3M1XgErhrWxPUDYiftT2GhFu6BMbDdzDE0sFQ9Bl/raZQ3eYUkAd7Uwk750p9z
- 5GVnAv3tx2FGyDZkfeOgPyrRkB8e15KqcCnoDUSMVCoQnZ+gDlU22zQt0olfrYUqmB/P
- yU1A==
-X-Gm-Message-State: AOAM533LaN94/TcLL5FrP/LeHUmnSLWzgiaNpr+mWq9sKVEoFAO+EjW6
- iowVA6wz4AIYqyD7WelHiS8a3w==
-X-Google-Smtp-Source: ABdhPJwuwutHSxsc30x0GuYczxoM+ZaGccXfIiHr5yeA360ZWxccCoRRWNh3hVbOmJYbEABo5e52nw==
-X-Received: by 2002:adf:906b:: with SMTP id h98mr6532994wrh.310.1603988133155; 
- Thu, 29 Oct 2020 09:15:33 -0700 (PDT)
-Received: from disaster-area.hh.sledj.net
- (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
- [2001:8b0:bb71:7140:64::dea8])
- by smtp.gmail.com with ESMTPSA id v6sm6341077wrp.69.2020.10.29.09.15.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Oct 2020 09:15:32 -0700 (PDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 9182287a;
- Thu, 29 Oct 2020 16:15:31 +0000 (UTC)
-To: Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: Out-of-Process Device Emulation session at KVM Forum 2020
-In-Reply-To: <c4e5b631-1607-a0ec-ee88-6c5a9493e3de@redhat.com>
-References: <20201027151400.GA138065@stefanha-x1.localdomain>
- <CAJSP0QWrmNN1Ci-M-4WDFZBOGHyeZvF71utg0w2ajCbOLtynJw@mail.gmail.com>
- <c4e5b631-1607-a0ec-ee88-6c5a9493e3de@redhat.com>
-X-HGTTG: vroomfondel
-From: David Edmondson <dme@dme.org>
-Date: Thu, 29 Oct 2020 16:15:30 +0000
-Message-ID: <cunr1ph3t5p.fsf@vroomfondel.hh.sledj.net>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kYArb-0007Lc-Go
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 12:33:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57608)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kYArY-0005yI-4E
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 12:33:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603989197;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=eNKSjOB3kDARAwA2I2QP1wRUB8+FZFhtiFn42dRy5ls=;
+ b=faOx57Y9OQ4oyb+ZPkZIBiEp93P2z4o2MttUoD/hnx4zWNevbdwQllLv8t31Uf1N7RF7Y1
+ vtiWVE108psvffVfk516kDx7zBs/RdH9epK7wvl3ng9hO6YcxMA0/Yfwh9xZL8kTqDW2Vb
+ wxkGK2e2/o1QbK6RKCoFz/O4bze74Bw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-390-HTyxAD-XMLiDenJh4VmZJw-1; Thu, 29 Oct 2020 12:33:15 -0400
+X-MC-Unique: HTyxAD-XMLiDenJh4VmZJw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D77C364084;
+ Thu, 29 Oct 2020 16:32:15 +0000 (UTC)
+Received: from redhat.com (ovpn-115-62.ams2.redhat.com [10.36.115.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D2ED655778;
+ Thu, 29 Oct 2020 16:30:50 +0000 (UTC)
+Date: Thu, 29 Oct 2020 16:30:48 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: Migrating to the gitlab issue tracker
+Message-ID: <20201029163048.GG27369@redhat.com>
+References: <bda4f471-8ed6-3832-29ac-279a6d3bb7cc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: neutral client-ip=2a00:1450:4864:20::444;
- envelope-from=dme@dme.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <bda4f471-8ed6-3832-29ac-279a6d3bb7cc@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 01:47:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,43 +95,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- "mst@redhat.com" <mtsirkin@redhat.com>,
- Janosch Frank <frankja@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
- Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Yan Vugenfirer <yan@daynix.com>, Jag Raman <jag.raman@oracle.com>,
- Anup Patel <anup@brainfault.org>,
- Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Roman Kagan <rkagan@virtuozzo.com>, Felipe Franciosi <felipe@nutanix.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Jens Freimann <jfreimann@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Kashyap Chamarthy <kchamart@redhat.com>,
- Darren Kenny <darren.kenny@oracle.com>, Liran Alon <liran.alon@oracle.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Jeff Cody <codyprime@gmail.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Klaus Jensen <its@irrelevant.dk>, Alberto Garcia <berto@igalia.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Ben Warren <ben@skyportsystems.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Kamil Rytarowski <kamil@netbsd.org>,
+ =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Laszlo Ersek <lersek@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Brad Smith <brad@comstyle.com>, Laurent Vivier <lvivier@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, Eduardo Habkost <ehabkost@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Beniamino Galvani <b.galvani@gmail.com>, Alexander Bulekov <alxndr@bu.edu>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
  Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
- Halil Pasic <pasic@linux.vnet.ibm.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>, fam <fam@euphon.net>
+ Aarushi Mehta <mehta.aaru20@gmail.com>, Richard Henderson <rth@twiddle.net>,
+ Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Ed Maste <emaste@freebsd.org>, Chris Wulff <crwulff@gmail.com>,
+ Laurent Vivier <laurent@vivier.eu>, Coiby Xu <Coiby.Xu@gmail.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Stefan Berger <stefanb@linux.ibm.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Anup Patel <anup.patel@wdc.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Thomas Huth <thuth@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ Su Hang <suhang16@mails.ucas.ac.cn>,
+ Alistair Francis <alistair.francis@wdc.com>, "Denis V. Lunev" <den@openvz.org>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>, Hannes Reinecke <hare@suse.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, Zhang Chen <chen.zhang@intel.com>,
+ Gonglei <arei.gonglei@huawei.com>, Radoslaw Biernacki <rad@semihalf.com>,
+ Liu Yuan <namei.unix@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Eric Farman <farman@linux.ibm.com>, Corey Minyard <minyard@acm.org>,
+ Stefan Weil <sw@weilnetz.de>, Julia Suvorova <jusual@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Cameron Esfahani <dirty@apple.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, Jan Kiszka <jan.kiszka@web.de>,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Stafford Horne <shorne@gmail.com>, Paul Burton <paulburton@kernel.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, Cornelia Huck <cohuck@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Tyrone Ting <kfting@nuvoton.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ Michael Rolnik <mrolnik@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Paul Durrant <paul@xen.org>,
+ Anthony Green <green@moxielogic.com>, Bin Meng <bin.meng@windriver.com>,
+ Peter Xu <peterx@redhat.com>, Colin Xu <colin.xu@intel.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Guan Xuetao <gxt@mprc.pku.edu.cn>, Ari Sundholm <ari@tuxera.com>,
+ Rob Herring <robh@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Antony Pavlov <antonynpavlov@gmail.com>, Jason Dillaman <dillaman@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, Sergio Lopez <slp@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>, Cleber Rosa <crosa@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Eduardo Otubo <otubo@redhat.com>,
+ Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+ "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Pavel Pisa <pisa@cmp.felk.cvut.cz>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Li Zhijian <lizhijian@cn.fujitsu.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Vincenzo Maffione <v.maffione@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ Jiri Slaby <jslaby@suse.cz>, Peter Chubb <peter.chubb@nicta.com.au>,
+ Marek Vasut <marex@denx.de>, Jia Liu <proljc@gmail.com>,
+ Sven Schnelle <svens@stackframe.org>,
+ Havard Skinnemoen <hskinnemoen@google.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Vikram Garhwal <fnu.vikram@xilinx.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, David Gibson <david@gibson.dropbear.id.au>,
+ Tony Krowiak <akrowiak@linux.ibm.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, Eric Auger <eric.auger@redhat.com>,
+ Thomas Huth <huth@tuxfamily.org>, Wen Congyang <wencongyang2@huawei.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Bin Meng <bmeng.cn@gmail.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thursday, 2020-10-29 at 21:02:05 +08, Jason Wang wrote:
+On Thu, Oct 29, 2020 at 12:01:27PM -0400, John Snow wrote:
+> If you're in the CC list, it's because you are listed in MAINTAINERS.
+> 
+> Paolo's QEMU keynote this morning mentioned the possible use of the Gitlab
+> issue tracker instead of using Launchpad.
+> 
+> I'm quite fond of the gitlab issue tracker, I think it works quite well and
+> it has pretty good and uncomplicated API access to it in order to customize
+> your workflow if you'd really like to.
+> 
+> In experimenting with my mirror on gitlab though, I was unable to find a way
+> to configure it to send issue tracker notifications to the email list. A
+> move to gitlab would likely mean, then:
+> 
+> 1. The cessation of (automatic) issue tracker mails to the list
+> 2. The loss of the ability to update the issue tracker by replying to said
+> emails
+> 3. Anyone listed in MAINTAINERS would be expected to have a gitlab account
+> in order to interact with the issue tracker.
+> 
+> However, once you have a gitlab account, you DO gain the ability to receive
+> emails for issues; possibly only those tagged with labels that you cared
+> about -- giving a nice filtering mechanism to receive only bugs you care
+> about.
 
-> 2) Did qemu even try to migrate opaque blobs before? It's probably a bad 
-> design of migration protocol as well.
+The other thing gained by having a gitlab account is that you can
+create a fork of QEMU, and push subsystem trees to the fork. This will
+run a load of CI jobs enabling subsystem maintainer to catch many build
+problems before sending an email PULL to Peter. This will make it more
+likely the PULL will get merged first time without problems, and reduce
+the load on Peter letting him do more productive stuff than finding build
+failures.
 
-The TPM emulator backend migrates blobs that are only understood by
-swtpm.
+I think we should have an expectation that all PULLs have undergone
+GitLab CI testing before being emailed to the list.
 
-dme.
+NB, GitLab CI doesn't cover every platform combo - there is also
+Cirrus CI and Travis. Maintainer can optionally setup accounts on
+those too, but I don't think we should seek to require that as it
+starts to get a bit more conplex to keep everything sane. Just
+focusing on GitLab CI for subsystem maintainers would be a big
+enough win on its own I expect.
+
+> Gitlab also does support individual accounts updating issues using a
+> generated personalized email address, so if the email workflow is crucial to
+> you, it is still available.
+> 
+> I'm for it, or at least for beginning a pilot program where we experiment
+> with the idea for interested parties. I wanted to send up a trial balloon to
+> see how we were feeling about this.
+
+The other benefit with using GitLab issues instead of Launchpad is
+auto-closing based on comments. A commit message can include a line:
+
+  Closes https://gitlab.com/qemu-project/qemu/-/issues/NNN
+
+When that git commit gets merged to git master in a PULL by Peter, the
+GitLab issue will be automatically closed, and it will cross-link to
+the commit.
+
+This will eliminate the manual actions that our Launchpad Janitor(s) do
+today to close old issues that have been fixed, improving the signal/noise
+ratio.
+
+Regards,
+Daniel
 -- 
-She's as sweet as Tupelo honey, she's an angel of the first degree.
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
