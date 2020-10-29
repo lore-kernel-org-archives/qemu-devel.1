@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD948C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:28:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 661BDC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:30:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A71C20729
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:28:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FEFB20729
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:30:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GVTOMFMQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A71C20729
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JEVWJE9+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FEFB20729
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYGPW-00030r-3I
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 18:28:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42942)
+	id 1kYGR3-00048L-Jf
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 18:30:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYG1h-0003we-TQ
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:04:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27882)
+ id 1kYG1x-0003yQ-61
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:04:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24640)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYG1b-0006fX-SS
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:04:09 -0400
+ id 1kYG1f-0006gE-6Z
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:04:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604009042;
+ s=mimecast20190719; t=1604009046;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TY3hhWOxXf4gzliy28PYdxe6IxkZamp50gu0DtVbhdQ=;
- b=GVTOMFMQMYJOcygmwYj2S2oQxGDHBxMmhEbE7GKXh6QfN/k2Mx6U1qu+FEZqS508Y/XQ08
- LLpyk15MndsPtztZVsDosYrzxAgi9q4ErkfHjRcIUPRFMUIT8uDIVxVNgcmu7EMVRpYt11
- gTdrmm7J4wN0eyX4Dv8Gb5sQj1WJGwc=
+ bh=oEYbP5Fufv/2Pc0hBcb52f+uJ8RaCQiISEAH9HcQPW4=;
+ b=JEVWJE9+fgRjAdlNZrBruOGap6+vwlOnxLolgvebnAKYj0aHxZiRsXlrrWBN1hQL7UJVoK
+ WF+H9BOGpGwAH1D39434BUxJlH6ZpBFbqASk975uoIbjTcidvIN8m7cVFQJHchp0LX7ah7
+ 4ZymazMvJCYS0s7VED/dNJkxbzovK38=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-qv9bIFjzNU-6VbrIZ6JsfQ-1; Thu, 29 Oct 2020 18:04:00 -0400
-X-MC-Unique: qv9bIFjzNU-6VbrIZ6JsfQ-1
+ us-mta-171-7n55JuXOMGacp3gh8NUOdQ-1; Thu, 29 Oct 2020 18:04:04 -0400
+X-MC-Unique: 7n55JuXOMGacp3gh8NUOdQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4DE09CC02
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 22:03:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51BF085C706
+ for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 22:04:03 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 70BC86EF68;
- Thu, 29 Oct 2020 22:03:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 123E26EF68;
+ Thu, 29 Oct 2020 22:04:02 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 33/36] tests: Use static properties at check-qom-proplist test
- case
-Date: Thu, 29 Oct 2020 18:02:43 -0400
-Message-Id: <20201029220246.472693-34-ehabkost@redhat.com>
+Subject: [PATCH 36/36] qom: Include static property API reference in
+ documentation
+Date: Thu, 29 Oct 2020 18:02:46 -0400
+Message-Id: <20201029220246.472693-37-ehabkost@redhat.com>
 In-Reply-To: <20201029220246.472693-1-ehabkost@redhat.com>
 References: <20201029220246.472693-1-ehabkost@redhat.com>
 MIME-Version: 1.0
@@ -71,18 +71,18 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 01:47:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 00:47:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,125 +104,267 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use static properties for the bool and string properties used at
-check-qom-proplist.
+Add new doc comments and reformat the existing ones,
+and include the static-properties.h API reference in
+docs/devel/qom.rst.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Daniel P. Berrangé" <berrange@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org
----
- tests/check-qom-proplist.c | 61 +++++---------------------------------
- 1 file changed, 8 insertions(+), 53 deletions(-)
+ docs/devel/qom.rst            |   6 ++
+ include/qom/static-property.h | 154 ++++++++++++++++++++++++++++++++--
+ 2 files changed, 151 insertions(+), 9 deletions(-)
 
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index 1b76581980..94ad6631c0 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -26,6 +26,8 @@
- #include "qemu/option.h"
- #include "qemu/config-file.h"
- #include "qom/object_interfaces.h"
-+#include "qom/static-property.h"
-+#include "qom/static-property-internal.h"
+diff --git a/docs/devel/qom.rst b/docs/devel/qom.rst
+index 42d0dc4f4d..0989b4e690 100644
+--- a/docs/devel/qom.rst
++++ b/docs/devel/qom.rst
+@@ -379,3 +379,9 @@ API Reference
+ -------------
  
+ .. kernel-doc:: include/qom/object.h
++
++
++Static Property API Reference
++-----------------------------
++
++.. kernel-doc:: include/qom/static-property.h
+diff --git a/include/qom/static-property.h b/include/qom/static-property.h
+index 779918c947..8339700818 100644
+--- a/include/qom/static-property.h
++++ b/include/qom/static-property.h
+@@ -8,20 +8,31 @@
+ #include "qapi/util.h"
  
- #define TYPE_DUMMY "qemu-dummy"
-@@ -68,24 +70,6 @@ struct DummyObjectClass {
- };
+ /**
+- * Property:
+- * @set_default: true if the default value should be set from @defval,
+- *    in which case @info->set_default_value must not be NULL
+- *    (if false then no default value is set by the property system
+- *     and the field retains whatever value it was given by instance_init).
+- * @defval: default value for the property. This is used only if @set_default
+- *     is true.
++ * struct Property: Definition of a static Property
++ *
++ * #Property structs should be always initialized using the
++ * ``DEFINE_PROP`` family of macros.
+  */
+ struct Property {
++    /* private: */
+     const char   *name;
+     const PropertyInfo *info;
+     ptrdiff_t    offset;
+     uint8_t      bitnr;
++    /**
++     *  @set_default: true if the default value should be set
++     *                from @defval, in which case
++     *                @info->set_default_value must not be NULL
++     *                (if false then no default value is set by
++     *                the property system and the field retains
++     *                whatever value it was given by
++     *                instance_init).
++     */
+     bool         set_default;
++    /**
++     * @defval: default value for the property. This is used only
++     *          if @set_default is true.
++     */
+     union {
+         int64_t i;
+         uint64_t u;
+@@ -110,6 +121,14 @@ extern const PropertyInfo prop_info_link;
+ #define DEFINE_PROP_SIGNED_NODEFAULT(_name, _state, _field, _prop, _type) \
+     DEFINE_PROP(_name, _state, _field, _prop, _type)
  
++/**
++ * DEFINE_PROP_BIT: Define bit property in uint32_t field
++ * @_name: name of the property
++ * @_state: name of the object state structure type
++ * @_field: name of ``uint32_t`` field in @_state
++ * @_bit: bit offset in @_field
++ * @_defval: default value for bit
++ */
+ #define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval)   \
+     DEFINE_PROP(_name, _state, _field, prop_info_bit, uint32_t, \
+                 .bitnr       = (_bit),                          \
+@@ -124,12 +143,27 @@ extern const PropertyInfo prop_info_link;
+ #define DEFINE_PROP_UNSIGNED_NODEFAULT(_name, _state, _field, _prop, _type) \
+     DEFINE_PROP(_name, _state, _field, _prop, _type)
  
--static void dummy_set_bv(Object *obj,
--                         bool value,
--                         Error **errp)
--{
--    DummyObject *dobj = DUMMY_OBJECT(obj);
--
--    dobj->bv = value;
--}
--
--static bool dummy_get_bv(Object *obj,
--                         Error **errp)
--{
--    DummyObject *dobj = DUMMY_OBJECT(obj);
--
--    return dobj->bv;
--}
--
--
- static void dummy_set_av(Object *obj,
-                          int value,
-                          Error **errp)
-@@ -103,39 +87,20 @@ static int dummy_get_av(Object *obj,
-     return dobj->av;
- }
++/**
++ * DEFINE_PROP_BIT64: Define bit property in uint64_t field
++ * @_name: name of the property
++ * @_state: name of the object state structure type
++ * @_field: name of ``uint64_t`` field in @_state
++ * @_bit: bit offset in @_field
++ * @_defval: default value for bit
++ */
+ #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval)   \
+     DEFINE_PROP(_name, _state, _field, prop_info_bit64, uint64_t, \
+                 .bitnr    = (_bit),                               \
+                 .set_default = true,                              \
+                 .defval.u  = (bool)_defval)
  
-+static Property bv_prop =
-+    DEFINE_PROP_BOOL("bv", DummyObject, bv, false);
++/**
++ * DEFINE_PROP_BOOL:
++ * @_name: name of the property
++ * @_state: name of the object state structure type
++ * @_field: name of ``bool`` field in @_state
++ * @_defval: default value of property
++ */
+ #define DEFINE_PROP_BOOL(_name, _state, _field, _defval)     \
+     DEFINE_PROP(_name, _state, _field, prop_info_bool, bool, \
+                 .set_default = true,                         \
+@@ -142,9 +176,10 @@ extern const PropertyInfo prop_info_link;
+  * @_name: name of the array
+  * @_state: name of the device state structure type
+  * @_field: uint32_t field in @_state to hold the array length
+- * @_arrayfield: field in @_state (of type '@_arraytype *') which
++ * @_arrayfield: field in @_state (of type ``_arraytype *``) which
+  *               will point to the array
+- * @_arrayprop: PropertyInfo defining what property the array elements have
++ * @_arrayprop: #PropertyInfo variable defining property type of
++ *              array elements
+  * @_arraytype: C type of the array elements
+  *
+  * Define device properties for a variable-length array _name.  A
+@@ -171,36 +206,137 @@ extern const PropertyInfo prop_info_link;
+                 .arrayfieldsize = sizeof(_arraytype),          \
+                 .arrayoffset = offsetof(_state, _arrayfield))
  
--static void dummy_set_sv(Object *obj,
--                         const char *value,
--                         Error **errp)
--{
--    DummyObject *dobj = DUMMY_OBJECT(obj);
--
--    g_free(dobj->sv);
--    dobj->sv = g_strdup(value);
--}
--
--static char *dummy_get_sv(Object *obj,
--                          Error **errp)
--{
--    DummyObject *dobj = DUMMY_OBJECT(obj);
--
--    return g_strdup(dobj->sv);
--}
--
-+static Property sv_prop =
-+    DEFINE_PROP_STRING("sv", DummyObject, sv);
++/**
++ * DEFINE_PROP_LINK: Define object link property
++ * @_name: name of the property
++ * @_state: name of the object state structure type
++ * @_field: name of field in @_state holding the property value
++ * @_type: QOM type name of link target
++ * @_ptr_type: Type of field @_field in struct @_state
++ */
+ #define DEFINE_PROP_LINK(_name, _state, _field, _type, _ptr_type)     \
+     DEFINE_PROP(_name, _state, _field, prop_info_link, _ptr_type,     \
+                 .link_type  = _type)
  
- static void dummy_init(Object *obj)
- {
--    object_property_add_bool(obj, "bv",
--                             dummy_get_bv,
--                             dummy_set_bv);
-+    object_property_add_static(obj, &bv_prop, NULL);
- }
++/**
++ * DEFINE_PROP_UINT8: Define uint8 property
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``uint8_t`` field in @_s
++ * @_d: default value of property
++ */
+ #define DEFINE_PROP_UINT8(_n, _s, _f, _d)                       \
+     DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, prop_info_uint8, uint8_t)
++/**
++ * DEFINE_PROP_UINT16: Define uint16 property
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``uint16_t`` field in @_s
++ * @_d: default value of property
++ */
+ #define DEFINE_PROP_UINT16(_n, _s, _f, _d)                      \
+     DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, prop_info_uint16, uint16_t)
++/**
++ * DEFINE_PROP_UINT32: Define uint32 property
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``uint32_t`` field in @_s
++ * @_d: default value of property
++ */
+ #define DEFINE_PROP_UINT32(_n, _s, _f, _d)                      \
+     DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, prop_info_uint32, uint32_t)
++/**
++ * DEFINE_PROP_INT32: Define int32 property
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``int32_t`` field in @_s
++ * @_d: default value of property
++ */
+ #define DEFINE_PROP_INT32(_n, _s, _f, _d)                      \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, prop_info_int32, int32_t)
++/**
++ * DEFINE_PROP_UINT64: Define uint64 property
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``uint64_t`` field in @_s
++ * @_d: default value of property
++ */
+ #define DEFINE_PROP_UINT64(_n, _s, _f, _d)                      \
+     DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, prop_info_uint64, uint64_t)
++/**
++ * DEFINE_PROP_INT64: Define int64 property
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``int64_t`` field in @_s
++ * @_d: default value of property
++ */
+ #define DEFINE_PROP_INT64(_n, _s, _f, _d)                      \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, prop_info_int64, int64_t)
++/**
++ * DEFINE_PROP_SIZE: Define uint64 property
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``uint64_t`` field in @_s
++ * @_d: default value of property
++ */
+ #define DEFINE_PROP_SIZE(_n, _s, _f, _d)                       \
+     DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, prop_info_size, uint64_t)
++/**
++ * DEFINE_PROP_STRING:
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``char *`` field in @_state
++ */
+ #define DEFINE_PROP_STRING(_n, _s, _f)             \
+     DEFINE_PROP(_n, _s, _f, prop_info_string, char*)
++/**
++ * DEFINE_PROP_ON_OFF_AUTO: Define OnOffAuto property
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``OnOffAuto`` field in @_s
++ * @_d: default value of property
++ */
+ #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, prop_info_on_off_auto, OnOffAuto)
++/**
++ * DEFINE_PROP_SIZE32: Define uint32 property
++ * @_n: name of the property
++ * @_s: name of the object state structure type
++ * @_f: name of ``uint32_t`` field in @_s
++ * @_d: default value of property
++ */
+ #define DEFINE_PROP_SIZE32(_n, _s, _f, _d)                       \
+     DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, prop_info_size32, uint32_t)
++/**
++ * DEFINE_PROP_UUID: Define UUID property
++ * @_name: name of the property
++ * @_state: name of the object state structure type
++ * @_field: name of field in @_state holding the property value
++ *
++ * The @_f field in struct @_s must be of type ``QemuUUID``.
++ * The default value of the property will be "auto".
++ */
+ #define DEFINE_PROP_UUID(_name, _state, _field)                      \
+     DEFINE_PROP(_name, _state, _field, prop_info_uuid, QemuUUID,     \
+                 .set_default = true)
++/**
++ * DEFINE_PROP_UUID_NODEFAULT: Define UUID property with no default
++ * @_name: name of the property
++ * @_state: name of the object state structure type
++ * @_field: name of field in @_state holding the property value
++ *
++ * The @_f field in struct @_s must be of type ``QemuUUID``.
++ * No default value will be set for the property.
++ */
+ #define DEFINE_PROP_UUID_NODEFAULT(_name, _state, _field) \
+     DEFINE_PROP(_name, _state, _field, prop_info_uuid, QemuUUID)
  
--
- static void dummy_class_init(ObjectClass *cls, void *data)
- {
--    object_class_property_add_str(cls, "sv",
--                                  dummy_get_sv,
--                                  dummy_set_sv);
-+    object_class_property_add_static(cls, &sv_prop, NULL);
-     object_class_property_add_enum(cls, "av",
-                                    "DummyAnimal",
-                                    &dummy_animal_map,
-@@ -143,21 +108,11 @@ static void dummy_class_init(ObjectClass *cls, void *data)
-                                    dummy_set_av);
- }
++/**
++ * DEFINE_PROP_END_OF_LIST: Mark end of property array
++ *
++ * This must be the last entry in #Property arrays when calling
++ * object_class_add_static_props().
++ */
+ #define DEFINE_PROP_END_OF_LIST()               \
+     {}
  
--
--static void dummy_finalize(Object *obj)
--{
--    DummyObject *dobj = DUMMY_OBJECT(obj);
--
--    g_free(dobj->sv);
--}
--
--
- static const TypeInfo dummy_info = {
-     .name          = TYPE_DUMMY,
-     .parent        = TYPE_OBJECT,
-     .instance_size = sizeof(DummyObject),
-     .instance_init = dummy_init,
--    .instance_finalize = dummy_finalize,
-     .class_size = sizeof(DummyObjectClass),
-     .class_init = dummy_class_init,
-     .interfaces = (InterfaceInfo[]) {
 -- 
 2.28.0
 
