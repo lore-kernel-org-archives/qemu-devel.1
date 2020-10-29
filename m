@@ -7,91 +7,98 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3FAEC4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 18:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD60C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 18:09:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3FE720782
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 18:07:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 376E7207DE
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 18:09:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3eR7UzY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3FE720782
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KiqM49MQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 376E7207DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYCKY-0002JM-Sc
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 14:07:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49090)
+	id 1kYCMK-0003Xu-RL
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 14:09:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kYCJi-0001hG-B9
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 14:06:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48154)
+ id 1kYCL0-0002uo-CX
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 14:07:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37682)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kYCJg-0001tQ-Km
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 14:06:30 -0400
+ id 1kYCKy-00021P-KM
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 14:07:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603994787;
+ s=mimecast20190719; t=1603994867;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9LJrr3M7VAGBUcrTXSCeZnIvU4lQPGh4U6f7W0NUluo=;
- b=O3eR7UzYt409ns8DdZK8vYBuIvMXr99Jbm8Nb9zfTVLc9m/rlAOXsBtGuxAWw6yMZRLNUN
- j0cdXZEcAg998jrOame2/z6Jn1CQRglkHu9lCQiTkM6VO4G5fSBFc+JYR4n5uc1JaxmMqB
- dkQGCrdZJUXzuRnVcZpsCJjBoyRKY8A=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-ytj1B8p_Oj6S4S6abLQ9xw-1; Thu, 29 Oct 2020 14:06:26 -0400
-X-MC-Unique: ytj1B8p_Oj6S4S6abLQ9xw-1
-Received: by mail-wr1-f71.google.com with SMTP id m4so1585001wrq.23
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 11:06:25 -0700 (PDT)
+ bh=2EldzP6MA20E0NkfiPx3Z5jBPQ+1SUR+1/lXTYGBky4=;
+ b=KiqM49MQs7CxObedMKki6Jtz2DvOv0gpPXD/O25kxaM1rhxTQhyBl73bCecs/jlFYMtfN/
+ 7ux6adSw1pZ/4mQoI9Pci1Xk/ilzZt7SULqaSlv+0TjakuNYW4TyHaBMgNKrAo+wGMKuif
+ vSluac2ahBPArCLN4SA3MmBeTHEBAtM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-312-Uh7N336FP5uadAPIr9XMgA-1; Thu, 29 Oct 2020 14:07:37 -0400
+X-MC-Unique: Uh7N336FP5uadAPIr9XMgA-1
+Received: by mail-wr1-f69.google.com with SMTP id t14so1617675wrs.2
+ for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 11:07:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=9LJrr3M7VAGBUcrTXSCeZnIvU4lQPGh4U6f7W0NUluo=;
- b=Vn66UBlUnBkHoqgRwymSPB6NZbdtEQLxI2B31PAALjNhlysySMHqBncIJeF7QGDztj
- LusLilde2Rkm41RLRze0067JH1IVKyGH0ihj0FLYCN6z0fkp3xJz/nZFYU6Q3j97Olt0
- qlA+4uuEd2K7tKFZdfsBTrRaeK61uGPI1eukyurqFfEkZh8AFsAW4dPMbs+u5yRdebk6
- tTh3/BujID9MoiHCo0OrrLjKMrRaiuZ/PcCX8fZ748l6FQDI3Cv32BpRqzEudGuhsKT2
- a2y5SxiNKuA3uziD6PscIT//IjKFTWnLb/tGPj7N5IR6shkkMfyVGIIfys2HkiQGJGJf
- 4g0Q==
-X-Gm-Message-State: AOAM533xIq6VKIP+TpjkH9PmixiwFMkbKLpFexe0Pp1DU0QC7io2NeuC
- 2kBQvCNAQNZAuvTCrO2FUem7UJvXsd70ygqDK08eMpORRVzdjx2pe3fzhY5iu2RCoSFlIKd/KgH
- qQMtjfollIovZx20=
-X-Received: by 2002:a1c:7dc5:: with SMTP id y188mr363017wmc.37.1603994781777; 
- Thu, 29 Oct 2020 11:06:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwG1tUL53cznBT25V6Hci1HBpo72G1+ER6iXQFPyNoGQPMu21hPCd0R3IN/u6p8HOJRRPKxXA==
-X-Received: by 2002:a1c:7dc5:: with SMTP id y188mr362996wmc.37.1603994781587; 
- Thu, 29 Oct 2020 11:06:21 -0700 (PDT)
+ bh=2EldzP6MA20E0NkfiPx3Z5jBPQ+1SUR+1/lXTYGBky4=;
+ b=sYOHB1DxIcRdsV74vPXJRC8HUqrM7rdZF7Edljz4Nc5Seen+xkRJIWWWPAcS3J1b5r
+ axp3sinp8OrEF3TgQMBK9q99nBbvLkduISJpBgByb4dUTkr78fFYQoOAWMZ1mcxkB/7w
+ lMnV0KmhFNlrGVcvZ+mgJti8rKLSNN1pDg6NkwYrxSmSCigfzG+7FxBTCdi0pv7cQ7OV
+ qXWDDM2rk/qu4dNFczEW0fVd/P2hC0g6+3bmCb2h9iFfcstXu3U09efSk8JNjTNPI6Yt
+ HEBsQLSqBqw7TOBHuFJECJNVt+MUitK7kb2tbvYlzMXPL6+Wbj0VwV5kd9QjooQbHei4
+ kKTQ==
+X-Gm-Message-State: AOAM532BPtfWU9LxTRkCNkK53VfpdFvmRj7aeK+0URCanLKqiDDwO1jB
+ 6Ojkc4ZcwXyUu3yuqa3/Lh+BEayZ+g0rd4++TsY20sjk4ehrr5ipVti2fAJ3+bK7DEKPD139u06
+ O47VoSh0WaF8cnj4=
+X-Received: by 2002:adf:a50e:: with SMTP id i14mr7276614wrb.121.1603994856517; 
+ Thu, 29 Oct 2020 11:07:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyaULE/3JYEUUEQqzw2cyJgkswW/IYuyC50111W8P7X/v4ZqcriRhtjjtBgKT91XyGFj1/egw==
+X-Received: by 2002:adf:a50e:: with SMTP id i14mr7276580wrb.121.1603994856266; 
+ Thu, 29 Oct 2020 11:07:36 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
  ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id t5sm7351363wrb.21.2020.10.29.11.06.20
+ by smtp.gmail.com with ESMTPSA id 71sm7028879wrm.20.2020.10.29.11.07.33
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 29 Oct 2020 11:06:20 -0700 (PDT)
-Subject: Re: [PATCH 00/11] sockets: Attempt to drain the abstract socket swamp
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20201029133833.3450220-1-armbru@redhat.com>
+ Thu, 29 Oct 2020 11:07:35 -0700 (PDT)
+Subject: Re: Out-of-Process Device Emulation session at KVM Forum 2020
+To: Kirti Wankhede <kwankhede@nvidia.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ David Edmondson <dme@dme.org>
+References: <20201027151400.GA138065@stefanha-x1.localdomain>
+ <CAJSP0QWrmNN1Ci-M-4WDFZBOGHyeZvF71utg0w2ajCbOLtynJw@mail.gmail.com>
+ <c4e5b631-1607-a0ec-ee88-6c5a9493e3de@redhat.com>
+ <cunr1ph3t5p.fsf@vroomfondel.hh.sledj.net>
+ <20201029164205.GH27369@redhat.com>
+ <f0e24955-db5a-7e97-b842-029d7adacc84@nvidia.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <07eb80c1-6d56-2bd4-c8be-90a34167ae91@redhat.com>
-Date: Thu, 29 Oct 2020 19:06:19 +0100
+Message-ID: <14102232-2121-607f-ae7c-40261be8df8a@redhat.com>
+Date: Thu, 29 Oct 2020 19:07:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201029133833.3450220-1-armbru@redhat.com>
+In-Reply-To: <f0e24955-db5a-7e97-b842-029d7adacc84@nvidia.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 01:47:28
@@ -116,35 +123,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, zxq_yx_007@163.com,
- kraxel@redhat.com, marcandre.lureau@redhat.com
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ John G Johnson <john.g.johnson@oracle.com>,
+ "mst@redhat.com" <mtsirkin@redhat.com>,
+ Janosch Frank <frankja@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Yan Vugenfirer <yan@daynix.com>, Jag Raman <jag.raman@oracle.com>,
+ Anup Patel <anup@brainfault.org>,
+ Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Roman Kagan <rkagan@virtuozzo.com>, Felipe Franciosi <felipe@nutanix.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Jens Freimann <jfreimann@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>,
+ Darren Kenny <darren.kenny@oracle.com>, Liran Alon <liran.alon@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ Halil Pasic <pasic@linux.vnet.ibm.com>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>, fam <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/10/20 14:38, Markus Armbruster wrote:
-> In my opinion, the Linux-specific abstract UNIX domain socket feature
-> introduced in 5.1 should have been rejected.  The feature is niche,
-> the interface clumsy, the implementation buggy and incomplete, and the
-> test coverage insufficient.  Review fail.
+On 29/10/20 18:47, Kirti Wankhede wrote:
 > 
-> Fixing the parts we can still fix now is regrettably expensive.  If I
-> had the power to decide, I'd unceremoniously revert the feature,
-> compatibility to 5.1 be damned.  But I don't, so here we go.
+> On 10/29/2020 10:12 PM, Daniel P. Berrangé wrote:
+>> On Thu, Oct 29, 2020 at 04:15:30PM +0000, David Edmondson wrote:
+>>> On Thursday, 2020-10-29 at 21:02:05 +08, Jason Wang wrote:
+>>>
+>>>> 2) Did qemu even try to migrate opaque blobs before? It's probably a
+>>>> bad
+>>>> design of migration protocol as well.
+>>>
+>>> The TPM emulator backend migrates blobs that are only understood by
+>>> swtpm.
+>>
+>> The separate slirp-helper net backend does the same too IIUC
 > 
-> I'm not sure this set of fixes is complete.  However, I already spent
-> too much time on this, so out it goes.  Lightly tested.
-> 
-> Regardless, I *will* make time for ripping the feature out if we
-> decide to do that.  Quick & easy way to avoid reviewing this series
-> *hint* *hint*.
+> When sys mem pages are marked dirty and content is copied to
+> destination, content of sys mem is also opaque to QEMU.
 
-Apart from the nits pointed out in patch 7 (commit message) and 8 (code),
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Thanks, and don't forget to fix the hole that your head has left in the
-wall.
+Non-opaque RAM might be a bit too much to expect, though. :)
 
 Paolo
 
