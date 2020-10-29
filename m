@@ -2,85 +2,84 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D95C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:30:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D30E1C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:32:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E175C2151B
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:30:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22A1B206A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:32:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Ynlro3m+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E175C2151B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PyvNmtmh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22A1B206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY8ww-0007rE-QE
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 10:30:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51600)
+	id 1kY8yV-0001nT-Vy
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 10:32:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=56447669b=alistair.francis@wdc.com>)
- id 1kY8sH-0001hl-N5
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:57 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42885)
+ id 1kY8ry-0001X1-1w
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:38 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42880)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=56447669b=alistair.francis@wdc.com>)
- id 1kY8sA-0005fQ-Ce
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:55 -0400
+ id 1kY8rv-0005fB-Vb
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603981550; x=1635517550;
+ t=1603981535; x=1635517535;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=2GIx+t0Rp+fA0ib/C5fOILwZ9azhuSUJ4wg+kNar0QY=;
- b=Ynlro3m+ShmGRP/QgqkVXQtzNYb7QS6bMxMtuD8dv+V9KzfUAo4XlgPA
- aahD/dnLZtI3omJHNSyVABOJQKQCmmU0GEW6qW9FWZYgw9pFwDbtL60yx
- PbIy+LSnplyi4HZssfMatTWIIO4add7dQnqCcArj7Z+dEE+rLNOXk4m96
- DGsQG6nmGbP2Ym/bCUtPFEmGh+bHNnP4Rd9o2PNp3SP1cI/HHMWnlVU4E
- YVhH6lk7w8QNZUKs1kU9p1KYstbO6arCLwyvur2fXtyDUHo13UNX8tAod
- Yy74/zX16e0iBJSgXt/AFVD6SiHZ9GpKSZlp4P+EvrDOE08UuuNnkIMaR g==;
-IronPort-SDR: 5H4JYIbucQNKRRqr8uzuWMvQLr6xXbUmZLAXK/1JEtvT9t9ZK+TOqA9sY3hPiPHESO7Fqs+HA9
- ABD7HIX1A8/Sco1zHIhXwZ2LuCgTElEGLR/sPzKmKaaRai96ilEU0torUpr6WmrxbpVH9zBzYP
- uXufh+rqQe1FfeM4NkH/h8xhiaNDNArJtbb2jzuCO5x3Ai7hK8F+xzfpKBsPcWWXO+bzbFI7XY
- mtJz8Z8LacClHezqCd9+xGLupu95TcIY9rkkKH7UCwck6ofDH3jnBdbL4+bp+LwJEmpPl1rsDK
- HQ0=
-X-IronPort-AV: E=Sophos;i="5.77,430,1596470400"; d="scan'208";a="151317889"
+ bh=Jn6EIm9hdrR24DW8Li1I2eFglThg87rXwX+el8u4/zc=;
+ b=PyvNmtmh6YWvh5ZgtVIYPOd1Kya8r6SonM3qb70rDUkMmMkgrwae/gI0
+ HaVjv7q/873VFdK9dEv8d3yXBqQ8usvty+4kOa+FlE44YwkyZhMnmGt2p
+ fUn33Xsmi7IDXno8y2Cce9o2pMIccc6zi/eca1ac8w7vN3nUqR7vBTbRq
+ K/hSYMpAsQ0LCmoqzW/lp/vNQY6y1Z65r9Naf4ZeRjAKsYTwdQGWF/VFG
+ 7PS0DL8XrByq8Isz0FHiFn/N1qCgPRFq12jGAArb578hGg8n911XDwY/3
+ +VqwbrQvRYp1qKpyXeKyvhn601vgwPH2DPziEFj9Gjd5jGDf5Ybxj9O6Q A==;
+IronPort-SDR: dOaHI68T8EthOhuswjjxqOSG//v4aw04Af/L+UbpyIJKiXuruFGCAolxzAU6U2ATRUwEYu6L3H
+ htk+iw/1CIP8kagqK8QZ4kkdzaFvNOL0i5AFOfGv8cJriXAeDXbzhJluqbf3x3ZXoDMmzZv2dS
+ WGgF5NycIHKjlFHSWNNffIYMuWd+hiXc29ahUZEbHySjCtdYZaOCRzVZBDE5AhWPJQf80b4Cux
+ hKrxkwnh0NCO6HEXqwVU4FjWzXrMawHTHXjbZOkL0vv6cWnw593Eo6XpkFJunWpItI1VwsRzkW
+ 9gw=
+X-IronPort-AV: E=Sophos;i="5.77,430,1596470400"; d="scan'208";a="151317881"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 29 Oct 2020 22:25:28 +0800
-IronPort-SDR: rA6Ojv6AP0n/8hbH72DhiTNJBt3AACAJxN5P25/4HftVbjWkvQzIpWJil8vYO+HzASrI6uWqGa
- Zp7zEIbWIYEZFQXuUyGZMoZibc+ym2BOf3NY0203bxIf3OY39kVa0QEL1JBaa76dn7CedZ4Q+2
- We0/PbykOnQ/urgSlaIKCyLZbbPtZWWHHbgO/GZ/ovrf0pXfz4cffZhHMW/kd7r9YR9RgtMSNd
- U4RRWzoTSQ4iiZx+TiZfaXQqtL0lCSKmgLvJznyVnpfsqmfxwbisCyAkoZDM3966QpUZPLAfCr
- i9Q+RmOvFf3ykm+RdSxbJGf6
+ by ob1.hgst.iphmx.com with ESMTP; 29 Oct 2020 22:25:27 +0800
+IronPort-SDR: QNf8Ok7uLnstUeNogV3gNfpQTeTO18uTMXv9RVzPoWEkxp4y0O3K6lE847PGS9BAkiZJqLQFnU
+ ZNmnVqWZBU1YXBRhnVL7XfbesqaC0zx2iA/dDp5689y/QIAK6lgYdKxBcfV85/95bhADviWzzU
+ NabU17tBFahnfdNtlHVt7aYG8B1eNb5ZvwsRH41/YDhQsmpEXR92WpQJnN5yfrFV7gqxsKjgCL
+ bjYpHhzEFlu3QUVrgLAY4gc5LOdMd+dabxlm6zNV0xSo2wAUEc8VEfmgXTt6D7WKQqPv0athjZ
+ nb1DqYX/0Ri6dGh4CDUHdfPo
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Oct 2020 07:11:44 -0700
-IronPort-SDR: TKEONT9XzMA30PvXBAHMWMg2RyrMsunRJJUfXJ4up6Zz7NoRY3YEaqhrz9/60delWviMGhgoUM
- VMgD1pqMQvsh7mZiRQb8FfDN3AecuHtjUaXF2tHFvHiIsq6na2IHSgDT6ClbGJUkezPCfsn7B8
- 6pJAztyLOZ5DNDxpOkVFw8AvrNjffUGQR93vzssweJVgE6PxAw5+l6b//vIuMdivq8/YaZHxUE
- 7BdusxXKzFNwlif6i/4RaryncRcHg+s2Bs/BkWDI4QQz6wd6nEFP+GXUKPT3NmQnvrTO01+nDm
- kmI=
+ 29 Oct 2020 07:11:43 -0700
+IronPort-SDR: z7H7dGFhUWEt/6ep/iDU9Q8oZEcnuwHv2JqhSVjn5ELizf0LcmLxWJuNE8Vg66cooSloI+MMkC
+ aQ3Hf3dwImaeUmIi/RunA173qmV0kEVYPoxZSanwajYv49GiNmNV5abiMns/bWdaCwTD1ME8kS
+ p7FIXTCjHWGllfWRI4u9P7BrmY2/z+gVKZzdd0w+TR7YK03e4Art7ez0mYZxl1C4jnzDpn5dG0
+ HRP2cnD6xAZYq5+Bqn0OdGO0eYlZiV+VDrIkplRlXcOLSSr7QP21S3Wun1hptVVWIg8CXw57hu
+ DBk=
 WDCIronportException: Internal
 Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.60.131])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 07:25:30 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 07:25:28 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 11/18] hw/riscv: microchip_pfsoc: Connect DDR memory controller
- modules
-Date: Thu, 29 Oct 2020 07:13:51 -0700
-Message-Id: <20201029141358.3102636-12-alistair.francis@wdc.com>
+Subject: [PULL 07/18] target/riscv: Add V extension state description
+Date: Thu, 29 Oct 2020 07:13:47 -0700
+Message-Id: <20201029141358.3102636-8-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201029141358.3102636-1-alistair.francis@wdc.com>
 References: <20201029141358.3102636-1-alistair.francis@wdc.com>
@@ -110,120 +109,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Yifei Jiang <jiangyifei@huawei.com>, Yipeng Yin <yinyipeng1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+From: Yifei Jiang <jiangyifei@huawei.com>
 
-Connect DDR SGMII PHY module and CFG module to the PolarFire SoC.
+In the case of supporting V extension, add V extension description
+to vmstate_riscv_cpu.
 
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 1603863010-15807-4-git-send-email-bmeng.cn@gmail.com
+Message-id: 20201026115530.304-6-jiangyifei@huawei.com
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- include/hw/riscv/microchip_pfsoc.h |  5 +++++
- hw/riscv/microchip_pfsoc.c         | 18 ++++++++++++++++++
- hw/riscv/Kconfig                   |  1 +
- 3 files changed, 24 insertions(+)
+ target/riscv/machine.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-index 8bfc7e1a85..5b81e26241 100644
---- a/include/hw/riscv/microchip_pfsoc.h
-+++ b/include/hw/riscv/microchip_pfsoc.h
-@@ -24,6 +24,7 @@
+diff --git a/target/riscv/machine.c b/target/riscv/machine.c
+index ae60050898..44d4015bd6 100644
+--- a/target/riscv/machine.c
++++ b/target/riscv/machine.c
+@@ -76,6 +76,30 @@ static bool hyper_needed(void *opaque)
+     return riscv_has_ext(env, RVH);
+ }
  
- #include "hw/char/mchp_pfsoc_mmuart.h"
- #include "hw/dma/sifive_pdma.h"
-+#include "hw/misc/mchp_pfsoc_dmc.h"
- #include "hw/net/cadence_gem.h"
- #include "hw/sd/cadence_sdhci.h"
- 
-@@ -37,6 +38,8 @@ typedef struct MicrochipPFSoCState {
-     RISCVHartArrayState e_cpus;
-     RISCVHartArrayState u_cpus;
-     DeviceState *plic;
-+    MchpPfSoCDdrSgmiiPhyState ddr_sgmii_phy;
-+    MchpPfSoCDdrCfgState ddr_cfg;
-     MchpPfSoCMMUartState *serial0;
-     MchpPfSoCMMUartState *serial1;
-     MchpPfSoCMMUartState *serial2;
-@@ -82,7 +85,9 @@ enum {
-     MICROCHIP_PFSOC_MMUART0,
-     MICROCHIP_PFSOC_SYSREG,
-     MICROCHIP_PFSOC_MPUCFG,
-+    MICROCHIP_PFSOC_DDR_SGMII_PHY,
-     MICROCHIP_PFSOC_EMMC_SD,
-+    MICROCHIP_PFSOC_DDR_CFG,
-     MICROCHIP_PFSOC_MMUART1,
-     MICROCHIP_PFSOC_MMUART2,
-     MICROCHIP_PFSOC_MMUART3,
-diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-index 6aac8497fc..3c504f7c03 100644
---- a/hw/riscv/microchip_pfsoc.c
-+++ b/hw/riscv/microchip_pfsoc.c
-@@ -15,6 +15,7 @@
-  * 4) Cadence eMMC/SDHC controller and an SD card connected to it
-  * 5) SiFive Platform DMA (Direct Memory Access Controller)
-  * 6) GEM (Gigabit Ethernet MAC Controller)
-+ * 7) DMC (DDR Memory Controller)
-  *
-  * This board currently generates devicetree dynamically that indicates at least
-  * two harts and up to five harts.
-@@ -103,7 +104,9 @@ static const struct MemmapEntry {
-     [MICROCHIP_PFSOC_MMUART0] =         { 0x20000000,     0x1000 },
-     [MICROCHIP_PFSOC_SYSREG] =          { 0x20002000,     0x2000 },
-     [MICROCHIP_PFSOC_MPUCFG] =          { 0x20005000,     0x1000 },
-+    [MICROCHIP_PFSOC_DDR_SGMII_PHY] =   { 0x20007000,     0x1000 },
-     [MICROCHIP_PFSOC_EMMC_SD] =         { 0x20008000,     0x1000 },
-+    [MICROCHIP_PFSOC_DDR_CFG] =         { 0x20080000,    0x40000 },
-     [MICROCHIP_PFSOC_MMUART1] =         { 0x20100000,     0x1000 },
-     [MICROCHIP_PFSOC_MMUART2] =         { 0x20102000,     0x1000 },
-     [MICROCHIP_PFSOC_MMUART3] =         { 0x20104000,     0x1000 },
-@@ -149,6 +152,11 @@ static void microchip_pfsoc_soc_instance_init(Object *obj)
-     object_initialize_child(obj, "dma-controller", &s->dma,
-                             TYPE_SIFIVE_PDMA);
- 
-+    object_initialize_child(obj, "ddr-sgmii-phy", &s->ddr_sgmii_phy,
-+                            TYPE_MCHP_PFSOC_DDR_SGMII_PHY);
-+    object_initialize_child(obj, "ddr-cfg", &s->ddr_cfg,
-+                            TYPE_MCHP_PFSOC_DDR_CFG);
++static bool vector_needed(void *opaque)
++{
++    RISCVCPU *cpu = opaque;
++    CPURISCVState *env = &cpu->env;
 +
-     object_initialize_child(obj, "gem0", &s->gem0, TYPE_CADENCE_GEM);
-     object_initialize_child(obj, "gem1", &s->gem1, TYPE_CADENCE_GEM);
- 
-@@ -278,6 +286,16 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
-         memmap[MICROCHIP_PFSOC_MPUCFG].base,
-         memmap[MICROCHIP_PFSOC_MPUCFG].size);
- 
-+    /* DDR SGMII PHY */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->ddr_sgmii_phy), errp);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ddr_sgmii_phy), 0,
-+                    memmap[MICROCHIP_PFSOC_DDR_SGMII_PHY].base);
++    return riscv_has_ext(env, RVV);
++}
 +
-+    /* DDR CFG */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->ddr_cfg), errp);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ddr_cfg), 0,
-+                    memmap[MICROCHIP_PFSOC_DDR_CFG].base);
++static const VMStateDescription vmstate_vector = {
++    .name = "cpu/vector",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = vector_needed,
++    .fields = (VMStateField[]) {
++            VMSTATE_UINT64_ARRAY(env.vreg, RISCVCPU, 32 * RV_VLEN_MAX / 64),
++            VMSTATE_UINTTL(env.vxrm, RISCVCPU),
++            VMSTATE_UINTTL(env.vxsat, RISCVCPU),
++            VMSTATE_UINTTL(env.vl, RISCVCPU),
++            VMSTATE_UINTTL(env.vstart, RISCVCPU),
++            VMSTATE_UINTTL(env.vtype, RISCVCPU),
++            VMSTATE_END_OF_LIST()
++        }
++};
 +
-     /* SDHCI */
-     sysbus_realize(SYS_BUS_DEVICE(&s->sdhci), errp);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdhci), 0,
-diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-index 2df978fe8d..c8e50bde99 100644
---- a/hw/riscv/Kconfig
-+++ b/hw/riscv/Kconfig
-@@ -4,6 +4,7 @@ config IBEX
- config MICROCHIP_PFSOC
-     bool
-     select CADENCE_SDHCI
-+    select MCHP_PFSOC_DMC
-     select MCHP_PFSOC_MMUART
-     select MSI_NONBROKEN
-     select SIFIVE_CLINT
+ static const VMStateDescription vmstate_hyper = {
+     .name = "cpu/hyper",
+     .version_id = 1,
+@@ -166,6 +190,7 @@ const VMStateDescription vmstate_riscv_cpu = {
+     .subsections = (const VMStateDescription * []) {
+         &vmstate_pmp,
+         &vmstate_hyper,
++        &vmstate_vector,
+         NULL
+     }
+ };
 -- 
 2.28.0
 
