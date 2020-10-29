@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22335C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C88B1C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83F9A20838
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:33:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3316220825
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:34:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QnIK6YiU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F9A20838
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XT4BUOz1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3316220825
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY8z9-0002zz-E9
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 10:33:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51678)
+	id 1kY90W-0005FC-20
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 10:34:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=56447669b=alistair.francis@wdc.com>)
- id 1kY8sS-0001o9-2A
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:26:08 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42880)
+ id 1kY8rz-0001Z9-Lo
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:39 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42881)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=56447669b=alistair.francis@wdc.com>)
- id 1kY8sP-0005fB-AI
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:26:07 -0400
+ id 1kY8rx-0005fG-I8
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603981565; x=1635517565;
+ t=1603981537; x=1635517537;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=o8QV0Me158q9SB0wiG+MH22S5sqXbxbb5FbSRzMEA74=;
- b=QnIK6YiUn93Onb0zIUtw7AmnkzIgxl/oYrl1G0+5hujWn1DG2b158B7A
- HpgfBcfF1enFD0BNxi4ZBDeWbtpK7R7PpZwaLORylBchWCgUpFGd2T0Lz
- VH8+vBTLkWR7nIN2+GlH1h3Nao3yJMMr6KAtVH3Rg3TTg3gItpY8kE5ec
- re1NqP59vHq5P0F8iKX1eoL5T7WJ47a+k3UiA3po+48aCi2bDSkGO1Tk0
- EFbwQvYCKHT3Ualggh/XMaKQJJ0xlCHyk2IfqQ0TlkLbdYZFS0E4ucet0
- A8xqQXjNdAgjsFh2vWfoDVXZXqLpDq9hxcnWpJPpKUo57y28KQ0euhXyS g==;
-IronPort-SDR: bBO1iDi9yOg3GRZoE0M7g2JKdJis3Q/GxT/oi4ncF5fLxQ62XtjDCT38RUFCSMbUhF8O3BXOUE
- d6NHQrgPnRKe/MxmJzo9hPONfxjQd1t4Ocv2cMEGNZ/0pRqiIoH3AwyToL5x/MKylvCVE3Jszt
- cIRro1OLQfKakp6bVeibcNhmZby9O4sHMACZJc6PbLaFmDFDhtMtiOpw7XuWsKoBQgJPOPqwTa
- KyAZcWMgmtjy6vYHpXaXP6dxMGHSTtAP0cjNY3l7sBGV6kaUFVy+D/YuFAns07QiclxyQiszcs
- T0c=
-X-IronPort-AV: E=Sophos;i="5.77,430,1596470400"; d="scan'208";a="151317893"
+ bh=P/qi2faPiuz4u3dNR7xsZrZ/3Jx9//l1Rlurl6tn9Fs=;
+ b=XT4BUOz1CHjLcZ2tXXlRf5gCjW5fJ46DbGvHa7avmyZf8qyfxhJEfqRB
+ Xi8enxpxUFAyqeTyCAxpnw3CJr7RGwnQSdcHgRWjXV14ovw1DRtJJQv09
+ MP4IlmNPOj6Ufaz4S81ALo496rULeX1aImG57LCeUEDrNEO4RGmbS7/99
+ t3lFVxTyuoM1kstf4pQ8cXb+ZrLcOCa64M9VIz1md2Ig58sZKHxZdXsqD
+ wT4wpprQDp8Yzu7msb0rl6Ml13jwCeUFUPEsT26zE7d1y5lgnwyk7m3Z4
+ OY5CZDAfsa1IxGo0kPgolHOJjnCP2ZG2mpbnpSnEhXveFL5JJLvxpBkHp Q==;
+IronPort-SDR: ebZtykrvj3WXOaDhabRlspr30TZsEK37M4nPCAQu0cb1ro+0uQYz1Bb8K5lQ4nK8oWQdfRTyoq
+ Fw4Gn+ENqGpMeCPPh3QtZORLYyvv9P8tePhjH+Aa0FE9LkpwdNXkg74QmhcMD5EchwFBvTIZPK
+ c0wOB9LzWaDUw5hhiVCV4XUQi4MlriXSQQnXPgoQmx+RE15IUEh66Mz0pouKhzj9A9yeOg6ShJ
+ pcLZP0zRWYBCv0S2sAfYajydhnre3y8YJ/jWWlI1qsgJIK81MAIPc00pIUg2vpt9VVWUCg/1h4
+ Z4U=
+X-IronPort-AV: E=Sophos;i="5.77,430,1596470400"; d="scan'208";a="151317886"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 29 Oct 2020 22:25:29 +0800
-IronPort-SDR: 8GbEy6CTauH9BJU/qi7S+y1lXISaVc46o1V4l8SWw80eMHjehnq+3GV7AoGbfPIYbG3qcNvalZ
- fUEpPFHWtbPXSAN5JlmTZsCmYHR47Di2qQAH6rfAyF7iOxt1XBTEOz2pEELIhM2603067hZ0d1
- A47jIPuvewof6/Abko5PV1V7LeLaaFliZjL7gnN6nFrI1esYjZrYHYxZg/VEGOZZa1Ur0GBo+H
- 0SJy5wYr8Nt/JbIv1JjpnEM842ehQ1KtquMzc5BxyNpdwLhBmcefUs45Qmeyw404/ZpOIq2SRf
- id6doxuyiTAW0GU4oJNZwBis
+ by ob1.hgst.iphmx.com with ESMTP; 29 Oct 2020 22:25:28 +0800
+IronPort-SDR: uyKjs74lHLVFJr9JKQkkLmDCsVptTkc9Y4EcvucPzK3qZu+hVxYw7WVi++n5I6QoJCl1LWz08y
+ 60ia/hr9BjRRhyndMW2+h5k3CYPLW4m/k9YfoTSLYycvKcwM+9j3uHQsoxntIvj3Dz5Llc86bq
+ 2k1W5CpjJhryE4UVQwPvURBq+9KsgoSSMe9oAYPqDlI03uWj1d2BKuvT+zaEeorJeKG/f9196Q
+ JTbNcqN7g+AEgKh1Hbl3xDL7QHBm6bgfG5A2cW5dwbID5wSuILDbsw321emKqTJ3zWTj5pPHR7
+ uTajVOuy5qXaWZ3r11wwpjh6
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Oct 2020 07:11:44 -0700
-IronPort-SDR: IkrHZHO77l3o9we5BDAt5i9Um4qPNk+RfDQF/Pzs1xOlxmVWejTnLhFNX5BC75I95op+YYQ8C4
- JAGbjpBNNK3TFVsbI+CVMexie9J0OOCiCzjBWfP98Ye07MS0s+hUKrLuQxIfTdPFejYOfhDMFy
- ffMLIRCMsdI0A0cb6eXLc40sEmhWChEg6WiyAm9XwChEN9+7CsYHz5otC8ifuYxpQccEF0/8oH
- ksABGi3ABwW/YLHMui52bLYCi/41U8gyQ5HotZwYNSaz/fqPEaBk5yZvhi/R6O21ifpf9LgKaw
- kE4=
+ 29 Oct 2020 07:11:43 -0700
+IronPort-SDR: ZGjxn9xYFV8Xn0WVUejTdpHrKYsNFu03UR6UDeiS00QNzvkfnVvmca70y+UmyYG7K7x7lQknGS
+ H0+ioS/acS9xBelWG26v7ywsqbxQv2TpbCHJw+N5ewbh0ICaUfGhugjiK/2HRmHPa2sutvIZTM
+ o2L/bMIWqystIViyvPlD3DBFQD8GDgwkUtcEXrLKouYrfsXM7KsZaeT1hUV3eZfv4yFw3TNPBe
+ W+fj88dwgiY3FWBXvItiOzdoALYZvPMijztpMQ/0pzyqA2RO1SRunwtPQyLRKMtEu3PJvPzQkl
+ CEQ=
 WDCIronportException: Internal
 Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.60.131])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 07:25:30 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 07:25:29 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 13/18] hw/riscv: microchip_pfsoc: Connect the IOSCB module
-Date: Thu, 29 Oct 2020 07:13:53 -0700
-Message-Id: <20201029141358.3102636-14-alistair.francis@wdc.com>
+Subject: [PULL 09/18] hw/riscv: microchip_pfsoc: Document where to look at the
+ SoC memory maps
+Date: Thu, 29 Oct 2020 07:13:49 -0700
+Message-Id: <20201029141358.3102636-10-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201029141358.3102636-1-alistair.francis@wdc.com>
 References: <20201029141358.3102636-1-alistair.francis@wdc.com>
@@ -117,107 +118,48 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bin.meng@windriver.com>
 
-Previously IOSCB_CFG was created as an unimplemented device. With
-the new IOSCB model, its memory range is already covered by the
-IOSCB hence remove the previous unimplemented device creation in
-the SoC codes.
+It is not easy to find out the memory map for a specific component
+in the PolarFire SoC as the information is scattered in different
+documents. Add some comments so that people can know where to get
+such information from the Microchip website.
 
 Signed-off-by: Bin Meng <bin.meng@windriver.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 1603863010-15807-6-git-send-email-bmeng.cn@gmail.com
+Message-id: 1603863010-15807-2-git-send-email-bmeng.cn@gmail.com
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- include/hw/riscv/microchip_pfsoc.h |  4 +++-
- hw/riscv/microchip_pfsoc.c         | 13 ++++++++-----
- hw/riscv/Kconfig                   |  1 +
- 3 files changed, 12 insertions(+), 6 deletions(-)
+ hw/riscv/microchip_pfsoc.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-index 5b81e26241..a244ae6d39 100644
---- a/include/hw/riscv/microchip_pfsoc.h
-+++ b/include/hw/riscv/microchip_pfsoc.h
-@@ -25,6 +25,7 @@
- #include "hw/char/mchp_pfsoc_mmuart.h"
- #include "hw/dma/sifive_pdma.h"
- #include "hw/misc/mchp_pfsoc_dmc.h"
-+#include "hw/misc/mchp_pfsoc_ioscb.h"
- #include "hw/net/cadence_gem.h"
- #include "hw/sd/cadence_sdhci.h"
- 
-@@ -40,6 +41,7 @@ typedef struct MicrochipPFSoCState {
-     DeviceState *plic;
-     MchpPfSoCDdrSgmiiPhyState ddr_sgmii_phy;
-     MchpPfSoCDdrCfgState ddr_cfg;
-+    MchpPfSoCIoscbState ioscb;
-     MchpPfSoCMMUartState *serial0;
-     MchpPfSoCMMUartState *serial1;
-     MchpPfSoCMMUartState *serial2;
-@@ -99,7 +101,7 @@ enum {
-     MICROCHIP_PFSOC_GPIO2,
-     MICROCHIP_PFSOC_ENVM_CFG,
-     MICROCHIP_PFSOC_ENVM_DATA,
--    MICROCHIP_PFSOC_IOSCB_CFG,
-+    MICROCHIP_PFSOC_IOSCB,
-     MICROCHIP_PFSOC_DRAM,
- };
- 
 diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-index 3c504f7c03..438e0c464d 100644
+index 4627179cd3..6aac8497fc 100644
 --- a/hw/riscv/microchip_pfsoc.c
 +++ b/hw/riscv/microchip_pfsoc.c
-@@ -16,6 +16,7 @@
-  * 5) SiFive Platform DMA (Direct Memory Access Controller)
-  * 6) GEM (Gigabit Ethernet MAC Controller)
-  * 7) DMC (DDR Memory Controller)
-+ * 8) IOSCB modules
-  *
-  * This board currently generates devicetree dynamically that indicates at least
-  * two harts and up to five harts.
-@@ -118,7 +119,7 @@ static const struct MemmapEntry {
-     [MICROCHIP_PFSOC_GPIO2] =           { 0x20122000,     0x1000 },
-     [MICROCHIP_PFSOC_ENVM_CFG] =        { 0x20200000,     0x1000 },
-     [MICROCHIP_PFSOC_ENVM_DATA] =       { 0x20220000,    0x20000 },
--    [MICROCHIP_PFSOC_IOSCB_CFG] =       { 0x37080000,     0x1000 },
-+    [MICROCHIP_PFSOC_IOSCB] =           { 0x30000000, 0x10000000 },
-     [MICROCHIP_PFSOC_DRAM] =            { 0x80000000,        0x0 },
- };
+@@ -66,6 +66,24 @@
+ /* GEM version */
+ #define GEM_REVISION    0x0107010c
  
-@@ -162,6 +163,8 @@ static void microchip_pfsoc_soc_instance_init(Object *obj)
- 
-     object_initialize_child(obj, "sd-controller", &s->sdhci,
-                             TYPE_CADENCE_SDHCI);
-+
-+    object_initialize_child(obj, "ioscb", &s->ioscb, TYPE_MCHP_PFSOC_IOSCB);
- }
- 
- static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
-@@ -373,10 +376,10 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
-                                 memmap[MICROCHIP_PFSOC_ENVM_DATA].base,
-                                 envm_data);
- 
--    /* IOSCBCFG */
--    create_unimplemented_device("microchip.pfsoc.ioscb.cfg",
--        memmap[MICROCHIP_PFSOC_IOSCB_CFG].base,
--        memmap[MICROCHIP_PFSOC_IOSCB_CFG].size);
-+    /* IOSCB */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->ioscb), errp);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ioscb), 0,
-+                    memmap[MICROCHIP_PFSOC_IOSCB].base);
- }
- 
- static void microchip_pfsoc_soc_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-index c8e50bde99..8f043e38e0 100644
---- a/hw/riscv/Kconfig
-+++ b/hw/riscv/Kconfig
-@@ -5,6 +5,7 @@ config MICROCHIP_PFSOC
-     bool
-     select CADENCE_SDHCI
-     select MCHP_PFSOC_DMC
-+    select MCHP_PFSOC_IOSCB
-     select MCHP_PFSOC_MMUART
-     select MSI_NONBROKEN
-     select SIFIVE_CLINT
++/*
++ * The complete description of the whole PolarFire SoC memory map is scattered
++ * in different documents. There are several places to look at for memory maps:
++ *
++ * 1 Chapter 11 "MSS Memory Map", in the doc "UG0880: PolarFire SoC FPGA
++ *   Microprocessor Subsystem (MSS) User Guide", which can be downloaded from
++ *   https://www.microsemi.com/document-portal/doc_download/
++ *   1244570-ug0880-polarfire-soc-fpga-microprocessor-subsystem-mss-user-guide,
++ *   describes the whole picture of the PolarFire SoC memory map.
++ *
++ * 2 A zip file for PolarFire soC memory map, which can be downloaded from
++ *   https://www.microsemi.com/document-portal/doc_download/
++ *   1244581-polarfire-soc-register-map, contains the following 2 major parts:
++ *   - Register Map/PF_SoC_RegMap_V1_1/pfsoc_regmap.htm
++ *     describes the complete integrated peripherals memory map
++ *   - Register Map/PF_SoC_RegMap_V1_1/MPFS250T/mpfs250t_ioscb_memmap_dri.htm
++ *     describes the complete IOSCB modules memory maps
++ */
+ static const struct MemmapEntry {
+     hwaddr base;
+     hwaddr size;
 -- 
 2.28.0
 
