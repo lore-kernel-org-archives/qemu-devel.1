@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9539EC4741F
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D9EC4742C
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:13:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF136206CA
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:12:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9FB5214F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:13:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I2BQOF9j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF136206CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZcakGsS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9FB5214F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYG9y-00071g-Pe
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 18:12:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42700)
+	id 1kYGAK-0007ww-Oj
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 18:13:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYG1M-0003Yt-MZ
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:03:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55227)
+ id 1kYG1H-0003US-LN
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:03:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32876)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYG1H-0006bS-96
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:03:48 -0400
+ id 1kYG18-0006as-1m
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:03:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604009019;
+ s=mimecast20190719; t=1604009013;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QUxh+dAMr7asfgASVssXiGfljD2JvuaH/LJeEOqBzHc=;
- b=I2BQOF9jnxr3T023GcPUcsEPOMbkCWUxn/rsYTU0pf2ci5uqWyOC1kUvXRt/PHxr7pbymg
- SB9W9fbKEqoMD2j3hrLF0XRYfn33ICpJAdLCoiJu3dRI2i+IyVz6ESuHkJ/Lb2JXnuRQIr
- YMj/IB3QvFqetMqcD8XkQ1TkpnTcfMA=
+ bh=jLlJBr7SgpOv5gaLjqD3GYfJzMABJAxfqTC7IiSG/wk=;
+ b=fZcakGsSQp+zP+qmHvwnPcUInfebvZhyvF24smqo0nZCQxFO4awt31fGm4HCYr/eAqHqSr
+ Zq0ruUtz4fGbnzACM1l5nxqEn9AvxinYt3fZ0YR1ce1oHPZkwp+8ItHNZo/xkFHcxSmt08
+ xNdjh4XjwV5dinShJk/FpwaP+1kNWlk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-fUCgkL_bOcqkT2zPyglrwg-1; Thu, 29 Oct 2020 18:03:37 -0400
-X-MC-Unique: fUCgkL_bOcqkT2zPyglrwg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-203-nTl09xHHPxWIkcM-AdAVFg-1; Thu, 29 Oct 2020 18:03:31 -0400
+X-MC-Unique: nTl09xHHPxWIkcM-AdAVFg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E058A802B66
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 22:03:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D4D39CC00
+ for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 22:03:30 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A0CEF5DA2A;
- Thu, 29 Oct 2020 22:03:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4B7EF55780;
+ Thu, 29 Oct 2020 22:03:30 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 21/36] qom: Add allow_set callback to ObjectProperty
-Date: Thu, 29 Oct 2020 18:02:31 -0400
-Message-Id: <20201029220246.472693-22-ehabkost@redhat.com>
+Subject: [PATCH 16/36] qdev: Make qdev_class_add_property() more flexible
+Date: Thu, 29 Oct 2020 18:02:26 -0400
+Message-Id: <20201029220246.472693-17-ehabkost@redhat.com>
 In-Reply-To: <20201029220246.472693-1-ehabkost@redhat.com>
 References: <20201029220246.472693-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -103,10 +103,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Note that this doesn't replace the check callback at
-object*_property_add_link() (yet), because currently the link
-property check callback needs to get the property value as
-argument (despite this not being necessary in most cases).
+Support Property.set_default and PropertyInfo.description even if
+PropertyInfo.create is set.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
@@ -115,59 +113,47 @@ Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- include/qom/object.h | 16 ++++++++++++++++
- qom/object.c         |  4 ++++
- 2 files changed, 20 insertions(+)
+ hw/core/qdev-properties.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index d378f13a11..24e591d954 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -86,6 +86,21 @@ typedef void (ObjectPropertyRelease)(Object *obj,
-  */
- typedef void (ObjectPropertyInit)(Object *obj, ObjectProperty *prop);
- 
-+/**
-+ * typedef ObjectPropertyAllowSet:
-+ * @obj: the object that owns the property
-+ * @prop: the property being set
-+ * @errp: pointer to error information
-+ *
-+ * Called when a property is being set.
-+ *
-+ * If return value is false, it will prevent the property from
-+ * being changed.  Error information should be filled in @errp
-+ * if return vlaue is false.
-+ */
-+typedef bool (ObjectPropertyAllowSet)(Object *obj, ObjectProperty *prop,
-+                                      Error **errp);
-+
- struct ObjectProperty
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 89e292dc25..ad685f371d 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -912,24 +912,25 @@ void qdev_property_add_static(DeviceState *dev, Property *prop)
+ static void qdev_class_add_property(DeviceClass *klass, Property *prop)
  {
-     char *name;
-@@ -96,6 +111,7 @@ struct ObjectProperty
-     ObjectPropertyResolve *resolve;
-     ObjectPropertyRelease *release;
-     ObjectPropertyInit *init;
-+    ObjectPropertyAllowSet *allow_set;
-     void *opaque;
-     QObject *defval;
- };
-diff --git a/qom/object.c b/qom/object.c
-index 1065355233..20726e4584 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1395,6 +1395,10 @@ bool object_property_set(Object *obj, const char *name, Visitor *v,
-         error_setg(errp, QERR_PERMISSION_DENIED);
-         return false;
+     ObjectClass *oc = OBJECT_CLASS(klass);
++    ObjectProperty *op;
+ 
+     if (prop->info->create) {
+-        prop->info->create(oc, prop);
++        op = prop->info->create(oc, prop);
+     } else {
+-        ObjectProperty *op;
+-
+         op = object_class_property_add(oc,
+                                        prop->name, prop->info->name,
+                                        static_prop_getter(prop->info),
+                                        static_prop_setter(prop->info),
+                                        prop->info->release,
+                                        prop);
+-        if (prop->set_default) {
+-            prop->info->set_default_value(op, prop);
+-        }
      }
-+    if (prop->allow_set && !prop->allow_set(obj, prop, errp)) {
-+        return false;
+-    object_class_property_set_description(oc, prop->name,
+-                                          prop->info->description);
++    if (prop->set_default) {
++        prop->info->set_default_value(op, prop);
 +    }
-+
-     prop->set(obj, v, name, prop->opaque, &err);
-     error_propagate(errp, err);
-     return !err;
++    if (prop->info->description) {
++        object_class_property_set_description(oc, prop->name,
++                                            prop->info->description);
++    }
+ }
+ 
+ /**
 -- 
 2.28.0
 
