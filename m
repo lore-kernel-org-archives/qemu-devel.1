@@ -7,92 +7,85 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 704DAC4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 07:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 228C8C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 07:05:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73036214DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 07:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7381021775
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 07:05:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rhIJSfHC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73036214DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gnRPf5rp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7381021775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY1xj-00065O-Rm
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 03:03:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57280)
+	id 1kY1zZ-0007DB-C8
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 03:05:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kY1vV-0005CQ-MK
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 03:00:49 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:39425)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kY1vT-0000e7-PO
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 03:00:49 -0400
-Received: by mail-ej1-x644.google.com with SMTP id bn26so2349819ejb.6
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 00:00:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Dg173+sGEfswzF9gfy416c9DJVSimwiYSD7RCaosqeg=;
- b=rhIJSfHCe8amTDmomZpahTWtkmtExmYnE5Jw5xzF2eCwgs9a6nEdPOGZb3rESyb38c
- yc3apyhkcEL96zZgEQnXtbbYUt2awIceUDLQlzXUSL+Zc8P34FwXmEyunhaNbGz2xP+B
- PtihxErLRQ7HF4oyMMS9asVe+OmFoMBMefszaoEFzHsZRPNbJzvaoAYvzlUoiUbvbDQT
- 7uSWigo3X3dJhQJhrx74LlVc6b/XwRIPmnSBRLhqaE4Im05id8tEBXmQYgxPIjmr/boh
- lAk/inUVcfIxs2UvQWHd9sqOAuv+3unVXKZ2o1xi/hJPHomOqOjp9W4/B3K6k9WbBokq
- 4FPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Dg173+sGEfswzF9gfy416c9DJVSimwiYSD7RCaosqeg=;
- b=O5qFMCi7UK3zoB+A83EHHV8HAMPC+0YopcMXYLPiIzFFpNPxmSbmQ8AOzyzjJRtJ6s
- yOjjVFXUb+cNvqj6tvBehZLWebS0sZJzIfT4mLWibBrUtF5rqidgFOX9kjGqSUPf0BrN
- VkkGy7LAy2p7OtwDfBJ9SZ6TSC8K7mVKXnB/ArREgRIXvEwa+WAxuwwkrqv1XRfF6ow6
- jUQpkGDltVsadujRwOiBnJMTpTgaH+t4HqpYasdpqNfte3VmaoWkdiVhRlBg8+aNWn3e
- J+ucHCW2R0jhOyTUCEV+uCTsLlPTm09aysLZtPTm93nakpb5pJyy7tXWE9z+PzG50u6h
- WLgw==
-X-Gm-Message-State: AOAM5335TZU2HO3W2JRF1xxNyVYHc+gS81XXeS1naGaJtLmCqeceLa2W
- nmKv/LxcyGZ8quSodfJTC/E=
-X-Google-Smtp-Source: ABdhPJzyhsuNPxEVpjqJQquUcGJ4babs4ops5v8QnrZO5XKyB1nJnToDcS8zGyyb2UgIrSUFudE9QQ==
-X-Received: by 2002:a17:906:a296:: with SMTP id
- i22mr518991ejz.288.1603954845596; 
- Thu, 29 Oct 2020 00:00:45 -0700 (PDT)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id e5sm926507ejb.26.2020.10.29.00.00.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 29 Oct 2020 00:00:44 -0700 (PDT)
-Subject: Re: [PATCH] Add int128_or to include/qemu/int128.h
-To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
-References: <1603919949-17498-1-git-send-email-tsimpson@quicinc.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <642eee82-160d-bcaa-3fb5-1808d7b3c7a9@amsat.org>
-Date: Thu, 29 Oct 2020 08:00:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kY1x8-0005me-L3
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 03:02:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59590)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kY1x5-0001Ag-GJ
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 03:02:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603954943;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1LCiOkbrK+4ryCpKLa/LqV2l45XFLIjZnvH/1qu+hY0=;
+ b=gnRPf5rpHWKNLjyvabElPn6MeSQBqt0xbI2iDMlfyr7I7POKTpcXctvYRG5Tf38qjDwGbC
+ j6ui0AIsyL9a5CHeRAKkhOo7U1EAQHX4QV9ReqXjrSKNjIq3CBI1JKktoKHPGuZx9b2SE1
+ dZdTVKrR944q1UNxcklp1T5ik9WopQ0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-GZfNoBqrN7GQIBSCeA8CfQ-1; Thu, 29 Oct 2020 03:02:20 -0400
+X-MC-Unique: GZfNoBqrN7GQIBSCeA8CfQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 929B81009E39;
+ Thu, 29 Oct 2020 07:02:19 +0000 (UTC)
+Received: from [10.72.12.209] (ovpn-12-209.pek2.redhat.com [10.72.12.209])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AE74C6EF6A;
+ Thu, 29 Oct 2020 07:02:08 +0000 (UTC)
+Subject: Re: [PATCH v2] virtio: skip guest index check on device load
+To: Felipe Franciosi <felipe@nutanix.com>, qemu-devel@nongnu.org
+References: <20201028134643.110698-1-felipe@nutanix.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <ca52cfce-0d89-3a13-ac75-400230462a9c@redhat.com>
+Date: Thu, 29 Oct 2020 15:02:07 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1603919949-17498-1-git-send-email-tsimpson@quicinc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20201028134643.110698-1-felipe@nutanix.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -23
-X-Spam_score: -2.4
-X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.921,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 00:47:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -29
+X-Spam_score: -3.0
+X-Spam_bar: ---
+X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.921, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,58 +99,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/28/20 10:19 PM, Taylor Simpson wrote:
-> Discovered the need when working on Hexagon target
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg733818.html
-> Useful as a standalone patch
 
-Following the QEMU commits style:
-
-"qemu/int128: Add int128_or()"
-
-Add the int128_or() implementation.
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> 
-> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
+On 2020/10/28 下午9:47, Felipe Franciosi wrote:
+> QEMU must be careful when loading device state off migration streams to
+> prevent a malicious source from exploiting the emulator. Overdoing these
+> checks has the side effect of allowing a guest to "pin itself" in cloud
+> environments by messing with state which is entirely in its control.
+>
+> Similarly to what f3081539 achieved in usb_device_post_load(), this
+> commit removes such a check from virtio_load(). Worth noting, the result
+> of a load without this check is the same as if a guest enables a VQ with
+> invalid indexes to begin with. That is, the virtual device is set in a
+> broken state (by the datapath handler) and must be reset.
+>
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
 > ---
->  include/qemu/int128.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/include/qemu/int128.h b/include/qemu/int128.h
-> index 76ea405..52fc238 100644
-> --- a/include/qemu/int128.h
-> +++ b/include/qemu/int128.h
-> @@ -58,6 +58,11 @@ static inline Int128 int128_and(Int128 a, Int128 b)
->      return a & b;
->  }
->  
-> +static inline Int128 int128_or(Int128 a, Int128 b)
-> +{
-> +    return a | b;
-> +}
-> +
->  static inline Int128 int128_rshift(Int128 a, int n)
->  {
->      return a >> n;
-> @@ -208,6 +213,11 @@ static inline Int128 int128_and(Int128 a, Int128 b)
->      return (Int128) { a.lo & b.lo, a.hi & b.hi };
->  }
->  
-> +static inline Int128 int128_or(Int128 a, Int128 b)
-> +{
-> +    return (Int128) { a.lo | b.lo, a.hi | b.hi };
-> +}
-> +
->  static inline Int128 int128_rshift(Int128 a, int n)
->  {
->      int64_t h;
-> 
+> v2: Keep the check around for logging.
+>
+>   hw/virtio/virtio.c | 13 +++++++------
+>   1 file changed, 7 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 6f8f865aff..ceb58fda6c 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -17,6 +17,7 @@
+>   #include "trace.h"
+>   #include "exec/address-spaces.h"
+>   #include "qemu/error-report.h"
+> +#include "qemu/log.h"
+>   #include "qemu/main-loop.h"
+>   #include "qemu/module.h"
+>   #include "hw/virtio/virtio.h"
+> @@ -3160,12 +3161,12 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+>               nheads = vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].last_avail_idx;
+>               /* Check it isn't doing strange things with descriptor numbers. */
+>               if (nheads > vdev->vq[i].vring.num) {
+> -                error_report("VQ %d size 0x%x Guest index 0x%x "
+> -                             "inconsistent with Host index 0x%x: delta 0x%x",
+> -                             i, vdev->vq[i].vring.num,
+> -                             vring_avail_idx(&vdev->vq[i]),
+> -                             vdev->vq[i].last_avail_idx, nheads);
+> -                return -1;
+> +                qemu_log_mask(LOG_GUEST_ERROR,
+> +                              "VQ %d size 0x%x Guest index 0x%x "
+> +                              "inconsistent with Host index 0x%x: delta 0x%x",
+> +                              i, vdev->vq[i].vring.num,
+> +                              vring_avail_idx(&vdev->vq[i]),
+> +                              vdev->vq[i].last_avail_idx, nheads);
+>               }
+>               vdev->vq[i].used_idx = vring_used_idx(&vdev->vq[i]);
+>               vdev->vq[i].shadow_avail_idx = vring_avail_idx(&vdev->vq[i]);
+
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
 
 
