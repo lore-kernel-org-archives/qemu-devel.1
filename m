@@ -2,85 +2,85 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 685BDC55179
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D95C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:30:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E4602151B
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:30:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E175C2151B
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:30:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="CzWdcjlM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E4602151B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Ynlro3m+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E175C2151B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY8wT-0006i4-CC
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 10:30:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51424)
+	id 1kY8ww-0007rE-QE
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 10:30:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=56447669b=alistair.francis@wdc.com>)
- id 1kY8ru-0001Qo-TF
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:34 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42881)
+ id 1kY8sH-0001hl-N5
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:57 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42885)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=56447669b=alistair.francis@wdc.com>)
- id 1kY8rs-0005fG-5m
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:34 -0400
+ id 1kY8sA-0005fQ-Ce
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:25:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603981531; x=1635517531;
+ t=1603981550; x=1635517550;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=PVCZQUTeCw2di1b+MS8hAMMWVCYqpu2LLmTnEQBfmSQ=;
- b=CzWdcjlMN3fDgmMK8n1Sjp05YZoXn/g9T2B2oYRofKlQorfZsjLitm2R
- MdQ9w6VBDcEV1pbyg1iA708nhO2z52N1UMKDJvvAyjppqjaiNE9rHcesN
- KiU1aQOibuRxhuYEk+HqFXE42JJIeS1nSPW6DoL9E5LS3M1/0pps+287I
- cbLy+PLRCGX38CKR981peHF1jZoug6TBOs+TPSzbIzbMAnv4+OBIhTC/a
- 0kOLthX0dCpEHBlRFD8X5AjOWjNVLV2BZvfAP6oqijUP6ZZbRwmh4N+af
- y6INv2IZhGm5sMeV2lp0UgiHyAVUjO+UKLYSzJVb5OObj/+y4x159AqgH g==;
-IronPort-SDR: tqbhrDjRl/vo5C8PXTOEllE/SbiutpTAEtKxuFmMXRwKBteVWvsaMYoIDPVJXyYIDauldtmEML
- xREy5CKE8XccdNbqlu1h1R6aFPfjhP32J4d8JO/xrcpDPNrBvVkPVuuVfqwsDb6pWLJW+LFqQU
- /SekfsejSI9PsfUX8dDYzIYeEwi8cL8VY4Y8QCge+GyAmhZshhKU6BHAIiSuq2+mZTDixf4lsB
- TRZ3C9yPBu6Fmvso9RGwfVY/7vSJFcreYuhdH6LzVfSdIEr0Y+jhAbjUMbshqG07vyvxxy2G7O
- TcI=
-X-IronPort-AV: E=Sophos;i="5.77,430,1596470400"; d="scan'208";a="151317873"
+ bh=2GIx+t0Rp+fA0ib/C5fOILwZ9azhuSUJ4wg+kNar0QY=;
+ b=Ynlro3m+ShmGRP/QgqkVXQtzNYb7QS6bMxMtuD8dv+V9KzfUAo4XlgPA
+ aahD/dnLZtI3omJHNSyVABOJQKQCmmU0GEW6qW9FWZYgw9pFwDbtL60yx
+ PbIy+LSnplyi4HZssfMatTWIIO4add7dQnqCcArj7Z+dEE+rLNOXk4m96
+ DGsQG6nmGbP2Ym/bCUtPFEmGh+bHNnP4Rd9o2PNp3SP1cI/HHMWnlVU4E
+ YVhH6lk7w8QNZUKs1kU9p1KYstbO6arCLwyvur2fXtyDUHo13UNX8tAod
+ Yy74/zX16e0iBJSgXt/AFVD6SiHZ9GpKSZlp4P+EvrDOE08UuuNnkIMaR g==;
+IronPort-SDR: 5H4JYIbucQNKRRqr8uzuWMvQLr6xXbUmZLAXK/1JEtvT9t9ZK+TOqA9sY3hPiPHESO7Fqs+HA9
+ ABD7HIX1A8/Sco1zHIhXwZ2LuCgTElEGLR/sPzKmKaaRai96ilEU0torUpr6WmrxbpVH9zBzYP
+ uXufh+rqQe1FfeM4NkH/h8xhiaNDNArJtbb2jzuCO5x3Ai7hK8F+xzfpKBsPcWWXO+bzbFI7XY
+ mtJz8Z8LacClHezqCd9+xGLupu95TcIY9rkkKH7UCwck6ofDH3jnBdbL4+bp+LwJEmpPl1rsDK
+ HQ0=
+X-IronPort-AV: E=Sophos;i="5.77,430,1596470400"; d="scan'208";a="151317889"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 29 Oct 2020 22:25:26 +0800
-IronPort-SDR: 5pdOXTI2WI9X1lj96AdYmGgtccNdxs7/amoIkjTJmZMYkse6BoyOsEIdc6t6ZWCrv3dHL3QTdZ
- kaX4iBIFvcPXJxRZbkc5C/08MK3O6cbmg0aaRK//O0P0yd2lql+fAxCYApwYzDwGbNfw0tvGWh
- v6ONiiDzrQu45Kvz2BE+sppSj18+AsZ9Cn3ymlA4yvJsimfyKze85P6RaozYfyHsrlraTVkgXx
- xxg1xSITCawriv9rgwLBLyPyTrnaF5iuwPAcdxWnjwecTsP9O6a72wXqkM24LHwH3ml4sS6bQG
- 6MFq8LL2sdL6CXo2CNySfwBa
+ by ob1.hgst.iphmx.com with ESMTP; 29 Oct 2020 22:25:28 +0800
+IronPort-SDR: rA6Ojv6AP0n/8hbH72DhiTNJBt3AACAJxN5P25/4HftVbjWkvQzIpWJil8vYO+HzASrI6uWqGa
+ Zp7zEIbWIYEZFQXuUyGZMoZibc+ym2BOf3NY0203bxIf3OY39kVa0QEL1JBaa76dn7CedZ4Q+2
+ We0/PbykOnQ/urgSlaIKCyLZbbPtZWWHHbgO/GZ/ovrf0pXfz4cffZhHMW/kd7r9YR9RgtMSNd
+ U4RRWzoTSQ4iiZx+TiZfaXQqtL0lCSKmgLvJznyVnpfsqmfxwbisCyAkoZDM3966QpUZPLAfCr
+ i9Q+RmOvFf3ykm+RdSxbJGf6
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Oct 2020 07:11:42 -0700
-IronPort-SDR: K5MaVht8ZP/jy4qgrfBQiRSQS5qocPF+FvQcE/7CzG+yZI5LU7yXZR92rGTamgQVFRt1tKhP/N
- PrCsM578p71GDRY3hZCLYex4glRSyUdZqyAn6F20qqkwKWOLnVYqGfU6vIdqUAC6NURmFRq3R+
- bfFy7ukuTqg+/uNfN3jr8F9cn8d4/dbRpARSyw111b34n22Ul4VRxg6V7Ffw7qWoXUqU+63u9A
- mYAKJgqgAOfLqc/VeSDZxktq3knZGTxZ243PB4cTn4/Re85AdvfUaJdhRXE7mRPEax0qD5nJsn
- JY4=
+ 29 Oct 2020 07:11:44 -0700
+IronPort-SDR: TKEONT9XzMA30PvXBAHMWMg2RyrMsunRJJUfXJ4up6Zz7NoRY3YEaqhrz9/60delWviMGhgoUM
+ VMgD1pqMQvsh7mZiRQb8FfDN3AecuHtjUaXF2tHFvHiIsq6na2IHSgDT6ClbGJUkezPCfsn7B8
+ 6pJAztyLOZ5DNDxpOkVFw8AvrNjffUGQR93vzssweJVgE6PxAw5+l6b//vIuMdivq8/YaZHxUE
+ 7BdusxXKzFNwlif6i/4RaryncRcHg+s2Bs/BkWDI4QQz6wd6nEFP+GXUKPT3NmQnvrTO01+nDm
+ kmI=
 WDCIronportException: Internal
 Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.60.131])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 07:25:27 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 07:25:30 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 03/18] target/riscv: Merge m/vsstatus and m/vsstatush into one
- uint64_t unit
-Date: Thu, 29 Oct 2020 07:13:43 -0700
-Message-Id: <20201029141358.3102636-4-alistair.francis@wdc.com>
+Subject: [PULL 11/18] hw/riscv: microchip_pfsoc: Connect DDR memory controller
+ modules
+Date: Thu, 29 Oct 2020 07:13:51 -0700
+Message-Id: <20201029141358.3102636-12-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201029141358.3102636-1-alistair.francis@wdc.com>
 References: <20201029141358.3102636-1-alistair.francis@wdc.com>
@@ -110,334 +110,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
- Yifei Jiang <jiangyifei@huawei.com>, Yipeng Yin <yinyipeng1@huawei.com>
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yifei Jiang <jiangyifei@huawei.com>
+From: Bin Meng <bin.meng@windriver.com>
 
-mstatus/mstatush and vsstatus/vsstatush are two halved for RISCV32.
-This patch expands mstatus and vsstatus to uint64_t instead of
-target_ulong so that it can be saved as one unit and reduce some
-ifdefs in the code.
+Connect DDR SGMII PHY module and CFG module to the PolarFire SoC.
 
-Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20201026115530.304-2-jiangyifei@huawei.com
+Message-id: 1603863010-15807-4-git-send-email-bmeng.cn@gmail.com
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu.h        | 24 +++++++++++-------------
- target/riscv/cpu_bits.h   | 19 ++++---------------
- target/riscv/cpu.c        |  8 +++++---
- target/riscv/cpu_helper.c | 35 +++++++----------------------------
- target/riscv/csr.c        | 18 ++++++++++--------
- target/riscv/op_helper.c  | 11 ++++-------
- 6 files changed, 41 insertions(+), 74 deletions(-)
+ include/hw/riscv/microchip_pfsoc.h |  5 +++++
+ hw/riscv/microchip_pfsoc.c         | 18 ++++++++++++++++++
+ hw/riscv/Kconfig                   |  1 +
+ 3 files changed, 24 insertions(+)
 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index de4705bb57..87b68affa8 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -144,14 +144,14 @@ struct CPURISCVState {
-     target_ulong resetvec;
+diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
+index 8bfc7e1a85..5b81e26241 100644
+--- a/include/hw/riscv/microchip_pfsoc.h
++++ b/include/hw/riscv/microchip_pfsoc.h
+@@ -24,6 +24,7 @@
  
-     target_ulong mhartid;
--    target_ulong mstatus;
-+    /*
-+     * For RV32 this is 32-bit mstatus and 32-bit mstatush.
-+     * For RV64 this is a 64-bit mstatus.
-+     */
-+    uint64_t mstatus;
+ #include "hw/char/mchp_pfsoc_mmuart.h"
+ #include "hw/dma/sifive_pdma.h"
++#include "hw/misc/mchp_pfsoc_dmc.h"
+ #include "hw/net/cadence_gem.h"
+ #include "hw/sd/cadence_sdhci.h"
  
-     target_ulong mip;
+@@ -37,6 +38,8 @@ typedef struct MicrochipPFSoCState {
+     RISCVHartArrayState e_cpus;
+     RISCVHartArrayState u_cpus;
+     DeviceState *plic;
++    MchpPfSoCDdrSgmiiPhyState ddr_sgmii_phy;
++    MchpPfSoCDdrCfgState ddr_cfg;
+     MchpPfSoCMMUartState *serial0;
+     MchpPfSoCMMUartState *serial1;
+     MchpPfSoCMMUartState *serial2;
+@@ -82,7 +85,9 @@ enum {
+     MICROCHIP_PFSOC_MMUART0,
+     MICROCHIP_PFSOC_SYSREG,
+     MICROCHIP_PFSOC_MPUCFG,
++    MICROCHIP_PFSOC_DDR_SGMII_PHY,
+     MICROCHIP_PFSOC_EMMC_SD,
++    MICROCHIP_PFSOC_DDR_CFG,
+     MICROCHIP_PFSOC_MMUART1,
+     MICROCHIP_PFSOC_MMUART2,
+     MICROCHIP_PFSOC_MMUART3,
+diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
+index 6aac8497fc..3c504f7c03 100644
+--- a/hw/riscv/microchip_pfsoc.c
++++ b/hw/riscv/microchip_pfsoc.c
+@@ -15,6 +15,7 @@
+  * 4) Cadence eMMC/SDHC controller and an SD card connected to it
+  * 5) SiFive Platform DMA (Direct Memory Access Controller)
+  * 6) GEM (Gigabit Ethernet MAC Controller)
++ * 7) DMC (DDR Memory Controller)
+  *
+  * This board currently generates devicetree dynamically that indicates at least
+  * two harts and up to five harts.
+@@ -103,7 +104,9 @@ static const struct MemmapEntry {
+     [MICROCHIP_PFSOC_MMUART0] =         { 0x20000000,     0x1000 },
+     [MICROCHIP_PFSOC_SYSREG] =          { 0x20002000,     0x2000 },
+     [MICROCHIP_PFSOC_MPUCFG] =          { 0x20005000,     0x1000 },
++    [MICROCHIP_PFSOC_DDR_SGMII_PHY] =   { 0x20007000,     0x1000 },
+     [MICROCHIP_PFSOC_EMMC_SD] =         { 0x20008000,     0x1000 },
++    [MICROCHIP_PFSOC_DDR_CFG] =         { 0x20080000,    0x40000 },
+     [MICROCHIP_PFSOC_MMUART1] =         { 0x20100000,     0x1000 },
+     [MICROCHIP_PFSOC_MMUART2] =         { 0x20102000,     0x1000 },
+     [MICROCHIP_PFSOC_MMUART3] =         { 0x20104000,     0x1000 },
+@@ -149,6 +152,11 @@ static void microchip_pfsoc_soc_instance_init(Object *obj)
+     object_initialize_child(obj, "dma-controller", &s->dma,
+                             TYPE_SIFIVE_PDMA);
  
--#ifdef TARGET_RISCV32
--    target_ulong mstatush;
--#endif
--
-     uint32_t miclaim;
- 
-     target_ulong mie;
-@@ -183,16 +183,17 @@ struct CPURISCVState {
-     uint64_t htimedelta;
- 
-     /* Virtual CSRs */
--    target_ulong vsstatus;
-+    /*
-+     * For RV32 this is 32-bit vsstatus and 32-bit vsstatush.
-+     * For RV64 this is a 64-bit vsstatus.
-+     */
-+    uint64_t vsstatus;
-     target_ulong vstvec;
-     target_ulong vsscratch;
-     target_ulong vsepc;
-     target_ulong vscause;
-     target_ulong vstval;
-     target_ulong vsatp;
--#ifdef TARGET_RISCV32
--    target_ulong vsstatush;
--#endif
- 
-     target_ulong mtval2;
-     target_ulong mtinst;
-@@ -204,10 +205,7 @@ struct CPURISCVState {
-     target_ulong scause_hs;
-     target_ulong stval_hs;
-     target_ulong satp_hs;
--    target_ulong mstatus_hs;
--#ifdef TARGET_RISCV32
--    target_ulong mstatush_hs;
--#endif
-+    uint64_t mstatus_hs;
- 
-     target_ulong scounteren;
-     target_ulong mcounteren;
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index bd36062877..daedad8691 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -4,10 +4,10 @@
- #define TARGET_RISCV_CPU_BITS_H
- 
- #define get_field(reg, mask) (((reg) & \
--                 (target_ulong)(mask)) / ((mask) & ~((mask) << 1)))
--#define set_field(reg, mask, val) (((reg) & ~(target_ulong)(mask)) | \
--                 (((target_ulong)(val) * ((mask) & ~((mask) << 1))) & \
--                 (target_ulong)(mask)))
-+                 (uint64_t)(mask)) / ((mask) & ~((mask) << 1)))
-+#define set_field(reg, mask, val) (((reg) & ~(uint64_t)(mask)) | \
-+                 (((uint64_t)(val) * ((mask) & ~((mask) << 1))) & \
-+                 (uint64_t)(mask)))
- 
- /* Floating point round mode */
- #define FSR_RD_SHIFT        5
-@@ -381,19 +381,8 @@
- #define MSTATUS_TVM         0x00100000 /* since: priv-1.10 */
- #define MSTATUS_TW          0x20000000 /* since: priv-1.10 */
- #define MSTATUS_TSR         0x40000000 /* since: priv-1.10 */
--#if defined(TARGET_RISCV64)
- #define MSTATUS_GVA         0x4000000000ULL
- #define MSTATUS_MPV         0x8000000000ULL
--#elif defined(TARGET_RISCV32)
--#define MSTATUS_GVA         0x00000040
--#define MSTATUS_MPV         0x00000080
--#endif
--
--#ifdef TARGET_RISCV32
--# define MSTATUS_MPV_ISSET(env)  get_field(env->mstatush, MSTATUS_MPV)
--#else
--# define MSTATUS_MPV_ISSET(env)  get_field(env->mstatus, MSTATUS_MPV)
--#endif
- 
- #define MSTATUS64_UXL       0x0000000300000000ULL
- #define MSTATUS64_SXL       0x0000000C00000000ULL
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 0bbfd7f457..dd05a220c7 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -216,13 +216,15 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "pc      ", env->pc);
- #ifndef CONFIG_USER_ONLY
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
--    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
-+    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", (target_ulong)env->mstatus);
- #ifdef TARGET_RISCV32
--    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatush ", env->mstatush);
-+    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatush ",
-+                 (target_ulong)(env->mstatus >> 32));
- #endif
-     if (riscv_has_ext(env, RVH)) {
-         qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hstatus ", env->hstatus);
--        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsstatus ", env->vsstatus);
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsstatus ",
-+                     (target_ulong)env->vsstatus);
-     }
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ", env->mip);
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 4652082df1..3eb3a034db 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -110,27 +110,19 @@ bool riscv_cpu_fp_enabled(CPURISCVState *env)
- 
- void riscv_cpu_swap_hypervisor_regs(CPURISCVState *env)
- {
--    target_ulong mstatus_mask = MSTATUS_MXR | MSTATUS_SUM | MSTATUS_FS |
--                                MSTATUS_SPP | MSTATUS_SPIE | MSTATUS_SIE;
-+    uint64_t mstatus_mask = MSTATUS_MXR | MSTATUS_SUM | MSTATUS_FS |
-+                            MSTATUS_SPP | MSTATUS_SPIE | MSTATUS_SIE |
-+                            MSTATUS64_UXL;
-     bool current_virt = riscv_cpu_virt_enabled(env);
- 
-     g_assert(riscv_has_ext(env, RVH));
- 
--#if defined(TARGET_RISCV64)
--    mstatus_mask |= MSTATUS64_UXL;
--#endif
--
-     if (current_virt) {
-         /* Current V=1 and we are about to change to V=0 */
-         env->vsstatus = env->mstatus & mstatus_mask;
-         env->mstatus &= ~mstatus_mask;
-         env->mstatus |= env->mstatus_hs;
- 
--#if defined(TARGET_RISCV32)
--        env->vsstatush = env->mstatush;
--        env->mstatush |= env->mstatush_hs;
--#endif
--
-         env->vstvec = env->stvec;
-         env->stvec = env->stvec_hs;
- 
-@@ -154,11 +146,6 @@ void riscv_cpu_swap_hypervisor_regs(CPURISCVState *env)
-         env->mstatus &= ~mstatus_mask;
-         env->mstatus |= env->vsstatus;
- 
--#if defined(TARGET_RISCV32)
--        env->mstatush_hs = env->mstatush;
--        env->mstatush |= env->vsstatush;
--#endif
--
-         env->stvec_hs = env->stvec;
-         env->stvec = env->vstvec;
- 
-@@ -727,7 +714,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     if (riscv_has_ext(env, RVH) && env->priv == PRV_M &&
-         access_type != MMU_INST_FETCH &&
-         get_field(env->mstatus, MSTATUS_MPRV) &&
--        MSTATUS_MPV_ISSET(env)) {
-+        get_field(env->mstatus, MSTATUS_MPV)) {
-         riscv_cpu_set_two_stage_lookup(env, true);
-     }
- 
-@@ -799,7 +786,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     if (riscv_has_ext(env, RVH) && env->priv == PRV_M &&
-         access_type != MMU_INST_FETCH &&
-         get_field(env->mstatus, MSTATUS_MPRV) &&
--        MSTATUS_MPV_ISSET(env)) {
-+        get_field(env->mstatus, MSTATUS_MPV)) {
-         riscv_cpu_set_two_stage_lookup(env, false);
-     }
- 
-@@ -862,7 +849,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-     RISCVCPU *cpu = RISCV_CPU(cs);
-     CPURISCVState *env = &cpu->env;
-     bool force_hs_execp = riscv_cpu_force_hs_excep_enabled(env);
--    target_ulong s;
-+    uint64_t s;
- 
-     /* cs->exception is 32-bits wide unlike mcause which is XLEN-bits wide
-      * so we mask off the MSB and separate into trap type and cause.
-@@ -995,19 +982,11 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-             if (riscv_cpu_virt_enabled(env)) {
-                 riscv_cpu_swap_hypervisor_regs(env);
-             }
--#ifdef TARGET_RISCV32
--            env->mstatush = set_field(env->mstatush, MSTATUS_MPV,
--                                       riscv_cpu_virt_enabled(env));
--            if (riscv_cpu_virt_enabled(env) && tval) {
--                env->mstatush = set_field(env->mstatush, MSTATUS_GVA, 1);
--            }
--#else
-             env->mstatus = set_field(env->mstatus, MSTATUS_MPV,
--                                      riscv_cpu_virt_enabled(env));
-+                                     riscv_cpu_virt_enabled(env));
-             if (riscv_cpu_virt_enabled(env) && tval) {
-                 env->mstatus = set_field(env->mstatus, MSTATUS_GVA, 1);
-             }
--#endif
- 
-             mtval2 = env->guest_phys_fault_addr;
- 
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index aaef6c6f20..e33f6cdc11 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -446,8 +446,8 @@ static int validate_vm(CPURISCVState *env, target_ulong vm)
- 
- static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
- {
--    target_ulong mstatus = env->mstatus;
--    target_ulong mask = 0;
-+    uint64_t mstatus = env->mstatus;
-+    uint64_t mask = 0;
-     int dirty;
- 
-     /* flush tlb on mstatus fields that affect VM */
-@@ -480,19 +480,20 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
- #ifdef TARGET_RISCV32
- static int read_mstatush(CPURISCVState *env, int csrno, target_ulong *val)
- {
--    *val = env->mstatush;
-+    *val = env->mstatus >> 32;
-     return 0;
- }
- 
- static int write_mstatush(CPURISCVState *env, int csrno, target_ulong val)
- {
--    if ((val ^ env->mstatush) & (MSTATUS_MPV)) {
-+    uint64_t valh = (uint64_t)val << 32;
-+    uint64_t mask = MSTATUS_MPV | MSTATUS_GVA;
++    object_initialize_child(obj, "ddr-sgmii-phy", &s->ddr_sgmii_phy,
++                            TYPE_MCHP_PFSOC_DDR_SGMII_PHY);
++    object_initialize_child(obj, "ddr-cfg", &s->ddr_cfg,
++                            TYPE_MCHP_PFSOC_DDR_CFG);
 +
-+    if ((valh ^ env->mstatus) & (MSTATUS_MPV)) {
-         tlb_flush(env_cpu(env));
-     }
+     object_initialize_child(obj, "gem0", &s->gem0, TYPE_CADENCE_GEM);
+     object_initialize_child(obj, "gem1", &s->gem1, TYPE_CADENCE_GEM);
  
--    val &= MSTATUS_MPV | MSTATUS_GVA;
--
--    env->mstatush = val;
-+    env->mstatus = (env->mstatus & ~mask) | (valh & mask);
+@@ -278,6 +286,16 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
+         memmap[MICROCHIP_PFSOC_MPUCFG].base,
+         memmap[MICROCHIP_PFSOC_MPUCFG].size);
  
-     return 0;
- }
-@@ -1105,7 +1106,8 @@ static int read_vsstatus(CPURISCVState *env, int csrno, target_ulong *val)
- 
- static int write_vsstatus(CPURISCVState *env, int csrno, target_ulong val)
- {
--    env->vsstatus = val;
-+    uint64_t mask = (target_ulong)-1;
-+    env->vsstatus = (env->vsstatus & ~mask) | (uint64_t)val;
-     return 0;
- }
- 
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index 4ce73575a7..e20d56dcb8 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -78,7 +78,8 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
- 
- target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
- {
--    target_ulong prev_priv, prev_virt, mstatus;
-+    uint64_t mstatus;
-+    target_ulong prev_priv, prev_virt;
- 
-     if (!(env->priv >= PRV_S)) {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-@@ -147,18 +148,14 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
-         riscv_raise_exception(env, RISCV_EXCP_INST_ADDR_MIS, GETPC());
-     }
- 
--    target_ulong mstatus = env->mstatus;
-+    uint64_t mstatus = env->mstatus;
-     target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
--    target_ulong prev_virt = MSTATUS_MPV_ISSET(env);
-+    target_ulong prev_virt = get_field(env->mstatus, MSTATUS_MPV);
-     mstatus = set_field(mstatus, MSTATUS_MIE,
-                         get_field(mstatus, MSTATUS_MPIE));
-     mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
-     mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
--#ifdef TARGET_RISCV32
--    env->mstatush = set_field(env->mstatush, MSTATUS_MPV, 0);
--#else
-     mstatus = set_field(mstatus, MSTATUS_MPV, 0);
--#endif
-     env->mstatus = mstatus;
-     riscv_cpu_set_mode(env, prev_priv);
- 
++    /* DDR SGMII PHY */
++    sysbus_realize(SYS_BUS_DEVICE(&s->ddr_sgmii_phy), errp);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ddr_sgmii_phy), 0,
++                    memmap[MICROCHIP_PFSOC_DDR_SGMII_PHY].base);
++
++    /* DDR CFG */
++    sysbus_realize(SYS_BUS_DEVICE(&s->ddr_cfg), errp);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ddr_cfg), 0,
++                    memmap[MICROCHIP_PFSOC_DDR_CFG].base);
++
+     /* SDHCI */
+     sysbus_realize(SYS_BUS_DEVICE(&s->sdhci), errp);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdhci), 0,
+diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+index 2df978fe8d..c8e50bde99 100644
+--- a/hw/riscv/Kconfig
++++ b/hw/riscv/Kconfig
+@@ -4,6 +4,7 @@ config IBEX
+ config MICROCHIP_PFSOC
+     bool
+     select CADENCE_SDHCI
++    select MCHP_PFSOC_DMC
+     select MCHP_PFSOC_MMUART
+     select MSI_NONBROKEN
+     select SIFIVE_CLINT
 -- 
 2.28.0
 
