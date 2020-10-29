@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC6E4C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF13C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:14:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38789206CA
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:14:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C227206CA
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 22:14:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JkPPek9K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38789206CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cq57UG/7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C227206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYGBO-0001Vj-40
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 18:14:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42474)
+	id 1kYGBl-0001zp-Ib
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 18:14:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYG0x-0003Kc-Fu
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:03:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28104)
+ id 1kYG1F-0003SJ-Oj
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:03:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56718)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYG0u-0006ZN-LG
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:03:23 -0400
+ id 1kYG16-0006am-V0
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 18:03:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604008999;
+ s=mimecast20190719; t=1604009012;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+SZZYhSE2rpTgLRMeYs39Kq9SIu/LUpzeiN/rszhjA4=;
- b=JkPPek9KUkj1Fuaw2FhXvkYD0UnZW2CrHvQo2C+PBjjjv6nAbUywBrYMMRRUviFovpcXZw
- t+Rq2W1akxrSUmD6d/rjFxI31XnjlyQYcX6Zn/RlR96tjPkDQPfsYhfxgJPHy1ligIQMIx
- ArH/cHYEbvRLXowIEToDBznp/TPAF+0=
+ bh=PYqBw404nya5K8lxIqHPM1NnICn2FHO0IC/N3cMXi94=;
+ b=Cq57UG/7CXCLDWj1Cvog50h8xnLvf5TIw4lCmvI351kmi7l93VLubo9iXY3cdbtJV6nJvS
+ 5h+M6gGMCpuZHOPe+eNLLjjFaRCasW4hqymh7ct8reO738cXw+GLF473sr3teb6TvFSCp2
+ V9YKiQ+giP8OBgsgOS40FcFSA0fXDlo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-419-yWraVOmoPVyzDAoNkDCSKQ-1; Thu, 29 Oct 2020 18:03:18 -0400
-X-MC-Unique: yWraVOmoPVyzDAoNkDCSKQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-237-_nNfHLc2MfGI9-pTap4GNQ-1; Thu, 29 Oct 2020 18:03:30 -0400
+X-MC-Unique: _nNfHLc2MfGI9-pTap4GNQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E260D1018F78
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 22:03:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7600B8030CC
+ for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 22:03:29 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9DEDD5C1C4;
- Thu, 29 Oct 2020 22:03:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0C8831002D48;
+ Thu, 29 Oct 2020 22:03:28 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 11/36] qdev: Make check_prop_still_unset() get Object* argument
-Date: Thu, 29 Oct 2020 18:02:21 -0400
-Message-Id: <20201029220246.472693-12-ehabkost@redhat.com>
+Subject: [PATCH 15/36] qdev: Make PropertyInfo.create return ObjectProperty*
+Date: Thu, 29 Oct 2020 18:02:25 -0400
+Message-Id: <20201029220246.472693-16-ehabkost@redhat.com>
 In-Reply-To: <20201029220246.472693-1-ehabkost@redhat.com>
 References: <20201029220246.472693-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -103,8 +103,6 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the code more generic and not specific to TYPE_DEVICE.
-
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
 Cc: Paolo Bonzini <pbonzini@redhat.com>
@@ -112,54 +110,45 @@ Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/core/qdev-properties-system.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/hw/qdev-properties.h |  2 +-
+ hw/core/qdev-properties.c    | 10 +++++-----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index af1339e562..85dd38db0f 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -32,11 +32,11 @@
- #include "hw/pci/pci.h"
- #include "util/block-helpers.h"
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 530286e869..7f8e4daade 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -34,7 +34,7 @@ struct PropertyInfo {
+     const QEnumLookup *enum_table;
+     int (*print)(Object *obj, Property *prop, char *dest, size_t len);
+     void (*set_default_value)(ObjectProperty *op, const Property *prop);
+-    void (*create)(ObjectClass *oc, Property *prop);
++    ObjectProperty *(*create)(ObjectClass *oc, Property *prop);
+     ObjectPropertyAccessor *get;
+     ObjectPropertyAccessor *set;
+     ObjectPropertyRelease *release;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 195bfed6e1..89e292dc25 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -872,12 +872,12 @@ const PropertyInfo qdev_prop_size = {
  
--static bool check_prop_still_unset(DeviceState *dev, const char *name,
-+static bool check_prop_still_unset(Object *obj, const char *name,
-                                    const void *old_val, const char *new_val,
-                                    Error **errp)
+ /* --- object link property --- */
+ 
+-static void create_link_property(ObjectClass *oc, Property *prop)
++static ObjectProperty *create_link_property(ObjectClass *oc, Property *prop)
  {
--    const GlobalProperty *prop = qdev_find_global_prop(OBJECT(dev), name);
-+    const GlobalProperty *prop = qdev_find_global_prop(obj, name);
+-    object_class_property_add_link(oc, prop->name, prop->link_type,
+-                                   prop->offset,
+-                                   qdev_prop_allow_set_link_before_realize,
+-                                   OBJ_PROP_LINK_STRONG);
++    return object_class_property_add_link(oc, prop->name, prop->link_type,
++                                          prop->offset,
++                                          qdev_prop_allow_set_link_before_realize,
++                                          OBJ_PROP_LINK_STRONG);
+ }
  
-     if (!old_val) {
-         return true;
-@@ -105,7 +105,7 @@ static void set_drive_helper(Object *obj, Visitor *v, const char *name,
-      * TODO Should this really be an error?  If no, the old value
-      * needs to be released before we store the new one.
-      */
--    if (!check_prop_still_unset(dev, name, *ptr, str, errp)) {
-+    if (!check_prop_still_unset(obj, name, *ptr, str, errp)) {
-         return;
-     }
- 
-@@ -247,7 +247,7 @@ static void set_chr(Object *obj, Visitor *v, const char *name, void *opaque,
-      * TODO Should this really be an error?  If no, the old value
-      * needs to be released before we store the new one.
-      */
--    if (!check_prop_still_unset(dev, name, be->chr, str, errp)) {
-+    if (!check_prop_still_unset(obj, name, be->chr, str, errp)) {
-         return;
-     }
- 
-@@ -429,7 +429,7 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
-          * TODO Should this really be an error?  If no, the old value
-          * needs to be released before we store the new one.
-          */
--        if (!check_prop_still_unset(dev, name, ncs[i], str, errp)) {
-+        if (!check_prop_still_unset(obj, name, ncs[i], str, errp)) {
-             goto out;
-         }
- 
+ const PropertyInfo qdev_prop_link = {
 -- 
 2.28.0
 
