@@ -2,63 +2,66 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 518C4C55179
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 15:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC8FC55179
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 15:03:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2FE72067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 15:00:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2FE72067C
+	by mail.kernel.org (Postfix) with ESMTPS id 98A1C20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 15:03:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98A1C20838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY9Q7-0004Zp-JX
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 11:00:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33922)
+	id 1kY9ST-0006Xc-DM
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 11:03:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wubinfeng@huawei.com>)
- id 1kY6J1-0002jr-OT
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 07:41:26 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:2058)
+ (Exim 4.90_1) (envelope-from <chaihaoyu1@huawei.com>)
+ id 1kY6m8-0002uo-Mj
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 08:11:28 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2488)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wubinfeng@huawei.com>)
- id 1kY6It-0002J3-93
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 07:41:23 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CMNmt4xLMzhZFX;
- Thu, 29 Oct 2020 19:41:02 +0800 (CST)
-Received: from huawei.com (10.174.187.148) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Thu, 29 Oct 2020
- 19:40:49 +0800
-From: Binfeng Wu <wubinfeng@huawei.com>
-To: <alex.williamson@redhat.com>
-Subject: [PATCH] vfio-pci: add Ascend devices passthrough quirks
-Date: Thu, 29 Oct 2020 19:40:48 +0800
-Message-ID: <20201029114048.700-1-wubinfeng@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
+ (Exim 4.90_1) (envelope-from <chaihaoyu1@huawei.com>)
+ id 1kY6m5-0006iN-7N
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 08:11:28 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CMPRf2rWjzhd93;
+ Thu, 29 Oct 2020 20:11:10 +0800 (CST)
+Received: from [10.108.235.54] (10.108.235.54) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 29 Oct 2020 20:10:59 +0800
+Subject: [PATCH 1/1] plugin: foo * bar should be foo *bar
+References: <122e27ba-05e5-6cdf-344f-13636451a408@huawei.com>
+To: <alex.bennee@linaro.org>
+From: chaihaoyu <chaihaoyu1@huawei.com>
+X-Forwarded-Message-Id: <122e27ba-05e5-6cdf-344f-13636451a408@huawei.com>
+Message-ID: <c88e3ba7-c689-fae8-947e-b6c78742b52b@huawei.com>
+Date: Thu, 29 Oct 2020 20:10:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.148]
+In-Reply-To: <122e27ba-05e5-6cdf-344f-13636451a408@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.108.235.54]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=wubinfeng@huawei.com;
- helo=szxga06-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 07:41:00
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=chaihaoyu1@huawei.com; helo=szxga05-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 08:11:09
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
 X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-Mailman-Approved-At: Thu, 29 Oct 2020 10:57:05 -0400
 X-BeenThere: qemu-devel@nongnu.org
@@ -72,149 +75,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xieyingtai@huawei.com, qemu-devel@nongnu.org,
- Binfeng Wu <wubinfeng@huawei.com>
+Cc: alex.chen@huawei.com, hunongda@huawei.com, zhang.zhanghailiang@huawei.com,
+ qemu-trival@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ascend is a series of SoC processors developed by Huawei. Ascend310/910
-are highly efficient, flexible, and programmable AI processors in this
-series and support device passthrough via vfio-pci. Ascends device
-xloader update is only allowed in host, because update triggered by vm
-users may affect other users when Ascend devices passthrough to vm.
-Set a bar quirk is an effective method to keep vm users from updating
-xloader. In this patch, two bar quirks were proposed to cover
-Ascend310/910 respectively.
+Date: Thu, 29 Oct 2020 15:53:44 +0800
+signed-off-by: Haoyu Chai<chaihaoyu1@huawei.com>
+Reported-by: Euler Robot <euler.robot@huawei.com>
 
-Signed-off-by: Binfeng Wu <wubinfeng@huawei.com>
 ---
- hw/vfio/pci-quirks.c | 104 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 104 insertions(+)
+ plugins/api.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 57150913b7..291a45d3ab 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1202,6 +1202,108 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
-     return 0;
- }
- 
-+#define PCI_VENDOR_ID_HUAWEI      0x19e5
-+#define PCI_DEVICE_ID_ASCEND910   0xd801
-+#define PCI_DEVICE_ID_ASCEND310   0xd100
-+#define ASCEND910_XLOADER_SIZE    4
-+#define ASCEND910_XLOADER_OFFSET  0x80400
-+#define ASCEND310_XLOADER_SIZE    4
-+#define ASCEND310_XLOADER_OFFSET  0x400
-+
-+typedef struct VFIOAscendBarQuirk {
-+    struct VFIOPCIDevice *vdev;
-+    pcibus_t offset;
-+    uint8_t bar;
-+    MemoryRegion *mem;
-+} VFIOAscendBarQuirk;
-+
-+static uint64_t vfio_ascend_quirk_read(void *opaque,
-+                                       hwaddr addr, unsigned size)
-+{
-+    VFIOAscendBarQuirk *quirk = opaque;
-+    VFIOPCIDevice *vdev = quirk->vdev;
-+
-+    return vfio_region_read(&vdev->bars[quirk->bar].region,
-+                            addr + quirk->offset, size);
-+}
-+
-+static void vfio_ascend_quirk_write(void *opaque, hwaddr addr,
-+                                    uint64_t data, unsigned size)
-+{
-+}
-+
-+static const MemoryRegionOps vfio_ascend_intercept_regs_quirk = {
-+    .read = vfio_ascend_quirk_read,
-+    .write = vfio_ascend_quirk_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void vfio_probe_ascend_bar0_quirk(VFIOPCIDevice *vdev, int nr)
-+{
-+    VFIOQuirk *quirk;
-+    VFIOAscendBarQuirk *bar0_quirk;
-+
-+    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ASCEND910) ||
-+        nr != 0) {
-+        return;
-+    }
-+
-+    quirk = g_malloc0(sizeof(*quirk));
-+    quirk->nr_mem = 1;
-+    quirk->mem = g_new0(MemoryRegion, quirk->nr_mem);
-+    bar0_quirk = quirk->data = g_new0(typeof(*bar0_quirk), quirk->nr_mem);
-+    bar0_quirk[0].vdev = vdev;
-+    bar0_quirk[0].offset = ASCEND910_XLOADER_OFFSET;
-+    bar0_quirk[0].bar = nr;
-+
-+    /*
-+     * intercept w/r to the xloader-updating register,
-+     * so the vm can't enable xloader-updating
-+     */
-+    memory_region_init_io(&quirk->mem[0], OBJECT(vdev),
-+                          &vfio_ascend_intercept_regs_quirk,
-+                          &bar0_quirk[0],
-+                          "vfio-ascend-bar0-intercept-regs-quirk",
-+                          ASCEND910_XLOADER_SIZE);
-+    memory_region_add_subregion_overlap(vdev->bars[nr].region.mem,
-+                                        bar0_quirk[0].offset,
-+                                        &quirk->mem[0], 1);
-+    QLIST_INSERT_HEAD(&vdev->bars[nr].quirks, quirk, next);
-+}
-+
-+static void vfio_probe_ascend_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-+{
-+    VFIOQuirk *quirk;
-+    VFIOAscendBarQuirk *bar4_quirk;
-+
-+    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ASCEND310) ||
-+        nr != 4) {
-+        return;
-+    }
-+
-+    quirk = g_malloc0(sizeof(*quirk));
-+    quirk->nr_mem = 1;
-+    quirk->mem = g_new0(MemoryRegion, quirk->nr_mem);
-+    bar4_quirk = quirk->data = g_new0(typeof(*bar4_quirk), quirk->nr_mem);
-+    bar4_quirk[0].vdev = vdev;
-+    bar4_quirk[0].offset = ASCEND310_XLOADER_OFFSET;
-+    bar4_quirk[0].bar = nr;
-+
-+    /*
-+     * intercept w/r to the xloader-updating register,
-+     * so the vm can't enable xloader-updating
-+     */
-+    memory_region_init_io(&quirk->mem[0], OBJECT(vdev),
-+                          &vfio_ascend_intercept_regs_quirk,
-+                          &bar4_quirk[0],
-+                          "vfio-ascend-bar4-intercept-regs-quirk",
-+                          ASCEND310_XLOADER_SIZE);
-+    memory_region_add_subregion_overlap(vdev->bars[nr].region.mem,
-+                                        bar4_quirk[0].offset,
-+                                        &quirk->mem[0], 1);
-+    QLIST_INSERT_HEAD(&vdev->bars[nr].quirks, quirk, next);
-+}
-+
- /*
-  * Common quirk probe entry points.
+diff --git a/plugins/api.c b/plugins/api.c
+index bbdc5a4eb4..9661824b89 100644
+--- a/plugins/api.c
++++ b/plugins/api.c
+@@ -309,7 +309,7 @@ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr
   */
-@@ -1251,6 +1353,8 @@ void vfio_bar_quirk_setup(VFIOPCIDevice *vdev, int nr)
-     vfio_probe_nvidia_bar5_quirk(vdev, nr);
-     vfio_probe_nvidia_bar0_quirk(vdev, nr);
-     vfio_probe_rtl8168_bar2_quirk(vdev, nr);
-+    vfio_probe_ascend_bar0_quirk(vdev, nr);
-+    vfio_probe_ascend_bar4_quirk(vdev, nr);
- #ifdef CONFIG_VFIO_IGD
-     vfio_probe_igd_bar4_quirk(vdev, nr);
- #endif
--- 
-2.26.2.windows.1
 
+ #ifndef CONFIG_USER_ONLY
+-static MachineState * get_ms(void)
++static MachineState *get_ms(void)
+ {
+     return MACHINE(qdev_get_machine());
+ }
+-- 
 
