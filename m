@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD05C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C632FC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:42:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF3D5207BC
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:41:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32DCD207BC
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:42:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5jLrmiF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF3D5207BC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F9tPcrXx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32DCD207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY8BD-0008Kv-QW
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 09:41:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41118)
+	id 1kY8Bs-000185-53
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 09:42:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kY88e-0005ot-FE
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:38:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22645)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kY88f-0005qM-GP
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:38:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42288)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kY88c-0008JB-CO
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:38:48 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kY88c-0008JF-Om
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:38:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603978724;
+ s=mimecast20190719; t=1603978725;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aAvrY18gsWhtfCs+PRf6YPZnkLAFlXIFr47Ukhgadd8=;
- b=Y5jLrmiFooNN5DKB5Avatf4dkwILNPm9obqYFNz5+s/7ygf3zz5fwydQ3UCibYsOK1BI7n
- kmhFmjEdC9OlH3qknosvQuOUFkLvZeFtV3DqJ40AkGEOljPM9sY5A/XZ9H2xkYu7Q/KnG9
- I7axUUU1fT7Gdm4w9F40pTRq4d+d7BY=
+ bh=0aaI62MqpCVlWiqfeRGUdxe9LfKHQujWNQ0NbrrtWK8=;
+ b=F9tPcrXx4hhnLs6FUv7kOnbkaJNObqv2DySXXI7BIty4C+RfwAWf+hdmk4/7PU0/VGjXL6
+ 7pkXiWCVtw27OgEF9PwrCUDpB2zuNDyycThGwC35SRWmXQqNPbAOCW5D3sUHr68mHK2Pco
+ h/654ozV06ZxXiymCMLXqCv+K+cJXxU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-lB-KYrK1M62iTnnQAF4m4A-1; Thu, 29 Oct 2020 09:38:42 -0400
-X-MC-Unique: lB-KYrK1M62iTnnQAF4m4A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-232-_6pBecWGO52W8yGO31eumg-1; Thu, 29 Oct 2020 09:38:44 -0400
+X-MC-Unique: _6pBecWGO52W8yGO31eumg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09BCE1018F79;
- Thu, 29 Oct 2020 13:38:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 418826D584;
+ Thu, 29 Oct 2020 13:38:43 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
  [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D19E19930;
- Thu, 29 Oct 2020 13:38:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D8795D9EF;
+ Thu, 29 Oct 2020 13:38:43 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9FD241138468; Thu, 29 Oct 2020 14:38:33 +0100 (CET)
+ id B2CC21132922; Thu, 29 Oct 2020 14:38:33 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/11] test-util-sockets: Clean up SocketAddress construction
-Date: Thu, 29 Oct 2020 14:38:25 +0100
-Message-Id: <20201029133833.3450220-4-armbru@redhat.com>
+Subject: [PATCH 09/11] char-socket: Fix qemu_chr_socket_address() for abstract
+ sockets
+Date: Thu, 29 Oct 2020 14:38:31 +0100
+Message-Id: <20201029133833.3450220-10-armbru@redhat.com>
 In-Reply-To: <20201029133833.3450220-1-armbru@redhat.com>
 References: <20201029133833.3450220-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -102,142 +103,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The thread functions build the SocketAddress from global variable
-@abstract_sock_name and the tight flag passed as pointer
-argument (either NULL or (gpointer)1).  There is no need for such
-hackery; simply pass the SocketAddress instead.
-
-While there, dumb down g_rand_int_range() to g_random_int().
+Commit 776b97d360 "qemu-sockets: add abstract UNIX domain socket
+support" neglected to update qemu_chr_socket_address().  It shows
+shows neither @abstract nor @tight.  Fix that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-util-sockets.c | 62 +++++++++++++++------------------------
- 1 file changed, 24 insertions(+), 38 deletions(-)
+ chardev/char-socket.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index 9d317e73a6..b1b5628bd5 100644
---- a/tests/test-util-sockets.c
-+++ b/tests/test-util-sockets.c
-@@ -230,25 +230,14 @@ static void test_socket_fd_pass_num_nocli(void)
- #endif
- 
- #ifdef __linux__
--static gchar *abstract_sock_name;
--
- static gpointer unix_server_thread_func(gpointer user_data)
- {
--    SocketAddress addr;
--    Error *err = NULL;
--    int fd = -1;
--    int connfd = -1;
-+    int fd;
-+    int connfd;
-     struct sockaddr_un un;
-     socklen_t len = sizeof(un);
- 
--    addr.type = SOCKET_ADDRESS_TYPE_UNIX;
--    addr.u.q_unix.path = abstract_sock_name;
--    addr.u.q_unix.has_tight = true;
--    addr.u.q_unix.tight = user_data != NULL;
--    addr.u.q_unix.has_abstract = true;
--    addr.u.q_unix.abstract = true;
--
--    fd = socket_listen(&addr, 1, &err);
-+    fd = socket_listen(user_data, 1, &error_abort);
-     g_assert_cmpint(fd, >=, 0);
-     g_assert(fd_is_socket(fd));
- 
-@@ -257,69 +246,66 @@ static gpointer unix_server_thread_func(gpointer user_data)
-     close(connfd);
- 
-     close(fd);
--
-     return NULL;
- }
- 
- static gpointer unix_client_thread_func(gpointer user_data)
- {
--    SocketAddress addr;
--    Error *err = NULL;
--    int fd = -1;
--
--    addr.type = SOCKET_ADDRESS_TYPE_UNIX;
--    addr.u.q_unix.path = abstract_sock_name;
--    addr.u.q_unix.has_tight = true;
--    addr.u.q_unix.tight = user_data != NULL;
--    addr.u.q_unix.has_abstract = true;
--    addr.u.q_unix.abstract = true;
--
--    fd = socket_connect(&addr, &err);
-+    int fd;
- 
-+    fd = socket_connect(user_data, &error_abort);
-     g_assert_cmpint(fd, >=, 0);
--
-     close(fd);
--
-     return NULL;
- }
- 
- static void test_socket_unix_abstract_good(void)
- {
--    GRand *r = g_rand_new();
-+    SocketAddress addr;
- 
--    abstract_sock_name = g_strdup_printf("unix-%d-%d", getpid(),
--                                         g_rand_int_range(r, 100, 1000));
-+    addr.type = SOCKET_ADDRESS_TYPE_UNIX;
-+    addr.u.q_unix.path = g_strdup_printf("unix-%d-%u",
-+                                         getpid(), g_random_int());
-+    addr.u.q_unix.has_abstract = true;
-+    addr.u.q_unix.abstract = true;
- 
-     /* non tight socklen serv and cli */
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 1ee5a8c295..dc1cf86ecf 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -443,10 +443,18 @@ static char *qemu_chr_socket_address(SocketChardev *s, const char *prefix)
+                                s->is_listen ? ",server" : "");
+         break;
+     case SOCKET_ADDRESS_TYPE_UNIX:
+-        return g_strdup_printf("%sunix:%s%s", prefix,
++    {
++        UnixSocketAddress *sa = &s->addr->u.q_unix;
 +
-+    addr.u.q_unix.has_tight = false;
-+    addr.u.q_unix.tight = false;
-+
-     GThread *serv = g_thread_new("abstract_unix_server",
-                                  unix_server_thread_func,
--                                 NULL);
-+                                 &addr);
- 
-     sleep(1);
- 
-     GThread *cli = g_thread_new("abstract_unix_client",
-                                 unix_client_thread_func,
--                                NULL);
-+                                &addr);
- 
-     g_thread_join(cli);
-     g_thread_join(serv);
- 
-     /* tight socklen serv and cli */
-+
-+    addr.u.q_unix.has_tight = true;
-+    addr.u.q_unix.tight = true;
-+
-     serv = g_thread_new("abstract_unix_server",
-                         unix_server_thread_func,
--                        (gpointer)1);
-+                        &addr);
- 
-     sleep(1);
- 
-     cli = g_thread_new("abstract_unix_client",
-                        unix_client_thread_func,
--                       (gpointer)1);
-+                       &addr);
- 
-     g_thread_join(cli);
-     g_thread_join(serv);
- 
--    g_free(abstract_sock_name);
--    g_rand_free(r);
-+    g_free(addr.u.q_unix.path);
- }
- #endif
- 
++        return g_strdup_printf("%sunix:%s%s%s%s", prefix,
+                                s->addr->u.q_unix.path,
++                               sa->has_abstract && sa->abstract
++                               ? ",abstract" : "",
++                               sa->has_tight && sa->tight
++                               ? ",tight" : "",
+                                s->is_listen ? ",server" : "");
+         break;
++    }
+     case SOCKET_ADDRESS_TYPE_FD:
+         return g_strdup_printf("%sfd:%s%s", prefix, s->addr->u.fd.str,
+                                s->is_listen ? ",server" : "");
 -- 
 2.26.2
 
