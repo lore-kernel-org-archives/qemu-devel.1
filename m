@@ -2,90 +2,89 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90EAFC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A34A9C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:41:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAC2C207BC
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA63420796
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:41:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fn544HyQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAC2C207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aE4xlScG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA63420796
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY88T-0005LL-NH
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 09:38:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40956)
+	id 1kY8Au-0007jm-Lr
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 09:41:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
- id 1kY87g-0004Wb-1z
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:37:48 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:45096)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
- id 1kY87e-0007zx-8e
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:37:47 -0400
-Received: by mail-lf1-x144.google.com with SMTP id y184so1374772lfa.12
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 06:37:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=YfRB8FQmwaiiY6xcRF4WpyWAS6wFDwuQyJf55DguVeI=;
- b=Fn544HyQ56FmED4VrrCTbRHrewY2uEkVSqzaOy/OKq87AbdPUFNUyYuUf/nm08B18F
- iio61xHYwW+0NlEBF+CzvBvhgYlXgOWybJHVIZoxTGgPyVXLGTrW9laQpieRFWS1efHN
- 98NTlo3NyEXCCSY2B2kvZHKdjFr1y+vIRntqxydoyBb4SFvm+DZgT+SDoHafT9QMrEGd
- +330fhVygOyqlkdKj+YZ9sWNUgIICw5gLXA4G9I1yhnE8kRphXrZ9CgJHUH7AKeN9WW2
- QOXuca2P4poUhCZ/oNkEDcMIaO3ERXDygL++4LhCSvNvwcF+Fff7OeRQdXA5+MQIVC/9
- yr0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=YfRB8FQmwaiiY6xcRF4WpyWAS6wFDwuQyJf55DguVeI=;
- b=EXCnYTv6lb54BZykFNWdcsPr/DvJrehBhW1Hk4gY7hatUBZmVrBBLC4tQPeAbm5Au4
- S8p/nqTKkFsVrfIVj/llotZ+y8OwCbo4YKBfH5QIGFGt7OT8Gpd/UUAUHrCgq5O744BI
- 7fwhmJ7g2rz8nFmLNT8hvBT+Jwad+9+TaZSl8S+OulxyzX1ybajWtI17erWTyEeJIwfg
- tfhHP+kWxLO66zI2plfaSfA0c0+voFxbAQD6R4i7sfLts2kNae/9PX07IhvyYj/U2dla
- F15hs9fxPeUj15vgF7wCu2UZrb2pJqD7BQogxum7AsBFmKDYm4pxdQ9E4rYR1+/5NMmK
- K25g==
-X-Gm-Message-State: AOAM5301u97TSG2fMIshqBFuWTOWx3BaqwucoLI+xwJvKgS2c6ffJ+Mk
- EutNm3en58R5VpxlhUizUpm4jWjdeiDmvX58wIo=
-X-Google-Smtp-Source: ABdhPJx8m++592/7jOeOjKwbpWqCnQXCFYegDVTkjfLC3umw/45ChrDJ7JUU2KiPV7DSMa6Ey9rVMi+ytX8h8FVXoMk=
-X-Received: by 2002:ac2:455c:: with SMTP id j28mr1530509lfm.320.1603978661669; 
- Thu, 29 Oct 2020 06:37:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kY88i-0005uu-48
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:38:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44312)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kY88c-0008JH-Uz
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:38:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603978726;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ipDAHN34HYPTwpBfDDlZgURqYSPDncPgCbiQcKj+//M=;
+ b=aE4xlScG/UryHPsY9w5kzfpTTVYDwCaPeUcC3YeK/PXrrUZEuivtoM8g/Nqp0bsHzOzsFe
+ NIBCmhCEUIJTvIF345kUCz3o0hrBhV1EOZMHO8wUHw5M6q8R/CMAKHzj6DV1mGcVLQQc6r
+ 2lD4m8LXpu7/BSKS6Mj2QtKAqiPMnRA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-bwbY1UlqO6-_Tfk9bFN91Q-1; Thu, 29 Oct 2020 09:38:44 -0400
+X-MC-Unique: bwbY1UlqO6-_Tfk9bFN91Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F0D11018F7C;
+ Thu, 29 Oct 2020 13:38:43 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2861160E1C;
+ Thu, 29 Oct 2020 13:38:35 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9CA401138461; Thu, 29 Oct 2020 14:38:33 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 02/11] test-util-sockets: Correct to set has_abstract,
+ has_tight
+Date: Thu, 29 Oct 2020 14:38:24 +0100
+Message-Id: <20201029133833.3450220-3-armbru@redhat.com>
+In-Reply-To: <20201029133833.3450220-1-armbru@redhat.com>
+References: <20201029133833.3450220-1-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20201028174406.23424-1-alex.bennee@linaro.org>
- <alpine.DEB.2.21.2010281406080.12247@sstabellini-ThinkPad-T480s>
- <87d011mjuw.fsf@linaro.org>
-In-Reply-To: <87d011mjuw.fsf@linaro.org>
-From: Jason Andryuk <jandryuk@gmail.com>
-Date: Thu, 29 Oct 2020 09:37:29 -0400
-Message-ID: <CAKf6xpsYorMRYpuPcb8B1zVWz3GHgZZwF+NPVA=nFL2Tr13hqQ@mail.gmail.com>
-Subject: Re: [PATCH] meson.build: fix building of Xen support for aarch64
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::144;
- envelope-from=jandryuk@gmail.com; helo=mail-lf1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 01:47:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,73 +97,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- Masami Hiramatsu <masami.hiramatsu@linaro.org>, Paul Durrant <paul@xen.org>,
- QEMU <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>,
- xen-devel <xen-devel@lists.xenproject.org>
+Cc: kwolf@redhat.com, berrange@redhat.com, zxq_yx_007@163.com,
+ kraxel@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 29, 2020 at 6:01 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->
->
-> Stefano Stabellini <sstabellini@kernel.org> writes:
->
-> > On Wed, 28 Oct 2020, Alex Benn=C3=A9e wrote:
-> >> Xen is supported on aarch64 although weirdly using the i386-softmmu
-> >> model. Checking based on the host CPU meant we never enabled Xen
-> >> support. It would be nice to enable CONFIG_XEN for aarch64-softmmu to
-> >> make it not seem weird but that will require further build surgery.
-> >>
-> >> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> >> Cc: Masami Hiramatsu <masami.hiramatsu@linaro.org>
-> >> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> >> Cc: Anthony Perard <anthony.perard@citrix.com>
-> >> Cc: Paul Durrant <paul@xen.org>
-> >> Fixes: 8a19980e3f ("configure: move accelerator logic to meson")
-> >> ---
-> >>  meson.build | 2 ++
-> >>  1 file changed, 2 insertions(+)
-> >>
-> >> diff --git a/meson.build b/meson.build
-> >> index 835424999d..f1fcbfed4c 100644
-> >> --- a/meson.build
-> >> +++ b/meson.build
-> >> @@ -81,6 +81,8 @@ if cpu in ['x86', 'x86_64']
-> >>      'CONFIG_HVF': ['x86_64-softmmu'],
-> >>      'CONFIG_WHPX': ['i386-softmmu', 'x86_64-softmmu'],
-> >>    }
-> >> +elif cpu in [ 'arm', 'aarch64' ]
-> >> +  accelerator_targets +=3D { 'CONFIG_XEN': ['i386-softmmu'] }
-> >>  endif
-> >
-> > This looks very reasonable -- the patch makes sense.
+The code tested doesn't care, which is a bug I will fix shortly.
 
-A comment would be useful to explain that Arm needs i386-softmmu for
-the xenpv machine.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/test-util-sockets.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> >
-> > However I have two questions, mostly for my own understanding. I tried
-> > to repro the aarch64 build problem but it works at my end, even without
-> > this patch.
->
-> Building on a x86 host or with cross compiler?
->
-> > I wonder why. I suspect it works thanks to these lines in
-> > meson.build:
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index 15da867b8f..9d317e73a6 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -243,7 +243,9 @@ static gpointer unix_server_thread_func(gpointer user_data)
+ 
+     addr.type = SOCKET_ADDRESS_TYPE_UNIX;
+     addr.u.q_unix.path = abstract_sock_name;
++    addr.u.q_unix.has_tight = true;
+     addr.u.q_unix.tight = user_data != NULL;
++    addr.u.q_unix.has_abstract = true;
+     addr.u.q_unix.abstract = true;
+ 
+     fd = socket_listen(&addr, 1, &err);
+@@ -267,7 +269,9 @@ static gpointer unix_client_thread_func(gpointer user_data)
+ 
+     addr.type = SOCKET_ADDRESS_TYPE_UNIX;
+     addr.u.q_unix.path = abstract_sock_name;
++    addr.u.q_unix.has_tight = true;
+     addr.u.q_unix.tight = user_data != NULL;
++    addr.u.q_unix.has_abstract = true;
+     addr.u.q_unix.abstract = true;
+ 
+     fd = socket_connect(&addr, &err);
+-- 
+2.26.2
 
-I think it's a runtime and not a build problem.  In osstest, Xen
-support was detected and configured, but CONFIG_XEN wasn't set for
-Arm.  So at runtime xen_available() returns 0, and QEMU doesn't start
-with "qemu-system-i386: -xen-domid 1: Option not supported for this
-target"
-
-I posted my investigation here:
-https://lore.kernel.org/xen-devel/CAKf6xpss8KpGOvZrKiTPz63bhBVbjxRTYWdHEkzU=
-o2q1KEMjhg@mail.gmail.com/
-
-Regards,
-Jason
 
