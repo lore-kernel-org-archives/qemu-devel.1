@@ -2,88 +2,87 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96CE1C55179
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 10:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72615C55178
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 10:09:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC73220791
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 10:08:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD3EA20706
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 10:09:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iwo70XCF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC73220791
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GwS+i9Tj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD3EA20706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY4rZ-0006Mp-Ph
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 06:08:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39364)
+	id 1kY4sT-00077Q-MR
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 06:09:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kY4l7-00081j-5W
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 06:02:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25274)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kY4kq-00081s-N2
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 06:02:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603965700;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xDOqEQafsFU5uLtkrs2Rr25U9vwUkZCVJsNK+e+BDn8=;
- b=iwo70XCFlPZC/TzW993gNRY9YECNmvkVMGlsnB0nmFQNTkJ3DAud6LghmNxdmdfwO4UorX
- bE/9eA/4VIj9aZzCAa65XSU5E5xtyNqxbfVLfYWutewBr1yu0/MnbatvG8NpaPfWWb99vJ
- tXTLZ/ODBHicmxi8a+F1lYrtszL37bs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-8M-gOgGfPY6E0MoR8fnC3A-1; Thu, 29 Oct 2020 06:01:38 -0400
-X-MC-Unique: 8M-gOgGfPY6E0MoR8fnC3A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39E571018F7B;
- Thu, 29 Oct 2020 10:01:37 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-115-62.ams2.redhat.com
- [10.36.115.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6606610013C1;
- Thu, 29 Oct 2020 10:01:35 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 5/5] util: include the target address in socket connect failures
-Date: Thu, 29 Oct 2020 10:01:19 +0000
-Message-Id: <20201029100119.30696-6-berrange@redhat.com>
-In-Reply-To: <20201029100119.30696-1-berrange@redhat.com>
-References: <20201029100119.30696-1-berrange@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kY4mK-0001Sg-M2
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 06:03:33 -0400
+Received: from mail-ed1-x530.google.com ([2a00:1450:4864:20::530]:44463)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kY4mI-0000CK-Ut
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 06:03:32 -0400
+Received: by mail-ed1-x530.google.com with SMTP id w1so1280799edv.11
+ for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 03:03:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=E2YCmm4hqIiNa7O/d+tl+9EEzjZMgYTXxABBb2o0uj8=;
+ b=GwS+i9Tj8FuePBiht52Z6qixTIHW4I9pBuYXa7ebuYV7T5dOqOJacgWh7v8nZpu+rz
+ v+hobu88QfOJkWXcmtGqS8hYuXGvddFe5cE4XNhLKOo4IanAk2KAaavpxxYb6bZaUfsc
+ 7w5saTQQswrhIu9OR6RmanCrwCfDZ4tPvBt6kx4yHX0PJvPRXxjmwPRvHiTIvgNNOtpf
+ 1jJjCG+xLlHyGawNjcCWY0ZdGlCcQggV1g+7PM/9TWnIcTjQcqOGZiOl/2SyhuqrgwKS
+ FYcrrKIPgqjgvarfnN9iuzaFqdiBFv24o8wpJ1gCAxCXjmiQodtYhQ0rV6lBRVgAh0gr
+ Gb+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=E2YCmm4hqIiNa7O/d+tl+9EEzjZMgYTXxABBb2o0uj8=;
+ b=Vu/gvtwTvApI6OUF4mAWSxq3L6VlWmTrUam3sWNlVvtRbWZ0O4rnDL6FW8roDlLX1k
+ 3cIMnTKQSxGT7Mjg2/tbdt0vilrNIJBNDb4orawe31wKk8fvxy5KxLiQa4XgMXRAHd81
+ NnI7nmFhFtmcaNWpq66avT6Nwybh0QlovPcMtqB+xmilsnyjHxZmJ0v967hfR23SXZKK
+ aQ8ApWIc5YYMAFrDvLmvnzOkWoh2Y1BEnxtpj0l7D7ssn1hFXdOEOKojRxBs/DrjTjj1
+ p5JGgsXyjaK8XzTzZiZzkgI08L1Auw+oX74QxT0S5sfGkNrLJf+2oUuZHZsi9dnAKCFa
+ pB2Q==
+X-Gm-Message-State: AOAM5308GgoV1h/KqLW1+nUDdc65so4jS9MQ0TkL9iDQwsG3itIcM53o
+ jHUNkSN1jV5ZP3xG00iU/LOSAa7x9Y4EtjLKRfH8eQ==
+X-Google-Smtp-Source: ABdhPJzeH6mU/r2bkjqFbEQ7teexDjpfGuzqDj2N+i+ako99Ha+1HLetK8OGRZiBLL4KcZL1y9O2UsnTaBzZqdD1mog=
+X-Received: by 2002:aa7:c683:: with SMTP id n3mr3047688edq.146.1603965808891; 
+ Thu, 29 Oct 2020 03:03:28 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 00:47:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201027095938.28673-1-alex.bennee@linaro.org>
+In-Reply-To: <20201027095938.28673-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 29 Oct 2020 10:03:17 +0000
+Message-ID: <CAFEAcA90vgR2FfPE08CkDLWPg3P89Cxo3LMrSSaHz6dwCp+Z=A@mail.gmail.com>
+Subject: Re: [PULL 0/8] testing and misc (gitdm, gitlab, docker, make)
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::530;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x530.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,153 +95,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reporting "Failed to connect socket" is essentially useless for a user
-attempting to diagnose failure. It needs to include the target address
-details. Similarly when failing to create a socket we should include the
-socket family info, so the user understands what particular feature was
-missing in their kernel build (IPv6, VSock in particular).
+On Tue, 27 Oct 2020 at 09:59, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> The following changes since commit 1dc887329a10903940501b43e8c0cc67af7c06=
+d5:
+>
+>   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/sd-next-202010=
+26' into staging (2020-10-26 17:19:26 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-testing-and-misc-271020-1
+>
+> for you to fetch changes up to c8e6cfba1291df2202bf406bb5137c9d365505d1:
+>
+>   makefile: handle -n / -k / -q correctly (2020-10-27 09:53:51 +0000)
+>
+> ----------------------------------------------------------------
+> Testing and gitdm updates
+>
+>   - add some more individual contributors
+>   - include SDL2 in centos images
+>   - skip checkpatch check when no commits found
+>   - use random port for gdb reverse debugging
+>   - make gitlab use it's own mirrors to clone
+>   - fix detection of make -nqp
+>
+> ----------------------------------------------------------------
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
----
- tests/qemu-iotests/162.out |  4 ++--
- util/qemu-sockets.c        | 32 +++++++++++++++++++-------------
- 2 files changed, 21 insertions(+), 15 deletions(-)
 
-diff --git a/tests/qemu-iotests/162.out b/tests/qemu-iotests/162.out
-index 5a00d36d17..f8714cb0d2 100644
---- a/tests/qemu-iotests/162.out
-+++ b/tests/qemu-iotests/162.out
-@@ -6,8 +6,8 @@ image: nbd://localhost:PORT
- image: nbd+unix://?socket=42
- 
- === SSH ===
--qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost", "port": "0", "path": "/foo"}': Failed to connect socket: Connection refused
--qemu-img: Could not open 'driver=ssh,host=localhost,port=0,path=/foo': Failed to connect socket: Connection refused
-+qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost", "port": "0", "path": "/foo"}': Failed to connect to 'localhost:0': Connection refused
-+qemu-img: Could not open 'driver=ssh,host=localhost,port=0,path=/foo': Failed to connect to 'localhost:0': Connection refused
- qemu-img: Could not open 'json:{"driver": "ssh", "host": "localhost", "port": 0.42, "path": "/foo"}': Parameter 'port' expects a number
- qemu-img: Could not open 'driver=ssh,host=localhost,port=0.42,path=/foo': Parameter 'port' expects a number
- 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 05e5c73f9d..38f82179b0 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -354,15 +354,15 @@ listen_ok:
-     ((rc) == -EINPROGRESS)
- #endif
- 
--static int inet_connect_addr(struct addrinfo *addr, Error **errp);
--
--static int inet_connect_addr(struct addrinfo *addr, Error **errp)
-+static int inet_connect_addr(const InetSocketAddress *saddr,
-+                             struct addrinfo *addr, Error **errp)
- {
-     int sock, rc;
- 
-     sock = qemu_socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
-     if (sock < 0) {
--        error_setg_errno(errp, errno, "Failed to create socket");
-+        error_setg_errno(errp, errno, "Failed to create socket family %d",
-+                         addr->ai_family);
-         return -1;
-     }
-     socket_set_fast_reuse(sock);
-@@ -376,7 +376,8 @@ static int inet_connect_addr(struct addrinfo *addr, Error **errp)
-     } while (rc == -EINTR);
- 
-     if (rc < 0) {
--        error_setg_errno(errp, errno, "Failed to connect socket");
-+        error_setg_errno(errp, errno, "Failed to connect to '%s:%s'",
-+                         saddr->host, saddr->port);
-         closesocket(sock);
-         return -1;
-     }
-@@ -455,7 +456,7 @@ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
-     for (e = res; e != NULL; e = e->ai_next) {
-         error_free(local_err);
-         local_err = NULL;
--        sock = inet_connect_addr(e, &local_err);
-+        sock = inet_connect_addr(saddr, e, &local_err);
-         if (sock >= 0) {
-             break;
-         }
-@@ -549,7 +550,8 @@ static int inet_dgram_saddr(InetSocketAddress *sraddr,
-     /* create socket */
-     sock = qemu_socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol);
-     if (sock < 0) {
--        error_setg_errno(errp, errno, "Failed to create socket");
-+        error_setg_errno(errp, errno, "Failed to create socket family %d",
-+                         peer->ai_family);
-         goto err;
-     }
-     socket_set_fast_reuse(sock);
-@@ -562,7 +564,8 @@ static int inet_dgram_saddr(InetSocketAddress *sraddr,
- 
-     /* connect to peer */
-     if (connect(sock,peer->ai_addr,peer->ai_addrlen) < 0) {
--        error_setg_errno(errp, errno, "Failed to connect socket");
-+        error_setg_errno(errp, errno, "Failed to connect to '%s:%s'",
-+                         addr, port);
-         goto err;
-     }
- 
-@@ -735,13 +738,15 @@ static bool vsock_parse_vaddr_to_sockaddr(const VsockSocketAddress *vaddr,
-     return true;
- }
- 
--static int vsock_connect_addr(const struct sockaddr_vm *svm, Error **errp)
-+static int vsock_connect_addr(const VsockSocketAddress *vaddr,
-+                              const struct sockaddr_vm *svm, Error **errp)
- {
-     int sock, rc;
- 
-     sock = qemu_socket(AF_VSOCK, SOCK_STREAM, 0);
-     if (sock < 0) {
--        error_setg_errno(errp, errno, "Failed to create socket");
-+        error_setg_errno(errp, errno, "Failed to create socket family %d",
-+                         AF_VSOCK);
-         return -1;
-     }
- 
-@@ -754,7 +759,8 @@ static int vsock_connect_addr(const struct sockaddr_vm *svm, Error **errp)
-     } while (rc == -EINTR);
- 
-     if (rc < 0) {
--        error_setg_errno(errp, errno, "Failed to connect socket");
-+        error_setg_errno(errp, errno, "Failed to connect to '%s:%s'",
-+                         vaddr->cid, vaddr->port);
-         closesocket(sock);
-         return -1;
-     }
-@@ -770,7 +776,7 @@ static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp)
-         return -1;
-     }
- 
--    return vsock_connect_addr(&svm, errp);
-+    return vsock_connect_addr(vaddr, &svm, errp);
- }
- 
- static int vsock_listen_saddr(VsockSocketAddress *vaddr,
-@@ -994,7 +1000,7 @@ static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
-     } while (rc == -EINTR);
- 
-     if (rc < 0) {
--        error_setg_errno(errp, -rc, "Failed to connect socket %s",
-+        error_setg_errno(errp, -rc, "Failed to connect to '%s'",
-                          saddr->path);
-         goto err;
-     }
--- 
-2.28.0
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
