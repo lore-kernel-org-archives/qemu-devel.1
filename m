@@ -2,93 +2,104 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3247C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:15:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D46A6C55178
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:18:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9AE220732
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:15:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IAq+7oAv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9AE220732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C5DAE2067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 13:18:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5DAE2067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY7mR-00073R-N0
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 09:15:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36560)
+	id 1kY7oX-0007rL-E8
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 09:18:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kY7l9-0006Ok-73
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:14:31 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45123)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kY7l7-0003Ol-8J
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 09:14:30 -0400
-Received: by mail-wr1-x443.google.com with SMTP id a9so2685488wrg.12
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 06:14:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ivJyo8qfMPmys8buszjG5qNHNgJpfyftMhgAFYcDp9k=;
- b=IAq+7oAvbTmvMRRLROTrZbtHxPmkIxtscKBNnbD+CLa5PgIGiS7qL+DEiUN8i6bZY8
- XzhskT18v/QtG6LajMZAmt3EsoP+lrFhmGJaMTfILTdQHiGt2JlE242VjCdS+XqNRjYn
- vDfAFUdCBQxMMnjVEuiNg1W8pI6KLe7h9MfLG6eG0KQ/aPN2IdLxNxdMpZt7Ydh6+6II
- VogjY2Q52fvODS+ZSm7pXe1Bue3e2glFl+sF8LpRwUD22bJUfiZRHSdMuV0ooo+phlWY
- 8Qc2CEZAL12bwpasGVf0A68gPh9W23w4QNUcRfOBh1Qk1v0bp1t/ky2jtZWq0fz/uoqo
- CMBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ivJyo8qfMPmys8buszjG5qNHNgJpfyftMhgAFYcDp9k=;
- b=Y8ElK1KVL1EI5TybcHwA6V42rD80qCG6spSh4ieYq9tiTVXuJUrbj6kw5Qsqww2DUu
- QjSdVNcEj4jWbjOcjTwSS34ZIxzonu+LGtzYu6nm41CkgXkmTdyuIdBRBPHPs/cNFVUa
- qI/zqDwqHl7JostZCZp5YaAtoHHogdDBeIFCKiIMjdv7y4AoDGEJm0XgcOd4hYg5Iq+v
- au+XPI4dBr3j24nnsUegLOc1wjVK+thYEfUn8M30o9+FpkXXUoc6jToQ3U2+WfTyYdNQ
- Zb9ZzCp5ALCAwgNDid54cfv37dhvbwcE40D01tKv7UX7gDrHKejtKubvq7gguoWpGZgd
- C9Kg==
-X-Gm-Message-State: AOAM530lt/64ZicfrYMcgJK+icqdMknE4022vqtm+9kZAPPstmK1pb1x
- 9KnXzmcZZwZXs1PmoBiUl67cIiN26Qg=
-X-Google-Smtp-Source: ABdhPJyxouPT9Kuf3jI2XughFKsgR/RGALA7RG6mwntabrR2/mRptW6muJFSnPB4uICG10UFcnE9/A==
-X-Received: by 2002:adf:ff82:: with SMTP id j2mr3057515wrr.401.1603977267445; 
- Thu, 29 Oct 2020 06:14:27 -0700 (PDT)
-Received: from avogadro.redhat.com ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id
- o4sm5195844wrv.8.2020.10.29.06.14.26 for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Oct 2020 06:14:26 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] docs: expand sourceset documentation
-Date: Thu, 29 Oct 2020 14:14:24 +0100
-Message-Id: <20201029131424.504526-2-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201029131424.504526-1-pbonzini@redhat.com>
-References: <20201029131424.504526-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kY7l0-0006Kq-TY; Thu, 29 Oct 2020 09:14:22 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:44021)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kY7ky-0003Lg-L1; Thu, 29 Oct 2020 09:14:22 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailout.nyi.internal (Postfix) with ESMTP id 6AF295C007C;
+ Thu, 29 Oct 2020 09:14:18 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Thu, 29 Oct 2020 09:14:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=/hFL0HvrLcnD+feQL7F8JhgR5kT
+ cgIVJMIg/0RKOumw=; b=YfTx7ThriDjsscZmZaBE4yHewinShx0jyNahYejKkT9
+ g7YmX3oD1ChVNCRYDnR0Nlho9Bc8iWM30joDG+YsChBfStq+OCCer33SCW0AMEa/
+ +CyCe4QuVsGUO5OTpI6Z4W3KrrWy5+ZvNxHIXlP0ND4MxCq4BmqNI9LyjPgLuIGm
+ Sag6YOufsJhrdUpfHsyfvKiptda4Lin/zzbsgtn3bhUgb23mvLrbPzPN6Z6fP/e0
+ U5VkHZzvEPaeysnxnFD54UtxyfpJ+cK9aNiGfvc99DMR+hVUUgY9IZ9vVVT4FMHw
+ PaOOBY6XMkGhvjgKz42+efUehCwpkSn6hvKr09xi/KQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=/hFL0H
+ vrLcnD+feQL7F8JhgR5kTcgIVJMIg/0RKOumw=; b=cyhxxxenxr4yXO6IkkPqdQ
+ GfZ5HvgsYxXy+Jqzv4ga00IGcUyaPHCJIalzQwXz57hGKb9ZOxpqZ+Lou1e9WTGf
+ qzXAYF6FY+ij85kzKi5PvdISFbso2QugcpZtlTSmT7wBY1PdR6wVMF+xMEpMjTGJ
+ Bf38K6pYLaz8gwWIhmAThayJsPFjzbVWdZx4X7TgKwn5+ajw5Pg3mNz0+WRGQrGr
+ 2KAGvwNoe9qytZs9FdvoKH3BIwx+jCJWlgW+8Ffo+AnmwAv2Z35Ixa2gGbE2kHBy
+ HNOoGIhKMVyjohjTUffECAR9Feo33d7m8nVtMzWqUyCltraDBmvgmnjjvjuvHmZA
+ ==
+X-ME-Sender: <xms:KcCaX8YF7ca3UCXfxYKOwe4uDGeWRpAsSkR62HXanKZkKa75e3_eVg>
+ <xme:KcCaX3Z1mfTdSe4eKx4TJGf-CWDtC0Xe-L1LPK_lC_W9pqOgbd3UwRW_5HGzHfYk3
+ 041pJYlfsNVxfiU30A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrleefgdeglecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnhepuddtheelledvtedvfeeuheegvefhjeeuleeihfduhfeiffffhfdutdekkeeikeef
+ necuffhomhgrihhnpehinhhfrhgruggvrggurdhorhhgnecukfhppeektddrudeijedrle
+ ekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhho
+ mhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:KcCaX29fB5ngWhr-rgagTAU7fW7rCJVUcnzgMfODnz7tJmHeYiyBUw>
+ <xmx:KcCaX2rIGEmJMp9_j0IvsabqpWciQL0NohqDgBnDLfLjRps8Bnv0uw>
+ <xmx:KcCaX3pVmE3pTIojYeIcfN1JPjh6sK-7Zr8RJ9dlCk_rvWciSQcVfQ>
+ <xmx:KsCaX4njPUhBjWSQ2py_WbnhcGnkRSpO5NMpofxP8Rso709Zspakzw>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 3E4A73280063;
+ Thu, 29 Oct 2020 09:14:16 -0400 (EDT)
+Date: Thu, 29 Oct 2020 14:14:14 +0100
+From: Klaus Jensen <its@irrelevant.dk>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PULL 00/30] nvme emulation patches for 5.2
+Message-ID: <20201029131414.GB777050@apples.localdomain>
+References: <20201027104932.558087-1-its@irrelevant.dk>
+ <CAFEAcA8EcEfaFZYUicbL5ShA5y5sTP7hmNNX5Ot=3ZyAGnV81A@mail.gmail.com>
+ <20201029115254.GA777050@apples.localdomain>
+ <1cd6447c-66f2-df28-a3ce-94456a17fcf4@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="IrhDeMKUP4DT/M7F"
+Content-Disposition: inline
+In-Reply-To: <1cd6447c-66f2-df28-a3ce-94456a17fcf4@redhat.com>
+Received-SPF: pass client-ip=66.111.4.27; envelope-from=its@irrelevant.dk;
+ helo=out3-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 09:14:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,223 +112,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Keith Busch <kbusch@kernel.org>, Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Klaus Jensen <k.jensen@samsung.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Expand on the usage of sourcesets and describe the CONFIG_ALL
-symbol.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- docs/devel/build-system.rst | 158 ++++++++++++++++++++++++------------
- docs/devel/kconfig.rst      |   2 +
- 2 files changed, 107 insertions(+), 53 deletions(-)
+--IrhDeMKUP4DT/M7F
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/docs/devel/build-system.rst b/docs/devel/build-system.rst
-index 6fcf8854b7..8c7c845f53 100644
---- a/docs/devel/build-system.rst
-+++ b/docs/devel/build-system.rst
-@@ -187,21 +187,23 @@ process for:
- 
- 4) other data files, such as icons or desktop files
- 
--The source code is highly modularized, split across many files to
--facilitate building of all of these components with as little duplicated
--compilation as possible. The Meson "sourceset" functionality is used
--to list the files and their dependency on various configuration  
--symbols.
--
- All executables are built by default, except for some `contrib/`
- binaries that are known to fail to build on some platforms (for example
- 32-bit or big-endian platforms).  Tests are also built by default,
- though that might change in the future.
- 
--Various subsystems that are common to both tools and emulators have
--their own sourceset, for example `block_ss` for the block device subsystem,
--`chardev_ss` for the character device subsystem, etc.  These sourcesets
--are then turned into static libraries as follows::
-+The source code is highly modularized, split across many files to
-+facilitate building of all of these components with as little duplicated
-+compilation as possible. Using the Meson "sourceset" functionality,
-+`meson.build` files group the source files in rules that are
-+enabled according to the available system libraries and to various
-+configuration symbols.  Sourcesets belong to one of four groups:
-+
-+Subsystem sourcesets:
-+  Various subsystems that are common to both tools and emulators have
-+  their own sourceset, for example `block_ss` for the block device subsystem,
-+  `chardev_ss` for the character device subsystem, etc.  These sourcesets
-+  are then turned into static libraries as follows::
- 
-     libchardev = static_library('chardev', chardev_ss.sources(),
-                                 name_suffix: 'fa',
-@@ -209,61 +211,111 @@ are then turned into static libraries as follows::
- 
-     chardev = declare_dependency(link_whole: libchardev)
- 
--As of Meson 0.55.1, the special `.fa` suffix should be used for everything
--that is used with `link_whole`, to ensure that the link flags are placed
--correctly in the command line.
--
--Files linked into emulator targets there can be split into two distinct groups
--of files, those which are independent of the QEMU emulation target and
--those which are dependent on the QEMU emulation target.
--
--In the target-independent set lives various general purpose helper code,
--such as error handling infrastructure, standard data structures,
--platform portability wrapper functions, etc. This code can be compiled
--once only and the .o files linked into all output binaries.
--Target-independent code lives in the `common_ss`, `softmmu_ss` and
--`user_ss` sourcesets.  `common_ss` is linked into all emulators, `softmmu_ss`
--only in system emulators, `user_ss` only in user-mode emulators.
--
--In the target-dependent set lives CPU emulation, device emulation and
--much glue code. This sometimes also has to be compiled multiple times,
--once for each target being built.  Target-dependent files are included
--in the `specific_ss` sourceset.
--
--All binaries link with a static library `libqemuutil.a`, which is then
--linked to all the binaries.  `libqemuutil.a` is built from several
--sourcesets; most of them however host generated code, and the only two
--of general interest are `util_ss` and `stub_ss`.
--
--The separation between these two is purely for documentation purposes.
--`util_ss` contains generic utility files.  Even though this code is only
--linked in some binaries, sometimes it requires hooks only in some of
--these and depend on other functions that are not fully implemented by
--all QEMU binaries.  `stub_ss` links dummy stubs that will only be linked
--into the binary if the real implementation is not present.  In a way,
--the stubs can be thought of as a portable implementation of the weak
--symbols concept.
-+  As of Meson 0.55.1, the special `.fa` suffix should be used for everything
-+  that is used with `link_whole`, to ensure that the link flags are placed
-+  correctly in the command line.
-+
-+Target-independent emulator sourcesets:
-+  Various general purpose helper code is compiled only once and
-+  the .o files are linked into all output binaries that need it.
-+  This includes error handling infrastructure, standard data structures,
-+  platform portability wrapper functions, etc.
-+
-+  Target-independent code lives in the `common_ss`, `softmmu_ss` and
-+  `user_ss` sourcesets.  `common_ss` is linked into all emulators,
-+  `softmmu_ss` only in system emulators, `user_ss` only in user-mode
-+  emulators.
-+
-+  Target-independent sourcesets must exercise particular care when using
-+  `if_false` rules.  The `if_false` rule will be used correctly when linking
-+  emulator binaries; however, when *compiling* target-independent files
-+  into .o files, Meson may need to pick *both* the `if_true` and
-+  `if_false` sides to cater for targets that want either side.  To
-+  achieve that, you can add a special rule using the ``CONFIG_ALL``
-+  symbol::
-+
-+    # Some targets have CONFIG_ACPI, some don't, so this is not enough
-+    softmmu_ss.add(when: 'CONFIG_ACPI`, if_true: files('acpi.c'),
-+                                        if_false: files('acpi-stub.c'))
-+
-+    # This is required as well:
-+    softmmu_ss.add(when: 'CONFIG_ALL`, if_true: files('acpi-stub.c'))
-+
-+Target-dependent emulator sourcesets:
-+  In the target-dependent set lives CPU emulation, some device emulation and
-+  much glue code. This sometimes also has to be compiled multiple times,
-+  once for each target being built.  Target-dependent files are included
-+  in the `specific_ss` sourceset.
-+
-+  Each emulator also includes sources for files in the `hw/` and `target/`
-+  subdirectories.  The subdirectory used for each emulator comes
-+  from the target's definition of ``TARGET_BASE_ARCH`` or (if missing)
-+  ``TARGET_ARCH``, as found in `default-configs/targets/*.mak`.
-+
-+  Each subdirectory in `hw/` adds one sourceset to the `hw_arch` dictionary,
-+  for example::
-+
-+    arm_ss = ss.source_set()
-+    arm_ss.add(files('boot.c'), fdt)
-+    ...
-+    hw_arch += {'arm': arm_ss}
-+
-+  The sourceset is only used for system emulators.
-+
-+  Each subdirectory in `target/` instead should add one sourceset to each
-+  of the `target_arch` and `target_softmmu_arch`, which are used respectively
-+  for all emulators and for system emulators only.  For example::
-+
-+    arm_ss = ss.source_set()
-+    arm_softmmu_ss = ss.source_set()
-+    ...
-+    target_arch += {'arm': arm_ss}
-+    target_softmmu_arch += {'arm': arm_softmmu_ss}
-+
-+Utility sourcesets:
-+  All binaries link with a static library `libqemuutil.a`.  This library
-+  is built from several sourcesets; most of them however host generated
-+  code, and the only two of general interest are `util_ss` and `stub_ss`.
-+
-+  The separation between these two is purely for documentation purposes.
-+  `util_ss` contains generic utility files.  Even though this code is only
-+  linked in some binaries, sometimes it requires hooks only in some of
-+  these and depend on other functions that are not fully implemented by
-+  all QEMU binaries.  `stub_ss` links dummy stubs that will only be linked
-+  into the binary if the real implementation is not present.  In a way,
-+  the stubs can be thought of as a portable implementation of the weak
-+  symbols concept.
-+
- 
- The following files concur in the definition of which files are linked
- into each emulator:
- 
--`default-configs/*.mak`
--  The files under default-configs/ control what emulated hardware is built
--  into each QEMU system and userspace emulator targets. They merely contain
--  a list of config variable definitions like the machines that should be
--  included. For example, default-configs/aarch64-softmmu.mak has::
-+`default-configs/devices/*.mak`
-+  The files under `default-configs/devices/` control the boards and devices
-+  that are built into each QEMU system emulation targets. They merely contain
-+  a list of config variable definitions such as::
- 
-     include arm-softmmu.mak
-     CONFIG_XLNX_ZYNQMP_ARM=y
-     CONFIG_XLNX_VERSAL=y
- 
- `*/Kconfig`
--  These files are processed together with `default-configs/*.mak` and
-+  These files are processed together with `default-configs/devices/*.mak` and
-   describe the dependencies between various features, subsystems and
--  device models.  They are described in kconfig.rst.
-+  device models.  They are described in :ref:`kconfig`
-+
-+`default-configs/targets/*.mak`
-+  These files mostly define symbols that appear in the `*-config-target.h`
-+  file for each emulator[#cfgtarget]_.  However, the ``TARGET_ARCH``
-+  and ``TARGET_BASE_ARCH`` will also be used to select the `hw/` and
-+  `target/` subdirectories that are compiled into each target.
-+
-+.. [#cfgtarget] This header is included by `qemu/osdep.h` when
-+   compiling files from the target-specific sourcesets.
- 
--These files rarely need changing unless new devices / hardware need to
--be enabled for a particular system/userspace emulation target
-+These files rarely need changing unless you are adding a completely
-+new target, or enabling new devices or hardware for a particular
-+system/userspace emulation target
- 
- 
- Support scripts
-diff --git a/docs/devel/kconfig.rst b/docs/devel/kconfig.rst
-index e5df72b342..336ba0e8e5 100644
---- a/docs/devel/kconfig.rst
-+++ b/docs/devel/kconfig.rst
-@@ -1,3 +1,5 @@
-+.. _kconfig:
-+
- ================
- QEMU and Kconfig
- ================
--- 
-2.26.2
+On Oct 29 13:20, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 10/29/20 12:52 PM, Klaus Jensen wrote:
+> > On Oct 29 11:39, Peter Maydell wrote:
+> >> On Tue, 27 Oct 2020 at 10:49, Klaus Jensen <its@irrelevant.dk> wrote:
+> >>>
+> >>> From: Klaus Jensen <k.jensen@samsung.com>
+> >>>
+> >>> Hi Peter,
+> >>>
+> >>> The following changes since commit 1dc887329a10903940501b43e8c0cc67af=
+7c06d5:
+> >>>
+> >>>   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/sd-next-20=
+201026' into staging (2020-10-26 17:19:26 +0000)
+> >>>
+> >>> are available in the Git repository at:
+> >>>
+> >>>   git://git.infradead.org/qemu-nvme.git tags/nvme-next-pull-request
+> >>>
+> >>> for you to fetch changes up to 843c8f91a7ad63f8f3e4e564d3f41f3d030ab8=
+a9:
+> >>>
+> >>>   hw/block/nvme: fix queue identifer validation (2020-10-27 11:29:25 =
++0100)
+> >>>
+> >>> ----------------------------------------------------------------
+> >>> nvme emulation patches for 5.2
+> >>>
+> >>>   - lots of cleanups
+> >>>   - add support for scatter/gather lists
+> >>>   - add support for multiple namespaces (adds new nvme-ns device)
+> >>>   - change default pci vendor/device id
+> >>>   - add support for per-namespace smart log
+> >>
+> >> Hi. This tag appears to have been signed with a GPG key
+> >> which isn't one that's been used before for an nvme pullreq
+> >> and which isn't on the public GPG servers...
+> >>
+> >=20
+> > Uhm. Keith, can we coordinate a keysigning?
+> >=20
+> > Would a signature by Keith on my key be acceptable to you Peter? That
+> > way Keith doesn't have to create a new tag and bomb the list again.
+>=20
+> Although list bombing isn't really a problem, if you don't modify
+> the patches, then you can simply post the cover (as v2) without
+> the patches.
+>=20
+> You can also get your key signed and ask Peter to retry your tag,
+> or push a different tag and ask again, replying to this cover.
+>=20
 
+Thanks Phil!
+
+--IrhDeMKUP4DT/M7F
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+awCQACgkQTeGvMW1P
+Dek2lQf/Q3YH5auqi20rMdosW60Hy66VzA7/ntcpRbsT+foUfyLaABT7EGdNMJ46
+tYfpSJ8dW1NWivg2xYN6Im6dGWLTAsmExqNBAzquTVRqvoovoVaq8iseIcouHBk1
+FRbhmijCOE/AtLcbMmEHOp23CRYM0NloJbMkEUOvlsBmuVwMwJ6R7t9TVSxwQiZi
+cv2+q/SAfgWkehhHA87pRMugzZtdQAAeLMiUps170rDBoX5zRyHMNJ7ttiHbDOuk
+yMEwT62B0EbLf7g07tZOYpxCGOUPcvdOOMhbkbUXT+byn0SsW5QVYA019jSdkrM7
+vcoSFEx16bEAvmBYdrl0HRru8dkAzg==
+=QAvW
+-----END PGP SIGNATURE-----
+
+--IrhDeMKUP4DT/M7F--
 
