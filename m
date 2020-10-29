@@ -2,85 +2,83 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53647C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 17:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5197AC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 17:24:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A91D3206CA
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 17:24:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC0C8206CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 17:24:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L2E4KCAe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A91D3206CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xZXLo9Qh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC0C8206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYBey-0000Yq-IL
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 13:24:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37362)
+	id 1kYBfL-00017J-Pa
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 13:24:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kYBZT-0000t1-BB
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 13:18:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48863)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kYBZR-0003YT-0c
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 13:18:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603991920;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=O8+YAd1fGproYW3ezzaCKOCGwEPBie/HD8i/Su+7pmM=;
- b=L2E4KCAeDV+mVGndbCMT9u2DGiyGCtLumzE7ra0HGO7NNEmrXVYQ0EhvxVgsnWS/mPykmT
- arGFs9wHqcF2EmvpPw1NGaQmw9fZ175IcJPxRyXKP5GkyjMWOm7Z1XRykrwqeqEyvb2+fR
- QSbnqe138vHkqLdo0b/99e/9DephMFc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-I0QuaZ0qOc-JcoIHuUGXQA-1; Thu, 29 Oct 2020 13:18:38 -0400
-X-MC-Unique: I0QuaZ0qOc-JcoIHuUGXQA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FC8AEC1A9
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 17:18:37 +0000 (UTC)
-Received: from localhost (unknown [10.40.194.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 60C325DA2A;
- Thu, 29 Oct 2020 17:18:25 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/7] virtiofsd: Announce sub-mount points
-Date: Thu, 29 Oct 2020 18:17:42 +0100
-Message-Id: <20201029171744.150726-6-mreitz@redhat.com>
-In-Reply-To: <20201029171744.150726-1-mreitz@redhat.com>
-References: <20201029171744.150726-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kYBbn-0004c8-Q1
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 13:21:08 -0400
+Received: from mail-ej1-x630.google.com ([2a00:1450:4864:20::630]:45223)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kYBbi-0003vP-OI
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 13:21:07 -0400
+Received: by mail-ej1-x630.google.com with SMTP id dk16so4292956ejb.12
+ for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 10:21:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=VMzUzeNQrIX2+vMe2GrHUdKkSTLfIXJeqymGGOEeFaE=;
+ b=xZXLo9Qhz38LJhLyP9Q347WEck/6ovEM69I8FmSRijEK8/c9lsw6JwzTattPCVRd26
+ 7entz7tl+hsoMPO3a4O1UdeJNUIAwYGm4PqZexvL9+HfVwQPGzMpvekJBB8+chRY7B9r
+ gem92Uh7Dj4pHpCNG/Lwosoyg+2Ypl7knWIta4LRXU44S1Z6meXUQEKGTlgH4DWT44AY
+ g7gaRmumjaaILWzqW+mOJLtxI5UWWImFTSVeuc4yxxic24FtoaWwn8n2muWoZOivqAqR
+ LoeJzRxGfGDQqg8cyOPMaJDHMjiBur69vKdw50TDakfF+/biRn0n138DMpLep4bgONgi
+ y5tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=VMzUzeNQrIX2+vMe2GrHUdKkSTLfIXJeqymGGOEeFaE=;
+ b=VTFvJJscgLmNXTF7EOcNb8IhcjkihrXnd8EyY/uYY/BLUYW2r/Mhurlamqj/b1g/nk
+ yikq3LS6FQUtwgi03gRmp/LNsmK8ZkiEqrwr3cJ7jtqfDncxauhSsv5XZBrfmuo7oa60
+ Mj+lKNwz7lsOYbLYtPI/Cy+sq/KV4UNQkz1TN9aTDu8qZJnksoYy2/rYfA5Vo3LbI+d7
+ BgCbRsL3xInaF6vl6UN+uXTGjWZ/D5xUG2ej2M8INGMMaUdGUuzgMj33ZrjAsbgk+S84
+ WpTMqzAGrviM2N3PCkDJv4BjVIa5Qjfx60duT6nYIGxvuPseqkoROO8P7DWPr2jntgxc
+ fIGQ==
+X-Gm-Message-State: AOAM532PvI40OPmGwHfGLog7j6PRF/1W9Zx/gRaBNSWE+YpDyrzs+xud
+ Vhid6+BtL5xIgzrU8NVIBt6GEAn1uWsNV1JqyFyaZAwviWE=
+X-Google-Smtp-Source: ABdhPJy7ynLiIZLyfF4HgGiNR/Ow2zCXMyxXi+YVR21In+HUcKX0p1D9tibUQXRBxO1OSdAMvwZy8i1CtSxdXgJkk4M=
+X-Received: by 2002:a17:907:9e3:: with SMTP id ce3mr5162416ejc.4.1603992060253; 
+ Thu, 29 Oct 2020 10:21:00 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 00:47:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 29 Oct 2020 17:20:48 +0000
+Message-ID: <CAFEAcA-EsEZWDbUSy6_AXym5e-wP_B4buZYG0swF946ue41WKg@mail.gmail.com>
+Subject: recent flakiness (intermittent hangs) of migration-test
+To: QEMU Developers <qemu-devel@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, 
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::630;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x630.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,118 +91,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Miklos Szeredi <mszeredi@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Whenever we encounter a directory with an st_dev or mount ID that
-differs from that of its parent, we set the FUSE_ATTR_SUBMOUNT flag so
-the guest can create a submount for it.
+Recently I've seen the 'make check' migration-test developing an
+intermittent hang; I've seen this now on aarch32 host several times
+and also on s390x host. The symptom is that the test just hangs
+with a couple of child qemu processes sitting around doing nothing.
+^Cing out of 'make check' doesn't kill the qemu processes; they
+seem to need a 'kill -9'.
 
-We only need to do so in lo_do_lookup().  The following functions return
-a fuse_attr object:
-- lo_create(), though fuse_reply_create(): Calls lo_do_lookup().
-- lo_lookup(), though fuse_reply_entry(): Calls lo_do_lookup().
-- lo_mknod_symlink(), through fuse_reply_entry(): Calls lo_do_lookup().
-- lo_link(), through fuse_reply_entry(): Creating a link cannot create a
-  submount, so there is no need to check for it.
-- lo_getattr(), through fuse_reply_attr(): Announcing submounts when the
-  node is first detected (at lookup) is sufficient.  We do not need to
-  return the submount attribute later.
-- lo_do_readdir(), through fuse_add_direntry_plus(): Calls
-  lo_do_lookup().
+Sorry for the low-information-density bug report, but I don't really
+have time at the moment to debug failures in merge build test runs
+because the queue of stuff still to merge is enormous...
 
-Make announcing submounts optional, so submounts are only announced to
-the guest with the announce_submounts option.  Some users may prefer the
-current behavior, so that the guest learns nothing about the host mount
-structure.
-
-(announce_submounts is force-disabled when the guest does not present
-the FUSE_SUBMOUNTS capability, or when there is no statx().)
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tools/virtiofsd/helper.c         |  1 +
- tools/virtiofsd/passthrough_ll.c | 22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+)
-
-diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-index 2e181a49b5..4433724d3a 100644
---- a/tools/virtiofsd/helper.c
-+++ b/tools/virtiofsd/helper.c
-@@ -190,6 +190,7 @@ void fuse_cmdline_help(void)
-            "                               retain/discard O_DIRECT flags passed down\n"
-            "                               to virtiofsd from guest applications.\n"
-            "                               default: no_allow_direct_io\n"
-+           "    -o announce_submounts      Announce sub-mount points to the guest\n"
-            );
- }
- 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 34d107975f..ec1008bceb 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -40,6 +40,7 @@
- #include "fuse_virtio.h"
- #include "fuse_log.h"
- #include "fuse_lowlevel.h"
-+#include "standard-headers/linux/fuse.h"
- #include <assert.h>
- #include <cap-ng.h>
- #include <dirent.h>
-@@ -167,6 +168,7 @@ struct lo_data {
-     int readdirplus_set;
-     int readdirplus_clear;
-     int allow_direct_io;
-+    int announce_submounts;
-     bool use_statx;
-     struct lo_inode root;
-     GHashTable *inodes; /* protected by lo->mutex */
-@@ -207,6 +209,7 @@ static const struct fuse_opt lo_opts[] = {
-     { "no_readdirplus", offsetof(struct lo_data, readdirplus_clear), 1 },
-     { "allow_direct_io", offsetof(struct lo_data, allow_direct_io), 1 },
-     { "no_allow_direct_io", offsetof(struct lo_data, allow_direct_io), 0 },
-+    { "announce_submounts", offsetof(struct lo_data, announce_submounts), 1 },
-     FUSE_OPT_END
- };
- static bool use_syslog = false;
-@@ -601,6 +604,20 @@ static void lo_init(void *userdata, struct fuse_conn_info *conn)
-         fuse_log(FUSE_LOG_DEBUG, "lo_init: disabling readdirplus\n");
-         conn->want &= ~FUSE_CAP_READDIRPLUS;
-     }
-+
-+    if (!(conn->capable & FUSE_CAP_SUBMOUNTS) && lo->announce_submounts) {
-+        fuse_log(FUSE_LOG_WARNING, "lo_init: Cannot announce submounts, client "
-+                 "does not support it\n");
-+        lo->announce_submounts = false;
-+    }
-+
-+#ifndef CONFIG_STATX
-+    if (lo->announce_submounts) {
-+        fuse_log(FUSE_LOG_WARNING, "lo_init: Cannot announce submounts, there "
-+                 "is no statx()\n");
-+        lo->announce_submounts = false;
-+    }
-+#endif
- }
- 
- static void lo_getattr(fuse_req_t req, fuse_ino_t ino,
-@@ -877,6 +894,11 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *name,
-         goto out_err;
-     }
- 
-+    if (S_ISDIR(e->attr.st_mode) && lo->announce_submounts &&
-+        (e->attr.st_dev != dir->key.dev || mnt_id != dir->key.mnt_id)) {
-+        e->attr_flags |= FUSE_ATTR_SUBMOUNT;
-+    }
-+
-     inode = lo_find(lo, &e->attr, mnt_id);
-     if (inode) {
-         close(newfd);
--- 
-2.26.2
-
+thanks
+-- PMM
 
