@@ -2,92 +2,90 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A87C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 15:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B09D1C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 15:29:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2B6E20724
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 15:11:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D14FA206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 15:29:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X99z5h8l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B6E20724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HXpo+0fD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D14FA206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY9Zx-0005pW-HV
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 11:11:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34680)
+	id 1kY9ru-0000ZX-Q5
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 11:29:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kY9ZC-0005Jy-NY
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 11:10:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53020)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kY9rI-00007G-2p
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 11:29:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46572)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kY9ZA-0003Le-Lv
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 11:10:18 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kY9rG-00060M-AG
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 11:28:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603984215;
+ s=mimecast20190719; t=1603985337;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=leMfdUHyqD90ogGbIaQWjgaZC2he87It8gFacaCHLqQ=;
- b=X99z5h8lJ+QLR+8rGfv4G/7LXDy3wDANuPJE/27WF83e5mWTRdIOLz9IO1kjYrTNDb/PUK
- ugQK0fKtwPqt1ijLTupQlEKUB5L0U3SHCpxFyWSE283J2QCEDLRYFN9Xyl+KgxPcLycbUk
- Z5KtpWqEtfkZZerOYITH+j1Q6VSIYLU=
+ bh=x5/EgEz9059a155iAtMhsuUg2WuGK2vuSfR+p8Dz5UA=;
+ b=HXpo+0fDzZVPOlf4MoSbxdr6AwD3/7n/PW/5cxRpXn/jrARKCR7YZBgTzHagNyZFcYxAYX
+ n9hzTCW3uSdWUGIoJXsQjw8Xjg8WXlUs8mFqZpxQ74+u1ic9beidiHsq1SOOegd1qwzdlW
+ 7LHCJka6+tsYVIX2FRh86gGfL0XLrds=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-uhatkSmtMa2gy85njPy8PA-1; Thu, 29 Oct 2020 11:10:12 -0400
-X-MC-Unique: uhatkSmtMa2gy85njPy8PA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-399-boriIJZrOCu1TMtUact5KQ-1; Thu, 29 Oct 2020 11:28:55 -0400
+X-MC-Unique: boriIJZrOCu1TMtUact5KQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 002A98030CC;
- Thu, 29 Oct 2020 15:10:08 +0000 (UTC)
-Received: from [10.72.12.72] (ovpn-12-72.pek2.redhat.com [10.72.12.72])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C85941001281;
- Thu, 29 Oct 2020 15:09:34 +0000 (UTC)
-Subject: Re: Out-of-Process Device Emulation session at KVM Forum 2020
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <20201027151400.GA138065@stefanha-x1.localdomain>
- <CAJSP0QWrmNN1Ci-M-4WDFZBOGHyeZvF71utg0w2ajCbOLtynJw@mail.gmail.com>
- <c4e5b631-1607-a0ec-ee88-6c5a9493e3de@redhat.com>
- <20201029083130.0617a28f@w520.home>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <b85405de-d525-bf59-826c-737fa7bbdfef@redhat.com>
-Date: Thu, 29 Oct 2020 23:09:33 +0800
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43AC0195CC40;
+ Thu, 29 Oct 2020 15:28:54 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-114.ams2.redhat.com [10.36.113.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 663FC60C17;
+ Thu, 29 Oct 2020 15:28:49 +0000 (UTC)
+Subject: Re: [PATCH v2 8/8] configure: add [lm32|unicore32]-softmmu to
+ deprecation logic
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200915134317.11110-1-alex.bennee@linaro.org>
+ <20200915134317.11110-9-alex.bennee@linaro.org>
+ <599acb88-ab14-c8c7-5ba6-6526b6e7c629@redhat.com> <874kmdm6v7.fsf@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5ca6d5d0-968b-8e3f-a265-c632d74d31d8@redhat.com>
+Date: Thu, 29 Oct 2020 16:28:48 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201029083130.0617a28f@w520.home>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <874kmdm6v7.fsf@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 01:47:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 00:47:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -23
 X-Spam_score: -2.4
 X-Spam_bar: --
 X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.261, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ NICE_REPLY_A=-0.261, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -102,118 +100,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- Janosch Frank <frankja@linux.vnet.ibm.com>,
- "mst@redhat.com" <mtsirkin@redhat.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Yan Vugenfirer <yan@daynix.com>, Jag Raman <jag.raman@oracle.com>,
- Anup Patel <anup@brainfault.org>,
- Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Roman Kagan <rkagan@virtuozzo.com>, Felipe Franciosi <felipe@nutanix.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Jens Freimann <jfreimann@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Kashyap Chamarthy <kchamart@redhat.com>,
- Darren Kenny <darren.kenny@oracle.com>, Liran Alon <liran.alon@oracle.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
- Halil Pasic <pasic@linux.vnet.ibm.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>, fam <fam@euphon.net>
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020/10/29 下午10:31, Alex Williamson wrote:
-> On Thu, 29 Oct 2020 21:02:05 +0800
-> Jason Wang <jasowang@redhat.com> wrote:
->
->> On 2020/10/29 下午8:08, Stefan Hajnoczi wrote:
->>> Here are notes from the session:
+On 29/10/2020 15.42, Alex Bennée wrote:
+> 
+> Thomas Huth <thuth@redhat.com> writes:
+> 
+>> On 15/09/2020 15.43, Alex Bennée wrote:
+>>> While we are at it move the few places where they are into the
+>>> deprecation build bucket.
 >>>
->>> protocol stability:
->>>       * vhost-user already exists for existing third-party applications
->>>       * vfio-user is more general but will take more time to develop
->>>       * libvfio-user can be provided to allow device implementations
->>>
->>> management:
->>>       * Should QEMU launch device emulation processes?
->>>           * Nicer user experience
->>>           * Technical blockers: forking, hotplug, security is hard once
->>> QEMU has started running
->>>           * Probably requires a new process model with a long-running
->>> QEMU management process proxying QMP requests to the emulator process
->>>
->>> migration:
->>>       * dbus-vmstate
->>>       * VFIO live migration ioctls
->>>           * Source device can continue if migration fails
->>>           * Opaque blobs are transferred to destination, destination can
->>> fail migration if it decides the blobs are incompatible
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> ---
+>>>  configure      | 2 +-
+>>>  .gitlab-ci.yml | 9 +++++----
+>>>  .shippable.yml | 2 +-
+>>>  3 files changed, 7 insertions(+), 6 deletions(-)
 >>
->> I'm not sure this can work:
+>>  Hi Alex,
 >>
->> 1) Reading something that is opaque to userspace is probably a hint of
->> bad uAPI design
->> 2) Did qemu even try to migrate opaque blobs before? It's probably a bad
->> design of migration protocol as well.
+>> I noticed that these deprecated targets do not show up in the
+>> output of "configure --help" at all anymore:
 >>
->> It looks to me have a migration driver in qemu that can clearly define
->> each byte in the migration stream is a better approach.
-> Any time during the previous two years of development might have been a
-> more appropriate time to express your doubts.
+>>  --target-list=LIST       set target list (default: build everything)
+>>                            Available targets: aarch64-softmmu alpha-softmmu 
+>>                            arm-softmmu avr-softmmu cris-softmmu hppa-softmmu 
+>>                            i386-softmmu m68k-softmmu microblazeel-softmmu 
+>>                            microblaze-softmmu mips64el-softmmu mips64-softmmu 
+>>                            mipsel-softmmu mips-softmmu moxie-softmmu 
+>>                            nios2-softmmu or1k-softmmu ppc64-softmmu ppc-softmmu 
+>>                            riscv32-softmmu riscv64-softmmu rx-softmmu 
+>>                            s390x-softmmu sh4eb-softmmu sh4-softmmu 
+>>                            sparc64-softmmu sparc-softmmu tricore-softmmu 
+>>                            x86_64-softmmu xtensaeb-softmmu xtensa-softmmu 
+>>                            aarch64_be-linux-user aarch64-linux-user 
+>>                            alpha-linux-user armeb-linux-user arm-linux-user 
+>>                            cris-linux-user hppa-linux-user i386-linux-user 
+>>                            m68k-linux-user microblazeel-linux-user 
+>>                            microblaze-linux-user mips64el-linux-user 
+>>                            mips64-linux-user mipsel-linux-user mips-linux-user 
+>>                            mipsn32el-linux-user mipsn32-linux-user 
+>>                            nios2-linux-user or1k-linux-user ppc64le-linux-user 
+>>                            ppc64-linux-user ppc-linux-user riscv32-linux-user 
+>>                            riscv64-linux-user s390x-linux-user sh4eb-linux-user 
+>>                            sh4-linux-user sparc32plus-linux-user 
+>>                            sparc64-linux-user sparc-linux-user 
+>>                            x86_64-linux-user xtensaeb-linux-user 
+>>                            xtensa-linux-user
+>>
+>> The text "default: build everything" is now also not accurate anymore.
+>> How is a user who is still interested in these targets supposed to find
+>> the right --target-list parameters now?
+> 
+> How about:
+> 
+> --8<---------------cut here---------------start------------->8---
+> modified   configure
+> @@ -1644,9 +1644,11 @@ Standard options:
+>    --prefix=PREFIX          install in PREFIX [$prefix]
+>    --interp-prefix=PREFIX   where to find shared libraries, etc.
+>                             use %M for cpu name [$interp_prefix]
+> -  --target-list=LIST       set target list (default: build everything)
+> +  --target-list=LIST       set target list (default: build all non-deprcated)
+>  $(echo Available targets: $default_target_list | \
+>    fold -s -w 53 | sed -e 's/^/                           /')
+> +$(echo Deprecated targets: $deprecated_targets_list | \
+> +  fold -s -w 53 | sed -e 's/^/                           /')
+>    --target-list-exclude=LIST exclude a set of targets from the default target-list
+>  
+>  Advanced options (experts only):
+> --8<---------------cut here---------------end--------------->8---
+> 
+> Which would give:
+> 
+> 
+>   --target-list=LIST       set target list (default: build all non-deprcated)
+>                            Available targets: aarch64-softmmu alpha-softmmu 
+>                            arm-softmmu avr-softmmu cris-softmmu hppa-softmmu 
+>                            i386-softmmu m68k-softmmu microblaze-softmmu 
+>                            microblazeel-softmmu mips-softmmu mips64-softmmu 
+>                            mips64el-softmmu mipsel-softmmu moxie-softmmu 
+>                            nios2-softmmu or1k-softmmu ppc-softmmu ppc64-softmmu 
+>                            riscv32-softmmu riscv64-softmmu rx-softmmu 
+>                            s390x-softmmu sh4-softmmu sh4eb-softmmu 
+>                            sparc-softmmu sparc64-softmmu tricore-softmmu 
+>                            x86_64-softmmu xtensa-softmmu xtensaeb-softmmu 
+>                            aarch64-linux-user aarch64_be-linux-user 
+>                            alpha-linux-user arm-linux-user armeb-linux-user 
+>                            cris-linux-user hppa-linux-user i386-linux-user 
+>                            m68k-linux-user microblaze-linux-user 
+>                            microblazeel-linux-user mips-linux-user 
+>                            mips64-linux-user mips64el-linux-user 
+>                            mipsel-linux-user mipsn32-linux-user 
+>                            mipsn32el-linux-user nios2-linux-user 
+>                            or1k-linux-user ppc-linux-user ppc64-linux-user 
+>                            ppc64le-linux-user riscv32-linux-user 
+>                            riscv64-linux-user s390x-linux-user sh4-linux-user 
+>                            sh4eb-linux-user sparc-linux-user 
+>                            sparc32plus-linux-user sparc64-linux-user 
+>                            x86_64-linux-user xtensa-linux-user 
+>                            xtensaeb-linux-user
+>                            Deprecated targets: 
+>                            ppc64abi32-linux-user,tilegx-linux-user,lm32-softmmu,
+>                            unicore32-softmmu
+>   --target-list-exclude=LIST exclude a set of targets from the default target-list
 
+Sounds good!
 
-Somehow I did that in this series[1]. But the main issue is still there. 
-Is this legal to have a uAPI that turns out to be opaque to userspace? 
-(VFIO seems to be the first). If it's not,  the only choice is to do 
-that in Qemu.
-
-
->
-> Note that we're not talking about vDPA devices here, we're talking
-> about arbitrary devices with arbitrary state.  Some degree of migration
-> support for assigned devices can be implemented in QEMU, Alex Graf
-> proved this several years ago with i40evf.  Years later, we don't have
-> any vendors proposing device specific migration code for QEMU.
-
-
-Yes but it's not necessarily VFIO as well.
-
-
->
-> Clearly we're also trying to account for proprietary devices where even
-> for suspend/resume support, proprietary drivers may be required for
-> manipulating that internal state.  When we move device emulation
-> outside of QEMU, whether in kernel or to other userspace processes,
-> does it still make sense to require code in QEMU to support
-> interpretation of that device for migration purposes?
-
-
-Well, we could extend Qemu to support property module (or have we 
-supported that now?). And then it can talk to property drivers via 
-either VFIO or vendor specific uAPI.
-
-
->   That seems
-> counter to the actual goal of out-of-process devices and clearly hasn't
-> work for us so far.  Thanks,
->
-> Alex
-
-
-Thanks
-
-[1] 
-https://lore.kernel.org/kvm/20200914084449.0182e8a9@x1.home/T/#m23b08f92a7269fa9676b91dacb6699a78d4b3949
+ Thomas
 
 
 
