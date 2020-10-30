@@ -2,72 +2,69 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D6EC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B12C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:13:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8746206E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:13:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B759206E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:13:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e9E/ztHp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8746206E3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OHja2iVX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B759206E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYRPG-0007c8-Ds
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 06:13:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42304)
+	id 1kYRPs-0008W2-8v
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 06:13:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kYRNf-0006Fe-Gp
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:11:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32050)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kYROe-0007Fc-Dv
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:12:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49358)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kYRNb-0003VG-7f
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:11:35 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kYROc-0003r3-R1
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:12:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604052690;
+ s=mimecast20190719; t=1604052754;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=A7C7ZFvh8dYAWvbu5eSaA1GFbtpsWKvy0DidOZ3L2jk=;
- b=e9E/ztHpT5uQh5N5Yn0+PRJ8xou4HimbTERTVjWS35ox3Yj1+WZwNgx8keYSqikip3dD6G
- qvz+bHLTdQdZ/yopA6G92ZTKxSdbyeKOdqJ6T+dtMFtnwdEM696V63UeEWB02dKgpAqjtq
- DyZA9+wj/bL7MoApsQ2oZ/q/FKnNz4s=
+ bh=UM5f9Kvis6JZbzag/0+drIalW5ea3ncMMS7qOLfDzxE=;
+ b=OHja2iVX6wvkFpPTp7w066QH8VGSKLYvP4CerhV9ldRaORurFCM+yb8GUTCJLN3yVHNXmO
+ k2Gc7h4I7fOc0WJrusSlkwXYIfGeM4VVmRbwTduRtCJOhJ0tv9IHSaU8HcFqNtyYZc4j3g
+ jmYGgU2LauoHF1S3mo0zWbw6OAklp9I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-VyMG6Px3OU2prLemfSBSVA-1; Fri, 30 Oct 2020 06:11:26 -0400
-X-MC-Unique: VyMG6Px3OU2prLemfSBSVA-1
+ us-mta-468-VMO7yFq0MGmCJ0_XQN58cw-1; Fri, 30 Oct 2020 06:12:32 -0400
+X-MC-Unique: VMO7yFq0MGmCJ0_XQN58cw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 065315700E;
- Fri, 30 Oct 2020 10:11:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE12C5708A;
+ Fri, 30 Oct 2020 10:12:30 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
  [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EC88260BFA;
- Fri, 30 Oct 2020 10:11:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BC52619C4;
+ Fri, 30 Oct 2020 10:12:20 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 66FF7113865F; Fri, 30 Oct 2020 11:11:20 +0100 (CET)
+ id C75E1113865F; Fri, 30 Oct 2020 11:12:18 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [PATCH 00/11] sockets: Attempt to drain the abstract socket swamp
 References: <20201029133833.3450220-1-armbru@redhat.com>
- <CAJ+F1CLW=zfWq3apgrKear2v42LYarSMQKw07BHadM-rYjcmoA@mail.gmail.com>
-Date: Fri, 30 Oct 2020 11:11:19 +0100
-In-Reply-To: <CAJ+F1CLW=zfWq3apgrKear2v42LYarSMQKw07BHadM-rYjcmoA@mail.gmail.com>
- (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 29 Oct 2020
- 17:53:25 +0400")
-Message-ID: <87pn50vxa0.fsf@dusky.pond.sub.org>
+ <07eb80c1-6d56-2bd4-c8be-90a34167ae91@redhat.com>
+Date: Fri, 30 Oct 2020 11:12:18 +0100
+In-Reply-To: <07eb80c1-6d56-2bd4-c8be-90a34167ae91@redhat.com> (Paolo
+ Bonzini's message of "Thu, 29 Oct 2020 19:06:19 +0100")
+Message-ID: <87lffovx8d.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
@@ -75,8 +72,7 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
@@ -100,117 +96,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
- xiaoqiang zhao <zxq_yx_007@163.com>, QEMU <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, berrange@redhat.com, zxq_yx_007@163.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> Hi Markus,
->
-> On Thu, Oct 29, 2020 at 5:43 PM Markus Armbruster <armbru@redhat.com> wro=
-te:
->
+> On 29/10/20 14:38, Markus Armbruster wrote:
 >> In my opinion, the Linux-specific abstract UNIX domain socket feature
 >> introduced in 5.1 should have been rejected.  The feature is niche,
 >> the interface clumsy, the implementation buggy and incomplete, and the
 >> test coverage insufficient.  Review fail.
->>
->
-> I also failed (as chardev maintainer..) to not only review but weigh in a=
-nd
-> discuss the merits or motivations behind it.
->
-> I agree with you. Also the commit lacks motivation behind this "feature".
->
->
+>> 
 >> Fixing the parts we can still fix now is regrettably expensive.  If I
 >> had the power to decide, I'd unceremoniously revert the feature,
 >> compatibility to 5.1 be damned.  But I don't, so here we go.
->>
+>> 
 >> I'm not sure this set of fixes is complete.  However, I already spent
 >> too much time on this, so out it goes.  Lightly tested.
->>
+>> 
 >> Regardless, I *will* make time for ripping the feature out if we
 >> decide to do that.  Quick & easy way to avoid reviewing this series
 >> *hint* *hint*.
->>
 >
-> well, fwiw, I would also take that approach too, to the risk of upsetting
-> the users.
+> Apart from the nits pointed out in patch 7 (commit message) and 8 (code),
+>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+> Thanks, and don't forget to fix the hole that your head has left in the
+> wall.
 
-Reverting the feature requires rough consensus and a patch.
-
-I can provide a patch, but let's give everybody a chance to object
-first.
-
->            But maybe we can get a clear reason behind it before that
-> happens. (sorry, I didn't dig the ML archive is such evidence is there, i=
-t
-> should have been in the commit message too)
-
-I just did, and found next to nothing.
-
-This is the final cover letter:
-
-    qemu-sockets: add abstract UNIX domain socket support
-
-    qemu does not support abstract UNIX domain
-    socket address. Add this ability to make qemu handy
-    when abstract address is needed.
-
-Boils down to "$feature is needed because it's handy when it's needed",
-which is less than helpful.
-
-Patch history:
-
-v1: https://lists.nongnu.org/archive/html/qemu-devel/2020-04/msg03799.html
-
-    This version repurposes @path starting with '@' for abstract
-    sockets, always tight.  Only connect, no tests, no documentation.
-
-    R-by Marc-Andr=C3=A9.
-
-v2: https://lists.nongnu.org/archive/html/qemu-devel/2020-04/msg03803.html
-
-    Minor cleanup.
-
-    Daniel asks why it's needed, points out listen is missing, and
-    suggests the two boolean flags abstract, tight.
-
-v3: https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg02291.html
-
-    Implement interface proposed by Daniel, default of @tight broken,
-    tests (which don't catch the broken default), documentation.
-
-    Eric suggests QAPI schema doc improvements (but doesn't challenge
-    the interface).
-
-    R-by Daniel for the code.  He asks for randomized @path in tests.
-
-v4: https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg04036.html
-
-    Daniel points out style nits in tests.
-
-    Eric suggests a few more QAPI schema doc improvements.
-
-v5: https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg04144.html
-
-    R-by Daniel for the tests.
-
-v6: https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg04508.html
-
-    No further review comments.
-
-PR: https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg05747.html
-
-    Pull request catches my eye.  The interface looks odd, and I
-    challenge @tight.  I silently accept Daniel's defense of it without
-    digging deeper.
-
-This is a review failure.  I do not blame the patch submitter.
+Thanks for the review, and thanks for cheering my up!
 
 
