@@ -2,82 +2,80 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D04C00A89
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 15:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 315BDC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 15:26:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90DF22225C
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 15:21:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6676620725
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 15:26:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uou9KUqs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90DF22225C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W+BM5Ot9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6676620725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYWDa-0008F8-IL
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 11:21:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35220)
+	id 1kYWI5-0002VL-2r
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 11:26:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kYWC2-0006tk-Pw
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 11:19:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34320)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kYWGz-0001bT-MB
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 11:25:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21300)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kYWC0-0007ih-Mn
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 11:19:54 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kYWGx-000091-3O
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 11:25:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604071191;
+ s=mimecast20190719; t=1604071498;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0cnZMdGpskDpwIf+skZVV2NsWMfFTOqQtC0HrO/rs8c=;
- b=Uou9KUqsRaRZs2XA7UD0qLtCDyp+d9lUT9AcPIefMYrsrkvTKkrnZdXcER8ZBmMPPUYB80
- U80H2zMwtMEbNDo1KGbqFeUqmmKMXrAzZsHu3OeE7CLpZJLsD66yUTS6KzWH4+/Sobtej5
- jDjQ3XiH0rYk2n7RL7l6RYAAJf79tNc=
+ bh=JjxdNJZN9vTwED8skXnPPG/hlG7mAirMyQBeWztyzKg=;
+ b=W+BM5Ot9JWW03jbFO/lLa7oL5A733GCCxATAJh/12f//GelQ8r9Hx3aCDbrCnfo+NF29KN
+ eqG4QzBd43OunIunQiqZu/aptDmo2Nqwqm1EJ41YDkioRZkqMDO79epIfZ+KtQoQsMEquq
+ xc+FnkEpBCJ7EokgygKbAOd2YwB8SGo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-450-rrKidos9M86hrlDlnv-p6w-1; Fri, 30 Oct 2020 11:19:47 -0400
-X-MC-Unique: rrKidos9M86hrlDlnv-p6w-1
+ us-mta-2-1a6dZym_PKe-pA2Ae7qvwA-1; Fri, 30 Oct 2020 11:24:56 -0400
+X-MC-Unique: 1a6dZym_PKe-pA2Ae7qvwA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A7BF8F62E4;
- Fri, 30 Oct 2020 15:19:46 +0000 (UTC)
-Received: from [10.36.114.125] (ovpn-114-125.ams2.redhat.com [10.36.114.125])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5125A5578C;
- Fri, 30 Oct 2020 15:19:45 +0000 (UTC)
-Subject: Re: [PATCH-for-5.2] hw/arm/smmuv3: Fix potential integer overflow
- (CID 1432363)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C344818B9F0C;
+ Fri, 30 Oct 2020 15:24:54 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-87.ams2.redhat.com [10.36.113.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 199B255772;
+ Fri, 30 Oct 2020 15:24:53 +0000 (UTC)
+Subject: Re: [PATCH] configure: surface deprecated targets in the help output
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
-References: <20201030144617.1535064-1-philmd@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0e2ae767-91ba-543e-7140-23026b7573a5@redhat.com>
-Date: Fri, 30 Oct 2020 16:19:43 +0100
+References: <20201029201449.6926-1-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <77fa0da6-ff0a-de8c-6ba1-a74fbf44dcb5@redhat.com>
+Date: Fri, 30 Oct 2020 16:24:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201030144617.1535064-1-philmd@redhat.com>
+In-Reply-To: <20201029201449.6926-1-alex.bennee@linaro.org>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eric.auger@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -88,7 +86,7 @@ X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  NICE_REPLY_A=-0.253, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,56 +99,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
-
-On 10/30/20 3:46 PM, Philippe Mathieu-Daudé wrote:
-> Use the BIT_ULL() macro to ensure we use 64-bit arithmetic.
-> This fixes the following Coverity issue (OVERFLOW_BEFORE_WIDEN):
+On 29/10/2020 21.14, Alex Bennée wrote:
+> Show the targets but keep them separate from the main list.
 > 
->   CID 1432363 (#1 of 1): Unintentional integer overflow:
-> 
->   overflow_before_widen:
->     Potentially overflowing expression 1 << scale with type int
->     (32 bits, signed) is evaluated using 32-bit arithmetic, and
->     then used in a context that expects an expression of type
->     hwaddr (64 bits, unsigned).
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks!
-
-Eric
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  hw/arm/smmuv3.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  configure | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-> index 2017ba7a5a7..22607c37841 100644
-> --- a/hw/arm/smmuv3.c
-> +++ b/hw/arm/smmuv3.c
-> @@ -17,6 +17,7 @@
->   */
+> diff --git a/configure b/configure
+> index 55e07c82dd..6c2e9ff37c 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1644,9 +1644,11 @@ Standard options:
+>    --prefix=PREFIX          install in PREFIX [$prefix]
+>    --interp-prefix=PREFIX   where to find shared libraries, etc.
+>                             use %M for cpu name [$interp_prefix]
+> -  --target-list=LIST       set target list (default: build everything)
+> +  --target-list=LIST       set target list (default: build all non-deprecated)
+>  $(echo Available targets: $default_target_list | \
+>    fold -s -w 53 | sed -e 's/^/                           /')
+> +$(echo Deprecated targets: $deprecated_targets_list | \
+> +  fold -s -w 53 | sed -e 's/^/                           /')
+>    --target-list-exclude=LIST exclude a set of targets from the default target-list
 >  
->  #include "qemu/osdep.h"
-> +#include "qemu/bitops.h"
->  #include "hw/irq.h"
->  #include "hw/sysbus.h"
->  #include "migration/vmstate.h"
-> @@ -864,7 +865,7 @@ static void smmuv3_s1_range_inval(SMMUState *s, Cmd *cmd)
->          scale = CMD_SCALE(cmd);
->          num = CMD_NUM(cmd);
->          ttl = CMD_TTL(cmd);
-> -        num_pages = (num + 1) * (1 << (scale));
-> +        num_pages = (num + 1) * BIT_ULL(scale);
->      }
->  
->      if (type == SMMU_CMD_TLBI_NH_VA) {
+>  Advanced options (experts only):
 > 
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
