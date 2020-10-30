@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD190C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA05C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:55:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5060520838
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:55:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9C9D2071A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:55:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yk89YWsz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5060520838
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q7dP2FeG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9C9D2071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYIhS-0003oC-8O
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 20:55:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46698)
+	id 1kYIhl-0004Dw-K0
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 20:55:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kYIbm-00048N-OV
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:49:36 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46115)
+ id 1kYIbu-0004DF-Kn
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:49:42 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42010)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kYIbg-0001pF-IM
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:49:34 -0400
-Received: by mail-pg1-x543.google.com with SMTP id n16so3736055pgv.13
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 17:49:27 -0700 (PDT)
+ id 1kYIbq-0001qr-KK
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:49:42 -0400
+Received: by mail-pg1-x541.google.com with SMTP id k9so2059110pgt.9
+ for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 17:49:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8pLkiqkIjZ/7Qr8Zv4gVi8ZhnT5Yj9+J9ATOQP2/qhI=;
- b=Yk89YWszf5JD6Ic7xaLk6bhhr8ojInWKf7wBno+yhJ2sLbAeWHSP9a5IxjG0UbKzJQ
- +FYpnteOkJFzxSZ+eo6UnId4bxdmO2We8M4+5BYqSfrlAXpn78xbjl2EHkX8vMk94sxQ
- otuwwyej9/bxrnkp3p4aDmgAdBkIIlvgqbHzXtbSWf7vJpNHdhCsD5yvC+MGCvGRCWZj
- oMEioEbc7M43mGSRePzalcgzWEGWSII4w4D4ZxPwhKXew+BEtwE+3oaAcYSavuTV1srS
- Th1GhONSVjqP9XCILvQ+iK1CmbELbPyTa8UOFJhqf/8dItWP73+bATT15Tj8lEZQnW0D
- oZtg==
+ bh=WQtz9VJLYSx04Hh8zsTVQFn8wB6GzwGePEieOesZ6FA=;
+ b=q7dP2FeGiKfgbHeD3ZoC9tyxhsY6euZLjKFB8UVJ2Os+FTeXieruZjkVJPX8063QtA
+ 6rKY+/RsrEJtH3BzwA9/J1wUNj0190vaFRYxctpo8n93hMQLp9uTemoTKrPhM+/hpUJk
+ 8WHVSmzih0AzUqbfCtHEcQibe4RyJ4GAIaWOnFDVPT/LMSIJQZWv/VWHrhm7TSEE7UHq
+ TGX3Z6j74oixxooLLIEuV4vnZic04zzM/FwOOGwvAlgKVnSikLbptstCGIlplc2PhSpE
+ kig5c/BJNvFWZ5FFdS1rCffK98svhum1nQWo1XF+R0nvAwrpHAqKgmPjABtKIxdJ5GiT
+ gg+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8pLkiqkIjZ/7Qr8Zv4gVi8ZhnT5Yj9+J9ATOQP2/qhI=;
- b=MEeHI+8MCoLQX4SMZ8e0pBcwKw/eAnSQ8feJgARKTCdKG85hwxtukKC+F9Gxdfq6AV
- 6pp3gGz5Zo6YANUER98U3XX/fPTHgtwaP5tq5APcKQtAuYYdIRYIxe4w5YmqOLkPWolA
- hyvfDiyJP4P2vJEnqs8NkXDc3N25CMQuqqQ59pWA3ikBZ97ztLrFqIM51MzUUbzZgeka
- Ry6OOVv/aHOsWAVDXLgBRotUFMaTmIHMBSmBGPmmgeZjpt0T6Jy+uheGTy61/n628YiV
- MNmise4saT+DFYzdYOFFNoDld/Fno6bCbDZh195Lk5m+xTBgyeXz/m5ov1T+58YSFqPA
- b4PA==
-X-Gm-Message-State: AOAM5310YP9ghVJBB6Uh7usGbmRh3sHLRiNvphvZVr7W7M9jALNDa6uW
- c+4sP3KyqQmGREVhuFIXMxKt3FPIA6DQaA==
-X-Google-Smtp-Source: ABdhPJwEI8f80BYXNQS4p5IlkC+4Mdt/XvKMiEeCNXsa28tZS8mONk2q2mie4Z/TRVnC2MPW4srz3A==
-X-Received: by 2002:a63:134d:: with SMTP id 13mr6282120pgt.370.1604018966204; 
- Thu, 29 Oct 2020 17:49:26 -0700 (PDT)
+ bh=WQtz9VJLYSx04Hh8zsTVQFn8wB6GzwGePEieOesZ6FA=;
+ b=OilHpmdHnRajFOOiPzP/TiMqIj0NIBKyoFsG64mv/dsATQM8DPyR3BMqzbNQABijSG
+ IaGURNj+arLmhob+VRN+CoiFBAD31Z2De51lZxnUuiqJECy0aj8IfVudU8vqhn8uvSbQ
+ zmKMzTnu+4QgCzwjTXqxvF9k7tcA/q4iurO9aYQujq1GfAi4pNuLFD/vqSyqzKFfdn6V
+ xyfdp8PU3WMD173eD4mP2LhMP2IN5fE+b+goBvnG5xSl/GQFdAecdpspFkl7hdrp3shq
+ peVXTGLWFy2tpbSW82izSFCt8jo/5aCiXN61IyoPwcagJWVJhaxnIA8W7nFOmqECBMWC
+ VCIg==
+X-Gm-Message-State: AOAM530hYUb7HMeibzHLuI/Rkg2n2+s7Lok2itGEtecJ29hmOEiZr0rf
+ 2yAoMZ68E/DMlg5pNd7KV1BVznzze0a3ug==
+X-Google-Smtp-Source: ABdhPJwd0FdbZKzzGsPvHsH9Yi1kqbYmhKXMgg2ZiaGGfZ9JtekrukCB5/c9jH/ctZsn9DRz+xZ/Dg==
+X-Received: by 2002:aa7:8b0b:0:b029:152:900d:2288 with SMTP id
+ f11-20020aa78b0b0000b0290152900d2288mr6950906pfd.53.1604018975744; 
+ Thu, 29 Oct 2020 17:49:35 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id b6sm3557264pgq.58.2020.10.29.17.49.24
+ by smtp.gmail.com with ESMTPSA id b6sm3557264pgq.58.2020.10.29.17.49.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Oct 2020 17:49:25 -0700 (PDT)
+ Thu, 29 Oct 2020 17:49:34 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 02/19] tcg: Move tcg prologue pointer out of TCGContext
-Date: Thu, 29 Oct 2020 17:49:04 -0700
-Message-Id: <20201030004921.721096-3-richard.henderson@linaro.org>
+Subject: [PATCH v2 09/19] tcg: Make DisasContextBase.tb const
+Date: Thu, 29 Oct 2020 17:49:11 -0700
+Message-Id: <20201030004921.721096-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201030004921.721096-1-richard.henderson@linaro.org>
 References: <20201030004921.721096-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,107 +105,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This value is constant across all thread-local copies of TCGContext,
-so we might as well move it out of thread-local storage.
+There is nothing within the translators that ought to be
+changing the TranslationBlock data, so make it const.
 
-Use the correct function pointer type, and name the variable
-tcg_qemu_tb_exec, which means that we are able to remove the
-macro that does the casting.
-
-Replace HAVE_TCG_QEMU_TB_EXEC with CONFIG_TCG_INTERPRETER,
-as this is somewhat clearer in intent.
+This does not actually use the read-only copy of the
+data structure that exists within the rx mirror.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/tcg/tcg.h    | 9 ++++-----
- tcg/tci/tcg-target.h | 2 --
- tcg/tcg.c            | 9 ++++++++-
- tcg/tci.c            | 3 ++-
- 4 files changed, 14 insertions(+), 9 deletions(-)
+ include/exec/gen-icount.h  | 4 ++--
+ include/exec/translator.h  | 2 +-
+ include/tcg/tcg-op.h       | 2 +-
+ accel/tcg/translator.c     | 4 ++--
+ target/arm/translate-a64.c | 2 +-
+ tcg/tcg-op.c               | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
-index 8804a8c4a2..5ff5bf2a73 100644
---- a/include/tcg/tcg.h
-+++ b/include/tcg/tcg.h
-@@ -621,7 +621,6 @@ struct TCGContext {
-        here, because there's too much arithmetic throughout that relies
-        on addition and subtraction working on bytes.  Rely on the GCC
-        extension that allows arithmetic on void*.  */
--    void *code_gen_prologue;
-     void *code_gen_epilogue;
-     void *code_gen_buffer;
-     size_t code_gen_buffer_size;
-@@ -1220,11 +1219,11 @@ static inline unsigned get_mmuidx(TCGMemOpIdx oi)
- #define TB_EXIT_IDXMAX    1
- #define TB_EXIT_REQUESTED 3
+diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+index 822c43cfd3..aa4b44354a 100644
+--- a/include/exec/gen-icount.h
++++ b/include/exec/gen-icount.h
+@@ -32,7 +32,7 @@ static inline void gen_io_end(void)
+     tcg_temp_free_i32(tmp);
+ }
  
--#ifdef HAVE_TCG_QEMU_TB_EXEC
--uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr);
-+#ifdef CONFIG_TCG_INTERPRETER
-+uintptr_t tcg_qemu_tb_exec(CPUArchState *env, void *tb_ptr);
- #else
--# define tcg_qemu_tb_exec(env, tb_ptr) \
--    ((uintptr_t (*)(void *, void *))tcg_ctx->code_gen_prologue)(env, tb_ptr)
-+typedef uintptr_t tcg_prologue_fn(CPUArchState *env, void *tb_ptr);
-+extern tcg_prologue_fn *tcg_qemu_tb_exec;
- #endif
- 
- void tcg_register_jit(void *buf, size_t buf_size);
-diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-index 6460449719..49f3291f8a 100644
---- a/tcg/tci/tcg-target.h
-+++ b/tcg/tci/tcg-target.h
-@@ -189,8 +189,6 @@ typedef enum {
- 
- void tci_disas(uint8_t opc);
- 
--#define HAVE_TCG_QEMU_TB_EXEC
--
- /* Flush the dcache at RW, and the icache at RX, as necessary. */
- static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
+-static inline void gen_tb_start(TranslationBlock *tb)
++static inline void gen_tb_start(const TranslationBlock *tb)
  {
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 3bf36e0cfe..8d63c714fb 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -161,6 +161,10 @@ static TCGContext **tcg_ctxs;
- static unsigned int n_tcg_ctxs;
- TCGv_env cpu_env = 0;
+     TCGv_i32 count, imm;
  
-+#ifndef CONFIG_TCG_INTERPRETER
-+tcg_prologue_fn *tcg_qemu_tb_exec;
-+#endif
-+
- struct tcg_region_tree {
-     QemuMutex lock;
-     GTree *tree;
-@@ -1053,7 +1057,10 @@ void tcg_prologue_init(TCGContext *s)
-     s->code_ptr = buf0;
-     s->code_buf = buf0;
-     s->data_gen_ptr = NULL;
--    s->code_gen_prologue = buf0;
-+
-+#ifndef CONFIG_TCG_INTERPRETER
-+    tcg_qemu_tb_exec = (tcg_prologue_fn *)buf0;
-+#endif
+@@ -71,7 +71,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
+     tcg_temp_free_i32(count);
+ }
  
-     /* Compute a high-water mark, at which we voluntarily flush the buffer
-        and start over.  The size here is arbitrary, significantly larger
-diff --git a/tcg/tci.c b/tcg/tci.c
-index 82039fd163..d996eb7cf8 100644
---- a/tcg/tci.c
-+++ b/tcg/tci.c
-@@ -475,8 +475,9 @@ static bool tci_compare64(uint64_t u0, uint64_t u1, TCGCond condition)
- #endif
- 
- /* Interpret pseudo code in tb. */
--uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
-+uintptr_t tcg_qemu_tb_exec(CPUArchState *env, void *v_tb_ptr)
+-static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
++static inline void gen_tb_end(const TranslationBlock *tb, int num_insns)
  {
-+    uint8_t *tb_ptr = v_tb_ptr;
-     tcg_target_ulong regs[TCG_TARGET_NB_REGS];
-     long tcg_temps[CPU_TEMP_BUF_NLONGS];
-     uintptr_t sp_value = (uintptr_t)(tcg_temps + CPU_TEMP_BUF_NLONGS);
+     if (tb_cflags(tb) & CF_USE_ICOUNT) {
+         /* Update the num_insn immediate parameter now that we know
+diff --git a/include/exec/translator.h b/include/exec/translator.h
+index 638e1529c5..24232ead41 100644
+--- a/include/exec/translator.h
++++ b/include/exec/translator.h
+@@ -67,7 +67,7 @@ typedef enum DisasJumpType {
+  * Architecture-agnostic disassembly context.
+  */
+ typedef struct DisasContextBase {
+-    TranslationBlock *tb;
++    const TranslationBlock *tb;
+     target_ulong pc_first;
+     target_ulong pc_next;
+     DisasJumpType is_jmp;
+diff --git a/include/tcg/tcg-op.h b/include/tcg/tcg-op.h
+index 5abf17fecc..cbe39a3b95 100644
+--- a/include/tcg/tcg-op.h
++++ b/include/tcg/tcg-op.h
+@@ -805,7 +805,7 @@ static inline void tcg_gen_insn_start(target_ulong pc, target_ulong a1,
+  * be NULL and @idx should be 0.  Otherwise, @tb should be valid and
+  * @idx should be one of the TB_EXIT_ values.
+  */
+-void tcg_gen_exit_tb(TranslationBlock *tb, unsigned idx);
++void tcg_gen_exit_tb(const TranslationBlock *tb, unsigned idx);
+ 
+ /**
+  * tcg_gen_goto_tb() - output goto_tb TCG operation
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index fb1e19c585..a49a794065 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -133,8 +133,8 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+     }
+ 
+     /* The disas_log hook may use these values rather than recompute.  */
+-    db->tb->size = db->pc_next - db->pc_first;
+-    db->tb->icount = db->num_insns;
++    tb->size = db->pc_next - db->pc_first;
++    tb->icount = db->num_insns;
+ 
+ #ifdef DEBUG_DISAS
+     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 072754fa24..297782e6ef 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -410,7 +410,7 @@ static inline bool use_goto_tb(DisasContext *s, int n, uint64_t dest)
+ 
+ static inline void gen_goto_tb(DisasContext *s, int n, uint64_t dest)
+ {
+-    TranslationBlock *tb;
++    const TranslationBlock *tb;
+ 
+     tb = s->base.tb;
+     if (use_goto_tb(s, n, dest)) {
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 4b8a473fad..e3dc0cb4cb 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -2664,7 +2664,7 @@ void tcg_gen_extr32_i64(TCGv_i64 lo, TCGv_i64 hi, TCGv_i64 arg)
+ 
+ /* QEMU specific operations.  */
+ 
+-void tcg_gen_exit_tb(TranslationBlock *tb, unsigned idx)
++void tcg_gen_exit_tb(const TranslationBlock *tb, unsigned idx)
+ {
+     uintptr_t val = (uintptr_t)tb + idx;
+ 
 -- 
 2.25.1
 
