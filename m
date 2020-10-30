@@ -2,100 +2,103 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EACDC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:29:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EFBC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:31:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C2EF20704
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:29:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83889221EB
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:31:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e0leOUGO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C2EF20704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0Aim9/g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83889221EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYRfA-0002b5-6g
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 06:29:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48386)
+	id 1kYRgT-0005Dl-AE
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 06:31:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kYRbz-0007am-SN
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:26:23 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:35260)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kYRbx-0001Eb-20
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:26:23 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id n15so5887279wrq.2
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 03:26:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Ht7WYueNgfp0UhVkFiZol+cFg7ruSFbIxqfSH2tHy8w=;
- b=e0leOUGOHWJzi7zHF/W2SLhWtX8QcqSn/UwCVkDGdFtiYxSQo3m21UaG8XsJPG2/XQ
- Xt43U+olHddIT4ERXEs/rXiSnCQlJtjasaiuboiLuC7Kyme8TWfP3WdYPL07nvS5m6M7
- 7GiOBIVWLT0A9/V19lSsmyIDXpedidaAOownLzIkluhGYY6xDfqxBqizCRQVq1mpAP6n
- 80Abi5kZlzLoQnBlI7/wZ+I6TkIgFCoZWy7ezcvzZGn4mEPFfJcnOFaU05ZBhFc4u9rH
- EuvLJFNmcI8CQ880TMakKsIBgH6BrCsWI2IcCgq4XwWjjVthwLZX88aXh+J2vZ6KNGFn
- WSIA==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYRbR-0006kP-DN
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:25:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55037)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYRbK-0000wc-Hk
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:25:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604053540;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=uaGHpAHWD9ks3LIGz6RmBK3NueQAckz5y8aJ7EJEjBM=;
+ b=U0Aim9/gyxrPVSr2mNUY4gdDolQK2PATyCpM95iNkpMABLcxus81MbMNVqeI7RO8wiNTfY
+ zkH7rFW63S2f/yErEmSQK4llCOw3DpqYk80yrBGwdyztgqrbWZmjbSsrHndnQ4rFgqgswe
+ 4J9zlCQCS9y9WrF/CtI9xAXGgcs3cGg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-346-CHuLpMIjPPKDE3_CCb9vAQ-1; Fri, 30 Oct 2020 06:25:39 -0400
+X-MC-Unique: CHuLpMIjPPKDE3_CCb9vAQ-1
+Received: by mail-wm1-f70.google.com with SMTP id y21so212441wmi.7
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 03:25:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Ht7WYueNgfp0UhVkFiZol+cFg7ruSFbIxqfSH2tHy8w=;
- b=SgI2ihZQjelwwPVP/UppOwGRm4ssg3v4RVfyGgC1CeP5ivTlJDUUGD3/MtWSrNgfR4
- zXv1chN6Ry+Vhl0oGvBjbDH7ElSE5eDM/5bKB8vXbEdsdnUyArzpxJvCHDpOCFsbFWGH
- 5C7j13nqqBMiri7CRFjQczfcaLILkcVuHAFzbuoGbNtXIZ3GeCbmq3duj73s6COukj6q
- ACbSoXzZsUBwUeF15F8yLQZXzZxMpN9N49/+ii0GNPG3bH1zdPOoH2TaXkbjn3eynQK7
- hV3mH6xZt14LXfybzCR6BOvsyDwux6Z5UPw9e0IqZ7ozOPy34ojBmTbfU/im+xnQKKO7
- USXw==
-X-Gm-Message-State: AOAM532NPaB2Lj8LIsAGOeSXu8AH1OtUMR7XY4xPz1t6/H52FYmSNp+V
- OQnlxettvOYSXuMHm4DM7mXD1w==
-X-Google-Smtp-Source: ABdhPJxcLaut66Xrd6WH0apfByRTJ2hfWsTg2BRumsWI3avp4AzbixVqDZjT5SOWq9tiQJmXj0G4Vg==
-X-Received: by 2002:adf:a50e:: with SMTP id i14mr2203576wrb.121.1604053579157; 
- Fri, 30 Oct 2020 03:26:19 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t4sm4174335wmb.20.2020.10.30.03.26.17
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=uaGHpAHWD9ks3LIGz6RmBK3NueQAckz5y8aJ7EJEjBM=;
+ b=sQ505DR8rhtYM/KgDkJpTmwlZu3OcUU8p1ia5eqpTIiOre3njUR44CZjSju4zI1RRe
+ oTWk48c93hJ0IxfiPpZp5iJkxJFVjpPJds351T64JKzBizT9shQVmhlAZTiMYgZl0GNH
+ 7q2250QzLJ7ZhSlok8j+0hUbbp00SqV5qr/a33cTAqBOKkgTOCcLfwGfrK3LOFH+QuvU
+ oG0veGNhx5qjU811Q2zmAUGk8+LDIqY4nTUQ01aeQK5oyq2wPJ3He0KOdWj5zCvenYJH
+ pepAMoFFTcFzn+NK3Jp6a2w6UmxOP3eTCjCZAHELBnMbqNZP0qa5zy0AWvNcXdjW0S5Y
+ DYEw==
+X-Gm-Message-State: AOAM533yhrwWzD8Ou+Cd8QYYnRsFROCoJYZL9UxZr8uLM9zRl3ifgyVA
+ 9ktkG9gYeXD3oNIv9hUNVzSnyraYuZm9OLfzZz53bvDtacsU7Zr6TDDXxSY512BGGllcAIcDQ6B
+ razCglBaEuDLrSkg=
+X-Received: by 2002:a05:600c:21c3:: with SMTP id
+ x3mr1778333wmj.81.1604053537924; 
+ Fri, 30 Oct 2020 03:25:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyv8idjCn+87HbLck06YrZ/BCI/HEvDHlj+svaumUO0S76mmcHejsxWmgtg++1PsDZdWehxBw==
+X-Received: by 2002:a05:600c:21c3:: with SMTP id
+ x3mr1778313wmj.81.1604053537702; 
+ Fri, 30 Oct 2020 03:25:37 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
+ by smtp.gmail.com with ESMTPSA id 26sm4167218wmk.42.2020.10.30.03.25.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Oct 2020 03:26:17 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2AC021FF7E;
- Fri, 30 Oct 2020 10:26:17 +0000 (GMT)
-References: <bda4f471-8ed6-3832-29ac-279a6d3bb7cc@redhat.com>
- <20201029174114.47e2b351.cohuck@redhat.com>
- <CAKmqyKOY+5WcxUg3Rvq2t3vYWOHrHQdhcv8PkiqZX2zVMdqJ3Q@mail.gmail.com>
- <3713093e-bf3b-bf23-a8d0-70fe429032ba@redhat.com>
- <c7308133-cf29-8668-f781-6d025eb16722@redhat.com>
- <3d9b264a-5e1f-b936-8455-bafc6b89ebe5@redhat.com>
-User-agent: mu4e 1.5.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: Migrating to the gitlab issue tracker
-In-reply-to: <3d9b264a-5e1f-b936-8455-bafc6b89ebe5@redhat.com>
-Date: Fri, 30 Oct 2020 10:26:17 +0000
-Message-ID: <87v9esko1i.fsf@linaro.org>
+ Fri, 30 Oct 2020 03:25:36 -0700 (PDT)
+Date: Fri, 30 Oct 2020 06:25:34 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v10 10/10] vfio: Don't issue full 2^64 unmap
+Message-ID: <20201030062513-mutt-send-email-mst@kernel.org>
+References: <20201008171558.410886-1-jean-philippe@linaro.org>
+ <20201008171558.410886-11-jean-philippe@linaro.org>
+ <20201008152214.3cb1425b@w520.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201008152214.3cb1425b@w520.home>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,89 +111,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair23@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, qemu-devel@nongnu.org,
+ peterx@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com,
+ bbhushan2@marvell.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Oct 08, 2020 at 03:22:14PM -0600, Alex Williamson wrote:
+> On Thu,  8 Oct 2020 19:15:58 +0200
+> Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
+> 
+> > IOMMUs may declare memory regions spanning from 0 to UINT64_MAX. When
+> > attempting to deal with such region, vfio_listener_region_del() passes a
+> > size of 2^64 to int128_get64() which throws an assertion failure.  Even
+> > ignoring this, the VFIO_IOMMU_DMA_MAP ioctl cannot handle this size
+> > since the size field is 64-bit. Split the request in two.
+> > 
+> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > ---
+> > For me this happens when memory_region_iommu_set_page_size_mask()
+> > returns an error because a hotplugged endpoint uses an incompatible page
+> > mask. vfio_connect_container() releases the memory listener which calls
+> > region_del() with the 2^64 IOMMU region. There are probably other ways
+> > to reach this.
+> > ---
+> >  hw/vfio/common.c | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> > 
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index e66054b02a7..e90a89c389e 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -797,6 +797,17 @@ static void vfio_listener_region_del(MemoryListener *listener,
+> >      }
+> >  
+> >      if (try_unmap) {
+> > +        if (llsize == int128_2_64()) {
+> > +            /* The unmap ioctl doesn't accept a full 64-bit span. */
+> > +            llsize = int128_rshift(llsize, 1);
+> > +            ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
+> > +            if (ret) {
+> > +                error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+> > +                             "0x%"HWADDR_PRIx") = %d (%m)",
+> > +                             container, iova, int128_get64(llsize), ret);
+> > +            }
+> > +            iova += int128_get64(llsize);
+> > +        }
+> >          ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
+> >          if (ret) {
+> >              error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
+> 
+> We're still susceptible that splitting the range in two could result in
+> unmap calls that attempt to bisect a mapping that spans both ranges.
+> Both unmap calls would fail in that case.  I think we could solve this
+> more completely with a high water marker, but this probably good enough
+> for now.
+> 
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
 
-John Snow <jsnow@redhat.com> writes:
 
-> On 10/29/20 3:55 PM, Thomas Huth wrote:
->> On 29/10/2020 18.12, John Snow wrote:
->>> On 10/29/20 12:49 PM, Alistair Francis wrote:
->>>> On Thu, Oct 29, 2020 at 9:41 AM Cornelia Huck <cohuck@redhat.com> wrot=
-e:
->>>>>
->>>>> On Thu, 29 Oct 2020 12:01:27 -0400
->>>>> John Snow <jsnow@redhat.com> wrote:
->>>>>
->>>>>> If you're in the CC list, it's because you are listed in MAINTAINERS.
->>>>>
->>>>> <cleared the cc: list except for qemu-devel :)>
->>>>>
->>>>>>
->>>>>> Paolo's QEMU keynote this morning mentioned the possible use of the
->>>>>> Gitlab issue tracker instead of using Launchpad.
->>>>>>
->>>>>> I'm quite fond of the gitlab issue tracker, I think it works quite w=
-ell
->>>>>> and it has pretty good and uncomplicated API access to it in order to
->>>>>> customize your workflow if you'd really like to.
->>>>>>
->>>>>> In experimenting with my mirror on gitlab though, I was unable to fi=
-nd a
->>>>>> way to configure it to send issue tracker notifications to the email
->>>>>> list. A move to gitlab would likely mean, then:
->>>>>>
->>>>>> 1. The cessation of (automatic) issue tracker mails to the list
+Are you merging this then?
+If yes
 
-It would miss this feature as sometimes I get wind of things I can track
-down. On the other hand there is a fair bit of list noise at the end of
-a release when stuff gets closed.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
->>>>>> 2. The loss of the ability to update the issue tracker by replying to
->>>>>> said emails
->>>>>> 3. Anyone listed in MAINTAINERS would be expected to have a gitlab
->>>>>> account in order to interact with the issue tracker.
-
-Not a problem for me at least - it's just another (2FA) account.
-
-<snip>
->> So could somebody please enable the issue tracker there, so we can give =
-it a
->> try? Phil? Alex? Stefan? ...?
->>=20
->> If it works well, I can certainly help to get the links etc. in our webs=
-ite
->> fixed.
->>=20
->
-> Great! You are the primary bug wrangler, so if you are interested in=20
-> trialing it, I am interested in helping!
->
-> If we enable the bug tracker, can we please add Thomas and myself as=20
-> 'Reporter' level contributors to QEMU so we can wrangle bugs?
-
-I have enabled the issue tracker and assigned Thomas and you the first
-bug.
-
-> Info on permissions: https://docs.gitlab.com/ee/user/permissions.html
->
-> There's also an old bug (2 years) about migrating Launchpad to Gitlab,=20
-> but there's been no movement.
->
-> https://gitlab.com/gitlab-org/gitlab/-/issues/22600
->
-> If we like the results of the trial, we'll need a convincing migration=20
-> strategy.
-
-Can we extract data as a CSV from Launchpad?
-
---=20
-Alex Benn=C3=A9e
 
