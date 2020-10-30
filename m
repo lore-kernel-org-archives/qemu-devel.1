@@ -2,82 +2,79 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A7BC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E33C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:20:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB82D2076E
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:20:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE5D42076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:20:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WkU7fxjW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB82D2076E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F0SPUVCf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE5D42076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYVGV-0003w7-Ho
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:20:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45982)
+	id 1kYVGY-00042k-OI
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:20:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYV8e-0003i9-Fr
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:12:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56617)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYV8n-0003kh-Px
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:12:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30971)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYV8Z-0007Fx-2M
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:12:20 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYV8b-0007GD-W2
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:12:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604067132;
+ s=mimecast20190719; t=1604067135;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=B/zT27wrNEHsIn9RPNBpuM2tzqmJYYoAGZySli/obU8=;
- b=WkU7fxjW3w8waHRYU9T4WRwy+GDJxfZ1CizWcI9GR/JLNntWKXZ/qy4tQGf0dpW8aOMHg5
- eyAB9SvKQzgixeL7pxmSTrV3CGa6bODcRNBdWaTc1JUt6BlBhPj1LLMflgGkMcKYxEpt3l
- kvxsWQoLayknZCMV8psnMToV3aI590E=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-3es-3gwWM8WqwBsIRMZ-Zg-1; Fri, 30 Oct 2020 10:12:08 -0400
-X-MC-Unique: 3es-3gwWM8WqwBsIRMZ-Zg-1
-Received: by mail-wr1-f72.google.com with SMTP id w3so616969wrt.11
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 07:12:08 -0700 (PDT)
+ bh=et4yufnnD++h3AJk3UX83J9geIWo0Gn07GUHuuNVBW4=;
+ b=F0SPUVCfnu3exJAzS0b/bO2Yd4hWv6TqlEXYsoTvjXL3XSBBObpgsfmJbicGu8dtnNiAu4
+ Jl+1r5AcOicjO9KbbJXbhbiWPCMUZScsw5vhYVj2haw+sPbXO6idKltAHy59l6KvUzYWDy
+ 5RLGysrsl6bE+zho2B/MO/edftchNj0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-557-LZsVszREPCuToUf3RoNSGA-1; Fri, 30 Oct 2020 10:12:13 -0400
+X-MC-Unique: LZsVszREPCuToUf3RoNSGA-1
+Received: by mail-wm1-f69.google.com with SMTP id t21so664509wmt.8
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 07:12:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=B/zT27wrNEHsIn9RPNBpuM2tzqmJYYoAGZySli/obU8=;
- b=dChyVuJPVA5qpka8/lh9wWDITGxescW6j+5+KiJnkGDZUKKjI3YmB4HWm2GH424tdc
- AL9AsIai8CgbFPHA4d+dPi06aSrr0ZSlrtLnr0ZWW0hXlj52/9im0oWgWsNimYgDs4NS
- PLzJv74sQObD5kqdLLMOxC5j6nZmymduyn2MbT7TYo/zgGGHiaW735XURaMG1KgNj6FE
- 2UKoIql2N35WMtPVqQwCVGkyX67YPVF5+LgBWgF56BpscJh0/6heMBAcgK4qMsWg0FBv
- dkmad+1jMhSSkxVuxuDoY/HB9E6F75btqu3comHSwISffQaPtX8+ZLc0+MXJcb+oDFCV
- baCA==
-X-Gm-Message-State: AOAM531GwDwBqCZNlc5imJVuV+2KyzQaPwq8CNsCQbFvIHuJaUdCbMkP
- 5TqqFcvfPp1eJinFE2pciPMcLo0OCFCrRVsb1Vexe6axltWmKOvuU0l0K5UlmHxnz3FqwWrrcJ/
- ey3unPI6YMFmkgEA=
-X-Received: by 2002:a5d:688c:: with SMTP id h12mr3577080wru.92.1604067126720; 
- Fri, 30 Oct 2020 07:12:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz88sXk08d3H74+ai8QgMNtx7G+dDD6r5jEDCWNgQ+yd73QVVkxAb6mKY5UPzwkhqDBXLLmfg==
-X-Received: by 2002:a5d:688c:: with SMTP id h12mr3577066wru.92.1604067126579; 
- Fri, 30 Oct 2020 07:12:06 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=et4yufnnD++h3AJk3UX83J9geIWo0Gn07GUHuuNVBW4=;
+ b=ogPajFItmHCvMreWDq0mw1GN+NigC9q9hoITPTbu1apQO28i9uJuZMe3JbjDzh1pFu
+ zuZ3xTbcj7ZluNln7z27kQJF9/xb+8hhDmFDJZEfo4PdtQwJ4q4t5yeQJ9S28l9ILR39
+ HPIrA3J0NZViF5XSXx4FDMWXbRHqak7IX39ZfOBfb/fpL7zm0DYMTVZXKbmKSImbVsjx
+ gFlv1ASh1BpJfV+U0EslxH4nmVQFc0GNMkvN+XdBsjnvSUy8tZGmN+joNkpxjrTBXYRY
+ T5BttbgrK335KCqdoGQ2bQ+SOzTfZ0/GGcCxrwJU/WnM7KkuL4+Gx1DoK2Np2TDCbB3m
+ JXLw==
+X-Gm-Message-State: AOAM5325ceq3iBfxvX090RxtaVdqeMUBv2JHcB553u//EruCyi6j01sA
+ JF2LMX2qtLuVsjpxcnF0KKL5p4qqZXBytYi8z0En0FjUJKOVX6lw2v2skhhr2rqUJUbni3pAfOw
+ dRA7pzJeFb5L+ARM=
+X-Received: by 2002:adf:de91:: with SMTP id w17mr3381734wrl.84.1604067131523; 
+ Fri, 30 Oct 2020 07:12:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxenQYLluWaV0MelRk2jGRS+18z8P0Ya7gU76Jyn65Op9K1fHWh3ZLUmaSI+6Yohfm6PQw55Q==
+X-Received: by 2002:adf:de91:: with SMTP id w17mr3381718wrl.84.1604067131349; 
+ Fri, 30 Oct 2020 07:12:11 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id m14sm10754435wro.43.2020.10.30.07.12.05
+ by smtp.gmail.com with ESMTPSA id t7sm10157363wrx.42.2020.10.30.07.12.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Oct 2020 07:12:05 -0700 (PDT)
-Date: Fri, 30 Oct 2020 10:12:04 -0400
+ Fri, 30 Oct 2020 07:12:10 -0700 (PDT)
+Date: Fri, 30 Oct 2020 10:12:09 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/15] pci: Assert irqnum is between 0 and bus->nirqs in
- pci_bus_change_irq_level
-Message-ID: <20201030141136.1013521-8-mst@redhat.com>
+Subject: [PULL 09/15] pc: Implement -no-hpet as sugar for -machine hpet=on
+Message-ID: <20201030141136.1013521-10-mst@redhat.com>
 References: <20201030141136.1013521-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201030141136.1013521-1-mst@redhat.com>
@@ -87,19 +84,18 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 02:24:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,41 +110,187 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-These assertions similar to those in the adjacent pci_bus_get_irq_level()
-function ensure that irqnum lies within the valid PCI bus IRQ range.
+Get rid of yet another global variable.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <20201011082022.3016-1-mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20201024203900.3619498-3-f4bug@amsat.org>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+The default will be hpet=on only if CONFIG_HPET=y.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20201021144716.1536388-1-ehabkost@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci/pci.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/hw/i386/pc.h  |  1 +
+ include/hw/i386/x86.h |  3 ---
+ hw/i386/pc.c          | 63 +++++++++++++++++++++++++++++--------------
+ hw/i386/pc_piix.c     |  2 +-
+ softmmu/vl.c          |  4 +--
+ 5 files changed, 47 insertions(+), 26 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 081ddcadd1..dc4019865b 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -250,6 +250,8 @@ static inline void pci_set_irq_state(PCIDevice *d, int irq_num, int level)
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 84639d0ebc..911e460097 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -43,6 +43,7 @@ typedef struct PCMachineState {
+     bool smbus_enabled;
+     bool sata_enabled;
+     bool pit_enabled;
++    bool hpet_enabled;
  
- static void pci_bus_change_irq_level(PCIBus *bus, int irq_num, int change)
- {
-+    assert(irq_num >= 0);
-+    assert(irq_num < bus->nirq);
-     bus->irq_count[irq_num] += change;
-     bus->set_irq(bus->irq_opaque, irq_num, bus->irq_count[irq_num] != 0);
+     /* NUMA information: */
+     uint64_t numa_nodes;
+diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+index bfa9cb2a25..739fac5087 100644
+--- a/include/hw/i386/x86.h
++++ b/include/hw/i386/x86.h
+@@ -126,7 +126,4 @@ qemu_irq x86_allocate_cpu_irq(void);
+ void gsi_handler(void *opaque, int n, int level);
+ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name);
+ 
+-/* hpet.c */
+-extern int no_hpet;
+-
+ #endif
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4e323755d0..416fb0e0f6 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1142,28 +1142,31 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+      * Without KVM_CAP_PIT_STATE2, we cannot switch off the in-kernel PIT
+      * when the HPET wants to take over. Thus we have to disable the latter.
+      */
+-    if (!no_hpet && (!kvm_irqchip_in_kernel() || kvm_has_pit_state2())) {
++    if (pcms->hpet_enabled && (!kvm_irqchip_in_kernel() ||
++                               kvm_has_pit_state2())) {
+         hpet = qdev_try_new(TYPE_HPET);
+-        if (hpet) {
+-            /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
+-             * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
+-             * IRQ8 and IRQ2.
+-             */
+-            uint8_t compat = object_property_get_uint(OBJECT(hpet),
+-                    HPET_INTCAP, NULL);
+-            if (!compat) {
+-                qdev_prop_set_uint32(hpet, HPET_INTCAP, hpet_irqs);
+-            }
+-            sysbus_realize_and_unref(SYS_BUS_DEVICE(hpet), &error_fatal);
+-            sysbus_mmio_map(SYS_BUS_DEVICE(hpet), 0, HPET_BASE);
+-
+-            for (i = 0; i < GSI_NUM_PINS; i++) {
+-                sysbus_connect_irq(SYS_BUS_DEVICE(hpet), i, gsi[i]);
+-            }
+-            pit_isa_irq = -1;
+-            pit_alt_irq = qdev_get_gpio_in(hpet, HPET_LEGACY_PIT_INT);
+-            rtc_irq = qdev_get_gpio_in(hpet, HPET_LEGACY_RTC_INT);
++        if (!hpet) {
++            error_report("couldn't create HPET device");
++            exit(1);
+         }
++        /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
++            * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
++            * IRQ8 and IRQ2.
++            */
++        uint8_t compat = object_property_get_uint(OBJECT(hpet),
++                HPET_INTCAP, NULL);
++        if (!compat) {
++            qdev_prop_set_uint32(hpet, HPET_INTCAP, hpet_irqs);
++        }
++        sysbus_realize_and_unref(SYS_BUS_DEVICE(hpet), &error_fatal);
++        sysbus_mmio_map(SYS_BUS_DEVICE(hpet), 0, HPET_BASE);
++
++        for (i = 0; i < GSI_NUM_PINS; i++) {
++            sysbus_connect_irq(SYS_BUS_DEVICE(hpet), i, gsi[i]);
++        }
++        pit_isa_irq = -1;
++        pit_alt_irq = qdev_get_gpio_in(hpet, HPET_LEGACY_PIT_INT);
++        rtc_irq = qdev_get_gpio_in(hpet, HPET_LEGACY_RTC_INT);
+     }
+     *rtc_state = mc146818_rtc_init(isa_bus, 2000, rtc_irq);
+ 
+@@ -1535,6 +1538,20 @@ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
+     pcms->pit_enabled = value;
  }
+ 
++static bool pc_machine_get_hpet(Object *obj, Error **errp)
++{
++    PCMachineState *pcms = PC_MACHINE(obj);
++
++    return pcms->hpet_enabled;
++}
++
++static void pc_machine_set_hpet(Object *obj, bool value, Error **errp)
++{
++    PCMachineState *pcms = PC_MACHINE(obj);
++
++    pcms->hpet_enabled = value;
++}
++
+ static void pc_machine_get_max_ram_below_4g(Object *obj, Visitor *v,
+                                             const char *name, void *opaque,
+                                             Error **errp)
+@@ -1585,6 +1602,9 @@ static void pc_machine_initfn(Object *obj)
+     pcms->smbus_enabled = true;
+     pcms->sata_enabled = true;
+     pcms->pit_enabled = true;
++#ifdef CONFIG_HPET
++    pcms->hpet_enabled = true;
++#endif
+ 
+     pc_system_flash_create(pcms);
+     pcms->pcspk = isa_new(TYPE_PC_SPEAKER);
+@@ -1705,6 +1725,9 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+ 
+     object_class_property_add_bool(oc, PC_MACHINE_PIT,
+         pc_machine_get_pit, pc_machine_set_pit);
++
++    object_class_property_add_bool(oc, "hpet",
++        pc_machine_get_hpet, pc_machine_set_hpet);
+ }
+ 
+ static const TypeInfo pc_machine_info = {
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 0cf22a57ad..13d1628f13 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -216,7 +216,7 @@ static void pc_init1(MachineState *machine,
+         i440fx_state = NULL;
+         isa_bus = isa_bus_new(NULL, get_system_memory(), system_io,
+                               &error_abort);
+-        no_hpet = 1;
++        pcms->hpet_enabled = false;
+     }
+     isa_bus_irqs(isa_bus, x86ms->gsi);
+ 
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 7c1c6d37ef..a537a0377f 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -146,7 +146,6 @@ static Chardev **serial_hds;
+ Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+ int win2k_install_hack = 0;
+ int singlestep = 0;
+-int no_hpet = 0;
+ int fd_bootchk = 1;
+ static int no_reboot;
+ int no_shutdown = 0;
+@@ -3562,7 +3561,8 @@ void qemu_init(int argc, char **argv, char **envp)
+                 qemu_opts_parse_noisily(olist, "acpi=off", false);
+                 break;
+             case QEMU_OPTION_no_hpet:
+-                no_hpet = 1;
++                olist = qemu_find_opts("machine");
++                qemu_opts_parse_noisily(olist, "hpet=off", false);
+                 break;
+             case QEMU_OPTION_no_reboot:
+                 no_reboot = 1;
 -- 
 MST
 
