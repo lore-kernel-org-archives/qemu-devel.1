@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB49AC55178
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3210CC00A89
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:25:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6005020739
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:23:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F71920739
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:25:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1/V9Hfk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6005020739
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PDR7wUws"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F71920739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYavj-00023p-94
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 16:23:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53002)
+	id 1kYaxq-0005J6-Gn
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 16:25:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYau6-0000Eh-Su
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:21:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21236)
+ id 1kYauH-0000jG-Nj
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:21:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23097)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYau4-0007hO-Tw
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:21:42 -0400
+ id 1kYauG-0007k6-1t
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:21:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604089300;
+ s=mimecast20190719; t=1604089311;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IOX1B2ywU49qOzfq+/i+SXG8+eWS0AeocjQ/XNxwOzE=;
- b=S1/V9HfkdMVCivMrYesBPBqc1u1ctm+JvX5MvlyJ/n3RHveL0oqykmJwokl0OAS53czpl1
- LbbrGxclv4sjQOHFfVSrNY97cMys+IYFGrOT0cOjAbah+Gc4fcZE/Roczzv6Jhe9vaXYWs
- B/4j8Z1I8BX+fSHciBV9piPzCm/r3Mw=
+ bh=vZQHVjSJMF668x4UzpaNBLVz/DvKzoqy9uYRrP037O8=;
+ b=PDR7wUws4tNEByo7K/ijT3XPa0muCwWJZFfavSxyTHkSsGTrcysDzledj2P3b2B4xZQ8/7
+ u49xHLpTCxCdAFnuudsTMNJUDokeUcXSSXqLiwwtRgrIQxwR/hyKRFhdSQsA1X3FbpETOG
+ b6RazkQAqjIcqcIdL0Mu9dVfS3Z7JWw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-QVxOgdo8O7yVGAHeRIn0zg-1; Fri, 30 Oct 2020 16:21:38 -0400
-X-MC-Unique: QVxOgdo8O7yVGAHeRIn0zg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-22-y5JOUccxOTSe7XNx_EDhhg-1; Fri, 30 Oct 2020 16:21:49 -0400
+X-MC-Unique: y5JOUccxOTSe7XNx_EDhhg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67FAE18A225C
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 20:21:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C1BC101962E
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 20:21:48 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2AAA05C1CF;
- Fri, 30 Oct 2020 20:21:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1A2795D9D2;
+ Fri, 30 Oct 2020 20:21:47 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/20] qdev: Stop using error_set_from_qdev_prop_error() for
- mac property
-Date: Fri, 30 Oct 2020 16:21:15 -0400
-Message-Id: <20201030202131.796967-5-ehabkost@redhat.com>
+Subject: [PATCH 10/20] memfd: Remove unnecessary prefix from error message
+Date: Fri, 30 Oct 2020 16:21:21 -0400
+Message-Id: <20201030202131.796967-11-ehabkost@redhat.com>
 In-Reply-To: <20201030202131.796967-1-ehabkost@redhat.com>
 References: <20201030202131.796967-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
@@ -96,49 +95,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just setting a reasonable error string using error_setg() is
-simpler and makes error messages clearer.
-
-Before:
-
-  $ qemu-system-x86_64 -device e1000,mac=x
-  qemu-system-x86_64: -device e1000,mac=x: Property 'e1000.mac' doesn't take value 'x'
-
-After:
-
-  $ qemu-system-x86_64 -device e1000,mac=x
-  qemu-system-x86_64: -device e1000,mac=x: Property 'e1000.mac' can't take value 'x': invalid mac address
+object_property_parse() will add a
+  "Property '<TYPE>.<PROP>' can't take value '<VALUE>'"
+prefix automatically for us.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/core/qdev-properties-system.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ backends/hostmem-memfd.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index a5a1a6ffee..fc0abcae17 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -336,7 +336,7 @@ static void set_mac(Object *obj, Visitor *v, const char *name, void *opaque,
-     return;
- 
- inval:
--    error_set_from_qdev_prop_error(errp, EINVAL, obj, prop, str);
-+    error_setg(errp, "invalid mac address");
-     g_free(str);
- }
- 
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+index e5626d4330..05cf743fe8 100644
+--- a/backends/hostmem-memfd.c
++++ b/backends/hostmem-memfd.c
+@@ -87,8 +87,7 @@ memfd_backend_set_hugetlbsize(Object *obj, Visitor *v, const char *name,
+         return;
+     }
+     if (!value) {
+-        error_setg(errp, "Property '%s.%s' doesn't take value '%" PRIu64 "'",
+-                   object_get_typename(obj), name, value);
++        error_setg(errp, "hugetlbsize can't be zero");
+         return;
+     }
+     m->hugetlbsize = value;
 -- 
 2.28.0
 
