@@ -2,79 +2,84 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6528AC00A89
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EADC4741F
 	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 17:47:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA52F2151B
+	by mail.kernel.org (Postfix) with ESMTPS id 9C73120A8B
 	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 17:47:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xYwAPcLX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA52F2151B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xW0Tgk+/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C73120A8B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYYVG-0006gb-OE
+	id 1kYYVG-0006fR-Dt
 	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 13:47:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41178)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYYUU-0005pA-T9
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 13:47:07 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:38136)
+ id 1kYYUW-0005pJ-1x
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 13:47:08 -0400
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:38931)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYYUS-0002c5-SK
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 13:47:06 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id l8so3698726wmg.3
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 10:47:04 -0700 (PDT)
+ id 1kYYUU-0002cE-BJ
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 13:47:07 -0400
+Received: by mail-wm1-x330.google.com with SMTP id d3so3697260wma.4
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 10:47:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=pM8j+uQaBnEdVDuMOQ5/GF9lY6Ou7utHXU/JGkgWHKw=;
- b=xYwAPcLXo7nHUyHUnOSMiSGXsYReJdK7ciMxYsB3q0xkNIuQl+XajXO75tDO1mrfAf
- p5UORhxojEeqIPCaLRwT1l61lJ8DPStDFHZ60j4D5rM1fgsbR9Va4qh89c1lV06YDi1Z
- 3aabvu+NgA9QArxsPU8qLRqtH/A95LnMRzbfL84/zPN8MZzTQQAaan4RWfR629MyCPdB
- uVMJ6Qulh5c5RK+6FzBw77e/tFsc9jIby23qJcs7Aw+BhoCXECejbP+d3YdGvoLXQXJF
- oKg6aJNfWcWwEsVW6aIHl4ReSoxTunuVu8D/phOFyiIAZxQ7DSEYp2EmMV0g8U2cQEUL
- VwDw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=28SgNa3EluWUvbAzV8yhw6h4WUxhavGJS1xTF5jSc7o=;
+ b=xW0Tgk+/e+5YCX0etdavOkr/d5VuOH9G3UcNn82btAN4Id6xUf8FMny0JvRKi6w2P6
+ sPIHcRjOBP7r3B5uYqfv3nKy4vcstoPGv3W6TjW5wA3Nfm5j55+vt0JsiYz3YhasuQ4R
+ j+9B2S0NX37bPNCCmzkjYHhCFHbFcIoTFRfZDjNqpJloK1N2EHY7Zfddn1wZMa9OQnpz
+ B7PpPlwl77Ge6qfWxyrpH2gF+DkvNUpQ5Ms13yXowKPz9V2aL7himQjtEKk+NRAYzcNl
+ /vM9suF9NIJ/1YI0uPrOQrR/EdO+PGL2cWLht8FPA8djsHP/FCjDV3CkWz3q6uHs5v78
+ xaCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=pM8j+uQaBnEdVDuMOQ5/GF9lY6Ou7utHXU/JGkgWHKw=;
- b=LYNKpUceSk/zIkSIv/JYl4SvBsuyAv79ZNIv8atkcfp0wSRQhDtheVB9euuwepa1H3
- JCH0Nmg769RablXO6HJlf84Z4P8VCrswenUUJ5G34h9EePCnMGaCZPvZsOEb4JJGQNgu
- /jawGS4XlDQuiBiWPSdc198sPAW8bfcCGWethjVaTg5yGMMUO8TVT7MrSYSMJKZRr/mr
- ukoAEbmTiuL736itwBhtEWtERO6lDzNXcu6I6XfJyrRtlAjMislm1ZFeddUjd+Vl50X7
- 2wTZcpe20QNIGE4UERnpKpAV8SgN/L8pvwSiA4GgBDt1Ew473mNDPkauqE4OmDb92AtB
- AScg==
-X-Gm-Message-State: AOAM5300iG573D147jMGqudwYXFIxkq1KjFxgnP8ejv6HC9LHNDGOADf
- glYowF2Mz765oNIBl0rKK4YV8lKSJT3H6w==
-X-Google-Smtp-Source: ABdhPJzWL3gDMFk+xQ1jgF1Y1C96iCBCgNezCNQp64fqZVim9OhbKB/NtVafmCdiyK3GCqW2EyQv7Q==
-X-Received: by 2002:a7b:cb98:: with SMTP id m24mr4187658wmi.133.1604080022858; 
- Fri, 30 Oct 2020 10:47:02 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=28SgNa3EluWUvbAzV8yhw6h4WUxhavGJS1xTF5jSc7o=;
+ b=AtQAt8Fc3x0NobxedpXDssTwmSg61+GAFVLyiw7Mh/o3ogPowrku3N4KREWcbcQycl
+ u7P4dg1KI46GexYHFhwr5XniAosiqJ3XLnqdeZXMkgpBbn4DKCFGklUDbLbBkWygWvf6
+ Rnedhw+eOqyJjAbE9ffxQmFk359izdqHni/AJzWN/j6udbuO8rdNsxvV2Y1SQUBRnFqL
+ juMKSKJCPkQCOoNhEl4ayy4Qs3IkDJd1gpKjUDiXUqzwCVzQrsEUXdJXjW/A8H664GII
+ YqHNBXpnfSiQXFdsGxhP/+HwYNIucANcG1lBwPk5jvLnp9nZPW3G10cIUNgiy9NtVRO8
+ lvUA==
+X-Gm-Message-State: AOAM530PUSXZDV3uurN2WB/hjX99Bac1L0EoX57ZGJ9M+tDZUtfdnHUd
+ YX/sXUNJ3HXsqgyb7HnqGnGcQD0aKsd/hg==
+X-Google-Smtp-Source: ABdhPJzaToe3/QPz8pUIe9JSbB7FQ5LCgGznWmd9BUzygqdEPlxVFULsxHLAmQf9+eWbKLGHbJYKlg==
+X-Received: by 2002:a05:600c:218a:: with SMTP id
+ e10mr3899763wme.7.1604080024164; 
+ Fri, 30 Oct 2020 10:47:04 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 1sm12522655wre.61.2020.10.30.10.47.01
+ by smtp.gmail.com with ESMTPSA id 1sm12522655wre.61.2020.10.30.10.47.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Oct 2020 10:47:02 -0700 (PDT)
+ Fri, 30 Oct 2020 10:47:03 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/2] docs: Fix building with Sphinx 3.2
-Date: Fri, 30 Oct 2020 17:46:58 +0000
-Message-Id: <20201030174700.7204-1-peter.maydell@linaro.org>
+Subject: [PATCH 1/2] scripts/kerneldoc: For Sphinx 3 use c:macro for macros
+ with arguments
+Date: Fri, 30 Oct 2020 17:46:59 +0000
+Message-Id: <20201030174700.7204-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201030174700.7204-1-peter.maydell@linaro.org>
+References: <20201030174700.7204-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::330;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x330.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,43 +108,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patchseries fixes some issues with building our docs
-with Sphinx 3.2:
- * kerneldoc was using the 'c:function' directive for both
-   functions and macros, but Sphinx 3.2 wants 'c:macro' for
-   macros and complains if the argument to 'c:function' isn't
-   parseable as a function declaration
- * qemu-option-trace.rst.inc's use of option:: provokes a
-   warning in Sphinx 3.2
+The kerneldoc script currently emits Sphinx markup for a macro with
+arguments that uses the c:function directive. This is correct for
+Sphinx versions earlier than Sphinx 3, where c:macro doesn't allow
+documentation of macros with arguments and c:function is not picky
+about the syntax of what it is passed. However, in Sphinx 3 the
+c:macro directive was enhanced to support macros with arguments,
+and c:function was made more picky about what syntax it accepted.
 
-We fix the first by making kerneldoc output the right directive
-depending on the Sphinx version it's working with, and fix
-the second by just dropping our usage of option:: in favour
-of a simple definition-list markup.
+When kerneldoc is told that it needs to produce output for Sphinx
+3 or later, make it emit c:function only for functions and c:macro
+for macros with arguments. We assume that anything with a return
+type is a function and anything without is a macro.
 
-This does mean our kernel-doc gets another patch that makes
-it diverge a little from the kernel's version, but we already
-have one of those (commit 152d1967f650f67b7e). I do want to
-try to upstream these to the kernel, but that will require
-more work I suspect since the kernel makes much more extensive
-use of kernel-doc and probably also has other issues when
-building with newer Sphinxes. For the moment I would like us
-to release QEMU 5.2 with docs that build with all the Sphinxes
-we know about.
+This fixes the Sphinx error:
 
-Tested by building with Sphinx 1.6.1, 2.0, 2.4, 3.0 and 3.2.
+/home/petmay01/linaro/qemu-from-laptop/qemu/docs/../include/qom/object.h:155:Error in declarator
+If declarator-id with parameters (e.g., 'void f(int arg)'):
+  Invalid C declaration: Expected identifier in nested name. [error at 25]
+    DECLARE_INSTANCE_CHECKER ( InstanceType,  OBJ_NAME,  TYPENAME)
+    -------------------------^
+If parenthesis in noptr-declarator (e.g., 'void (*f(int arg))(double)'):
+  Error in declarator or parameters
+  Invalid C declaration: Expecting "(" in parameters. [error at 39]
+    DECLARE_INSTANCE_CHECKER ( InstanceType,  OBJ_NAME,  TYPENAME)
+    ---------------------------------------^
 
-thanks
--- PMM
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ scripts/kernel-doc | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-Peter Maydell (2):
-  scripts/kerneldoc: For Sphinx 3 use c:macro for macros with arguments
-  qemu-option-trace.rst.inc: Don't use option:: markup
-
- docs/qemu-option-trace.rst.inc |  6 +++---
- scripts/kernel-doc             | 18 +++++++++++++++++-
- 2 files changed, 20 insertions(+), 4 deletions(-)
-
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 0ff62bb6a2d..4fbaaa05e38 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -839,7 +839,23 @@ sub output_function_rst(%) {
+ 	output_highlight_rst($args{'purpose'});
+ 	$start = "\n\n**Syntax**\n\n  ``";
+     } else {
+-	print ".. c:function:: ";
++        if ((split(/\./, $sphinx_version))[0] >= 3) {
++            # Sphinx 3 and later distinguish macros and functions and
++            # complain if you use c:function with something that's not
++            # syntactically valid as a function declaration.
++            # We assume that anything with a return type is a function
++            # and anything without is a macro.
++            if ($args{'functiontype'} ne "") {
++                print ".. c:function:: ";
++            } else {
++                print ".. c:macro:: ";
++            }
++        } else {
++            # Older Sphinx don't support documenting macros that take
++            # arguments with c:macro, and don't complain about the use
++            # of c:function for this.
++            print ".. c:function:: ";
++        }
+     }
+     if ($args{'functiontype'} ne "") {
+ 	$start .= $args{'functiontype'} . " " . $args{'function'} . " (";
 -- 
 2.20.1
 
