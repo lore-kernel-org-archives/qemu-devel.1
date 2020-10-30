@@ -2,99 +2,72 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE1E5C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D62C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:44:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A157206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:43:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jxsiTJt0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A157206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD43A206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:44:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD43A206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYKNn-0002Gm-1j
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 22:43:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41312)
+	id 1kYKPB-0003Bz-Na
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 22:44:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=56530b5a8=dmitry.fomichev@wdc.com>)
- id 1kYKE8-0006TD-Vh; Thu, 29 Oct 2020 22:33:17 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:11025)
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kYKOF-0002fI-Qw
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 22:43:43 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2049)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=56530b5a8=dmitry.fomichev@wdc.com>)
- id 1kYKE6-0006fl-Gy; Thu, 29 Oct 2020 22:33:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1604025194; x=1635561194;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=5nTTmQuD/HiZqHuuk3VyWsaPe9oSQQMKS3teO6XgKiY=;
- b=jxsiTJt0p/wbL705kojZOcQRUbahRmhV+PhByDh8FA21VLm5wV5LjUvW
- TpSa99GTc1npBKedAI4rsHCJXGsDfypoNCuRbqv+mm5WCDmmiLs+cuJse
- /OuoiyI6cyS8BVnTQXnYVG29MnQS4jP4gETF2KrVwUA0lCo9KtuYyT1pY
- Mjm2o61z9pU2DLsDXzRB8FOPu3YN/hQxIZpNSx4TYAYaM6xdxS+/NXZjv
- l7qTtL0X/G6lbrk+wLcyemE0s1tFGolF/JOIZWLsCziFASV6NuJ83HZ8/
- Po/+iBKw5Qu27NS9s6107z2z662AmnqWtwH8NxpIWOSQYq1E22hHYLxpa A==;
-IronPort-SDR: 8rJKwJjXxdOevMSSaM8gGdvZzTT+McJ9/T7byov6hOjoh6g04sp9OXZy1OboRp7ZRnjZd4l9lZ
- ZS0tK1Y6TUcfMvuwKE7FeQDKM2VSDDqlviUmIyqVsxcvx0ek2/HwFtkVIzOc7wMM6y2et0QmzG
- 1kV0rnRJxZJZFjJefKfQNUMvdmU0ySHFtyDti5A1kMgGcwhmg1RPBP4wQ6wPwa5RWjNiS5Ux4x
- /gLyHIWSUKWpEIvNS3I5JPZWfqKzOizhvPK2DuGIaYy2lA3sPsgtu32ZF8+GhkFeR38xWKpuBP
- grA=
-X-IronPort-AV: E=Sophos;i="5.77,431,1596470400"; d="scan'208";a="155748103"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 30 Oct 2020 10:33:12 +0800
-IronPort-SDR: M7wNJ2uRU5cokfO9bYf5eLPoD3E7wg+Mtlb37ik8SSsCqPKnztsiSkGsCxSLrTH92c1/qIbB/8
- 9OP+JZBjV6o3miCScupey1fYEXcrpmanLnylfKsfiWIpmCiUgMa3ECvRI6TBI+8g2D14VPrTg3
- eM7HLdOt8LhAhRRGCCsi5jrYDy8Q8VBeRYSTX/UhxUkk+ibAlHeda+q5WzLHJrvHr+pmPm0xPU
- /JwceYsiHau8R11qReEOn6yu4jCyEYGibveFNqFd/QumaELgv6OGskFcr2UWcuBiWB9CDOrqnY
- CoJLvTt5aCREY5ky1u4/keCW
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Oct 2020 19:18:17 -0700
-IronPort-SDR: U82bYWB5Ck8sOnw7gQl/3UkiYBYHDwMhX+CT4NVfAR6KE8jCl8thnXHwRuDL7w0CIIUVj73WWz
- FJdoqiVtl2BWpI9we8E2jfilrzrkO5VUpZUoFZmW80OKA2uEc0bg3Mw3r/I7/zxci8OChBAVz2
- I9rFn1s4DlIMOPKdOrCb7p884T969J4QMHA8j6xZ5WCM2CG5ZRoxp1PsBe9N6fXO+f8EtBWe8G
- ffu+xEMjc1HBZlVAFk4PQR+f9W1bDh7kae4Vk3tVuJzR/nxW1xtnnla8P8hJLuAq8xfI/4IJdm
- Ltg=
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 19:33:12 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
- Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
-Subject: [PATCH v8 11/11] hw/block/nvme: Document zoned parameters in usage
- text
-Date: Fri, 30 Oct 2020 11:32:42 +0900
-Message-Id: <20201030023242.5204-12-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20201030023242.5204-1-dmitry.fomichev@wdc.com>
-References: <20201030023242.5204-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kYKOB-0001J3-CF
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 22:43:43 -0400
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.56])
+ by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CMmpD48CQzQlpq;
+ Fri, 30 Oct 2020 10:43:32 +0800 (CST)
+Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.225]) by
+ DGGEMM404-HUB.china.huawei.com ([10.3.20.212]) with mapi id 14.03.0487.000;
+ Fri, 30 Oct 2020 10:43:27 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth
+ <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: RE: [PATCH] tcg/optimize: Add fallthrough annotations
+Thread-Topic: [PATCH] tcg/optimize: Add fallthrough annotations
+Thread-Index: AQHWre8Vraw8sTLInUaP5k71cY9i1amufCyAgADsDrA=
+Date: Fri, 30 Oct 2020 02:43:26 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83BA174B6@dggemm531-mbx.china.huawei.com>
+References: <20201029122833.195420-1-thuth@redhat.com>
+ <24b2a36c-d94d-e5f6-57c0-a9e6c4970b53@linaro.org>
+In-Reply-To: <24b2a36c-d94d-e5f6-57c0-a9e6c4970b53@linaro.org>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.185.149]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.141;
- envelope-from=prvs=56530b5a8=dmitry.fomichev@wdc.com; helo=esa3.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 22:32:49
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.188;
+ envelope-from=kuhn.chenqun@huawei.com; helo=szxga02-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 22:43:33
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,106 +81,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added brief descriptions of the new device properties that are
-now available to users to configure features of Zoned Namespace
-Command Set in the emulator.
-
-This patch is for documentation only, no functionality change.
-
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Reviewed-by: Niklas Cassel <Niklas.Cassel@wdc.com>
----
- hw/block/nvme.c | 47 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 42 insertions(+), 5 deletions(-)
-
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 339becd3e2..10f5c752ba 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -9,7 +9,7 @@
-  */
- 
- /**
-- * Reference Specs: http://www.nvmexpress.org, 1.2, 1.1, 1.0e
-+ * Reference Specs: http://www.nvmexpress.org, 1.4, 1.3, 1.2, 1.1, 1.0e
-  *
-  *  https://nvmexpress.org/developers/nvme-specification/
-  */
-@@ -22,8 +22,9 @@
-  *              [pmrdev=<mem_backend_file_id>,] \
-  *              max_ioqpairs=<N[optional]>, \
-  *              aerl=<N[optional]>, aer_max_queued=<N[optional]>, \
-- *              mdts=<N[optional]>
-- *      -device nvme-ns,drive=<drive_id>,bus=bus_name,nsid=<nsid>
-+ *              mdts=<N[optional]>,zoned.append_size_limit=<N[optional]> \
-+ *      -device nvme-ns,drive=<drive_id>,bus=<bus_name>,nsid=<nsid>,\
-+ *              zoned=<true|false[optional]>
-  *
-  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
-  * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-@@ -41,14 +42,50 @@
-  * ~~~~~~~~~~~~~~~~~~~~~~
-  * - `aerl`
-  *   The Asynchronous Event Request Limit (AERL). Indicates the maximum number
-- *   of concurrently outstanding Asynchronous Event Request commands suppoert
-+ *   of concurrently outstanding Asynchronous Event Request commands support
-  *   by the controller. This is a 0's based value.
-  *
-  * - `aer_max_queued`
-  *   This is the maximum number of events that the device will enqueue for
-- *   completion when there are no oustanding AERs. When the maximum number of
-+ *   completion when there are no outstanding AERs. When the maximum number of
-  *   enqueued events are reached, subsequent events will be dropped.
-  *
-+ * - `zoned.append_size_limit`
-+ *   The maximum I/O size in bytes that is allowed in Zone Append command.
-+ *   The default is 128KiB. Since internally this this value is maintained as
-+ *   ZASL = log2(<maximum append size> / <page size>), some values assigned
-+ *   to this property may be rounded down and result in a lower maximum ZA
-+ *   data size being in effect. By setting this property to 0, users can make
-+ *   ZASL to be equal to MDTS. This property only affects zoned namespaces.
-+ *
-+ * Setting `zoned` to true selects Zoned Command Set at the namespace.
-+ * In this case, the following namespace properties are available to configure
-+ * zoned operation:
-+ *     zoned.zsze=<zone size in bytes, default: 128MiB>
-+ *         The number may be followed by K, M, G as in kilo-, mega- or giga-.
-+ *
-+ *     zoned.zcap=<zone capacity in bytes, default: zone size>
-+ *         The value 0 (default) forces zone capacity to be the same as zone
-+ *         size. The value of this property may not exceed zone size.
-+ *
-+ *     zoned.descr_ext_size=<zone descriptor extension size, default 0>
-+ *         This value needs to be specified in 64B units. If it is zero,
-+ *         namespace(s) will not support zone descriptor extensions.
-+ *
-+ *     zoned.max_active=<Maximum Active Resources (zones), default: 0>
-+ *         The default value means there is no limit to the number of
-+ *         concurrently active zones.
-+ *
-+ *     zoned.max_open=<Maximum Open Resources (zones), default: 0>
-+ *         The default value means there is no limit to the number of
-+ *         concurrently open zones.
-+ *
-+ *     zoned.offline_zones=<the number of offline zones to inject, default: 0>
-+ *
-+ *     zoned.rdonly_zones=<the number of read-only zones to inject, default: 0>
-+ *
-+ *     zoned.cross_zone_read=<enable RAZB, default: false>
-+ *         Setting this property to true enables Read Across Zone Boundaries.
-  */
- 
- #include "qemu/osdep.h"
--- 
-2.21.0
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBSaWNoYXJkIEhlbmRlcnNvbiBb
+bWFpbHRvOnJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmddDQo+IFNlbnQ6IEZyaWRheSwgT2N0
+b2JlciAzMCwgMjAyMCA0OjA3IEFNDQo+IFRvOiBUaG9tYXMgSHV0aCA8dGh1dGhAcmVkaGF0LmNv
+bT47IFJpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+Ow0KPiBxZW11LWRldmVsQG5v
+bmdudS5vcmcNCj4gQ2M6IENoZW5xdW4gKGt1aG4pIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4N
+Cj4gU3ViamVjdDogUmU6IFtQQVRDSF0gdGNnL29wdGltaXplOiBBZGQgZmFsbHRocm91Z2ggYW5u
+b3RhdGlvbnMNCj4gDQo+IE9uIDEwLzI5LzIwIDU6MjggQU0sIFRob21hcyBIdXRoIHdyb3RlOg0K
+PiA+IFRvIGJlIGFibGUgdG8gY29tcGlsZSB0aGlzIGZpbGUgd2l0aCAtV2Vycm9yPWltcGxpY2l0
+LWZhbGx0aHJvdWdoLCB3ZQ0KPiA+IG5lZWQgdG8gYWRkIHNvbWUgZmFsbHRocm91Z2ggYW5ub3Rh
+dGlvbnMgdG8gdGhlIGNhc2Ugc3RhdGVtZW50cyB0aGF0DQo+ID4gbWlnaHQgZmFsbCB0aHJvdWdo
+LiBVbmZvcnR1bmF0ZWx5LCB0aGUgdHlwaWNhbCAiLyogZmFsbHRocm91Z2ggKi8iDQo+ID4gY29t
+bWVudHMgZG8gbm90IHdvcmsgaGVyZSBhcyBleHBlY3RlZCBzaW5jZSBzb21lIGNhc2UgbGFiZWxz
+IGFyZQ0KPiA+IHdyYXBwZWQgaW4gbWFjcm9zIGFuZCB0aGUgY29tcGlsZXIgZmFpbHMgdG8gbWF0
+Y2ggdGhlIGNvbW1lbnRzIGluIHRoaXMNCj4gPiBjYXNlLiBCdXQgdXNpbmcgX19hdHRyaWJ1dGVf
+XygoZmFsbHRocm91Z2gpKSBzZWVtcyB0byB3b3JrIGZpbmUsIHNvDQo+ID4gbGV0J3MgdXNlIHRo
+YXQgaW5zdGVhZC4NCj4gDQo+IFdoeSB3b3VsZCB0aGUgbWFjcm8gbWF0dGVyPyAgSXQgZXhwYW5k
+cyB0byB0d28gY2FzZSBzdGF0ZW1lbnRzIHdpdGgNCj4gbm90aGluZyBpbiBiZXR3ZWVuIHRoZW0u
+DQo+IA0KPiBUaGlzIHNvdW5kcyBsaWtlIGEgY29tcGlsZXIgYnVnIHRoYXQgc2hvdWxkIGJlIHJl
+cG9ydGVkLg0KPiANCkhpIGFsbCwNCiAgSSBoYXZlIHF1ZXJpZWQgdGhlIEdDQyBvcHRpb25zIGRl
+c2NyaXB0aW9uIGFib3V0IHRoZSBXaW1wbGljaXQtZmFsbHRocm91Z2ggYW5kIHZlcmlmaWVkIGl0
+Lg0KVGhlIHZhbHVlIG9mIFdpbXBsaWNpdC1mYWxsdGhyb3VnaCByYW5nZXMgZnJvbSAwIHRvIDUu
+IA0KVGhlIHZhbHVlIDAgaXMgdG8gaWdub3JlIGFsbCB3YXJuaW5ncywgd2hpY2ggaXMgY2VydGFp
+bmx5IG5vdCB3aGF0IHdlIG5lZWQuDQpJZiB0aGUgdmFsdWUgaXMgc2V0IHRvIDEgb3IgMiwgbW9z
+dCBmYWxsIHRocm91Z2ggb24gdGhlIFFFTVUgY2FuIHRha2UgZWZmZWN0Lg0KICAgRWfvvJovKiBG
+QUxMVEhSVSAqL+OAgS8qIGZhbGx0aHJ1ICov44CBLyogZmFsbC10aHJvdWdoICov44CBLyogRkFM
+TFRIT1VHSCAqL+OAgS8qIGZhbGwgdGhyb3VnaCAqL+OAgS8qIGZhbGx0aHJvdWdoICovLi4NCg0K
+V2hlbiB0aGUgdmFsdWUgcmFuZ2VzIGZyb20gMyB0byA1LCBtb3JlIGZhbGx0aHJvdWdoIGNvbW1l
+bnRzIGJlY29tZSBpbnZhbGlkIGFzIHRoZSB2YWx1ZSBpbmNyZWFzZXMuDQoNClNvLCBJIGFncmVl
+IHdpdGggUGhpbGlwcGUncyBzdWdnZXN0aW9uIHRvIGFkZCBhIFFFTVVfRkFMTFRIUk9VR0ggdG8g
+dW5pZnkgdGhpcyBjb21waWxlciBwcm9wZXJ0eS4NCg0KVGhhbmtzLA0KQ2hlbiBRdW4NCg0KQWRk
+aXRpb25hbCBnY2MgaW5mb3JtYXRpb24gaXMgYXMgZm9sbG93czoNCmh0dHBzOi8vZ2NjLmdudS5v
+cmcvb25saW5lZG9jcy9nY2MvV2FybmluZy1PcHRpb25zLmh0bWwNCi1XaW1wbGljaXQtZmFsbHRo
+cm91Z2ggaXMgdGhlIHNhbWUgYXMgLVdpbXBsaWNpdC1mYWxsdGhyb3VnaD0zIGFuZCAtV25vLWlt
+cGxpY2l0LWZhbGx0aHJvdWdoIGlzIHRoZSBzYW1lIGFzIC1XaW1wbGljaXQtZmFsbHRocm91Z2g9
+MC4NCg0KVGhlIG9wdGlvbiBhcmd1bWVudCBuIHNwZWNpZmllcyB3aGF0IGtpbmQgb2YgY29tbWVu
+dHMgYXJlIGFjY2VwdGVkOg0KLVdpbXBsaWNpdC1mYWxsdGhyb3VnaD0wIGRpc2FibGVzIHRoZSB3
+YXJuaW5nIGFsdG9nZXRoZXIuDQotV2ltcGxpY2l0LWZhbGx0aHJvdWdoPTEgbWF0Y2hlcyAuKiBy
+ZWd1bGFyIGV4cHJlc3Npb24sIGFueSBjb21tZW50IGlzIHVzZWQgYXMgZmFsbHRocm91Z2ggY29t
+bWVudC4NCi1XaW1wbGljaXQtZmFsbHRocm91Z2g9MiBjYXNlIGluc2Vuc2l0aXZlbHkgbWF0Y2hl
+cyAuKmZhbGxzP1sgXHQtXSp0aHIob3VnaHx1KS4qIHJlZ3VsYXIgZXhwcmVzc2lvbi4NCi1XaW1w
+bGljaXQtZmFsbHRocm91Z2g9MyBjYXNlIHNlbnNpdGl2ZWx5IG1hdGNoZXMgb25lIG9mIHRoZSBm
+b2xsb3dpbmcgcmVndWxhciBleHByZXNzaW9uczoNCiAgIC1mYWxsdGhyb3VnaA0KICAgQGZhbGx0
+aHJvdWdoQA0KICAgbGludCAtZmFsbHRocm91Z2hbIFx0XSoNCiAgIFsgXHQuIV0qKEVMU0UsPyB8
+SU5URU5USU9OQUwoTFkpPyApPw0KICAgRkFMTChTIHwgfC0pP1RIUihPVUdIfFUpWyBcdC4hXSoo
+LVteXG5ccl0qKT8NCiAgIFsgXHQuIV0qKEVsc2UsPyB8SW50ZW50aW9uYWwobHkpPyApPw0KICAg
+RmFsbCgocyB8IHwtKVtUdF18dClocihvdWdofHUpWyBcdC4hXSooLVteXG5ccl0qKT8NCiAgIFsg
+XHQuIV0qKFtFZV1sc2UsPyB8W0lpXW50ZW50aW9uYWwobHkpPyApPw0KICAgZmFsbChzIHwgfC0p
+P3RocihvdWdofHUpWyBcdC4hXSooLVteXG5ccl0qKT8NCi1XaW1wbGljaXQtZmFsbHRocm91Z2g9
+NCBjYXNlIHNlbnNpdGl2ZWx5IG1hdGNoZXMgb25lIG9mIHRoZSBmb2xsb3dpbmcgcmVndWxhciBl
+eHByZXNzaW9uczoNCiAgICAtZmFsbHRocm91Z2gNCiAgICBAZmFsbHRocm91Z2hADQogICAgbGlu
+dCAtZmFsbHRocm91Z2hbIFx0XSoNCiAgICBbIFx0XSpGQUxMVEhSKE9VR0h8VSlbIFx0XSoNCi1X
+aW1wbGljaXQtZmFsbHRocm91Z2g9NSBkb2VzbuKAmXQgcmVjb2duaXplIGFueSBjb21tZW50cyBh
+cyBmYWxsdGhyb3VnaCBjb21tZW50cywgb25seSBhdHRyaWJ1dGVzIGRpc2FibGUgdGhlIHdhcm5p
+bmcuDQo=
 
