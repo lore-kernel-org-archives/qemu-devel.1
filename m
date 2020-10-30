@@ -2,90 +2,90 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C9D8C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EC4C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:51:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B8DE2076E
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:48:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD0982076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:51:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7nndi6+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8DE2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l15Nxchq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD0982076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYUln-0007Pz-S3
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 09:48:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39834)
+	id 1kYUoS-0000PY-Ma
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 09:51:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kYUkM-0006kz-TA
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 09:47:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46058)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kYUkK-00049n-GW
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 09:47:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604065630;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4BUUvfKLhhkeEZX58ifRtpk7l5XynEDEHKRkFOKAClA=;
- b=J7nndi6+9xuI8Xvwgh1lIROxa3wunMy+isjD5n1hsmW8/NtthRuoYLNb2hIz4+MMt+BNBz
- cjXNOVA1ptVqB2sP8YObq177t38qsxO1ySDxttZyhL9PkbrvQTEYxf+RxlUuDrF/dIKpuB
- /6g8mRhXr6oGWGSwIRoy5NKqUuKR5TQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-oZIIrIWdOVGyDG0r6FEfwA-1; Fri, 30 Oct 2020 09:47:06 -0400
-X-MC-Unique: oZIIrIWdOVGyDG0r6FEfwA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54E058F62CB;
- Fri, 30 Oct 2020 13:47:05 +0000 (UTC)
-Received: from [10.10.118.238] (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C8BB310027AB;
- Fri, 30 Oct 2020 13:47:04 +0000 (UTC)
-Subject: Re: QEMU release tagging script?
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <e8b378a2-144c-e915-3e5e-c84c9e9a17b5@redhat.com>
- <CAFEAcA8cc_C6aKkO0n=Z_b3ais6AE0VSvZD1TZweAzhocm6aTg@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <926ca0d9-840a-f850-19b1-cd22c25c0daa@redhat.com>
-Date: Fri, 30 Oct 2020 09:47:04 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kYUmU-00082Y-Hn; Fri, 30 Oct 2020 09:49:26 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:45342)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kYUmS-0004KJ-7A; Fri, 30 Oct 2020 09:49:25 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id a9so6512739wrg.12;
+ Fri, 30 Oct 2020 06:49:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=enUHVE6/PhcWn+p+KJmbDxlEVfrqGZDvXq7Vvykiais=;
+ b=l15NxchqxHP32IrV97Oaxdtzr3ovzT8yLhgt2wRUvgCAe+k7EG0A73U8V/OnUV6knl
+ mW/82zxGRrjpSgDx7j1UkrKtlzvzYUawaXKtHGo8/LSClAxg8aCDf/RZzVdPCUdkMj3b
+ RogjorSz2dAWz6uTvdGdEFSkbua9jx1OVGT36A1S9IfT+SPOxUutc4IhJ7NnO2MYT/2Y
+ bZCVhECEs/7oiCr0lwZQKBuVCLrnQYhU88EhWS6eURYfaI0wDq7yGToLcgvTLQ16mbW4
+ suzBM5oZg/umkpm0UGQzttAQlQcXDf0whC0PQGST+nYHCJ5oss0T7MkM1smJBYAE27MP
+ ztbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=enUHVE6/PhcWn+p+KJmbDxlEVfrqGZDvXq7Vvykiais=;
+ b=bDBXQTwoC4233BnPjTJYCoiorzXjHV3S6LBHJ5KOpDmjod/xvlI2heviGfnDoK2bs4
+ OAKrlk9hUQB+q/vzMMI2vxZsCVS0vehKz30aOgzlHiOZc4WZH0TDq/oYPBNRL/6U0imZ
+ 5au73679Wp4gueqPilFKGD+Jdfgc6eYSkbEw4Fm8jsovOIRMBu1N+P9LpK62oSMUHQpK
+ skK+qpMEuR9/u5qp1AZcSx37ud4Z6fTD2T6h1dhpfVYAuWt1WvrCA5srOQKBbRANPLzu
+ 65IYJGkB/yrJzTKRJHluMTWgbzhvFcWJiSdZq3upcVxm45dvadCySsqPPdFQVx708TFE
+ Ancg==
+X-Gm-Message-State: AOAM533t5Bj+tmFVyDISVdq5ZQc2NWhxBA61c9zabhNKKQ6kuim4dnQo
+ Z+g4OOsaNJ9s9WzRQeUYD9ZErWe2xdM=
+X-Google-Smtp-Source: ABdhPJw0zNnE0bCthm0WUdrS9gHjSkaetEIKU5DDAWJXPMiZblBQdUYRYj47r5Vlufe4HkxmVOm9NA==
+X-Received: by 2002:a5d:4f8c:: with SMTP id d12mr3369673wru.351.1604065762105; 
+ Fri, 30 Oct 2020 06:49:22 -0700 (PDT)
+Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id 205sm4905578wme.38.2020.10.30.06.49.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 30 Oct 2020 06:49:21 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.2 v2] hw/rx/rx-gdbsim: Fix memory leak
+Date: Fri, 30 Oct 2020 14:49:18 +0100
+Message-Id: <20201030134918.1518930-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8cc_C6aKkO0n=Z_b3ais6AE0VSvZD1TZweAzhocm6aTg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
-X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.253, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,49 +98,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/30/20 9:38 AM, Peter Maydell wrote:
-> On Fri, 30 Oct 2020 at 13:32, John Snow <jsnow@redhat.com> wrote:
->> Is there a script that's public that you use for tagging the QEMU
->> release? I see make-release in scripts/, but that's for creating the
->> tarballs after the tagging has been done.
-> 
-> I use this script:
-> https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/qemu-tag-release
-> 
+As load_device_tree() returns allocated memory,
+we need to free it.
 
-Thanks!
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+Fixes: bda19d7bb56 ("hw/rx: Add RX GDB simulator")
+Reported-by: Coverity (CID 1432307: RESOURCE_LEAK)
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+v2: NULL-initialize (Richard)
+---
+ hw/rx/rx-gdbsim.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->> I am looking into being able to cut releases for our Python QMP library,
->> but due to constraints in the Python packaging ecosystem I have not yet
->> been able to solve, it requires its own VERSION file.
->>
->> It would be nice if when 5.2.0 is tagged that "0.5.2.0" could be written
->> into ./python/VERSION as well.
-> 
-> I'm pretty strongly against having the version hardcoded
-> anywhere except the top level VERSION file. Everything else
-> should read the information from there.
-> 
-
-Yeah, I know. I don't want to do it either, but I don't see an 
-alternative that works with Python packaging tooling right now.
-
-The problem is that whenever you run an install, (which runs a python 
-"build"), the source is copied out into a temp directory where it loses 
-all access to the parent directory and any knowledge of .git.
-
-Perhaps someone has a solution, but I've not found one yet. The authors 
-of pip are aware of the problem and are working on a solution, but we 
-don't have one yet.
-
-> thanks
-> -- PMM
-> 
+diff --git a/hw/rx/rx-gdbsim.c b/hw/rx/rx-gdbsim.c
+index 417ec0564b3..d70865962e8 100644
+--- a/hw/rx/rx-gdbsim.c
++++ b/hw/rx/rx-gdbsim.c
+@@ -122,7 +122,7 @@ static void rx_gdbsim_init(MachineState *machine)
+         if (dtb_filename) {
+             ram_addr_t dtb_offset;
+             int dtb_size;
+-            void *dtb;
++            g_autofree void *dtb = NULL;
+ 
+             dtb = load_device_tree(dtb_filename, &dtb_size);
+             if (dtb == NULL) {
+-- 
+2.26.2
 
 
