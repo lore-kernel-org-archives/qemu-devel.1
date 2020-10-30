@@ -2,79 +2,94 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DBA7C00A89
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 15:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 043C4C00A89
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 15:58:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF8042067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 15:56:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF8042067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 4B1862067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 15:58:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hiU3yGgO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B1862067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYWlu-0007pG-Es
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 11:56:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42942)
+	id 1kYWn5-0000ZL-89
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 11:58:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kYWkk-0006nR-EZ
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 11:55:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46604)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kYWke-0004S9-Ck
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 11:55:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kYWkW-0003B2-1m
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 15:55:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DC47D2E813A
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 15:55:31 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kYWlo-0007xm-0q
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 11:56:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54855)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kYWlk-0004cA-QZ
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 11:56:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604073406;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MW74JwSfWvbcVTL5ph/uPgOQWVnKT14rY+Xic3xBfwk=;
+ b=hiU3yGgO0QGwM/Tx5tQ+CCBS1KJLo6Nma7KSiPaG7Kuur/bgx8vxRrbfsWZaEEnfpPY3Ku
+ fpbQfsVwOoAyq9P5aiGdG6FOap6FNv2tOXXtK9QOfBQoSDtT84lWozU14yON0AtKjB1cN2
+ 82c5W32vPmqytgyngq0HgtupB57eJYM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-MjtzRT8fMoGjBzotdCnQ1A-1; Fri, 30 Oct 2020 11:56:44 -0400
+X-MC-Unique: MjtzRT8fMoGjBzotdCnQ1A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 546735F9C4
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 15:56:43 +0000 (UTC)
+Received: from work-vm (ovpn-114-198.ams2.redhat.com [10.36.114.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B8E819656;
+ Fri, 30 Oct 2020 15:56:39 +0000 (UTC)
+Date: Fri, 30 Oct 2020 15:56:32 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [RFC PATCH-for-5.2] tools/virtiofsd: Check vu_init() return
+ value (CID 1435958)
+Message-ID: <20201030155632.GF3046@work-vm>
+References: <20201030150951.1542382-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Oct 2020 15:47:33 -0000
-From: Jingtao <1902262@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jl939612
-X-Launchpad-Bug-Reporter: Jingtao (jl939612)
-X-Launchpad-Bug-Modifier: Jingtao (jl939612)
-Message-Id: <160407285408.8291.17235632998408436942.malonedeb@soybean.canonical.com>
-Subject: [Bug 1902262] [NEW] vmstate_load_state return error into virtio_load
- function
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="96ff31b88b65a0d0ea73b89333fe7c4a2669d8fb"; Instance="production"
-X-Launchpad-Hash: 6b1aad2093087b537c039d003cb721d71d40ee93
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 11:55:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201030150951.1542382-1-philmd@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,82 +98,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1902262 <1902262@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+* Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
+> Since commit 6f5fd837889, vu_init() can fail if malloc() returns NULL.
+> 
+> This fixes the following Coverity warning:
+> 
+>   CID 1435958 (#1 of 1): Unchecked return value (CHECKED_RETURN)
+> 
+> Fixes: 6f5fd837889 ("libvhost-user: support many virtqueues")
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Qemu version 4.2.1
+A fuse_log would have been nice.
 
-In the function of virtio_load, the vmstate_load_state will return error
-in the following case.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-The virtio is legacy mode(disable-modern=3Don,disable-legacy=3Doff),
-virtio_device is in reset state.
+> ---
+>  tools/virtiofsd/fuse_virtio.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+> index 324936948d3..3a32256e7af 100644
+> --- a/tools/virtiofsd/fuse_virtio.c
+> +++ b/tools/virtiofsd/fuse_virtio.c
+> @@ -1013,8 +1013,10 @@ int virtio_session_mount(struct fuse_session *se)
+>      se->vu_socketfd = data_sock;
+>      se->virtio_dev->se = se;
+>      pthread_rwlock_init(&se->virtio_dev->vu_dispatch_rwlock, NULL);
+> -    vu_init(&se->virtio_dev->dev, 2, se->vu_socketfd, fv_panic, NULL,
+> -            fv_set_watch, fv_remove_watch, &fv_iface);
+> +    if (!vu_init(&se->virtio_dev->dev, 2, se->vu_socketfd, fv_panic, NULL,
+> +                 fv_set_watch, fv_remove_watch, &fv_iface)) {
+> +        return -1;
+> +    }
+>  
+>      return 0;
+>  }
+> -- 
+> 2.26.2
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-In the the function of "vmstate_load_state", it will load all subsection. F=
-or the vmstate_virtio_extra_state subsection. =
-
-It will execute:
-vmstate_load_state   -->
-          ret =3D field->info->get(f, curr_elem, size, field);    line 143 =
- vmstate.c.
-           -->virtio_pci_load_extra_state
-                        -->  vmstate_load_state
-                                 -->qemu_peek_byte
-But if the f->buf_index is same with buf_size, qemu_peek_byte function will=
- set "-EIO" error. =
-
-the field->info->get will return 0, then it will get the error "ret =3D qem=
-u_file_get_error(f);". then the vmstate_load_state will return error.
-
-It output is "Failed to load virtio/extra_state:extra_state"
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1902262
-
-Title:
-  vmstate_load_state return error into virtio_load function
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu version 4.2.1
-
-  In the function of virtio_load, the vmstate_load_state will return
-  error in the following case.
-
-  The virtio is legacy mode(disable-modern=3Don,disable-legacy=3Doff),
-  virtio_device is in reset state.
-
-  In the the function of "vmstate_load_state", it will load all subsection.=
- For the vmstate_virtio_extra_state subsection. =
-
-  It will execute:
-  vmstate_load_state   -->
-            ret =3D field->info->get(f, curr_elem, size, field);    line 14=
-3  vmstate.c.
-             -->virtio_pci_load_extra_state
-                          -->  vmstate_load_state
-                                   -->qemu_peek_byte
-  But if the f->buf_index is same with buf_size, qemu_peek_byte function wi=
-ll set "-EIO" error. =
-
-  the field->info->get will return 0, then it will get the error "ret =3D q=
-emu_file_get_error(f);". then the vmstate_load_state will return error.
-
-  It output is "Failed to load virtio/extra_state:extra_state"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1902262/+subscriptions
 
