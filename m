@@ -2,80 +2,78 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E0A8C00A89
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12411C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A64972087E
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:04:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E9AD2087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:06:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F1NJySxI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A64972087E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hdX5puXB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E9AD2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYV0o-00062p-8a
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:04:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43242)
+	id 1kYV2n-0007bR-EQ
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:06:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kYUz2-0004ku-O0
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:02:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59305)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kYUzs-0005gE-I1
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:03:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42964)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kYUz0-000601-H6
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:02:24 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kYUzq-00064i-T7
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:03:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604066541;
+ s=mimecast20190719; t=1604066594;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=JNHM3yfWtHPgWNBcdCD2jLdozfJprCFunJOAm9uBv6Y=;
- b=F1NJySxIc6WC2RUA+EL0HfEaUubcWgFq2uCVzrSVUlIrb8mwKDh04cs+AFa276CK5t28MY
- TrrnFkH0gOtsejbhYYTnsTZH8Dwt8n4a6vElzmSIGq9v1MUmgUqOzSYceZmKMqZDDoxxrF
- YR2DH349eJyaz1vStMoGhj1u3Q0U9Wo=
+ bh=r1DPYxLZH7BlcgZFEnXlAc5nOgWHXwHLFiH93ba/avE=;
+ b=hdX5puXBp03NBzeq53gqOCLBFKhhyb3V2lJLH+b6TaF7pg1x2Er6P3lsR8B8b0GKGQdgVM
+ v5DelVF4BHnrSNqmvtj9ZEyWPnO3TBRZdTsemUrrvJIIspooFsW6eqMAOYmQ4ssS465Y8z
+ 0+vr0P0YirA3WjlTjqi7D9U2V9jDfO4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-xeq8TlbYN7GnLK3-uie6yw-1; Fri, 30 Oct 2020 10:02:17 -0400
-X-MC-Unique: xeq8TlbYN7GnLK3-uie6yw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-588-a3YBB8ZqPPS8LXNT75xmDA-1; Fri, 30 Oct 2020 10:03:08 -0400
+X-MC-Unique: a3YBB8ZqPPS8LXNT75xmDA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A453C1800D42;
- Fri, 30 Oct 2020 14:02:16 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 005D74149;
- Fri, 30 Oct 2020 14:02:12 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7B1C5113865F; Fri, 30 Oct 2020 15:02:11 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH v9 1/8] Introduce yank feature
-References: <cover.1603909658.git.lukasstraub2@web.de>
- <7b3b182b6ab1a859a1e9fb4ebfa5ce0a7a441e10.1603909658.git.lukasstraub2@web.de>
- <87a6w556rl.fsf@dusky.pond.sub.org> <20201030113212.37ddf1fb@luklap>
-Date: Fri, 30 Oct 2020 15:02:09 +0100
-In-Reply-To: <20201030113212.37ddf1fb@luklap> (Lukas Straub's message of "Fri, 
- 30 Oct 2020 11:32:12 +0100")
-Message-ID: <87lffnstge.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 252AC1007286;
+ Fri, 30 Oct 2020 14:03:07 +0000 (UTC)
+Received: from localhost (ovpn-113-41.ams2.redhat.com [10.36.113.41])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BF51A55798;
+ Fri, 30 Oct 2020 14:03:02 +0000 (UTC)
+Date: Fri, 30 Oct 2020 14:03:01 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.2 v2 10/25] block/nvme: Make nvme_identify() return
+ boolean indicating error
+Message-ID: <20201030140301.GC330921@stefanha-x1.localdomain>
+References: <20201029093306.1063879-1-philmd@redhat.com>
+ <20201029093306.1063879-11-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20201029093306.1063879-11-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="ncSAzJYg3Aa9+CRW"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -85,7 +83,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,220 +96,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Eric Auger <eric.auger@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Lukas Straub <lukasstraub2@web.de> writes:
+--ncSAzJYg3Aa9+CRW
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Thu, 29 Oct 2020 17:36:14 +0100
-> Markus Armbruster <armbru@redhat.com> wrote:
->
->> Nothing major, looks almost ready to me.
->> 
->> Lukas Straub <lukasstraub2@web.de> writes:
->> 
->> > The yank feature allows to recover from hanging qemu by "yanking"
->> > at various parts. Other qemu systems can register themselves and
->> > multiple yank functions. Then all yank functions for selected
->> > instances can be called by the 'yank' out-of-band qmp command.
->> > Available instances can be queried by a 'query-yank' oob command.
->> >
->> > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
->> > Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
->> > ---
->> >  include/qemu/yank.h |  95 ++++++++++++++++++++
->> >  qapi/misc.json      | 106 ++++++++++++++++++++++
->> >  util/meson.build    |   1 +
->> >  util/yank.c         | 213 ++++++++++++++++++++++++++++++++++++++++++++  
->> 
->> checkpatch.pl warns:
->> 
->>     WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
->> 
->> Can we find a maintainer for the two new files?
->
-> Yes, I'm maintaining this for now, see patch 7.
+On Thu, Oct 29, 2020 at 10:32:51AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Just for consistency, following the example documented since
+> commit e3fe3988d7 ("error: Document Error API usage rules"),
+> return a boolean value indicating an error is set or not.
+> Directly pass errp as the local_err is not requested in our
+> case.
+>=20
+> Tested-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+>  block/nvme.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
 
-Thanks!  Would it make sense to add the yank stuff to a new QAPI module
-yank.json instead of misc.jaon, so the new MAINTAINERS stanza can cover
-it?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-[...]
->> > diff --git a/qapi/misc.json b/qapi/misc.json
->> > index 40df513856..3b7de02a4d 100644
->> > --- a/qapi/misc.json
->> > +++ b/qapi/misc.json
-[...]
->> > +##
->> > +# @YankInstance:
->> > +#
->> > +# A yank instance can be yanked with the "yank" qmp command to recover from a
->> > +# hanging qemu.  
->> 
->> QEMU
->> 
->> > +#
->> > +# Currently implemented yank instances:
->> > +#  -nbd block device:
->> > +#   Yanking it will shutdown the connection to the nbd server without
->> > +#   attempting to reconnect.
->> > +#  -socket chardev:
->> > +#   Yanking it will shutdown the connected socket.
->> > +#  -migration:
->> > +#   Yanking it will shutdown all migration connections.  
->> 
->> To my surprise, this is recognized as bullet list markup.  But please
->> put a space between the bullet and the text anyway.
->> 
->> Also: "shutdown" is a noun, the verb is spelled "shut down".
->
-> Both changed for the next version.
->
->> In my review of v8, I asked how yanking migration is related to command
->> migrate_cancel.  Daniel explained:
->> 
->>     migrate_cancel will do a shutdown() on the primary migration socket only.
->>     In addition it will toggle the migration state.
->> 
->>     Yanking will do a shutdown on all migration sockets (important for
->>     multifd), but won't touch migration state or any other aspect of QEMU
->>     code.
->> 
->>     Overall yanking has less potential for things to go wrong than the
->>     migrate_cancel method, as it doesn't try to do any kind of cleanup
->>     or migration.
->> 
->> Would it make sense to work this into the documentation?
->
-> How about this?
->
->   - migration:
->     Yanking it will shut down all migration connections. Unlike
->     @migrate_cancel, it will not notify the migration process,
->     so migration will go into @failed state, instead of @cancelled
->     state.
+--ncSAzJYg3Aa9+CRW
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Works for me.  Advice on when to use it rather than migrate_cancel would
-be nice, though.
+-----BEGIN PGP SIGNATURE-----
 
->> > +#
->> > +# Since: 5.2
->> > +##
->> > +{ 'union': 'YankInstance',
->> > +  'base': { 'type': 'YankInstanceType' },
->> > +  'discriminator': 'type',
->> > +  'data': {
->> > +      'blockdev': 'YankInstanceBlockdev',
->> > +      'chardev': 'YankInstanceChardev' } }
->> > +
->> > +##
->> > +# @yank:
->> > +#
->> > +# Recover from hanging qemu by yanking the specified instances. See  
->> 
->> QEMU
->> 
->> "Try to recover" would be more precise, I think.
->
-> Changed for the next version.
->
->> > +# "YankInstance" for more information.
->> > +#
->> > +# Takes a list of @YankInstance as argument.
->> > +#
->> > +# Returns: nothing.
->> > +#
->> > +# Example:
->> > +#
->> > +# -> { "execute": "yank",
->> > +#      "arguments": {
->> > +#          "instances": [
->> > +#               { "type": "block-node",
->> > +#                 "node-name": "nbd0" }
->> > +#          ] } }
->> > +# <- { "return": {} }
->> > +#
->> > +# Since: 5.2
->> > +##
->> > +{ 'command': 'yank',
->> > +  'data': { 'instances': ['YankInstance'] },
->> > +  'allow-oob': true }
->> > +
-[...]
->> > diff --git a/util/yank.c b/util/yank.c
->> > new file mode 100644
->> > index 0000000000..0b3a816706
->> > --- /dev/null
->> > +++ b/util/yank.c
-[...]
->> > +void qmp_yank(YankInstanceList *instances,
->> > +              Error **errp)
->> > +{
->> > +    YankInstanceList *tail;
->> > +    YankInstanceEntry *entry;
->> > +    YankFuncAndParam *func_entry;
->> > +
->> > +    qemu_mutex_lock(&yank_lock);
->> > +    for (tail = instances; tail; tail = tail->next) {
->> > +        entry = yank_find_entry(tail->value);
->> > +        if (!entry) {
->> > +            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND, "Instance not found");  
->> 
->> Quote error.h:
->> 
->>  * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR is
->>  * strongly discouraged.
->> 
->> Any particular reason for ERROR_CLASS_DEVICE_NOT_FOUND?  If not, then
->> error_setg(), please.
->
-> There may be a time-to-check to time-to-use race condition here. Suppose
-> the management application (via QMP) calls 'blockev-del nbd0', then QEMU
-> hangs, so after a timeout it calls 'yank nbd0' while shortly before that
-> QEMU unhangs for some reason and removes the blockdev. Then yank returns
-> this error.
->
-> QMP errors should not be parsed except for the error class, so the the
-> management application can only differentiate between this (ignorable)
-> error and other (possibly fatal) ones by parsing the error class.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+cHRUACgkQnKSrs4Gr
+c8iBBggAlFvQ8gIFxaMkP/OAb0EEvMri1MzC7AKiMntDbhR5cYDs8mDc/Uxc/epA
+UeUmKAAAprUKYZDOYat8OV49mFj+6H3ITlQyeDly05UPqEb2U7MG6Nzbx+lUEYsf
+/MU1D+plKm3EcMFV+KLLkgz3mMQ7xT+u+0Bpgz0s7T80zkejMraeNZhr/zPII8/Y
+LU58YLBE2UX3z3xpXy4gK8BHPIFbafoU/AO+lT34Tcg2VNMna0XmfzPioncxOFB3
+/NflOIdj48ZXjBSCIhBHp0LAcO15i3QrW1qg6sd1otOIj3zjDWyC7TtGYqm80/Mp
+71yXVw5VlgP4x42tp8EcjA+NLP7EBQ==
+=QWE8
+-----END PGP SIGNATURE-----
 
-I see.
-
-DeviceNotFound doesn't really fit, but none of the other error classes
-is any better.
-
-I think the line
-
-      # Returns: nothing.
-
-in the QAPI schema (quoted above) should be expanded to something like
-
-
-      # Returns: - Nothing on success
-                 - If the YankInstance doesn't exist, DeviceNotFound
-
->> > +            qemu_mutex_unlock(&yank_lock);
->> > +            return;
->> > +        }
->> > +    }
->> > +    for (tail = instances; tail; tail = tail->next) {
->> > +        entry = yank_find_entry(tail->value);
->> > +        assert(entry);
->> > +        QLIST_FOREACH(func_entry, &entry->yankfns, next) {
->> > +            func_entry->func(func_entry->opaque);
->> > +        }
->> > +    }
->> > +    qemu_mutex_unlock(&yank_lock);
->> > +}
-[...]
+--ncSAzJYg3Aa9+CRW--
 
 
