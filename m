@@ -2,79 +2,85 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7741BC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F08BEC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:33:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3ADB2075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:26:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3ADB2075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1995A2076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:33:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nd0JLGc/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1995A2076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYUQM-00057B-OU
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 09:26:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35302)
+	id 1kYUWu-0000HJ-UJ
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 09:33:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kYUPd-0004aw-CL; Fri, 30 Oct 2020 09:25:49 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:40821)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kYUPb-0006A6-LH; Fri, 30 Oct 2020 09:25:49 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.143.118])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id BCEA2697F586;
- Fri, 30 Oct 2020 14:25:44 +0100 (CET)
-Received: from kaod.org (37.59.142.96) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Fri, 30 Oct
- 2020 14:25:43 +0100
-Authentication-Results: garm.ovh; auth=pass
- (GARM-96R001289f949e-d634-4c34-9369-65a2563b2290,
- 28B94817A5BF005C53DACA451BCD6EA07813AA4A) smtp.auth=groug@kaod.org
-Date: Fri, 30 Oct 2020 14:25:42 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 4/5] spapr: Pass &error_abort when getting some PC DIMM
- properties
-Message-ID: <20201030142542.3051b508@bahia.lan>
-In-Reply-To: <20201028162216.0f33e0ef@redhat.com>
-References: <160309727218.2739814.14722724927730985344.stgit@bahia.lan>
- <160309732180.2739814.7243774674998010907.stgit@bahia.lan>
- <20201023211509.5c316c01@redhat.com>
- <20201025162444.0fdec88a@bahia.lan>
- <20201027125424.13833af8@redhat.com>
- <20201027161858.590329a7@bahia>
- <20201028162216.0f33e0ef@redhat.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kYUW8-0008GM-Nj
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 09:32:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51772)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kYUW2-0008SS-RT
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 09:32:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604064744;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=K/Ko0eWrk58HpQVnFoeRQs1gJmseOr9XCg9msoiUmHY=;
+ b=Nd0JLGc/kuvgSrX7F4uDCRn/AKXVeS0RO76On/63lFmzUIkX+/r0AvjSCaft7/2si4Sfuw
+ +FjzBb877+HP8hq3H6X0ZLU1FROCsZZvXpfTnjLf8n8hfJnJeUSnZEogtCiqO2pCe+/Ssa
+ i9PO0C9D5YQ2sJEk2rXFMHlotM9n/xE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-uROtbrbsOu-sVvAAcvTlfQ-1; Fri, 30 Oct 2020 09:32:22 -0400
+X-MC-Unique: uROtbrbsOu-sVvAAcvTlfQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C41A188C13A;
+ Fri, 30 Oct 2020 13:32:20 +0000 (UTC)
+Received: from [10.10.118.238] (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C10D51002C01;
+ Fri, 30 Oct 2020 13:32:19 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+From: John Snow <jsnow@redhat.com>
+Subject: QEMU release tagging script?
+Message-ID: <e8b378a2-144c-e915-3e5e-c84c9e9a17b5@redhat.com>
+Date: Fri, 30 Oct 2020 09:32:19 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.96]
-X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: efae3436-317d-44f7-af3e-ae9a8c83244e
-X-Ovh-Tracer-Id: 1465921682983066104
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrleehgdegkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheprhhthhesthifihguughlvgdrnhgvth
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 07:32:16
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,40 +93,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 28 Oct 2020 16:22:16 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
+Hi,
 
-> On Tue, 27 Oct 2020 16:18:58 +0100
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-[...]
-> > 
-> > It might require some more code refactoring because the way regular
-> > PC-DIMMs are broken down into a set of logical memory blocks (LMBs),
-> > each one having its own DRC but it's certainly doable. Probably for
-> > QEMU 6.0 though since we're entering soft freeze and David already
-> > fired a PR today.
-> 
-> as far as it's not forgotten, it can be done later.
-> 
+Is there a script that's public that you use for tagging the QEMU 
+release? I see make-release in scripts/, but that's for creating the 
+tarballs after the tagging has been done.
 
-David,
+I am looking into being able to cut releases for our Python QMP library, 
+but due to constraints in the Python packaging ecosystem I have not yet 
+been able to solve, it requires its own VERSION file.
 
-Can you create a ppc-for-6.0 branch ?
+It would be nice if when 5.2.0 is tagged that "0.5.2.0" could be written 
+into ./python/VERSION as well.
 
-Cheers,
+(Effectively I am targeting using '0.' + VERSION. This is pending 
+discussion on the python packaging series.)
 
---
-Greg
+Thanks,
+--js
+
 
