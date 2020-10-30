@@ -7,77 +7,74 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4621EC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DC3C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:47:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5AAD20725
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3939D20725
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:47:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SNmDLRfh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5AAD20725
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOfrw4Yt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3939D20725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYToc-0002Md-Mo
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 08:47:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53728)
+	id 1kYTom-0002ZK-2e
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 08:47:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTma-0000Z3-9X
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38809)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmi-0000kr-OB
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26020)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmY-0000eD-I5
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:27 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmg-0000iE-OX
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604061925;
+ s=mimecast20190719; t=1604061933;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=B/zT27wrNEHsIn9RPNBpuM2tzqmJYYoAGZySli/obU8=;
- b=SNmDLRfhcI/9mIAN/dW3pv2og1GGCnIwknyrHmUAbvLGn8Gs94uNcAD/GZXjbRFjF+QuZF
- BQ0d9G0WLcJITe2UUd5Q3DwhXFRaVVgR0QEH5gLeLB67f5AJes2QZfAHkaR/1+eEOAKlKJ
- N7CieII13qTliz9rm0ddUNguhrgjOl4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-p8oNuSqwP32YI3V6yiAn6Q-1; Fri, 30 Oct 2020 08:45:24 -0400
-X-MC-Unique: p8oNuSqwP32YI3V6yiAn6Q-1
-Received: by mail-wr1-f72.google.com with SMTP id t11so2619051wrv.10
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 05:45:23 -0700 (PDT)
+ bh=2qvybBCIE1Zjv+mt4qBhgbngIyzXePj4i5BwfD1rO8Y=;
+ b=JOfrw4Ytd2ULEsuRP+uu0DhK6veIvmbOl8P2wQ8W7adOX0B/QBc8VKYoclgU/bDCQloDjf
+ WOITWGkDNyc64l2FewgZmFNQgwkU3wv0KQttUSZiloKzN8afvlW7j2lO375ztXQl8V1whq
+ vTll8yUJjAfjqhRNP1ZSHlz+o95OXXs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-88jYwgSCPxWsuyK3OEp0Kw-1; Fri, 30 Oct 2020 08:45:30 -0400
+X-MC-Unique: 88jYwgSCPxWsuyK3OEp0Kw-1
+Received: by mail-wm1-f69.google.com with SMTP id y21so316163wmi.7
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 05:45:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=B/zT27wrNEHsIn9RPNBpuM2tzqmJYYoAGZySli/obU8=;
- b=aOB1JVwswe2tt+HC493ChB8sgfhhz4fy45nVYP1hyzPSUyhHyBeVQiIptvGtWZ9tOf
- HEVPwLa+prpiI0qOQmgNNp3YmpcnjriuHXZKGN4LkljQZ7yVYjXuhSkc1YL/7xU4E/Vl
- UHq2AHfiPdzxOZqeM2uOK0thLxTGFRA4l1SdiRuX3vXv/VtD6SmB1Wxwh1h6n95Z+PZU
- 1fW71JCczCQX1HpPk0QxTNX2c++enp55NJwnEk01ERoE0wLEzQ+7gn6YVpd08iUtzdzK
- +OLSOLpg8i1+/dRHXDbcO8DJT3YhlTdXLs7PIPx8IaIZnlQAX2IW8jaTfQldHXWBk+ST
- cp6A==
-X-Gm-Message-State: AOAM530x6WwqFEqFQiKS5e3ANo/VZGEFcMSNqupE+4lCwT37GQjxkVnD
- tXnzFLHtE/XuSXKeNbk7i2cVeBewrLmz03/vBq1TeWKysF+/8ROBbLMsoOYeSDlVpmbi7aUDNEB
- qGKY17w9cQ4QYkC0=
-X-Received: by 2002:a5d:4b12:: with SMTP id v18mr2882661wrq.259.1604061922520; 
- Fri, 30 Oct 2020 05:45:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWpB2dIplVbLMFmPo22CKqNaAudJKkIqAfJ4iUVHWvHAYKi5BTxYxtrGhHTv1hI0sEMBf1IA==
-X-Received: by 2002:a5d:4b12:: with SMTP id v18mr2882644wrq.259.1604061922375; 
- Fri, 30 Oct 2020 05:45:22 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=2qvybBCIE1Zjv+mt4qBhgbngIyzXePj4i5BwfD1rO8Y=;
+ b=Bj64RkgZN7Cd3oFm3WBmtWaTHkvWpyjnLiDE+5Nm3SYvKcsk5tK3whHqwoPQlVGqDs
+ EpOOgME8pwjUr0VXjvvcDmShIeeKG0kyOBEks2KnVwKuOFiG5Zog9VAf98mwSOwLuS/O
+ jGVBzReNV/zuFj5EZhwBEopoDDYp8Qv5SEdGyCIvUwV2w0HUnDBrMNkkmwJchZBNNaEh
+ u4w9p6IZgdUDVDbrPkbQu3b9245h70TOy1mc/GdrmC9fkWV0eNLLXb2j5XNu3a51FJwj
+ 1JQ951ugS0/SJV18/eBIZ9MdK0YnUQ0LCItTP1ea8OJCi3jPRNNBQIJAUyop5TiG/D5l
+ nOoQ==
+X-Gm-Message-State: AOAM533SAFn7VDTDXJh3qbyp+HII7CxNRzSTBu1mHTyJzdSM8XbtOFgG
+ xn6ENcYFVJJYagoXxLy8huQtzBCydi35ZqiyvFyoe610JxyQCgNwWIUaWJYrIEopN3nntTW+NMu
+ I79l8ZbAA3EJcCDQ=
+X-Received: by 2002:a1c:4d14:: with SMTP id o20mr2441791wmh.72.1604061929450; 
+ Fri, 30 Oct 2020 05:45:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyocOfMUmDYW7MlCrgP8+STQiAso4Njm5zwNXPERdlLOAvy7spFLjdptL6oXGytgo3z8GZM4g==
+X-Received: by 2002:a1c:4d14:: with SMTP id o20mr2441779wmh.72.1604061929287; 
+ Fri, 30 Oct 2020 05:45:29 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id g8sm4597291wma.36.2020.10.30.05.45.21
+ by smtp.gmail.com with ESMTPSA id r18sm11477001wrj.50.2020.10.30.05.45.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Oct 2020 05:45:21 -0700 (PDT)
-Date: Fri, 30 Oct 2020 08:45:20 -0400
+ Fri, 30 Oct 2020 05:45:28 -0700 (PDT)
+Date: Fri, 30 Oct 2020 08:45:27 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/15] pci: Assert irqnum is between 0 and bus->nirqs in
- pci_bus_change_irq_level
-Message-ID: <20201030124454.854286-8-mst@redhat.com>
+Subject: [PULL 10/15] pci: advertise a page aligned ATS
+Message-ID: <20201030124454.854286-11-mst@redhat.com>
 References: <20201030124454.854286-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201030124454.854286-1-mst@redhat.com>
@@ -87,9 +84,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 02:24:40
@@ -113,42 +109,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ qemu-stable@nongnu.org, Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Jason Wang <jasowang@redhat.com>
 
-These assertions similar to those in the adjacent pci_bus_get_irq_level()
-function ensure that irqnum lies within the valid PCI bus IRQ range.
+After Linux kernel commit 61363c1474b1 ("iommu/vt-d: Enable ATS only
+if the device uses page aligned address."), ATS will be only enabled
+if device advertises a page aligned request.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <20201011082022.3016-1-mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20201024203900.3619498-3-f4bug@amsat.org>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Unfortunately, vhost-net is the only user and we don't advertise the
+aligned request capability in the past since both vhost IOTLB and
+address_space_get_iotlb_entry() can support non page aligned request.
+
+Though it's not clear that if the above kernel commit makes
+sense. Let's advertise a page aligned ATS here to make vhost device
+IOTLB work with Intel IOMMU again.
+
+Note that in the future we may extend pcie_ats_init() to accept
+parameters like queue depth and page alignment.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Message-Id: <20200909081731.24688-1-jasowang@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci/pci.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/pci/pcie.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 081ddcadd1..dc4019865b 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -250,6 +250,8 @@ static inline void pci_set_irq_state(PCIDevice *d, int irq_num, int level)
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 5b48bae0f6..d4010cf8f3 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -971,8 +971,9 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
  
- static void pci_bus_change_irq_level(PCIBus *bus, int irq_num, int change)
- {
-+    assert(irq_num >= 0);
-+    assert(irq_num < bus->nirq);
-     bus->irq_count[irq_num] += change;
-     bus->set_irq(bus->irq_opaque, irq_num, bus->irq_count[irq_num] != 0);
- }
+     dev->exp.ats_cap = offset;
+ 
+-    /* Invalidate Queue Depth 0, Page Aligned Request 0 */
+-    pci_set_word(dev->config + offset + PCI_ATS_CAP, 0);
++    /* Invalidate Queue Depth 0, Page Aligned Request 1 */
++    pci_set_word(dev->config + offset + PCI_ATS_CAP,
++                 PCI_ATS_CAP_PAGE_ALIGNED);
+     /* STU 0, Disabled by default */
+     pci_set_word(dev->config + offset + PCI_ATS_CTRL, 0);
+ 
 -- 
 MST
 
