@@ -2,102 +2,91 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5C4C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F92C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:33:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A5B120704
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:31:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34E2C20704
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 10:33:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yh7DZF/Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A5B120704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oev4IKKj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34E2C20704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYRh2-0005mG-6B
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 06:31:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48498)
+	id 1kYRj6-00084i-4c
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 06:33:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYRcJ-00086B-Ho
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:26:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38822)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYRcF-0001K7-D0
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:26:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604053597;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=XURLfmIBmkN3M8zln9MT16idTxjsy7ulWWJmF/4Hn7c=;
- b=Yh7DZF/YMClMujn8e78D+3lbwMsG87411uV3QI2JmiIKZ/PUe9X6Tt8/DhIe/tQU9BepT6
- CcJAZznuC4AWj2J3SyIfdPMfgXCwp9BLmH/9w1Q5RhNUJu83zd8pc+ve5pC02S0CwEfVOB
- KKGBsn8lEsXgquOjgU994KN9IhO+fA4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-MZvcCpOTPf2R5-rqbaUALg-1; Fri, 30 Oct 2020 06:26:35 -0400
-X-MC-Unique: MZvcCpOTPf2R5-rqbaUALg-1
-Received: by mail-wr1-f70.google.com with SMTP id n14so2486993wrp.1
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 03:26:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kYRe7-0001v6-KE
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:28:35 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41351)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kYRe5-0001t8-Tx
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 06:28:35 -0400
+Received: by mail-pf1-x444.google.com with SMTP id c20so4862897pfr.8
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 03:28:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=6Vj7rJ1HbGvjo2klZQHezr8aeMv8wuLNCnIvPj2MkoI=;
+ b=oev4IKKj39K+dlRv61PDTEHJjun6fGQE93WWrQ/HRplMBxzXsh6aigCRtcQLjDnmo3
+ qsSALxyHPwmxmUEzNjw3X1S/SKJWCoYhGfMCzQ5J4GTWMA3MHnnhkpqxalNki+Ol3gNZ
+ yGz8zQHTptrMREQ3bk6grq349MNlqoxT3xNEEKBfkS4QD1Kg4vXoVBN2LVoTw4Sawpvm
+ hxLACrmXaxgmAr3u5S/1Q5X9aNN7X17i7T+0W9eI/pa9RaN6FhN9uiSNwytohqr6a7b9
+ hrEOVP1PcRdSHrMcrQtS/4BCulNQN2taHX/rr9KleV8GMlR0ZcoUN+MwKKjh+7ZnCKof
+ lQbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=XURLfmIBmkN3M8zln9MT16idTxjsy7ulWWJmF/4Hn7c=;
- b=gBFW8LusAY/2NknVxUwjD8MEqYeT41n3LliBHBwMSegCyAO/7xCmlRNRiTgrWdFDgT
- q3FnGQ6ynQdRuNLGsVH3qDKrp70DT56paCjRoibTGp58ItQpNMtjFKWXWmD1vFlXMxk0
- Z5+xcCbetph8gE0LLb0mh2n6j7UpDiDZEuNdfwC2zgCf9L9PWyI4d4KLz/AP5t7N4wvD
- chsY0tiEIFgm87u6EiclQ4EV4MsQSxkq2fYSJSgRq2i2S9+0dMW/MZ5hbop6+xEP1GXQ
- 7urG9dCiHk5ugGBWFkusEuJ1qqGTHts8XO8HvAyblrJDtRwgDSrz7WVWf3PYoaU6BNsg
- uyZQ==
-X-Gm-Message-State: AOAM5324yQIYQ3QlB15pHaqSxLsbeqFPeUUVqdwddDp7kkjovEqiP7Ul
- wdrPYNjPyFziC/IC9UopyCpLINIKH3dZihpUGsTl9x18GnaJv7wnOrDZtruJzZSRZTewj6+cbE9
- cp2rZcFK1bLzkx/8=
-X-Received: by 2002:a5d:4fc5:: with SMTP id h5mr2064743wrw.145.1604053594649; 
- Fri, 30 Oct 2020 03:26:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwvStEsspwMX49OCer+ApIvMxH9kj62MpYaj6h+m4Wg/ilKldx6iDWMWNv8Gvdm4UMJYBjF6A==
-X-Received: by 2002:a5d:4fc5:: with SMTP id h5mr2064724wrw.145.1604053594518; 
- Fri, 30 Oct 2020 03:26:34 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id t7sm9505805wrx.42.2020.10.30.03.26.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Oct 2020 03:26:33 -0700 (PDT)
-Date: Fri, 30 Oct 2020 06:26:31 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v10 08/10] vfio: Set IOMMU page size as per host
- supported page size
-Message-ID: <20201030062606-mutt-send-email-mst@kernel.org>
-References: <20201008171558.410886-1-jean-philippe@linaro.org>
- <20201008171558.410886-9-jean-philippe@linaro.org>
- <20201008152254.7bf6d8a7@w520.home>
-MIME-Version: 1.0
-In-Reply-To: <20201008152254.7bf6d8a7@w520.home>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=6Vj7rJ1HbGvjo2klZQHezr8aeMv8wuLNCnIvPj2MkoI=;
+ b=jKQbraVGbb8KJ8MWlth4Apeahw8Rd17xtdPMZ4BuQTeb8OHbqsgMKlRV3GZJBKo1Hq
+ tHgcpuUy8M0dfEgER3FcIxrCbXRYNodlEDbEvmU8zD3cuKf0Grvj8cObHjFh/72ZAF8S
+ KIP+CPVPzaXF4ZT0cyCoAGPCmKVNp6mjV0/nwysAHb+fU2ONWiD2gv+8lj4xxVO1PYwM
+ lFN0BYQyMkwE1sa0UolfjUDnccPl5MsQCy6NfOxEiyybGGuhFgQ56Syo6B6mzVEkOaEg
+ 8GWUcy8NJWFfwHItFfbPGz2aoVBRHXw/EAqh97vhWy+FT3eiSfJO3j5EBihKfcThZ+Vx
+ HjkQ==
+X-Gm-Message-State: AOAM530qirtYq8S0klPUw9baTDDhSc0Heyh2nAkx380An/9dAALQy4qT
+ CeFH30NfjXiKd0JWzlKcC6aueRuo4zziYw==
+X-Google-Smtp-Source: ABdhPJzMYW+bQZlbKZ8CP4O35XO8tAPKxBma9WxRixH9mpmMGXfv08/NA1jtFAaFPumlbOEdNQ/j5A==
+X-Received: by 2002:a63:845:: with SMTP id 66mr1559645pgi.318.1604053712735;
+ Fri, 30 Oct 2020 03:28:32 -0700 (PDT)
+Received: from software.domain.org ([45.77.13.216])
+ by smtp.gmail.com with ESMTPSA id v79sm6062146pfc.197.2020.10.30.03.28.29
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 30 Oct 2020 03:28:32 -0700 (PDT)
+From: Huacai Chen <zltjiangshi@gmail.com>
+X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH V16 6/6] docs/system: Update MIPS machine documentation
+Date: Fri, 30 Oct 2020 18:25:41 +0800
+Message-Id: <1604053541-27822-7-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1604053541-27822-1-git-send-email-chenhc@lemote.com>
+References: <1604053541-27822-1-git-send-email-chenhc@lemote.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,54 +99,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, qemu-devel@nongnu.org,
- peterx@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com,
- bbhushan2@marvell.com
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhc@lemote.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 08, 2020 at 03:22:54PM -0600, Alex Williamson wrote:
-> On Thu,  8 Oct 2020 19:15:56 +0200
-> Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
-> 
-> > From: Bharat Bhushan <bbhushan2@marvell.com>
-> > 
-> > Set IOMMU supported page size mask same as host Linux supported page
-> > size mask.
-> > 
-> > Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > ---
-> >  hw/vfio/common.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > index 13471ae2943..e66054b02a7 100644
-> > --- a/hw/vfio/common.c
-> > +++ b/hw/vfio/common.c
-> > @@ -636,6 +636,14 @@ static void vfio_listener_region_add(MemoryListener *listener,
-> >                              int128_get64(llend),
-> >                              iommu_idx);
-> >  
-> > +        ret = memory_region_iommu_set_page_size_mask(giommu->iommu,
-> > +                                                     container->pgsizes,
-> > +                                                     &err);
-> > +        if (ret) {
-> > +            g_free(giommu);
-> > +            goto fail;
-> > +        }
-> > +
-> >          ret = memory_region_register_iommu_notifier(section->mr, &giommu->n,
-> >                                                      &err);
-> >          if (ret) {
-> 
-> Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Update MIPS machine documentation to add Loongson-3 based machine description.
 
-This one too, seems independent of the rest of the
-patchset and can be merged separately, right?
-If so
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+---
+ docs/system/target-mips.rst | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+diff --git a/docs/system/target-mips.rst b/docs/system/target-mips.rst
+index cd2a931..138441b 100644
+--- a/docs/system/target-mips.rst
++++ b/docs/system/target-mips.rst
+@@ -84,6 +84,16 @@ The Fuloong 2E emulation supports:
+ 
+ -  RTL8139D as a network card chipset
+ 
++The Loongson-3 virtual platform emulation supports:
++
++-  Loongson 3A CPU
++
++-  LIOINTC as interrupt controller
++
++-  GPEX and virtio as peripheral devices
++
++-  Both KVM and TCG supported
++
+ The mipssim pseudo board emulation provides an environment similar to
+ what the proprietary MIPS emulator uses for running Linux. It supports:
+ 
+-- 
+2.7.0
 
 
