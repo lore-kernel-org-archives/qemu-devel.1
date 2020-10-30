@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1530DC00A89
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 18:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F4F2C4741F
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 18:12:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E376206E5
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 18:10:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40634206E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 18:12:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xlBHFdmh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E376206E5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HpJEUqpV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40634206E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYYra-0003vQ-EP
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 14:10:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44824)
+	id 1kYYt0-0005Pc-3H
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 14:12:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1kYYmo-000587-1f
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 14:06:03 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:45394)
+ id 1kYYmt-00059Y-Ce
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 14:06:08 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:38254)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1kYYmf-0004q3-2V
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 14:05:58 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id a9so7413718wrg.12
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 11:05:51 -0700 (PDT)
+ id 1kYYmn-0004qz-Pc
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 14:06:07 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id l8so3745943wmg.3
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 11:05:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Ej1fodcMaFb0u/aG6D5WFwOmMShNXQ/JZRK7Jgg8zcU=;
- b=xlBHFdmhXjztVOxAH++ajnfav437zwW1ucZZwyrJKmfe8GNEdDAGnDR+ZkyT6SVz/v
- esCnG92y5+82iM778VESCuSyABhC+Bjse0dy3G8LYRYP9GN7N5NWyWmAGdGbav9cw/2W
- E+lJxMXFZuo4ENIntUCbHWEGxDBv5CwF0nuxhjoNM6L2p8uYoSCQpgXzKjLuWaAv7BTg
- RlG1eA2NwkLyf5QhDpxfpWrM8Q8k5FHNYbgcSTNgSdz/jUTV52zUMID+Uxpa5sOHkCos
- cLuBl5Y/1xiaU574aaBeXQh4h5R8DVY4JyoQIPDsws/GltTK4PiEomQfs5epJkFy3Arz
- DLHw==
+ bh=Dg6KgMRhe+BDU/aQn0+rRvWHE//ly0GmnJbDrG3nhDE=;
+ b=HpJEUqpVFuZPcKweNR+djPDKqDFedR/o2qpdMNLvABKExA2TPXSgJ7JxXoWngFAmx3
+ V/NSmJrOk5L+nMXKZHqTnYv+KjSjL7i4mQKUT0XxTnuLbGTgDuqpNtkvFrlMb4+fXEHW
+ gWZqqQN75cbM0s7SYbg4+gFuxcXN6U7bsyEEbic1jq/ILoMo03CMZa437sZavEXUIUIl
+ oDbWFkJ+81nhKA7rZbExldBmTffNe1cyKGk9TwS9zo1btTje3owy1dnTosr3iXWi8PYt
+ WdurYylCGWV2unzSmAyVGhGoG1yg+td/zuTI8/h/HmsHk4xX3LFLOyzV9xYNFd5wRL35
+ jFDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Ej1fodcMaFb0u/aG6D5WFwOmMShNXQ/JZRK7Jgg8zcU=;
- b=ual1/JxYYhxFZHt42anllGgvrmLndH/C638zvzCV4950IqeoViTIhY6nrrfZPOOLnP
- 205D1i+0uia5DYL3tXM3KDPXMh2/wh8BlBadQKNZR3Cox4+hRc//FoEIwepU9rJhL0Wp
- Bz38B98LEoFeC0lxN3eKfu9/Xjs0sBbYOiicIUzxLhWOpWu3+IIHf3Q7KHPhODRUruPA
- 7COcdNF0Ks0SiCPse5/xO0baji8jgh8FfG6d7dpYZy49PLMMjinIhvqfkzzqwt/XXufO
- w5U8f6qA4VyVetFc9oPTfpq2QztwJgVdAkCMuR6QCDMHWi1EnaFvLc0mJHcKLuAKlSUt
- Py0Q==
-X-Gm-Message-State: AOAM532tH9SQMmd42Eveb/Y3DEC8WaqW+ILOgqdXw8qG6kK6aDe21Qbd
- uksasJtuDEKflfqjlgKkeO2Stg==
-X-Google-Smtp-Source: ABdhPJzTChbKCWnZ4AHdX0vjIlWD00tnrSOJrTIdekAes8OFpua+LUu3B2xS/66oyVhrrZdxhSbNHw==
-X-Received: by 2002:adf:ec47:: with SMTP id w7mr4714098wrn.253.1604081150164; 
- Fri, 30 Oct 2020 11:05:50 -0700 (PDT)
+ bh=Dg6KgMRhe+BDU/aQn0+rRvWHE//ly0GmnJbDrG3nhDE=;
+ b=EK94SQTvEhGGojHxfq64a9uSmxPF8+4WGuEmUhBMyNqQtxsus2mxHRkxCfdBazeCUW
+ N+E27qviu7bozgpPZsHnY9PtNoYrQxp5jZ6xniwurIXbYM9/Jj/BHuitvRuYaNSTd58/
+ oARP6wRBWxo8/JJ0MtnNSAJNGE1ZPI4MQPUrk3X0T3YCJE07k22nusAmFy3aKv6L1VYj
+ C+qcOyF6ijnPIJE7XpFvcJhuqswK8lIHLNLkuBEtEnbecUwLqAwSoV14I1rR8uFMzDpM
+ R8eqkuKCa3IKt97cm5r1Uo221/9UEsT68eFf4yGAD/d4ONZ0dBZH44XehzxNbWxgy64k
+ SLLg==
+X-Gm-Message-State: AOAM532Yh+9vKI7ORtv86aicveW/ElgniTPcL7EJ61c1hcd3qh41SCXZ
+ RN+L/ovM73jGJcVT+NUSyrnToA==
+X-Google-Smtp-Source: ABdhPJy3/qP4TMDnHcXus1pOkM+f0hcMY2/bDgqtnQRcC9NNwauMYaaelvovxL5LYEb6mZDalSqDLw==
+X-Received: by 2002:a1c:e006:: with SMTP id x6mr4150190wmg.107.1604081158148; 
+ Fri, 30 Oct 2020 11:05:58 -0700 (PDT)
 Received: from localhost.localdomain
  ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
- by smtp.gmail.com with ESMTPSA id u3sm10044438wro.33.2020.10.30.11.05.49
+ by smtp.gmail.com with ESMTPSA id u3sm10044438wro.33.2020.10.30.11.05.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Oct 2020 11:05:49 -0700 (PDT)
+ Fri, 30 Oct 2020 11:05:57 -0700 (PDT)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: eric.auger@redhat.com,
 	alex.williamson@redhat.com
-Subject: [PATCH v11 03/10] virtio-iommu: Add memory notifiers for map/unmap
-Date: Fri, 30 Oct 2020 19:05:03 +0100
-Message-Id: <20201030180510.747225-4-jean-philippe@linaro.org>
+Subject: [PATCH v11 09/10] virtio-iommu: Set supported page size mask
+Date: Fri, 30 Oct 2020 19:05:09 +0100
+Message-Id: <20201030180510.747225-10-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.29.1
 In-Reply-To: <20201030180510.747225-1-jean-philippe@linaro.org>
 References: <20201030180510.747225-1-jean-philippe@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=jean-philippe@linaro.org; helo=mail-wr1-x42e.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=jean-philippe@linaro.org; helo=mail-wm1-x32a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -110,129 +110,104 @@ Sender: "Qemu-devel"
 
 From: Bharat Bhushan <bbhushan2@marvell.com>
 
-Extend VIRTIO_IOMMU_T_MAP/UNMAP request to notify memory listeners. It
-will call VFIO notifier to map/unmap regions in the physical IOMMU.
+The virtio-iommu device can deal with arbitrary page sizes for virtual
+endpoints, but for endpoints assigned with VFIO it must follow the page
+granule used by the host IOMMU driver.
+
+Implement the interface to set the vIOMMU page size mask, called by VFIO
+for each endpoint. We assume that all host IOMMU drivers use the same
+page granule (the host page granule). Override the page_size_mask field
+in the virtio config space.
 
 Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
-v11:
-* Forward permissions from the MAP request
-* Don't notify MMIO mappings
+v11: Simplify the update logic slightly
 ---
- hw/virtio/virtio-iommu.c | 56 ++++++++++++++++++++++++++++++++++++++++
- hw/virtio/trace-events   |  2 ++
- 2 files changed, 58 insertions(+)
+ hw/virtio/virtio-iommu.c | 50 ++++++++++++++++++++++++++++++++++++++++
+ hw/virtio/trace-events   |  1 +
+ 2 files changed, 51 insertions(+)
 
 diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index a5c2d69aad6..7dd15c5eacd 100644
+index 78e07aa40a5..fc5c75d6933 100644
 --- a/hw/virtio/virtio-iommu.c
 +++ b/hw/virtio/virtio-iommu.c
-@@ -125,6 +125,51 @@ static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
-     }
+@@ -899,6 +899,55 @@ static int virtio_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu_mr,
+     return 0;
  }
  
-+static void virtio_iommu_notify_map(IOMMUMemoryRegion *mr, hwaddr virt_start,
-+                                    hwaddr virt_end, hwaddr paddr,
-+                                    uint32_t flags)
++/*
++ * The default mask (TARGET_PAGE_MASK) is the smallest supported guest granule,
++ * for example 0xfffffffffffff000. When an assigned device has page size
++ * restrictions due to the hardware IOMMU configuration, apply this restriction
++ * to the mask.
++ */
++static int virtio_iommu_set_page_size_mask(IOMMUMemoryRegion *mr,
++                                           uint64_t new_mask,
++                                           Error **errp)
 +{
-+    IOMMUTLBEntry entry;
-+    IOMMUAccessFlags perm = IOMMU_ACCESS_FLAG(flags & VIRTIO_IOMMU_MAP_F_READ,
-+                                              flags & VIRTIO_IOMMU_MAP_F_WRITE);
++    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
++    VirtIOIOMMU *s = sdev->viommu;
++    uint64_t cur_mask = s->config.page_size_mask;
 +
-+    if (!(mr->iommu_notify_flags & IOMMU_NOTIFIER_MAP) ||
-+        (flags & VIRTIO_IOMMU_MAP_F_MMIO) || !perm) {
-+        return;
++    trace_virtio_iommu_set_page_size_mask(mr->parent_obj.name, cur_mask,
++                                          new_mask);
++
++    if ((cur_mask & new_mask) == 0) {
++        error_setg(errp, "virtio-iommu page mask 0x%"PRIx64
++                   " is incompatible with mask 0x%"PRIx64, cur_mask, new_mask);
++        return -1;
 +    }
 +
-+    trace_virtio_iommu_notify_map(mr->parent_obj.name, virt_start, virt_end,
-+                                  paddr, perm);
++    /*
++     * After the machine is finalized, we can't change the mask anymore. If by
++     * chance the hotplugged device supports the same granule, we can still
++     * accept it. Having a different masks is possible but the guest will use
++     * sub-optimal block sizes, so warn about it.
++     */
++    if (qdev_hotplug) {
++        int new_granule = ctz64(new_mask);
++        int cur_granule = ctz64(cur_mask);
 +
-+    entry.target_as = &address_space_memory;
-+    entry.addr_mask = virt_end - virt_start;
-+    entry.iova = virt_start;
-+    entry.perm = perm;
-+    entry.translated_addr = paddr;
-+
-+    memory_region_notify_iommu(mr, 0, entry);
-+}
-+
-+static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr virt_start,
-+                                      hwaddr virt_end)
-+{
-+    IOMMUTLBEntry entry;
-+
-+    if (!(mr->iommu_notify_flags & IOMMU_NOTIFIER_UNMAP)) {
-+        return;
++        if (new_granule != cur_granule) {
++            error_setg(errp, "virtio-iommu page mask 0x%"PRIx64
++                       " is incompatible with mask 0x%"PRIx64, cur_mask,
++                       new_mask);
++            return -1;
++        } else if (new_mask != cur_mask) {
++            warn_report("virtio-iommu page mask 0x%"PRIx64
++                        " does not match 0x%"PRIx64, cur_mask, new_mask);
++        }
++        return 0;
 +    }
 +
-+    trace_virtio_iommu_notify_unmap(mr->parent_obj.name, virt_start, virt_end);
-+
-+    entry.target_as = &address_space_memory;
-+    entry.addr_mask = virt_end - virt_start;
-+    entry.iova = virt_start;
-+    entry.perm = IOMMU_NONE;
-+    entry.translated_addr = 0;
-+
-+    memory_region_notify_iommu(mr, 0, entry);
++    s->config.page_size_mask &= new_mask;
++    return 0;
 +}
 +
- static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
+ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
  {
-     if (!ep->domain) {
-@@ -315,6 +360,7 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
-     VirtIOIOMMUDomain *domain;
-     VirtIOIOMMUInterval *interval;
-     VirtIOIOMMUMapping *mapping;
-+    VirtIOIOMMUEndpoint *ep;
- 
-     if (flags & ~VIRTIO_IOMMU_MAP_F_MASK) {
-         return VIRTIO_IOMMU_S_INVAL;
-@@ -344,6 +390,11 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
- 
-     g_tree_insert(domain->mappings, interval, mapping);
- 
-+    QLIST_FOREACH(ep, &domain->endpoint_list, next) {
-+        virtio_iommu_notify_map(ep->iommu_mr, virt_start, virt_end, phys_start,
-+                                flags);
-+    }
-+
-     return VIRTIO_IOMMU_S_OK;
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -1130,6 +1179,7 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
+     imrc->translate = virtio_iommu_translate;
+     imrc->replay = virtio_iommu_replay;
+     imrc->notify_flag_changed = virtio_iommu_notify_flag_changed;
++    imrc->iommu_set_page_size_mask = virtio_iommu_set_page_size_mask;
  }
  
-@@ -356,6 +407,7 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-     VirtIOIOMMUMapping *iter_val;
-     VirtIOIOMMUInterval interval, *iter_key;
-     VirtIOIOMMUDomain *domain;
-+    VirtIOIOMMUEndpoint *ep;
-     int ret = VIRTIO_IOMMU_S_OK;
- 
-     trace_virtio_iommu_unmap(domain_id, virt_start, virt_end);
-@@ -373,6 +425,10 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-         uint64_t current_high = iter_key->high;
- 
-         if (interval.low <= current_low && interval.high >= current_high) {
-+            QLIST_FOREACH(ep, &domain->endpoint_list, next) {
-+                virtio_iommu_notify_unmap(ep->iommu_mr, current_low,
-+                                          current_high);
-+            }
-             g_tree_remove(domain->mappings, iter_key);
-             trace_virtio_iommu_unmap_done(domain_id, current_low, current_high);
-         } else {
+ static const TypeInfo virtio_iommu_info = {
 diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index cf1e59de302..b87a3974069 100644
+index 982d0002a65..2060a144a2f 100644
 --- a/hw/virtio/trace-events
 +++ b/hw/virtio/trace-events
-@@ -106,6 +106,8 @@ virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
- virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
- virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
- virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype, uint64_t start, uint64_t end) "dev= %d, type=%d start=0x%"PRIx64" end=0x%"PRIx64
-+virtio_iommu_notify_map(const char *name, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start, uint32_t flags) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64" phys_start=0x%"PRIx64" flags=%d"
-+virtio_iommu_notify_unmap(const char *name, uint64_t virt_start, uint64_t virt_end) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64
+@@ -109,6 +109,7 @@ virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype, uint64_t start,
+ virtio_iommu_notify_map(const char *name, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start, uint32_t flags) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64" phys_start=0x%"PRIx64" flags=%d"
+ virtio_iommu_notify_unmap(const char *name, uint64_t virt_start, uint64_t virt_end) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64
+ virtio_iommu_remap(const char *name, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64" phys_start=0x%"PRIx64
++virtio_iommu_set_page_size_mask(const char *name, uint64_t old, uint64_t new) "mr=%s old_mask=0x%"PRIx64" new_mask=0x%"PRIx64
+ virtio_iommu_notify_flag_add(const char *name) "add notifier to mr %s"
+ virtio_iommu_notify_flag_del(const char *name) "del notifier from mr %s"
  
- # virtio-mem.c
- virtio_mem_send_response(uint16_t type) "type=%" PRIu16
 -- 
 2.29.1
 
