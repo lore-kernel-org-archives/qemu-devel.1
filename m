@@ -2,61 +2,62 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BDD2C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 04:06:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE12C00A89
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 04:37:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9884B20706
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 04:06:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9884B20706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fennosys.fi
+	by mail.kernel.org (Postfix) with ESMTPS id 39283221E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 04:37:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39283221E2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYLgE-0000nI-QW
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 00:06:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57782)
+	id 1kYMAc-0005Xw-34
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 00:37:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <reader@fennosys.fi>)
- id 1kYLcW-0000HV-6S
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 00:02:32 -0400
-Received: from smtp.fennosys.fi ([62.241.241.27]:45662 helo=mail.fennosys.fi)
+ (Exim 4.90_1) (envelope-from <zhangxinhao1@huawei.com>)
+ id 1kYM9W-0004Tg-SX; Fri, 30 Oct 2020 00:36:38 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:2119)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <reader@fennosys.fi>)
- id 1kYLcT-0005CI-NL
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 00:02:31 -0400
-Received: (qmail 9371 invoked by uid 210); 30 Oct 2020 04:02:22 -0000
-Received: from 49.158.119.22 (antti@fennosys.fi@49.158.119.22) by
- mail01-fennosys (envelope-from <reader@fennosys.fi>,
- uid 201) with qmail-scanner-2.08st 
- (clamdscan: 0.98.7/25972. spamassassin: 3.4.0. perlscan: 2.08st.  
- Clear:RC:1(49.158.119.22):. 
- Processed in 0.035032 secs); 30 Oct 2020 04:02:22 -0000
-Received: from unknown (HELO gail) (antti@fennosys.fi@49.158.119.22)
- by 10.200.232.5 with ESMTPA; 30 Oct 2020 04:02:22 -0000
-Date: Fri, 30 Oct 2020 12:02:18 +0800
-From: Antti Antinoja <reader@fennosys.fi>
-To: qemu-devel@nongnu.org
-Subject: Live migration not possible from 5.0 to 5.1?
-Message-Id: <20201030120218.57ce841be22970274491be08@fennosys.fi>
-X-Mailer: Sylpheed 3.7.0
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=62.241.241.27; envelope-from=reader@fennosys.fi;
- helo=mail.fennosys.fi
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 00:02:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <zhangxinhao1@huawei.com>)
+ id 1kYM9U-00016b-9q; Fri, 30 Oct 2020 00:36:38 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CMqJX2t6Wz6vgC;
+ Fri, 30 Oct 2020 12:36:28 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Fri, 30 Oct 2020
+ 12:36:18 +0800
+From: Xinhao Zhang <zhangxinhao1@huawei.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH v3 3/3] hw/9pfs : add space before the open parenthesis '('
+Date: Fri, 30 Oct 2020 12:35:15 +0800
+Message-ID: <20201030043515.1030223-3-zhangxinhao1@huawei.com>
+X-Mailer: git-send-email 2.29.0-rc1
+In-Reply-To: <20201030043515.1030223-1-zhangxinhao1@huawei.com>
+References: <20201030043515.1030223-1-zhangxinhao1@huawei.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35;
+ envelope-from=zhangxinhao1@huawei.com; helo=szxga07-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 23:35:23
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,42 +71,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alex.chen@huawei.com, qemu-trivial@nongnu.org, qemu_oss@crudebyte.com,
+ groug@kaod.org, dengkai1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi All,
+Fix code style. Space required before the open parenthesis '('.
 
-I couldn't find any mention about live migration incompatibility between 5.0 and 5.1 in the release notes but at least on our AMD based platform live migration from 5.0 to 5.1 is not possible.
+Signed-off-by: Xinhao Zhang <zhangxinhao1@huawei.com>
+Signed-off-by: Kai Deng <dengkai1@huawei.com>
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/cofs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The upgraded host had identical versions with it's pair before the upgrade was started:
-* qemu 5.0.0-r2
-* kernel 5.7.17
-
-After upgrade:
-* qemu 5.1.0-r1
-* kernel 5.8.16
-
-After reverting qemu back to 5.0.0-r2 migration worked normally.
-
-On the sending end "info migrate" shows:
-(qemu) info migrate
-info migrate
-globals:
-store-global-state: on
-only-migratable: off
-send-configuration: on
-send-section-footer: on
-decompress-error-check: on
-clear-bitmap-shift: 18
-Migration status: failed (Unable to write to socket: Broken pipe)
-total time: 0 milliseconds
-
-At least once the receiving end died (while running 5.1.0-r1). All attempts resulted a "Broken pipe" error on the sending (5.0.0-r2) end.
-
-Cheers,
-Antti
-
+diff --git a/hw/9pfs/cofs.c b/hw/9pfs/cofs.c
+index 55991916ec..0b321b456e 100644
+--- a/hw/9pfs/cofs.c
++++ b/hw/9pfs/cofs.c
+@@ -23,7 +23,7 @@ static ssize_t __readlink(V9fsState *s, V9fsPath *path, V9fsString *buf)
+     ssize_t len, maxlen = PATH_MAX;
+ 
+     buf->data = g_malloc(PATH_MAX);
+-    for(;;) {
++    for (;;) {
+         len = s->ops->readlink(&s->ctx, path, buf->data, maxlen);
+         if (len < 0) {
+             g_free(buf->data);
 -- 
-Antti Antinoja <reader@fennosys.fi>
+2.29.0-rc1
+
 
