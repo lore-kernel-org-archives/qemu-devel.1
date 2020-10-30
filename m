@@ -2,101 +2,69 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD41C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF898C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:57:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 417A7206ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:55:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDE34206ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:57:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kj0fbqhM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 417A7206ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="YT1tjRC5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE34206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYTvr-0003GM-2N
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 08:55:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53902)
+	id 1kYTxt-0005Bl-Jj
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 08:57:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmr-0000rV-JX
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34172)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmp-0000m1-Sv
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604061942;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=509YkEUpGBV1ErtRUsNd1psMy3xW+1ruB0fSsKITRuw=;
- b=Kj0fbqhMbrD8KrQg+FFD++cUXlv5uT7Z6BWDQYzkUI/yzsqH0QkwKH/DmK3Oxp9SqqNayi
- sjzqB588sChaYseAWJ5oat8oWQBs1cP8Xcf+DOFMyo4K/vkAc6Wzcn66exkyxETdgwGjwq
- AcmpWbvt7MhiEgJwb4VU7wf/J508UNA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-XDvEhtB3OUGMLzKGcyWpug-1; Fri, 30 Oct 2020 08:45:40 -0400
-X-MC-Unique: XDvEhtB3OUGMLzKGcyWpug-1
-Received: by mail-wr1-f69.google.com with SMTP id t11so2619292wrv.10
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 05:45:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=509YkEUpGBV1ErtRUsNd1psMy3xW+1ruB0fSsKITRuw=;
- b=iOyakfwa3XU7T/pWED7Q9EuDcGuOWtEbqIR23XwWYT9Sy/zNSkeIF0QVxfXuI8yonn
- avfUlRLORCgWWhnYlaEGguDIyaLpXqBxhmuzuOK29MK1cyW19ac8O47vgRYgOf7jTDB6
- 75pqvgh+UIfpOfG2KBKyc3YNu9YAyegemK2kbImW4VT2aYUhmpKJGl/7h82N8HOjz3gr
- q1lkBByJ6+vj1yy4cYgy8Z1E2G4mimrBSWgiLhDQfq5xJYPsidTwnf9BjRgWmmjCe54G
- zdGy/hhgtHeYC5qa0U49RtLwn3Mj3s3esGqqfbQMLYLjoXCd4bHmCb4/rKDzqHYk6CsW
- sJcg==
-X-Gm-Message-State: AOAM531p+JnHSiwo5CVo3MDIz/mPlhgbC+4C3quThzZaRukrnyDdbEEt
- vh1JD5bfY0pnL+dVQCtrqDZ1HBsVs5bI10SpXtjIVlDcX9onTzzT7S7YsR68t8bRwfhci4at6ae
- 1MOqtwFDFdF27oXU=
-X-Received: by 2002:adf:f3c7:: with SMTP id g7mr3150539wrp.394.1604061939079; 
- Fri, 30 Oct 2020 05:45:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxW2gRd5skutD/4hjKT7rnhkZQYjgaIPNjN5aQtq2s6a92ZLCTTAzcrIojcPp7UFH1c3rpOAQ==
-X-Received: by 2002:adf:f3c7:: with SMTP id g7mr3150520wrp.394.1604061938861; 
- Fri, 30 Oct 2020 05:45:38 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id 71sm11021534wrm.20.2020.10.30.05.45.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Oct 2020 05:45:38 -0700 (PDT)
-Date: Fri, 30 Oct 2020 08:45:36 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
+ (Exim 4.90_1)
+ (envelope-from <03f68c7ec08064e20f43797f4eb4305ad21e1e8e@lizzy.crudebyte.com>)
+ id 1kYTwI-0003xM-3K
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:55:30 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:33871)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <03f68c7ec08064e20f43797f4eb4305ad21e1e8e@lizzy.crudebyte.com>)
+ id 1kYTwF-0003lo-Fy
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:55:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
+ Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
+ Content-Description; bh=9s02O/KYcd7A7lc/0kRbCK6nYi9tDPfa0S4ictjN0vw=; b=YT1tj
+ RC5+bOA3w0oqYHkaeIn4abX1BKAUWzEswOakZFJYTIL8ZgdK8ZydioFzkiB/iib2iavbnt4YPSFqH
+ B8T68N6/XVadkdHcwM3BSOBOMWu7ui02M/82ENeVUY+znJTNVgnyRWayjKw6WvRy8zd+GsMhKrPpV
+ PymnTrIC4/nhsGqngu++L9dcfAdzLAo9onvKHUkwSa088+NnHmN8Vo011iOx9FbAKsNZwTmMlu/j7
+ Q1L8q5EFKeIb5Kkf+saDABEUGs1zCdmab1uxXy3+dtUdaGbby6yadGDQvgnqM3JmLsCU/0GUkiW7c
+ 2jNkmVoSDsE+jE3ZqXHuTIgbVbjlw==;
+Message-Id: <03f68c7ec08064e20f43797f4eb4305ad21e1e8e.1604061839.git.qemu_oss@crudebyte.com>
+In-Reply-To: <cover.1604061839.git.qemu_oss@crudebyte.com>
+References: <cover.1604061839.git.qemu_oss@crudebyte.com>
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Date: Fri, 30 Oct 2020 13:07:03 +0100
+Subject: [PATCH v2 2/2] tests/9pfs: fix coverity error in
+ create_local_test_dir()
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/15] virtio: skip guest index check on device load
-Message-ID: <20201030124454.854286-15-mst@redhat.com>
-References: <20201030124454.854286-1-mst@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <20201030124454.854286-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 02:24:40
+Cc: Greg Kurz <groug@kaod.org>
+Received-SPF: none client-ip=91.194.90.13;
+ envelope-from=03f68c7ec08064e20f43797f4eb4305ad21e1e8e@lizzy.crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 07:59:50
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,66 +77,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Felipe Franciosi <felipe@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Felipe Franciosi <felipe@nutanix.com>
+Coverity wants the return value of mkdir() to be checked:
 
-QEMU must be careful when loading device state off migration streams to
-prevent a malicious source from exploiting the emulator. Overdoing these
-checks has the side effect of allowing a guest to "pin itself" in cloud
-environments by messing with state which is entirely in its control.
+  /qemu/tests/qtest/libqos/virtio-9p.c: 48 in create_local_test_dir()
+  42     /* Creates the directory for the 9pfs 'local' filesystem driver to
+  access. */
+  43     static void create_local_test_dir(void)
+  44     {
+  45         struct stat st;
+  46
+  47         g_assert(local_test_path != NULL);
+  >>> CID 1435963:  Error handling issues  (CHECKED_RETURN)
+  >>> Calling "mkdir(local_test_path, 511U)" without checking return value.
+  This library function may fail and return an error code.
+  48         mkdir(local_test_path, 0777);
+  49
+  50         /* ensure test directory exists now ... */
+  51         g_assert(stat(local_test_path, &st) == 0);
+  52         /* ... and is actually a directory */
+  53         g_assert((st.st_mode & S_IFMT) == S_IFDIR);
 
-Similarly to what f3081539 achieved in usb_device_post_load(), this
-commit removes such a check from virtio_load(). Worth noting, the result
-of a load without this check is the same as if a guest enables a VQ with
-invalid indexes to begin with. That is, the virtual device is set in a
-broken state (by the datapath handler) and must be reset.
+So let's just do that and log an info-level message at least, because we
+actually only care if the required directory exists and we do have an
+existence check for that in place already.
 
-Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-Message-Id: <20201028134643.110698-1-felipe@nutanix.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reported-by: Coverity (CID 1435963)
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- hw/virtio/virtio.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ tests/qtest/libqos/virtio-9p.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 6f8f865aff..ceb58fda6c 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -17,6 +17,7 @@
- #include "trace.h"
- #include "exec/address-spaces.h"
- #include "qemu/error-report.h"
-+#include "qemu/log.h"
- #include "qemu/main-loop.h"
- #include "qemu/module.h"
- #include "hw/virtio/virtio.h"
-@@ -3160,12 +3161,12 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-             nheads = vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].last_avail_idx;
-             /* Check it isn't doing strange things with descriptor numbers. */
-             if (nheads > vdev->vq[i].vring.num) {
--                error_report("VQ %d size 0x%x Guest index 0x%x "
--                             "inconsistent with Host index 0x%x: delta 0x%x",
--                             i, vdev->vq[i].vring.num,
--                             vring_avail_idx(&vdev->vq[i]),
--                             vdev->vq[i].last_avail_idx, nheads);
--                return -1;
-+                qemu_log_mask(LOG_GUEST_ERROR,
-+                              "VQ %d size 0x%x Guest index 0x%x "
-+                              "inconsistent with Host index 0x%x: delta 0x%x",
-+                              i, vdev->vq[i].vring.num,
-+                              vring_avail_idx(&vdev->vq[i]),
-+                              vdev->vq[i].last_avail_idx, nheads);
-             }
-             vdev->vq[i].used_idx = vring_used_idx(&vdev->vq[i]);
-             vdev->vq[i].shadow_avail_idx = vring_avail_idx(&vdev->vq[i]);
+diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
+index 6b22fa0e9a..8459a3ee58 100644
+--- a/tests/qtest/libqos/virtio-9p.c
++++ b/tests/qtest/libqos/virtio-9p.c
+@@ -48,9 +48,14 @@ static void init_local_test_path(void)
+ static void create_local_test_dir(void)
+ {
+     struct stat st;
++    int res;
+ 
+     g_assert(local_test_path != NULL);
+-    mkdir(local_test_path, 0777);
++    res = mkdir(local_test_path, 0777);
++    if (res < 0) {
++        g_test_message("mkdir('%s') failed: %s", local_test_path,
++                       strerror(errno));
++    }
+ 
+     /* ensure test directory exists now ... */
+     g_assert(stat(local_test_path, &st) == 0);
 -- 
-MST
+2.20.1
 
 
