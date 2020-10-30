@@ -2,99 +2,90 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0756CC4741F
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C985BC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:35:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E82120739
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:35:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17DC820739
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:35:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kklmOFf/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E82120739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RUI9yWx5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17DC820739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYKFr-00081X-AO
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 22:35:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41172)
+	id 1kYKGE-0000VI-0L
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 22:35:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=56530b5a8=dmitry.fomichev@wdc.com>)
- id 1kYKDt-0005pt-Qh; Thu, 29 Oct 2020 22:33:01 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:10998)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=56530b5a8=dmitry.fomichev@wdc.com>)
- id 1kYKDr-0006dn-7u; Thu, 29 Oct 2020 22:33:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1604025178; x=1635561178;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=8ARzR47N/qoaJcuPun/pbphvgstWibX4rHpfNfh048o=;
- b=kklmOFf/IiqSzl4EtiTXKZSgiIg2aavIC1Da9S8c4zZL/f37Qd9VjIzB
- k/kI1TtZDAZkLzc/ROI7FkZR5kwEJ9nbCIFMwV+txr6klH2yKluKjOhYg
- W70jLSa5Me4I1OrBMT/3ehmFG1zejBWRioI70xf8pFyzZFwYi/gbb7pPb
- ulGIqAv/OJLFc09k46IzVYw/G4ZmDxmvxNocqBsjbm0Zbk6AminDGqCP8
- qN0/uHh3/bmC45ehb7wtgTpQHjIC8BesfApMlqhg9+GQXJ1bOT+uUUhQV
- OCjHmqUARijWuTgeONj0w9RdHLxH77D4FBdt6I1HCUY3CspmiTHpCH0lW A==;
-IronPort-SDR: OOFIxDUeB2m07c1opadwsDBGQHoqs+f6Vo9PM91Ed+fQtWIhpHhuCNE8JeFlzoCZiNdrVtINxj
- DJcr/B4AzNxIQoTbHtEZerPILOjTYEWMC/Vs5ZaZwJuWtxfODXEyEUyfvZDpC8gsTCIC1Fggh2
- tXubWuFcCIxGLBClUTCrAbXb4husaw/Thyy+JZ58L+MZdPYaELlQmMYzD1QqRtc+bkwupH3/B1
- cHt0guZIynG+ZimXRYHhs3BsQ7qGjjOXNH0/nXLEsyA9jHzJUt+DISoI3ZvVLISD+Q7AEAJN53
- szc=
-X-IronPort-AV: E=Sophos;i="5.77,431,1596470400"; d="scan'208";a="155748069"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 30 Oct 2020 10:32:57 +0800
-IronPort-SDR: ngMg7lPAbctA9MWiGKBqjU2Ol8TbxTO159YVS7BXAC1VZUeMsUjRWNGMwHv3DO3z/s//imYnAJ
- q8HwUno/ZaDEqDGb8n6vyZklp+c+NYmKBisU5rWS1PoBcMZi1x0+W3Kjw7wGJ07f5ebTTdD8su
- X864T9Qc9SxqfdjVN2tgRpDH6mnCeouB2SEAkZzWXcvgba8tTkzr1eO/VIgjj5PouLdQD103DA
- xUoG1gorPBMiYtoLtsaZJfvIo1Za0wYHNWieVEqc3C++hPnvtQWvZ6VfeKkv4LPSGJhR3YqdGD
- YVt7CRZo7Bue8X1UzGG2z03Y
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Oct 2020 19:18:01 -0700
-IronPort-SDR: pig0vMkZbOh2jfFgVylg+DbvWke9vFC/ctMSWMtXxyrMZfPbGEKXm3O4oGV8TAo9AUad5DgY8H
- TiKxNEAk9oqnKyt5f5QNlpazOjuER0fx+8YoKW51gJq8jdsolDt23l/UG01NY+y4RDH635WPuT
- BdCiCyVZOEu8fgTtBS5+1gh4A1rCQeNub5vOYRvaSzo1g7eX+zH5Mgqnk+2uGCHhGpWOu63ydf
- ERaBth95FJ1WOyXsWOvPSTrdoSfLuxsqtvEhI/tJ8ODLW+rC7u3v8wY8CHeNc0Kt8m/dQ1CWcy
- GmM=
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 19:32:56 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
- Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
-Subject: [PATCH v8 04/11] hw/block/nvme: Merge nvme_write_zeroes() with
- nvme_write()
-Date: Fri, 30 Oct 2020 11:32:35 +0900
-Message-Id: <20201030023242.5204-5-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20201030023242.5204-1-dmitry.fomichev@wdc.com>
-References: <20201030023242.5204-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kYK7l-0005Kn-Pa
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 22:26:41 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37071)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kYK7i-0005vy-II
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 22:26:41 -0400
+Received: by mail-pg1-x541.google.com with SMTP id h6so3924595pgk.4
+ for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 19:26:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=/srvkEMVHhjFuX4GEztdA7BtJNAKhyCjy2OjjjYFdsY=;
+ b=RUI9yWx5Ixh8M4p1inbRmcRCRBOSB1rxWNuVyYBrxxZZzmNzXSaPvYj9pccDCn7B6D
+ dk/WwcOF1Ff4CCgVyw89CBegAP/BhIx4MKGiGsNz6SO1HyYTSQPjLg/t4LArloBYb0tX
+ 3o/stimnlG8DZAAOu1b8HRRYJ3qw/CSo95hIFhf8LAkTp3IBKzstiQeZYtQJaO/3y0tJ
+ 5mtEvwbKr4jZ3b4NzSquIHXJXWBofKA/qZ7idF0/EUXUtwPaywzn7XMWPPbaPoBfNiGI
+ pXqtoM7CDdK0+QM9tOTx5hGkbd/3yCj8jauni6wzzygK4Y0jTfwHOMaf+WU17ZKxqy5b
+ hXNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=/srvkEMVHhjFuX4GEztdA7BtJNAKhyCjy2OjjjYFdsY=;
+ b=Np98nVNhTMrpHwpHNP/EuFthRKvNEeqG7F+WbBs4iBBe7BAPchni7ebhCGnEAKk5Dq
+ wgNQWqB/S0YAuv30zCKhh8y58v1HxR7OcK+Rstk7eEsNTiyAfa6GO5S9lwttxSp2Kd3Q
+ 5kcrjbdwRtTjNRrTqnfCBDzsbWOnhhbyj+q9p7oCR8Kk1G8fm3UQnKXHqf5YSCWeeU2d
+ bSZT60o/uYRbrdv9TWjGAXuG3AaQyU06pcxVMW8XiLkq1Y/S8G0mXQqXDRMB8CEUCn04
+ oOKsXDJZcnEtEqfsC+DMUfStyeKkULH1zJBbjWt1F21KA5G+GeU9nPq0HgwEINA6fN6p
+ Qn1g==
+X-Gm-Message-State: AOAM530tjoeuqNevJXA36U/73WfxabL1LXufC+3HXDrZOvNjTbG13bBM
+ IBRjtvkk+kJznGcJSAEWwAxiHAt2lSPatg==
+X-Google-Smtp-Source: ABdhPJzKzloWAgDl8KsMNg+x9WyjzJ9YGL3SskZv9lNO6pX6C5tMytxDEyhmrven5nN75H7GzBQdBA==
+X-Received: by 2002:a17:90a:1903:: with SMTP id 3mr127263pjg.74.1604024795293; 
+ Thu, 29 Oct 2020 19:26:35 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id b7sm4446517pfr.171.2020.10.29.19.26.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 29 Oct 2020 19:26:34 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 11/11] target/arm: Improve do_prewiden_3d
+Date: Thu, 29 Oct 2020 19:26:18 -0700
+Message-Id: <20201030022618.785675-12-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201030022618.785675-1-richard.henderson@linaro.org>
+References: <20201030022618.785675-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.141;
- envelope-from=prvs=56530b5a8=dmitry.fomichev@wdc.com; helo=esa3.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 22:32:49
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,146 +99,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-nvme_write() now handles WRITE, WRITE ZEROES and ZONE_APPEND.
+We can use proper widening loads to extend 32-bit inputs,
+and skip the "widenfn" step.
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Reviewed-by: Niklas Cassel <Niklas.Cassel@wdc.com>
-Acked-by: Klaus Jensen <its@irrelevant.dk>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/block/nvme.c       | 72 +++++++++++++++++--------------------------
- hw/block/trace-events |  1 -
- 2 files changed, 28 insertions(+), 45 deletions(-)
+ target/arm/translate.c          |  6 +++
+ target/arm/translate-neon.c.inc | 66 ++++++++++++++++++---------------
+ 2 files changed, 43 insertions(+), 29 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 3023774484..2a33540542 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1011,32 +1011,7 @@ invalid:
-     return status | NVME_DNR;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 7611c1f0f1..29ea1eb781 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -1183,6 +1183,12 @@ static void read_neon_element64(TCGv_i64 dest, int reg, int ele, MemOp memop)
+     long off = neon_element_offset(reg, ele, memop);
+ 
+     switch (memop) {
++    case MO_SL:
++        tcg_gen_ld32s_i64(dest, cpu_env, off);
++        break;
++    case MO_UL:
++        tcg_gen_ld32u_i64(dest, cpu_env, off);
++        break;
+     case MO_Q:
+         tcg_gen_ld_i64(dest, cpu_env, off);
+         break;
+diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
+index 1c16c56e7e..59368cb243 100644
+--- a/target/arm/translate-neon.c.inc
++++ b/target/arm/translate-neon.c.inc
+@@ -1788,11 +1788,10 @@ static bool trans_Vimm_1r(DisasContext *s, arg_1reg_imm *a)
+ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
+                            NeonGenWidenFn *widenfn,
+                            NeonGenTwo64OpFn *opfn,
+-                           bool src1_wide)
++                           int src1_mop, int src2_mop)
+ {
+     /* 3-regs different lengths, prewidening case (VADDL/VSUBL/VAADW/VSUBW) */
+     TCGv_i64 rn0_64, rn1_64, rm_64;
+-    TCGv_i32 rm;
+ 
+     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+         return false;
+@@ -1804,12 +1803,12 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
+         return false;
+     }
+ 
+-    if (!widenfn || !opfn) {
++    if (!opfn) {
+         /* size == 3 case, which is an entirely different insn group */
+         return false;
+     }
+ 
+-    if ((a->vd & 1) || (src1_wide && (a->vn & 1))) {
++    if ((a->vd & 1) || (src1_mop == MO_Q && (a->vn & 1))) {
+         return false;
+     }
+ 
+@@ -1821,40 +1820,48 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
+     rn1_64 = tcg_temp_new_i64();
+     rm_64 = tcg_temp_new_i64();
+ 
+-    if (src1_wide) {
+-        read_neon_element64(rn0_64, a->vn, 0, MO_64);
++    if (src1_mop >= 0) {
++        read_neon_element64(rn0_64, a->vn, 0, src1_mop);
+     } else {
+         TCGv_i32 tmp = tcg_temp_new_i32();
+         read_neon_element32(tmp, a->vn, 0, MO_32);
+         widenfn(rn0_64, tmp);
+         tcg_temp_free_i32(tmp);
+     }
+-    rm = tcg_temp_new_i32();
+-    read_neon_element32(rm, a->vm, 0, MO_32);
++    if (src2_mop >= 0) {
++        read_neon_element64(rm_64, a->vm, 0, src2_mop);
++    } else {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        read_neon_element32(tmp, a->vm, 0, MO_32);
++        widenfn(rm_64, tmp);
++        tcg_temp_free_i32(tmp);
++    }
+ 
+-    widenfn(rm_64, rm);
+-    tcg_temp_free_i32(rm);
+     opfn(rn0_64, rn0_64, rm_64);
+ 
+     /*
+      * Load second pass inputs before storing the first pass result, to
+      * avoid incorrect results if a narrow input overlaps with the result.
+      */
+-    if (src1_wide) {
+-        read_neon_element64(rn1_64, a->vn, 1, MO_64);
++    if (src1_mop >= 0) {
++        read_neon_element64(rn1_64, a->vn, 1, src1_mop);
+     } else {
+         TCGv_i32 tmp = tcg_temp_new_i32();
+         read_neon_element32(tmp, a->vn, 1, MO_32);
+         widenfn(rn1_64, tmp);
+         tcg_temp_free_i32(tmp);
+     }
+-    rm = tcg_temp_new_i32();
+-    read_neon_element32(rm, a->vm, 1, MO_32);
++    if (src2_mop >= 0) {
++        read_neon_element64(rm_64, a->vm, 1, src2_mop);
++    } else {
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        read_neon_element32(tmp, a->vm, 1, MO_32);
++        widenfn(rm_64, tmp);
++        tcg_temp_free_i32(tmp);
++    }
+ 
+     write_neon_element64(rn0_64, a->vd, 0, MO_64);
+ 
+-    widenfn(rm_64, rm);
+-    tcg_temp_free_i32(rm);
+     opfn(rn1_64, rn1_64, rm_64);
+     write_neon_element64(rn1_64, a->vd, 1, MO_64);
+ 
+@@ -1865,14 +1872,13 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
+     return true;
  }
  
--static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
--{
--    NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
--    NvmeNamespace *ns = req->ns;
--    uint64_t slba = le64_to_cpu(rw->slba);
--    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
--    uint64_t offset = nvme_l2b(ns, slba);
--    uint32_t count = nvme_l2b(ns, nlb);
--    uint16_t status;
--
--    trace_pci_nvme_write_zeroes(nvme_cid(req), nvme_nsid(ns), slba, nlb);
--
--    status = nvme_check_bounds(n, ns, slba, nlb);
--    if (status) {
--        trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
--        return status;
--    }
--
--    block_acct_start(blk_get_stats(req->ns->blkconf.blk), &req->acct, 0,
--                     BLOCK_ACCT_WRITE);
--    req->aiocb = blk_aio_pwrite_zeroes(req->ns->blkconf.blk, offset, count,
--                                       BDRV_REQ_MAY_UNMAP, nvme_rw_cb, req);
--    return NVME_NO_COMPLETE;
--}
--
--static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req)
-+static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req, bool wrz)
- {
-     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
-     NvmeNamespace *ns = req->ns;
-@@ -1050,10 +1025,12 @@ static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req)
-     trace_pci_nvme_write(nvme_cid(req), nvme_io_opc_str(rw->opcode),
-                          nvme_nsid(ns), nlb, data_size, slba);
- 
--    status = nvme_check_mdts(n, data_size);
--    if (status) {
--        trace_pci_nvme_err_mdts(nvme_cid(req), data_size);
--        goto invalid;
-+    if (!wrz) {
-+        status = nvme_check_mdts(n, data_size);
-+        if (status) {
-+            trace_pci_nvme_err_mdts(nvme_cid(req), data_size);
-+            goto invalid;
-+        }
+-#define DO_PREWIDEN(INSN, S, EXT, OP, SRC1WIDE)                         \
++#define DO_PREWIDEN(INSN, S, OP, SRC1WIDE, SIGN)                        \
+     static bool trans_##INSN##_3d(DisasContext *s, arg_3diff *a)        \
+     {                                                                   \
+         static NeonGenWidenFn * const widenfn[] = {                     \
+             gen_helper_neon_widen_##S##8,                               \
+             gen_helper_neon_widen_##S##16,                              \
+-            tcg_gen_##EXT##_i32_i64,                                    \
+-            NULL,                                                       \
++            NULL, NULL,                                                 \
+         };                                                              \
+         static NeonGenTwo64OpFn * const addfn[] = {                     \
+             gen_helper_neon_##OP##l_u16,                                \
+@@ -1880,18 +1886,20 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
+             tcg_gen_##OP##_i64,                                         \
+             NULL,                                                       \
+         };                                                              \
+-        return do_prewiden_3d(s, a, widenfn[a->size],                   \
+-                              addfn[a->size], SRC1WIDE);                \
++        int narrow_mop = a->size == MO_32 ? MO_32 | SIGN : -1;          \
++        return do_prewiden_3d(s, a, widenfn[a->size], addfn[a->size],   \
++                              SRC1WIDE ? MO_Q : narrow_mop,             \
++                              narrow_mop);                              \
      }
  
-     status = nvme_check_bounds(n, ns, slba, nlb);
-@@ -1062,21 +1039,28 @@ static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req)
-         goto invalid;
-     }
+-DO_PREWIDEN(VADDL_S, s, ext, add, false)
+-DO_PREWIDEN(VADDL_U, u, extu, add, false)
+-DO_PREWIDEN(VSUBL_S, s, ext, sub, false)
+-DO_PREWIDEN(VSUBL_U, u, extu, sub, false)
+-DO_PREWIDEN(VADDW_S, s, ext, add, true)
+-DO_PREWIDEN(VADDW_U, u, extu, add, true)
+-DO_PREWIDEN(VSUBW_S, s, ext, sub, true)
+-DO_PREWIDEN(VSUBW_U, u, extu, sub, true)
++DO_PREWIDEN(VADDL_S, s, add, false, MO_SIGN)
++DO_PREWIDEN(VADDL_U, u, add, false, 0)
++DO_PREWIDEN(VSUBL_S, s, sub, false, MO_SIGN)
++DO_PREWIDEN(VSUBL_U, u, sub, false, 0)
++DO_PREWIDEN(VADDW_S, s, add, true, MO_SIGN)
++DO_PREWIDEN(VADDW_U, u, add, true, 0)
++DO_PREWIDEN(VSUBW_S, s, sub, true, MO_SIGN)
++DO_PREWIDEN(VSUBW_U, u, sub, true, 0)
  
--    status = nvme_map_dptr(n, data_size, req);
--    if (status) {
--        goto invalid;
--    }
--
-     data_offset = nvme_l2b(ns, slba);
- 
--    block_acct_start(blk_get_stats(blk), &req->acct, data_size,
--                     BLOCK_ACCT_WRITE);
--    if (req->qsg.sg) {
--        req->aiocb = dma_blk_write(blk, &req->qsg, data_offset,
--                                   BDRV_SECTOR_SIZE, nvme_rw_cb, req);
-+    if (!wrz) {
-+        status = nvme_map_dptr(n, data_size, req);
-+        if (status) {
-+            goto invalid;
-+        }
-+
-+        block_acct_start(blk_get_stats(blk), &req->acct, data_size,
-+                         BLOCK_ACCT_WRITE);
-+        if (req->qsg.sg) {
-+            req->aiocb = dma_blk_write(blk, &req->qsg, data_offset,
-+                                       BDRV_SECTOR_SIZE, nvme_rw_cb, req);
-+        } else {
-+            req->aiocb = blk_aio_pwritev(blk, data_offset, &req->iov, 0,
-+                                         nvme_rw_cb, req);
-+        }
-     } else {
--        req->aiocb = blk_aio_pwritev(blk, data_offset, &req->iov, 0,
--                                     nvme_rw_cb, req);
-+        block_acct_start(blk_get_stats(blk), &req->acct, 0, BLOCK_ACCT_WRITE);
-+        req->aiocb = blk_aio_pwrite_zeroes(blk, data_offset, data_size,
-+                                           BDRV_REQ_MAY_UNMAP, nvme_rw_cb,
-+                                           req);
-     }
-     return NVME_NO_COMPLETE;
- 
-@@ -1110,9 +1094,9 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
-     case NVME_CMD_FLUSH:
-         return nvme_flush(n, req);
-     case NVME_CMD_WRITE_ZEROES:
--        return nvme_write_zeroes(n, req);
-+        return nvme_write(n, req, true);
-     case NVME_CMD_WRITE:
--        return nvme_write(n, req);
-+        return nvme_write(n, req, false);
-     case NVME_CMD_READ:
-         return nvme_read(n, req);
-     default:
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index d81b1891d8..658633177d 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -43,7 +43,6 @@ pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode, const char *opna
- pci_nvme_read(uint16_t cid, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
- pci_nvme_write(uint16_t cid, const char *verb, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" opname '%s' nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
- pci_nvme_rw_cb(uint16_t cid, const char *blkname) "cid %"PRIu16" blk '%s'"
--pci_nvme_write_zeroes(uint16_t cid, uint32_t nsid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" nsid %"PRIu32" slba %"PRIu64" nlb %"PRIu32""
- pci_nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
- pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size, uint16_t qflags, int ien) "create completion queue, addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16", ien=%d"
- pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
+ static bool do_narrow_3d(DisasContext *s, arg_3diff *a,
+                          NeonGenTwo64OpFn *opfn, NeonGenNarrowFn *narrowfn)
 -- 
-2.21.0
+2.25.1
 
 
