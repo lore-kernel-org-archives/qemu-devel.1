@@ -2,88 +2,110 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14655C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD11C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:32:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2540620637
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5E3D2087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:32:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L5NIEc4j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2540620637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DLR6RiKK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E3D2087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYTGK-0004lP-W2
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 08:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45788)
+	id 1kYTZt-0003YM-K4
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 08:32:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYTDy-0002xg-Tt
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:09:44 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:40058)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYTDv-0004lT-NM
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:09:42 -0400
-Received: by mail-ej1-x643.google.com with SMTP id oq3so6410805ejb.7
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 05:09:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jGCl4PWS5uo6m2PFMVXPiLo1Y/4zUOWjNgXlPDjSGCk=;
- b=L5NIEc4jNgPmYPDiDcmvIRc4ZJcGRC9GjLifF1DxUtL2cBNsMzizK1g2HmLaEq9hYZ
- W6mF0kCkOjL1Q7DmLQXjJ1/XXY4e+YM8rpu4KOtJ/xSMRE8WZFVMzcOkbgiGOfAoy27v
- svVvPuqkUKo3BIJY3/TbssAjpFlCLo46Cc86Jh02D5yw5Fpf84eSaoZjWYKaYUoWuhyl
- sZyO+K7LX0IKllSwgsS1J+LpV1KydILsOA1zmdQJMc6T0/pMkjJCn6FBWMQzSqRwU4Vg
- 65AwvSWLEJaI6GaO3apnyaVunThG9l+Ned1LoBF3XmgzFD2a6IQxQcRIeKLjznDP5jF4
- d8qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jGCl4PWS5uo6m2PFMVXPiLo1Y/4zUOWjNgXlPDjSGCk=;
- b=LZ9b/BWarA1FO2wAlASwlHg4can6A59W8sqmKLotk/5I9yiH9vvKCEDIHoNn99YkXo
- LhM1SGfD25OVc4Gzk4VMJfHcWQAo/s0MAd1GfCbd0tQ8X8MsGYGtYud6wzVtQSnKhlX8
- BWhFdtBhlcMywHAT2Guq9jCEffqqmYkOe9ekTe+zn6AK9/PFYzU6xanSaqA2KRFTUclo
- sxsk7DLGCZZNSp7RmsIOxTIZIxR4t1LMDVxDvTyzcYkWJgO3cMv6Ri8qoHos9i+wk6ZQ
- 4WhmAmjn7f+5D0dR8KKs5Y4TOvvCApIYH1OGVwk9iasGH0fel/oFDPUddlI6dUW88r5+
- UX9Q==
-X-Gm-Message-State: AOAM533To30s6Jo5I7pM8xfZnUGybRUDJ3GYuC3VuSan/mg0iYga3c/z
- 1EluAu7Ni8GSm4XSXZyi4gr4SHE4xfMuwt3Cm0cSRQ==
-X-Google-Smtp-Source: ABdhPJwWokJH/LoBVng/tUJ7XLG4M1PwnESdbCND8ShlUwFxbB4XRkaZ6c37fq6MBDeV4fUItdkHyABfZX/y24zG8os=
-X-Received: by 2002:a17:906:3a97:: with SMTP id
- y23mr2117735ejd.250.1604059777949; 
- Fri, 30 Oct 2020 05:09:37 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1kYTWF-00027u-Gw; Fri, 30 Oct 2020 08:28:35 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27826)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1kYTWD-00030C-Ha; Fri, 30 Oct 2020 08:28:35 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09UC2Vfp013847; Fri, 30 Oct 2020 08:28:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=fAilbE+DOMC+LSljOWLvPLtXdUGINSrGsFpNxtrU184=;
+ b=DLR6RiKKDxegSz5icBMtY13OfD8xYFoW/eghGi6+M2t0fQQvm892PYa3dzZ0hmmsiG62
+ MoaxabmTGrs7gZ/ezi7jUbI6BvvabkVdozlwy4/o2+HwYq45d1vBlgRsPItycnAf13av
+ SA5A3OpG1h5Zatd6/MVvFxAHjrvyaJ0tQtW/9URw95SeNDNCIrpAs6jrWG3LYrWN9kTJ
+ 6ssEQw66OLZDlzLdt+UFm3xrxRBjQu+YXqK7itnf6oK1mNu6xpfwPnrO/EVTsyolKpqW
+ T57KWjL4G7vKEeDeEaaux/HX0NGsPMXD5Bc9nIM6Rc1f0+xgv4L3Rt2wXXmCeqH1CrrI 8g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34ge51159p-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 30 Oct 2020 08:28:29 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09UC2VkS013878;
+ Fri, 30 Oct 2020 08:28:29 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.108])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34ge51158s-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 30 Oct 2020 08:28:29 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+ by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09UCQv91029795;
+ Fri, 30 Oct 2020 12:28:27 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma05fra.de.ibm.com with ESMTP id 34fv15rkvu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 30 Oct 2020 12:28:26 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09UCSNwx28770762
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 30 Oct 2020 12:28:23 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C25D05205A;
+ Fri, 30 Oct 2020 12:28:23 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id AE7C552054;
+ Fri, 30 Oct 2020 12:28:23 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+ id 5DAD4E24D3; Fri, 30 Oct 2020 13:28:23 +0100 (CET)
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: [PATCH] s390-bios: Skip writing iplb location to low core for ccw ipl
+Date: Fri, 30 Oct 2020 13:28:23 +0100
+Message-Id: <20201030122823.347140-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <cover.1604046404.git.qemu_oss@crudebyte.com>
- <b111895492f8fb79bcca1c3e9586c0615f46cc97.1604046404.git.qemu_oss@crudebyte.com>
- <20201030124418.1a20fb9f@bahia.lan> <3565953.R2qxJ1zP7r@silver>
-In-Reply-To: <3565953.R2qxJ1zP7r@silver>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Oct 2020 12:09:26 +0000
-Message-ID: <CAFEAcA8QW0T3e4gUAOWh0Jnfov09=rPnqXGQDvHs3sYAYn7O3g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] tests/9pfs: fix coverity error in
- create_local_test_dir()
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312, 18.0.737
+ definitions=2020-10-30_04:2020-10-30,
+ 2020-10-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ bulkscore=0 spamscore=0 adultscore=0 impostorscore=0 suspectscore=0
+ priorityscore=1501 clxscore=1015 mlxlogscore=651 phishscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010300085
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 08:28:30
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,32 +119,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 30 Oct 2020 at 12:02, Christian Schoenebeck
-<qemu_oss@crudebyte.com> wrote:
-> On Freitag, 30. Oktober 2020 12:44:18 CET Greg Kurz wrote:
-> It's not clear to me where this coverity report is accessible online. A quick
-> search only brought me to statistics about its latest check, but not the
-> details of the report you quoted.
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
 
-https://scan.coverity.com/projects/qemu . To see the actual
-defect reports you need to create an account and request
-access to the QEMU project (we happily give access to developers,
-but it is a manual-approval process).
+The architecture states that the iplb location is only written to low
+core for list directed ipl and not for traditional ccw ipl. If we don't
+skip this then operating systems that load by reading into low core
+memory may fail to start.
 
-> And more importantly: is there coverity CI support that one could enable on
-> github, so that pending patches were checked before upstream merge?
+We should also not write the iplb pointer for network boot as it might
+overwrite content that we got via network.
 
-No, unfortunately not. The Coverity free-for-open-source-projects
-system has a very limited number of scans it allows (for a project
-the size of ours just one a day) so we can't open it up to
-submaintainer branches or even use it on pull requests pre merge;
-the best we can do is running it on master daily.
+Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Fixes: 9bfc04f9ef68 ("pc-bios: s390x: Save iplb location in lowcore")
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ pc-bios/s390-ccw/main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-thanks
--- PMM
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 43c792cf9509..fc4bfaa45529 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -43,7 +43,9 @@ void write_subsystem_identification(void)
+ 
+ void write_iplb_location(void)
+ {
+-    lowcore->ptr_iplb = ptr2u32(&iplb);
++    if (cutype == CU_TYPE_VIRTIO && virtio_get_device_type() != VIRTIO_ID_NET) {
++        lowcore->ptr_iplb = ptr2u32(&iplb);
++    }
+ }
+ 
+ unsigned int get_loadparm_index(void)
+-- 
+2.26.2
+
 
