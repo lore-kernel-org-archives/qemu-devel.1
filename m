@@ -2,78 +2,100 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34801C00A89
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 16:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42077C00A89
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 16:22:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2CFE206FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 16:16:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2CFE206FA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 7289520719
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 16:22:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p8In6fQS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7289520719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYX4w-0004Et-QW
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 12:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49002)
+	id 1kYXAF-0006aS-8B
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 12:22:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kYX40-0003Gq-6g
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 12:15:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49108)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kYX9W-00068w-Gk
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 12:21:22 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37045)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kYX3x-0007Zq-RZ
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 12:15:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kYX3v-0005VA-3m
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 16:15:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 137202E811E
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 16:15:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kYX9R-00005a-5b
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 12:21:21 -0400
+Received: by mail-pl1-x641.google.com with SMTP id b12so3198206plr.4
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 09:21:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=v6DMkAk9rzxcVpG0lFTErhiJaEWWLHIzE+pMe9PhI+Q=;
+ b=p8In6fQSZWNjGnaT/DQuEDQJH21uwujcYfbqjPioFT6FSV+jVxlO1FMNs2kCeBuZxB
+ Nk7hW2YTZNTPgzvtkygYj/QfDTNE/qIz1y68tftwMRu6sBMhHHGH86mzWZoSKCTGxxrB
+ fBax0KU0TD5g7w56rkVMhCc8+l8k/IRpjN3gUKMr/vPOt84pkeiWfwPXfSFPv+gO1veY
+ E2XHRmEip+8mQJQAvJEnnh7sUUOqsi3bszzunxCfLG62f9uDIFYMwBnATaqXynJn4v4N
+ l3EyjW5fHJe14pGgOCsT2VEHY6DLzX1yta78aEa0NWfB/Nl0dRmUCDc7nkNuZUqfCr3j
+ SIcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=v6DMkAk9rzxcVpG0lFTErhiJaEWWLHIzE+pMe9PhI+Q=;
+ b=JHrlvIjuV2NE9O5kiQv7IHgL9/oOVLkO8iNMq1/pF2IsffJY5EB/qfLnJqwEYBXJWt
+ HfzPThcUUVI5514Yl1KHED92zW/QgXKGfddJVRRVUCTYRAmlmm+LXjArVd//4sYAyviH
+ 1IkhaQlXqudO/4rzsaF66X3ZtZpX7mgQTbPggN0+Q9689OeN66BCdxiAhwNlw0MXGFKY
+ jHnjOQGc9w3cBGZBPLI1lIFCAUYHXSmcFtsUIBA/xhHsNuHtVmCfwwCsDwzXbvNTMvqi
+ Rt673/zncnuSOScb39SRi+bVFIqOTIBApE1SEp1/DqOVRrU6TguKBamWF+DEs2stgtSJ
+ CteQ==
+X-Gm-Message-State: AOAM531a4uXxPHm40IXK3U9d4dGbBNEgs3/8wLnZwx3cldSckqvQcLo/
+ 5lJMDxhowPwFCA5ZVA+gNBdy3w==
+X-Google-Smtp-Source: ABdhPJyVUEabIWbp3fvwK9/j0shgtIpUa6W2baK+ANG0KZj+N6o1NE8wJEghNItst+8EhaxEYxn02A==
+X-Received: by 2002:a17:902:ab94:b029:d6:9c3:e99e with SMTP id
+ f20-20020a170902ab94b02900d609c3e99emr9581333plr.68.1604074875279; 
+ Fri, 30 Oct 2020 09:21:15 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id l18sm6494855pfd.210.2020.10.30.09.21.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 30 Oct 2020 09:21:13 -0700 (PDT)
+Subject: Re: [PATCH] target/s390x: fix execution with icount
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>, qemu-devel@nongnu.org
+References: <160404699734.17100.6515653500382355060.stgit@pasha-ThinkPad-X280>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fd06fcf1-3850-3858-5e02-908d642d5229@linaro.org>
+Date: Fri, 30 Oct 2020 09:21:11 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Oct 2020 16:06:34 -0000
-From: CandyMan <1902267@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: candyman30
-X-Launchpad-Bug-Reporter: CandyMan (candyman30)
-X-Launchpad-Bug-Modifier: CandyMan (candyman30)
-Message-Id: <160407399412.14863.7198304237559619710.malonedeb@wampee.canonical.com>
-Subject: [Bug 1902267] [NEW] CPU not support 32-bit stack in 32-bit unreal mode
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="96ff31b88b65a0d0ea73b89333fe7c4a2669d8fb"; Instance="production"
-X-Launchpad-Hash: cd00c19fddb4940f97fe6d00381ab611e8b7a96a
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 11:55:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <160404699734.17100.6515653500382355060.stgit@pasha-ThinkPad-X280>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.253,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,100 +104,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1902267 <1902267@bugs.launchpad.net>
+Cc: thuth@redhat.com, cohuck@redhat.com, rth@twiddle.net, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 10/30/20 1:36 AM, Pavel Dovgalyuk wrote:
+> This patch adds some gen_io_start() calls to allow execution
+> of s390x targets in icount mode with -smp 1.
+> It enables deterministic timers and record/replay features.
 
-QEMU version 5.0.0 supports 32-bit and 16-bit unreal mode. Great!
-Unfortunately, QEMU does not support 32-bit stack in unreal 32-bit mode.
-After the INT instruction, the stack is switched to 16-bit, which should no=
-t be the case. =
+Thanks for pointing this out.
 
-At BOCHS, my code works 100%. At QEMU not works.
+There are enough of these that I think it would be worthwhile to annotate them
+in insn-data.def instead, much as we do for privileged instructions with IF_PRIV.
 
-Sample code to find out:
+Perhaps call it IF_IO?
 
-use32
-cli
-mov ax,cs
-shl eax,16
-mov ax,NewInt80h
-mov [IDT32+4*80h],eax
-mov edx,esp
-mov esp,0x10000
-int 80h
-NewInt80h:
-xchg esp,edx
-cmp edx,0x10000-6
-jnz IsStack16Bit
 
-Stack selector loaded from GDT:
-GDT:
-real32_GDT            =
-
-dq 0
-dw 0xFFFF,0x0000,9A00h,0xCF     ; 32-bit code descriptor
-dw 0xFFFF,0x0000,9200h,0x8F     ;   4 GB data descriptor
-dw 0xFFFF,0x0000,9A00h,0x00     ; 16-bit code descriptor
-dw 0xFFFF,0x0000,9200h,0xCF     ; 32-bit data descriptor stack
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "my operating system"
-   https://bugs.launchpad.net/bugs/1902267/+attachment/5429520/+files/FLATD=
-OS.IMG
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1902267
-
-Title:
-  CPU not support 32-bit stack in 32-bit unreal mode
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU version 5.0.0 supports 32-bit and 16-bit unreal mode. Great!
-  Unfortunately, QEMU does not support 32-bit stack in unreal 32-bit mode.
-  After the INT instruction, the stack is switched to 16-bit, which should =
-not be the case. =
-
-  At BOCHS, my code works 100%. At QEMU not works.
-
-  Sample code to find out:
-
-  use32
-  cli
-  mov ax,cs
-  shl eax,16
-  mov ax,NewInt80h
-  mov [IDT32+4*80h],eax
-  mov edx,esp
-  mov esp,0x10000
-  int 80h
-  NewInt80h:
-  xchg esp,edx
-  cmp edx,0x10000-6
-  jnz IsStack16Bit
-
-  Stack selector loaded from GDT:
-  GDT:
-  real32_GDT            =
-
-  dq 0
-  dw 0xFFFF,0x0000,9A00h,0xCF     ; 32-bit code descriptor
-  dw 0xFFFF,0x0000,9200h,0x8F     ;   4 GB data descriptor
-  dw 0xFFFF,0x0000,9A00h,0x00     ; 16-bit code descriptor
-  dw 0xFFFF,0x0000,9200h,0xCF     ; 32-bit data descriptor stack
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1902267/+subscriptions
+r~
 
