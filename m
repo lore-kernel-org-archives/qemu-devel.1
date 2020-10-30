@@ -2,76 +2,62 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80025C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C3DAC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:45:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE0F520691
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:45:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="xnAqH8AJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE0F520691
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6CBA020691
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:45:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CBA020691
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYIXa-0006GK-8d
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 20:45:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38994)
+	id 1kYIXk-0006Y8-5T
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 20:45:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tsimpson@qualcomm.com>)
- id 1kYHyb-00040C-GJ
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:09:08 -0400
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:14578)
- by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <tsimpson@qualcomm.com>)
- id 1kYHyS-0005Pf-9z
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:09:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1604016536; x=1635552536;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=+xXU0Gd1wUe3SSmyqUo96jQ5pVBSiFlE7hyiqmhJjHI=;
- b=xnAqH8AJMdhXXHWk1VuTSPnEF7tQmjj9TL7/CAs9AseL9zm3T95QjVdM
- Iy7yMwEdZm3aefQL+0ksrHK+VduXV7rFxkfLwpRc49eDTcT9sI6dfzJYs
- AUFTklUL1YasJ+citWY7K6IZajEFy23UkY7ZKDt8wD+QDVF/MIOZ08Bje o=;
-Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
- by alexa-out-sd-02.qualcomm.com with ESMTP; 29 Oct 2020 17:08:44 -0700
-X-QCInternal: smtphost
-Received: from vu-tsimpson-aus.qualcomm.com (HELO
- vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
- by ironmsg01-sd.qualcomm.com with ESMTP; 29 Oct 2020 17:08:43 -0700
-Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
- id AF3F44121; Thu, 29 Oct 2020 19:08:43 -0500 (CDT)
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v5 08/33] Hexagon (target/hexagon) GDB Stub
-Date: Thu, 29 Oct 2020 19:08:14 -0500
-Message-Id: <1604016519-28065-9-git-send-email-tsimpson@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1604016519-28065-1-git-send-email-tsimpson@quicinc.com>
-References: <1604016519-28065-1-git-send-email-tsimpson@quicinc.com>
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kYITp-0001WP-Dz; Thu, 29 Oct 2020 20:41:21 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kYITm-00013i-NU; Thu, 29 Oct 2020 20:41:21 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CMk583W8Wz15PJ3;
+ Fri, 30 Oct 2020 08:41:16 +0800 (CST)
+Received: from huawei.com (10.175.104.175) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Fri, 30 Oct 2020
+ 08:41:08 +0800
+From: Chen Qun <kuhn.chenqun@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
+Subject: [PATCH v2 4/8] linux-user/mips/cpu_loop: silence the compiler warnings
+Date: Fri, 30 Oct 2020 08:40:42 +0800
+Message-ID: <20201030004046.2191790-5-kuhn.chenqun@huawei.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20201030004046.2191790-1-kuhn.chenqun@huawei.com>
+References: <20201030004046.2191790-1-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=199.106.114.39;
- envelope-from=tsimpson@qualcomm.com; helo=alexa-out-sd-02.qualcomm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 19:58:53
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.175.104.175]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=kuhn.chenqun@huawei.com; helo=szxga04-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 20:41:14
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -85,66 +71,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ale@rev.ng, bcain@quicinc.com, richard.henderson@linaro.org,
- at.org@qualcomm.com, laurent@vivier.eu, tsimpson@quicinc.com
+Cc: Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com,
+ Laurent Vivier <laurent@vivier.eu>, ganqixin@huawei.com,
+ Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-R0RCIHJlZ2lzdGVyIHJlYWQgYW5kIHdyaXRlIHJvdXRpbmVzCgpTaWduZWQtb2ZmLWJ5OiBUYXls
-b3IgU2ltcHNvbiA8dHNpbXBzb25AcXVpY2luYy5jb20+ClJldmlld2VkLWJ5OiBSaWNoYXJkIEhl
-bmRlcnNvbiA8cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZz4KLS0tCiB0YXJnZXQvaGV4YWdv
-bi9pbnRlcm5hbC5oIHwgIDMgKysrCiB0YXJnZXQvaGV4YWdvbi9jcHUuYyAgICAgIHwgIDIgKysK
-IHRhcmdldC9oZXhhZ29uL2dkYnN0dWIuYyAgfCA0NyArKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKwogMyBmaWxlcyBjaGFuZ2VkLCA1MiBpbnNlcnRpb25zKCsp
-CiBjcmVhdGUgbW9kZSAxMDA2NDQgdGFyZ2V0L2hleGFnb24vZ2Ric3R1Yi5jCgpkaWZmIC0tZ2l0
-IGEvdGFyZ2V0L2hleGFnb24vaW50ZXJuYWwuaCBiL3RhcmdldC9oZXhhZ29uL2ludGVybmFsLmgK
-aW5kZXggMzI3YmFkOS4uOTYxMzE4YSAxMDA2NDQKLS0tIGEvdGFyZ2V0L2hleGFnb24vaW50ZXJu
-YWwuaAorKysgYi90YXJnZXQvaGV4YWdvbi9pbnRlcm5hbC5oCkBAIC0yOSw2ICsyOSw5IEBACiAg
-ICAgICAgIH0gXAogICAgIH0gd2hpbGUgKDApCiAKK2V4dGVybiBpbnQgaGV4YWdvbl9nZGJfcmVh
-ZF9yZWdpc3RlcihDUFVTdGF0ZSAqY3B1LCBHQnl0ZUFycmF5ICpidWYsIGludCByZWcpOworZXh0
-ZXJuIGludCBoZXhhZ29uX2dkYl93cml0ZV9yZWdpc3RlcihDUFVTdGF0ZSAqY3B1LCB1aW50OF90
-ICpidWYsIGludCByZWcpOworCiBleHRlcm4gdm9pZCBoZXhhZ29uX2RlYnVnKENQVUhleGFnb25T
-dGF0ZSAqZW52KTsKIAogZXh0ZXJuIGNvbnN0IGNoYXIgKiBjb25zdCBoZXhhZ29uX3JlZ25hbWVz
-W1RPVEFMX1BFUl9USFJFQURfUkVHU107CmRpZmYgLS1naXQgYS90YXJnZXQvaGV4YWdvbi9jcHUu
-YyBiL3RhcmdldC9oZXhhZ29uL2NwdS5jCmluZGV4IDVlMGRhM2YuLjMyYWE5ODIgMTAwNjQ0Ci0t
-LSBhL3RhcmdldC9oZXhhZ29uL2NwdS5jCisrKyBiL3RhcmdldC9oZXhhZ29uL2NwdS5jCkBAIC0y
-ODAsNiArMjgwLDggQEAgc3RhdGljIHZvaWQgaGV4YWdvbl9jcHVfY2xhc3NfaW5pdChPYmplY3RD
-bGFzcyAqYywgdm9pZCAqZGF0YSkKICAgICBjYy0+ZHVtcF9zdGF0ZSA9IGhleGFnb25fZHVtcF9z
-dGF0ZTsKICAgICBjYy0+c2V0X3BjID0gaGV4YWdvbl9jcHVfc2V0X3BjOwogICAgIGNjLT5zeW5j
-aHJvbml6ZV9mcm9tX3RiID0gaGV4YWdvbl9jcHVfc3luY2hyb25pemVfZnJvbV90YjsKKyAgICBj
-Yy0+Z2RiX3JlYWRfcmVnaXN0ZXIgPSBoZXhhZ29uX2dkYl9yZWFkX3JlZ2lzdGVyOworICAgIGNj
-LT5nZGJfd3JpdGVfcmVnaXN0ZXIgPSBoZXhhZ29uX2dkYl93cml0ZV9yZWdpc3RlcjsKICAgICBj
-Yy0+Z2RiX251bV9jb3JlX3JlZ3MgPSBUT1RBTF9QRVJfVEhSRUFEX1JFR1M7CiAgICAgY2MtPmdk
-Yl9zdG9wX2JlZm9yZV93YXRjaHBvaW50ID0gdHJ1ZTsKICAgICBjYy0+ZGlzYXNfc2V0X2luZm8g
-PSBoZXhhZ29uX2NwdV9kaXNhc19zZXRfaW5mbzsKZGlmZiAtLWdpdCBhL3RhcmdldC9oZXhhZ29u
-L2dkYnN0dWIuYyBiL3RhcmdldC9oZXhhZ29uL2dkYnN0dWIuYwpuZXcgZmlsZSBtb2RlIDEwMDY0
-NAppbmRleCAwMDAwMDAwLi5lOGMxMGIyCi0tLSAvZGV2L251bGwKKysrIGIvdGFyZ2V0L2hleGFn
-b24vZ2Ric3R1Yi5jCkBAIC0wLDAgKzEsNDcgQEAKKy8qCisgKiAgQ29weXJpZ2h0KGMpIDIwMTkt
-MjAyMCBRdWFsY29tbSBJbm5vdmF0aW9uIENlbnRlciwgSW5jLiBBbGwgUmlnaHRzIFJlc2VydmVk
-LgorICoKKyAqICBUaGlzIHByb2dyYW0gaXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiByZWRpc3Ry
-aWJ1dGUgaXQgYW5kL29yIG1vZGlmeQorICogIGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05V
-IEdlbmVyYWwgUHVibGljIExpY2Vuc2UgYXMgcHVibGlzaGVkIGJ5CisgKiAgdGhlIEZyZWUgU29m
-dHdhcmUgRm91bmRhdGlvbjsgZWl0aGVyIHZlcnNpb24gMiBvZiB0aGUgTGljZW5zZSwgb3IKKyAq
-ICAoYXQgeW91ciBvcHRpb24pIGFueSBsYXRlciB2ZXJzaW9uLgorICoKKyAqICBUaGlzIHByb2dy
-YW0gaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdCB3aWxsIGJlIHVzZWZ1bCwKKyAq
-ICBidXQgV0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJy
-YW50eSBvZgorICogIE1FUkNIQU5UQUJJTElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIg
-UFVSUE9TRS4gIFNlZSB0aGUKKyAqICBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBmb3IgbW9y
-ZSBkZXRhaWxzLgorICoKKyAqICBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRo
-ZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQorICogIGFsb25nIHdpdGggdGhpcyBwcm9ncmFt
-OyBpZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3JnL2xpY2Vuc2VzLz4uCisgKi8KKworI2lu
-Y2x1ZGUgInFlbXUvb3NkZXAuaCIKKyNpbmNsdWRlICJxZW11LWNvbW1vbi5oIgorI2luY2x1ZGUg
-ImV4ZWMvZ2Ric3R1Yi5oIgorI2luY2x1ZGUgImNwdS5oIgorI2luY2x1ZGUgImludGVybmFsLmgi
-CisKK2ludCBoZXhhZ29uX2dkYl9yZWFkX3JlZ2lzdGVyKENQVVN0YXRlICpjcywgR0J5dGVBcnJh
-eSAqbWVtX2J1ZiwgaW50IG4pCit7CisgICAgSGV4YWdvbkNQVSAqY3B1ID0gSEVYQUdPTl9DUFUo
-Y3MpOworICAgIENQVUhleGFnb25TdGF0ZSAqZW52ID0gJmNwdS0+ZW52OworCisgICAgaWYgKG4g
-PCBUT1RBTF9QRVJfVEhSRUFEX1JFR1MpIHsKKyAgICAgICAgcmV0dXJuIGdkYl9nZXRfcmVnbCht
-ZW1fYnVmLCBlbnYtPmdwcltuXSk7CisgICAgfQorCisgICAgZ19hc3NlcnRfbm90X3JlYWNoZWQo
-KTsKK30KKworaW50IGhleGFnb25fZ2RiX3dyaXRlX3JlZ2lzdGVyKENQVVN0YXRlICpjcywgdWlu
-dDhfdCAqbWVtX2J1ZiwgaW50IG4pCit7CisgICAgSGV4YWdvbkNQVSAqY3B1ID0gSEVYQUdPTl9D
-UFUoY3MpOworICAgIENQVUhleGFnb25TdGF0ZSAqZW52ID0gJmNwdS0+ZW52OworCisgICAgaWYg
-KG4gPCBUT1RBTF9QRVJfVEhSRUFEX1JFR1MpIHsKKyAgICAgICAgZW52LT5ncHJbbl0gPSBsZHR1
-bF9wKG1lbV9idWYpOworICAgICAgICByZXR1cm4gc2l6ZW9mKHRhcmdldF91bG9uZyk7CisgICAg
-fQorCisgICAgZ19hc3NlcnRfbm90X3JlYWNoZWQoKTsKK30KLS0gCjIuNy40Cgo=
+When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warning:
+linux-user/mips/cpu_loop.c: In function ‘cpu_loop’:
+linux-user/mips/cpu_loop.c:104:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  104 |                     if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
+      |                        ^
+linux-user/mips/cpu_loop.c:107:17: note: here
+  107 |                 case 7:
+      |                 ^~~~
+linux-user/mips/cpu_loop.c:108:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  108 |                     if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
+      |                        ^
+linux-user/mips/cpu_loop.c:111:17: note: here
+  111 |                 case 6:
+      |                 ^~~~
+linux-user/mips/cpu_loop.c:112:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  112 |                     if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
+      |                        ^
+linux-user/mips/cpu_loop.c:115:17: note: here
+  115 |                 case 5:
+      |                 ^~~~
+
+Add the corresponding "fall through" comment to fix it.
+
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+Cc: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/mips/cpu_loop.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+index 553e8ca7f5..cfe7ba5c47 100644
+--- a/linux-user/mips/cpu_loop.c
++++ b/linux-user/mips/cpu_loop.c
+@@ -104,18 +104,22 @@ void cpu_loop(CPUMIPSState *env)
+                     if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
+                         goto done_syscall;
+                     }
++                    /* fall through */
+                 case 7:
+                     if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
+                         goto done_syscall;
+                     }
++                    /* fall through */
+                 case 6:
+                     if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
+                         goto done_syscall;
+                     }
++                    /* fall through */
+                 case 5:
+                     if ((ret = get_user_ual(arg5, sp_reg + 16)) != 0) {
+                         goto done_syscall;
+                     }
++                    /* fall through */
+                 default:
+                     break;
+                 }
+-- 
+2.27.0
+
 
