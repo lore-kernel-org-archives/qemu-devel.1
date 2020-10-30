@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43EFDC55178
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F20C4741F
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:25:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A73C620739
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:25:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 444E320739
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:25:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BFPC9Ocq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A73C620739
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d2sf5OdM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 444E320739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYaxr-0005LG-I3
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 16:25:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52982)
+	id 1kYaxu-0005RX-7I
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 16:25:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYau5-0000C2-LS
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:21:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35062)
+ id 1kYau7-0000GZ-L8
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:21:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21710)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kYau3-0007h9-VQ
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:21:41 -0400
+ id 1kYau6-0007he-2c
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:21:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604089299;
+ s=mimecast20190719; t=1604089301;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=t+iBjVC7xcw6X3t+JOTGvDiD6Rn9cdGic8J7WThIGNg=;
- b=BFPC9OcqBo5Pc3W2aG1IqnBZlmVnfWFZ5n1lHLFv5fHKwNf1Ea9anTl1zkAcq80hsY1+EJ
- kPkUDgDjkuSCIGiBRo6lEPtcvDQ2dfp7Qr3PDWHl5QkokMylM0q4QqJzbBFfQyhXoA5GxT
- gCOwY06Xmiqwggt/5zy07n02rU7JOOw=
+ bh=Y+ETHuJHJ4SgmolQsEBNReIoHbZc9iqX+ntcUJXw3JQ=;
+ b=d2sf5OdMqTSAnxpbkNoUyX+uZQZi8d7qFQHjWFFoaK31uHxf9MgVsf9bWCN6niJxtATLuS
+ LIVE/CPcTRqRqamKvbypKVBTPI/e4qwtrVghFoThaGCEjE2epwZo3ZWPYupbeQZnQml8J6
+ CYDFAlsnF9DLBqQoBHZEDyGcuL4WMIA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-595-oEECHw-IPIGvlfqNIfZITA-1; Fri, 30 Oct 2020 16:21:36 -0400
-X-MC-Unique: oEECHw-IPIGvlfqNIfZITA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-307-3Qgk7EmYP3-HSmr7seP6-w-1; Fri, 30 Oct 2020 16:21:39 -0400
+X-MC-Unique: 3Qgk7EmYP3-HSmr7seP6-w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2245A805F12
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 20:21:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92877802B63
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 20:21:38 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF8325D9D2;
- Fri, 30 Oct 2020 20:21:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 228441002C01;
+ Fri, 30 Oct 2020 20:21:38 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/20] qdev: Stop using error_set_from_qdev_prop_error() for
- netdev property
-Date: Fri, 30 Oct 2020 16:21:13 -0400
-Message-Id: <20201030202131.796967-3-ehabkost@redhat.com>
+Subject: [PATCH 05/20] qdev: Stop using error_set_from_qdev_prop_error() for
+ devfn property
+Date: Fri, 30 Oct 2020 16:21:16 -0400
+Message-Id: <20201030202131.796967-6-ehabkost@redhat.com>
 In-Reply-To: <20201030202131.796967-1-ehabkost@redhat.com>
 References: <20201030202131.796967-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -108,17 +108,13 @@ simpler and makes error messages clearer.
 
 Before:
 
-  $ qemu-system-x86_64 -device e1000,netdev=n0
-  qemu-system-x86_64: -device e1000,netdev=n0: Property 'e1000.netdev' can't find value 'n0'
-  $ qemu-system-x86_64 -netdev id=n0,type=user -device e1000,netdev=n0 -device e1000,netdev=n0
-  qemu-system-x86_64: -device e1000,netdev=n0: Property 'e1000.netdev' can't take value 'n0', it's in use
+  $ qemu-system-x86_64 -device e1000,addr=x
+  qemu-system-x86_64: -device e1000,addr=x: Property 'e1000.addr' doesn't take value 'x'
 
 After:
 
-  $ ./qemu-system-x86_64 -device e1000,netdev=n0
-  qemu-system-x86_64: -device e1000,netdev=n0: Property 'e1000.netdev' can't take value 'n0': netdev not found
-  $ ./qemu-system-x86_64 -netdev id=n0,type=user -device e1000,netdev=n0 -device e1000,netdev=n0
-  qemu-system-x86_64: -device e1000,netdev=n0: Property 'e1000.netdev' can't take value 'n0': netdev is in use
+  $ qemu-system-x86_64 -device e1000,addr=x
+  qemu-system-x86_64: -device e1000,addr=x: Property 'e1000.addr' can't take value 'x': invalid PCI address
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
@@ -127,45 +123,19 @@ Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/core/qdev-properties-system.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ hw/core/qdev-properties-system.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index 232ff955fa..60be09efba 100644
+index fc0abcae17..5d3cb32708 100644
 --- a/hw/core/qdev-properties-system.c
 +++ b/hw/core/qdev-properties-system.c
-@@ -376,7 +376,7 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
-     NICPeers *peers_ptr = object_static_prop_ptr(obj, prop);
-     NetClientState **ncs = peers_ptr->ncs;
-     NetClientState *peers[MAX_QUEUE_NUM];
--    int queues, err = 0, i = 0;
-+    int queues, i = 0;
-     char *str;
+@@ -742,7 +742,7 @@ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
+     return;
  
-     if (!visit_type_str(v, name, &str, errp)) {
-@@ -387,7 +387,7 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
-                                           NET_CLIENT_DRIVER_NIC,
-                                           MAX_QUEUE_NUM);
-     if (queues == 0) {
--        err = -ENOENT;
-+        error_setg(errp, "netdev not found");
-         goto out;
-     }
- 
-@@ -399,7 +399,7 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
- 
-     for (i = 0; i < queues; i++) {
-         if (peers[i]->peer) {
--            err = -EEXIST;
-+            error_setg(errp, "netdev is in use");
-             goto out;
-         }
- 
-@@ -418,7 +418,6 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
-     peers_ptr->queues = queues;
- 
- out:
--    error_set_from_qdev_prop_error(errp, err, obj, prop, str);
+ invalid:
+-    error_set_from_qdev_prop_error(errp, EINVAL, obj, prop, str);
++    error_setg(errp, "invalid PCI address");
      g_free(str);
  }
  
