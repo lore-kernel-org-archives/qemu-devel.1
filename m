@@ -2,65 +2,89 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	WEIRD_QUOTING autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7ABAC00A89
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 17:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 020FCC00A89
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 17:08:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 256242075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 17:06:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256242075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=movementarian.org
+	by mail.kernel.org (Postfix) with ESMTPS id 539E520731
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 17:08:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gczs0sKU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 539E520731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYXrU-00027u-2A
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 13:06:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32968)
+	id 1kYXt2-0003UW-5v
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 13:08:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <movement@li1368-133.members.linode.com>)
- id 1kYXo3-0008FU-Br
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 13:03:15 -0400
-Received: from ssh.movementarian.org ([2a01:7e00::f03c:92ff:fefb:3ad2]:59820
- helo=movementarian.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <movement@li1368-133.members.linode.com>)
- id 1kYXo1-0005iF-41
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 13:03:14 -0400
-Received: from movement by movementarian.org with local (Exim 4.93)
- (envelope-from <movement@li1368-133.members.linode.com>)
- id 1kYXnu-00Agre-GO; Fri, 30 Oct 2020 17:03:06 +0000
-Date: Fri, 30 Oct 2020 17:03:06 +0000
-From: John Levon <levon@movementarian.org>
-To: Thanos Makatos <thanos.makatos@nutanix.com>
-Subject: Re: [PATCH v5] introduce vfio-user protocol specification
-Message-ID: <20201030170306.GA2544852@li1368-133.members.linode.com>
-References: <1594984851-59327-1-git-send-email-thanos.makatos@nutanix.com>
- <20201028161005.115810-1-thanos.makatos@nutanix.com>
- <SN1PR02MB3725C85DCD4BF652FF6FBB8D8B170@SN1PR02MB3725.namprd02.prod.outlook.com>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kYXrX-0002Ms-3W
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 13:06:51 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:34504)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kYXrV-00065U-2a
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 13:06:50 -0400
+Received: by mail-ej1-x641.google.com with SMTP id o9so7503214ejg.1
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 10:06:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ageQKVMyXpw9lAwTpkp/Z7CU4TKfDOZ4BpnSRCl+0wA=;
+ b=Gczs0sKU/+6F1DsaSN5/o13SPrFx8a7k60gcHcUn7nUp53m8dTJpFW9FeOaDdwFgUN
+ xKubYwHANZaWbL0w2MoCx9c3SyiIZKHCl0OjbPeO+9OifhvXIOor7FMS/5T6zAGyn22/
+ T/AEWzV7sJfRG29TAR1IIoL0xbp57+Mmr0pRR50LalJo6ruJphJ0B1qMcSPqltBVZmy0
+ 5WZy0T4+S23Z5d1gJbD44z25AAwhbnWvKJzyk6g783fStF6b+8cuVGjbARGFbu2J5Y60
+ GnUB3nWWfp9cJrd6yhqnmm63K6I3/9BHAMS7/vYN4YNolda/bP9pEt9CEGZWrwtW8Z0F
+ 9H1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ageQKVMyXpw9lAwTpkp/Z7CU4TKfDOZ4BpnSRCl+0wA=;
+ b=R5U/b65vpGciKcosan2A8sVqF7yWdEVJIVnb0Zf0wUa7wRGpROb23tUbiiUkfXpzXr
+ luOYWbp6SQ1UnwAtxDBm5yM9fgcToKx3wM8eZVcJn7S8wyqIeZdvFJunIzPNNoxPWnkj
+ /a/YQzyoqaZcQmFysDKGn2+MaOPfCivAcoiMvUpj1KDzVIk3JC6mDsfcW4pt/4fU1loe
+ EGFN+nwGq9J7Os0lWyNeizu/wvk2GlRQrP1vZ+dsmdo55wroRzN+SY+qYLMEv4TCOrMo
+ bMEi/mxz/b9mCu4WDxTIyBmwBzx7t/7SoFknEiTACmu3n0+NHDYjSCg5pkPny7fElo4v
+ 3xdA==
+X-Gm-Message-State: AOAM531P7iE8cJB1E7JqbXq+rWkBomQX3hOL1Ev6HIvfUWzHJ4dPpVGl
+ 2r+rB7V6ErIl8Td611nwBk+k44NdOYWQ7QOPD3k=
+X-Google-Smtp-Source: ABdhPJy4zUlvxWVQ0Ax2b8p6ySbth0T9tlKbRKblQQDuAfl4aPCSBvxxJpqNdZbASI4azlbcks+V/T/Dh7g5W2JtEiw=
+X-Received: by 2002:a17:906:2798:: with SMTP id
+ j24mr3375976ejc.109.1604077607203; 
+ Fri, 30 Oct 2020 10:06:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN1PR02MB3725C85DCD4BF652FF6FBB8D8B170@SN1PR02MB3725.namprd02.prod.outlook.com>
-X-Url: http://www.movementarian.org/
-Received-SPF: none client-ip=2a01:7e00::f03c:92ff:fefb:3ad2;
- envelope-from=movement@li1368-133.members.linode.com; helo=movementarian.org
+References: <20201029220246.472693-1-ehabkost@redhat.com>
+ <20201029220246.472693-32-ehabkost@redhat.com>
+In-Reply-To: <20201029220246.472693-32-ehabkost@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 30 Oct 2020 21:06:34 +0400
+Message-ID: <CAJ+F1C+-=hW0b0-kYKMftxOcz7BCr3bxEokj0LRWPqM5MCjj2w@mail.gmail.com>
+Subject: Re: [PATCH 31/36] qdev: Stop using error_set_from_qdev_prop_error()
+ for UUID property
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000f83bca05b2e66b02"
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 20
-X-Spam_score: 2.0
-X-Spam_bar: ++
-X-Spam_report: (2.0 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, KHOP_HELO_FCRDNS=0.276,
- RCVD_IN_SBL_CSS=3.335, SPF_HELO_FAIL=0.001, SPF_NONE=0.001,
- WEIRD_QUOTING=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,192 +97,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "benjamin.walker@intel.com" <benjamin.walker@intel.com>,
- Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- "jag.raman@oracle.com" <jag.raman@oracle.com>,
- "james.r.harris@intel.com" <james.r.harris@intel.com>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>,
- "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
- "yuvalkashtan@gmail.com" <yuvalkashtan@gmail.com>,
- "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
- "tina.zhang@intel.com" <tina.zhang@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- "ismael@linux.com" <ismael@linux.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
- "xiuchun.lu@intel.com" <xiuchun.lu@intel.com>,
- "tomassetti.andrea@gmail.com" <tomassetti.andrea@gmail.com>,
- "changpeng.liu@intel.com" <changpeng.liu@intel.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- "Kanth.Ghatraju@oracle.com" <Kanth.Ghatraju@oracle.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 28, 2020 at 04:41:31PM +0000, Thanos Makatos wrote:
+--000000000000f83bca05b2e66b02
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> FYI here's v5 of the vfio-user protocol, my --cc in git send-email got messed up somehow
+On Fri, Oct 30, 2020 at 2:22 AM Eduardo Habkost <ehabkost@redhat.com> wrote=
+:
 
-Hi Thanos, this looks great, I just had some minor questions below.
+> Just setting a reasonable error string using error_setg() is
+> simpler and makes error messages clearer.
+>
+> Before:
+>
+>   $ qemu-system-x86_64 -device vmgenid,guid=3Dx
+>   qemu-system-x86_64: -device vmgenid,guid=3Dx: Property 'vmgenid.guid'
+> doesn't take value 'x'
+>
+> After:
+>
+>   $ qemu-system-x86_64 -device vmgenid,guid=3Dx
+>   qemu-system-x86_64: -device vmgenid,guid=3Dx: invalid UUID: 'x'
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>
 
-> Command Concurrency
-> -------------------
-> A client may pipeline multiple commands without waiting for previous command
-> replies.  The server will process commands in the order they are received.
-> A consequence of this is if a client issues a command with the *No_reply* bit,
-> then subseqently issues a command without *No_reply*, the older command will
-> have been processed before the reply to the younger command is sent by the
-> server.  The client must be aware of the device's capability to process concurrent
-> commands if pipelining is used.  For example, pipelining allows multiple client
-> threads to concurently access device memory; the client must ensure these acceses
-> obey device semantics.
-> 
-> An example is a frame buffer device, where the device may allow concurrent access
-> to different areas of video memory, but may have indeterminate behavior if concurrent
-> acceses are performed to command or status registers.
+It looks like we agree that error_set_from_qdev_prop_error() should
+eventually be replaced :)
 
-Is it valid for an unrelated server->client message to appear in between a
-client->server request/reply, or not? And vice versa? Either way, seems useful
-for the spec to say.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> |                | +-----+------------+ |
-> |                | | Bit | Definition | |
-> |                | +=====+============+ |
-> |                | | 0-3 | Type       | |
-> |                | +-----+------------+ |
-> |                | | 4   | No_reply   | |
-> |                | +-----+------------+ |
-> |                | | 5   | Error      | |
-> |                | +-----+------------+ |
-> +----------------+--------+-------------+
-> | Error          | 12     | 4           |
-> +----------------+--------+-------------+
-> 
-> * *Message ID* identifies the message, and is echoed in the command's reply message.
+---
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/core/qdev-properties.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 59d65a7362..5b9907e8ba 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -509,7 +509,7 @@ static void set_uuid(Object *obj, Visitor *v, const
+> char *name, void *opaque,
+>      if (!strcmp(str, UUID_VALUE_AUTO)) {
+>          qemu_uuid_generate(uuid);
+>      } else if (qemu_uuid_parse(str, uuid) < 0) {
+> -        error_set_from_qdev_prop_error(errp, EINVAL, obj, prop, str);
+> +        error_setg(errp, "invalid UUID: '%s'", str);
+>      }
+>      g_free(str);
+>  }
+> --
+> 2.28.0
+>
+>
+>
 
-Is it valid to re-use an ID? When/when not?
+--=20
+Marc-Andr=C3=A9 Lureau
 
->   * *Error* in a reply message indicates the command being acknowledged had
->     an error. In this case, the *Error* field will be valid.
-> 
-> * *Error* in a reply message is a UNIX errno value. It is reserved in a command message.
+--000000000000f83bca05b2e66b02
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I'm not quite following why we need a bit flag and an error field. Do you
-anticipate a failure, but with errno==0?
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 30, 2020 at 2:22 AM Eduar=
+do Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.com</=
+a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
+x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Ju=
+st setting a reasonable error string using error_setg() is<br>
+simpler and makes error messages clearer.<br>
+<br>
+Before:<br>
+<br>
+=C2=A0 $ qemu-system-x86_64 -device vmgenid,guid=3Dx<br>
+=C2=A0 qemu-system-x86_64: -device vmgenid,guid=3Dx: Property &#39;vmgenid.=
+guid&#39; doesn&#39;t take value &#39;x&#39;<br>
+<br>
+After:<br>
+<br>
+=C2=A0 $ qemu-system-x86_64 -device vmgenid,guid=3Dx<br>
+=C2=A0 qemu-system-x86_64: -device vmgenid,guid=3Dx: invalid UUID: &#39;x&#=
+39;<br>
+<br>
+Signed-off-by: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" t=
+arget=3D"_blank">ehabkost@redhat.com</a>&gt;<br></blockquote><div><br></div=
+><div>It looks like we agree that error_set_from_qdev_prop_error() should e=
+ventually be replaced :)</div><div><br></div><div>Reviewed-by: Marc-Andr=C3=
+=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marcandre.lur=
+eau@redhat.com</a>&gt;</div><div> <br></div><blockquote class=3D"gmail_quot=
+e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
+;padding-left:1ex">
+---<br>
+Cc: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" target=3D"_bla=
+nk">pbonzini@redhat.com</a>&gt;<br>
+Cc: &quot;Daniel P. Berrang=C3=A9&quot; &lt;<a href=3D"mailto:berrange@redh=
+at.com" target=3D"_blank">berrange@redhat.com</a>&gt;<br>
+Cc: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" target=3D"_b=
+lank">ehabkost@redhat.com</a>&gt;<br>
+Cc: <a href=3D"mailto:qemu-devel@nongnu.org" target=3D"_blank">qemu-devel@n=
+ongnu.org</a><br>
+---<br>
+=C2=A0hw/core/qdev-properties.c | 2 +-<br>
+=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
+<br>
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c<br>
+index 59d65a7362..5b9907e8ba 100644<br>
+--- a/hw/core/qdev-properties.c<br>
++++ b/hw/core/qdev-properties.c<br>
+@@ -509,7 +509,7 @@ static void set_uuid(Object *obj, Visitor *v, const cha=
+r *name, void *opaque,<br>
+=C2=A0 =C2=A0 =C2=A0if (!strcmp(str, UUID_VALUE_AUTO)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qemu_uuid_generate(uuid);<br>
+=C2=A0 =C2=A0 =C2=A0} else if (qemu_uuid_parse(str, uuid) &lt; 0) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_set_from_qdev_prop_error(errp, EINVAL, o=
+bj, prop, str);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_setg(errp, &quot;invalid UUID: &#39;%s&#=
+39;&quot;, str);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0g_free(str);<br>
+=C2=A0}<br>
+-- <br>
+2.28.0<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
 
-> VFIO_USER_VERSION
-> -----------------
-> 
-> +--------------+------------------------+
-> | Message size | 16 + version length    |
-
-Terminating NUL included?
-
-> +--------------+--------+---------------------------------------------------+
-> | Name         | Type   | Description                                       |
-> +==============+========+===================================================+
-> | version      | object | ``{"major": <number>, "minor": <number>}``        |
-> |              |        |                                                   |
-> |              |        | Version supported by the sender, e.g. "0.1".      |
-
-It seems quite unlikely but this should specify it's strings not floating point
-values maybe?
-
-Definitely applies to max_fds too.
-
-> Common capabilities:
-> 
-> +---------------+------------------------------------------------------------+
-> | Name          | Description                                                |
-> +===============+============================================================+
-> | ``max_fds``   | Maximum number of file descriptors that can be received by |
-> |               | the sender. Optional.                                      |
-
-Could specify the meaning when absent?
-
-By array I presume you mean associative array i.e. an Object. Does the whole
-thing look like this:
-
- {
-   "major": ..
-   "minor": ..
-   "capabilities": {
-      "max_fds": ..,
-      "migration
-   }
- }
-
-or something else?
-
-> Versioning and Feature Support
-> ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> Upon accepting a connection, the server must send a VFIO_USER_VERSION message
-> proposing a protocol version and a set of capabilities. The client compares
-> these with the versions and capabilities it supports and sends a
-> VFIO_USER_VERSION reply according to the following rules.
-
-I'm curious if there was a specific reason it's this way around, when it seems
-more natural for the client to propose first, and the server to reply?
-
-> VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP
-> -----------------------------------------
-
-Huge nit, but why are these DMA_*MAP when vfio uses *MAP_DMA ?
-
-> VFIO bitmap format
-> * *size* the size for the bitmap, in bytes.
-
-Should this clarify it does *not* include the bitmap header in its size, unlike
-other size fields?
-
-> VFIO_USER_DMA_MAP
-> """""""""""""""""
-> If a DMA region being added can be directly mapped by the server, an array of
-> file descriptors must be sent as part of the message meta-data. Each region
-> entry must have a corresponding file descriptor.
-
-"Each mappable region entry" ?
-
-> descriptors must be passed as SCM_RIGHTS type ancillary data. Otherwise, if a
-> DMA region cannot be directly mapped by the server, it can be accessed by the
-> server using VFIO_USER_DMA_READ and VFIO_USER_DMA_WRITE messages, explained in
-> `Read and Write Operations`_. A command to map over an existing region must be
-> failed by the server with ``EEXIST`` set in error field in the reply.
-> 
-> VFIO_USER_DMA_UNMAP
-> """""""""""""""""""
-> Upon receiving a VFIO_USER_DMA_UNMAP command, if the file descriptor is mapped
-> then the server must release all references to that DMA region before replying,
-> which includes potentially in flight DMA transactions. Removing a portion of a
-> DMA region is possible. If the VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP bit is set
-> in the request, the server must append to the header the ``struct vfio_bitmap``
-> received in the command, followed by the bitmap. Thus, the message size the
-> client should is expect is the size of the header plus the size of
-> ``struct vfio_bitmap`` plus ``vfio_bitmap.size`` bytes. Each bit in the bitmap
-> represents one page of size ``vfio_bitmap.pgsize``.
-
-I'm finding this makes the sizing a bit confusing between map and unmap, could
-we may be separate them out, and always define a vfio_bitmap slot for unmap?
-
-Also, shouldn't the client expect sizeof (header) + (nr_table_entries_in_request
-* (each vfio_bitmap's size))  in the server's response?
-
-Does the reply header size field reflect this?
-
-> VFIO_USER_DMA_WRITE
-> -------------------
-> 
-> This command message is sent from the server to the client to write to server
-> memory.
-
-"write to client memory"?
-
-> VFIO_USER_DIRY_PAGES
-
-Nit, "DIRTY"
-
-thanks
-john
+--000000000000f83bca05b2e66b02--
 
