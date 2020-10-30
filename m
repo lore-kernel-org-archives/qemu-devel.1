@@ -7,86 +7,71 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9048CC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:53:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC87C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:55:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBC002071A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:53:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AB202071A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 00:55:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jdRclqiw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBC002071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pLEn8Gl9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB202071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYIfR-0000sO-Mh
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 20:53:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46782)
+	id 1kYIh3-0003EA-UB
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 20:55:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kYIbt-0004B4-2K
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:49:41 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38124)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kYIbo-0001qb-Bj
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:49:40 -0400
-Received: by mail-pl1-x642.google.com with SMTP id f21so2145917plr.5
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 17:49:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=lHun2ZxuS/0xbnIsg9kw/Mf4MSlDIejtF5E3bEXp2y0=;
- b=jdRclqiwJPaG6pPmyihrElHy2i5ZklnSskHGGLNR0eCa59tv4ZNr0PMdFFcoBHzh8D
- 7wVKKi4zxZ3t191xz7prwz2vOeK2jrYbkxECcGf2zD7fuYBpKLoiSBg+nA8ArkC2sUS2
- 9X/UZo7gnGRfLAOWYo1Aaz+AuI7eapnqC4eekh5qnn8ivx6OmjCJIJ9WCSij90D/7fVC
- 7N18SLrCwAS/H+TlAuc7RPO+O3twys0/uf9p47+6jEsnGIWXM0xa0Ejhzz74lyLvw9uM
- mANFASLgEnYCPGQ1Oy3WwD2r84PgofxM3hnmGBHYiPaJj01jYDbMl6ALYwGzRy6trCTg
- oBLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=lHun2ZxuS/0xbnIsg9kw/Mf4MSlDIejtF5E3bEXp2y0=;
- b=SlbmQdt8xW/jsQVG0m6Wi82PuGt9ykog1nGnvV3epi/CuVB7QK5vj6Y2rqsbT/JIFL
- YUSWfQ9GMJKUUYMTT1q270MeBLAw+JOrnpGGOgMIZ0g8aRfh8fdwyWpY7Lji87T9r4r1
- ismOvueCRKeuPS4UkjGvExeXALqAqgX2Eb6LbzXJuAPc+z3O5cDDJfaJW9o9EYEPBQw4
- nI0+f2S35kDKN8i2CdVzDlo7OoqiOL1Ddd2vf5aVOF18evv20CRTEEuL87MqEZTFZYnS
- mwcjUsx3tdnYQOUaMeXURKa0IW+SHEIf20Hilx37OeRWvHQGobY+720QZFcWSX6fq5VC
- 5xKQ==
-X-Gm-Message-State: AOAM532Bh0ifQq6z0eqLSaTPxA4KUhsHdn/1SHzbezjDbWk5AAW1hewb
- cXjskxH2OVmSpOffFjpVQrkU4bzLudn7MA==
-X-Google-Smtp-Source: ABdhPJz49nhjh1z6Zof/iefzVEJgpiDsGH9BCJsF/vMg9LVSZjwut/TJxFWWU1PoIvOZZmH+XwvqNQ==
-X-Received: by 2002:a17:902:c391:b029:d6:32b5:1066 with SMTP id
- g17-20020a170902c391b02900d632b51066mr6989421plg.79.1604018974403; 
- Thu, 29 Oct 2020 17:49:34 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id b6sm3557264pgq.58.2020.10.29.17.49.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Oct 2020 17:49:33 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <tsimpson@qualcomm.com>)
+ id 1kYHzG-0004Zi-3f
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:09:46 -0400
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:54820)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <tsimpson@qualcomm.com>)
+ id 1kYHz8-0005RE-Tb
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 20:09:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1604016578; x=1635552578;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=EEzL3rhGnVtZiY8emjGk7wiV7wZzkWzvxkVbFB212XY=;
+ b=pLEn8Gl9gQ1kD0Yv5YljRi7q/bmg39JiO59OA13LIntTOnT/BYgk/PaP
+ LuJPyh+T5I2YHCg8zC71bf3nnCSYs5dkiKsb8UiBppQ9qggOMCOXGD2h4
+ UlPrx8qwLRGI8DWwBHJzMC5ItGxDP5g2F7GCAfSLykiB0Ba8CK0i4k49y k=;
+Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 29 Oct 2020 17:08:47 -0700
+X-QCInternal: smtphost
+Received: from vu-tsimpson-aus.qualcomm.com (HELO
+ vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
+ by ironmsg-SD-alpha.qualcomm.com with ESMTP; 29 Oct 2020 17:08:46 -0700
+Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
+ id 4C164411A; Thu, 29 Oct 2020 19:08:46 -0500 (CDT)
+From: Taylor Simpson <tsimpson@quicinc.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 08/19] tcg: Adjust tb_target_set_jmp_target for split rwx
-Date: Thu, 29 Oct 2020 17:49:10 -0700
-Message-Id: <20201030004921.721096-9-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201030004921.721096-1-richard.henderson@linaro.org>
-References: <20201030004921.721096-1-richard.henderson@linaro.org>
+Subject: [RFC PATCH v5 26/33] Hexagon (target/hexagon) TCG generation
+Date: Thu, 29 Oct 2020 19:08:32 -0500
+Message-Id: <1604016519-28065-27-git-send-email-tsimpson@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1604016519-28065-1-git-send-email-tsimpson@quicinc.com>
+References: <1604016519-28065-1-git-send-email-tsimpson@quicinc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=199.106.114.39;
+ envelope-from=tsimpson@qualcomm.com; helo=alexa-out-sd-02.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 19:58:53
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,325 +85,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, j@getutm.app, laurent@vivier.eu
+Cc: ale@rev.ng, bcain@quicinc.com, richard.henderson@linaro.org,
+ at.org@qualcomm.com, laurent@vivier.eu, tsimpson@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pass both rx and rw addresses to tb_target_set_jmp_target.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/aarch64/tcg-target.h     |  2 +-
- tcg/arm/tcg-target.h         |  2 +-
- tcg/i386/tcg-target.h        |  6 +++---
- tcg/mips/tcg-target.h        |  2 +-
- tcg/ppc/tcg-target.h         |  2 +-
- tcg/riscv/tcg-target.h       |  2 +-
- tcg/s390/tcg-target.h        |  8 ++++----
- tcg/sparc/tcg-target.h       |  2 +-
- tcg/tci/tcg-target.h         |  6 +++---
- accel/tcg/cpu-exec.c         |  4 +++-
- tcg/aarch64/tcg-target.c.inc | 12 ++++++------
- tcg/mips/tcg-target.c.inc    |  8 ++++----
- tcg/ppc/tcg-target.c.inc     | 16 ++++++++--------
- tcg/sparc/tcg-target.c.inc   | 14 +++++++-------
- 14 files changed, 44 insertions(+), 42 deletions(-)
-
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index d0a6a059b7..91313d93be 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -158,7 +158,7 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
-     __builtin___clear_cache((char *)rx, (char *)(rx + len));
- }
- 
--void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
-+void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- 
- #ifdef CONFIG_SOFTMMU
- #define TCG_TARGET_NEED_LDST_LABELS
-diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
-index fa88b24e43..b21a2fb6a1 100644
---- a/tcg/arm/tcg-target.h
-+++ b/tcg/arm/tcg-target.h
-@@ -144,7 +144,7 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
- }
- 
- /* not defined -- call should be eliminated at compile time */
--void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
-+void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- 
- #ifdef CONFIG_SOFTMMU
- #define TCG_TARGET_NEED_LDST_LABELS
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 8323e72639..f52ba0ffec 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -211,11 +211,11 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
- {
- }
- 
--static inline void tb_target_set_jmp_target(uintptr_t tc_ptr,
--                                            uintptr_t jmp_addr, uintptr_t addr)
-+static inline void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
-+                                            uintptr_t jmp_rw, uintptr_t addr)
- {
-     /* patch the branch destination */
--    qatomic_set((int32_t *)jmp_addr, addr - (jmp_addr + 4));
-+    qatomic_set((int32_t *)jmp_rw, addr - (jmp_rx + 4));
-     /* no need to flush icache explicitly */
- }
- 
-diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
-index 47b1226ee9..cd548dacec 100644
---- a/tcg/mips/tcg-target.h
-+++ b/tcg/mips/tcg-target.h
-@@ -216,7 +216,7 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
-     cacheflush((void *)rx, len, ICACHE);
- }
- 
--void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
-+void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- 
- #ifdef CONFIG_SOFTMMU
- #define TCG_TARGET_NEED_LDST_LABELS
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index fbb6dc1b47..8f3e4c924a 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -176,7 +176,7 @@ extern bool have_vsx;
- #define TCG_TARGET_HAS_cmpsel_vec       0
- 
- void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len);
--void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
-+void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- 
- #define TCG_TARGET_DEFAULT_MO (0)
- #define TCG_TARGET_HAS_MEMORY_BSWAP     1
-diff --git a/tcg/riscv/tcg-target.h b/tcg/riscv/tcg-target.h
-index 0fa6ae358e..e03fd17427 100644
---- a/tcg/riscv/tcg-target.h
-+++ b/tcg/riscv/tcg-target.h
-@@ -169,7 +169,7 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
- }
- 
- /* not defined -- call should be eliminated at compile time */
--void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
-+void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- 
- #define TCG_TARGET_DEFAULT_MO (0)
- 
-diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-index c3dc2e8938..c5a749e425 100644
---- a/tcg/s390/tcg-target.h
-+++ b/tcg/s390/tcg-target.h
-@@ -150,12 +150,12 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
- {
- }
- 
--static inline void tb_target_set_jmp_target(uintptr_t tc_ptr,
--                                            uintptr_t jmp_addr, uintptr_t addr)
-+static inline void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
-+                                            uintptr_t jmp_rw, uintptr_t addr)
- {
-     /* patch the branch destination */
--    intptr_t disp = addr - (jmp_addr - 2);
--    qatomic_set((int32_t *)jmp_addr, disp / 2);
-+    intptr_t disp = addr - (jmp_rx - 2);
-+    qatomic_set((int32_t *)jmp_rw, disp / 2);
-     /* no need to flush icache explicitly */
- }
- 
-diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
-index c27c40231e..87e2be61e6 100644
---- a/tcg/sparc/tcg-target.h
-+++ b/tcg/sparc/tcg-target.h
-@@ -178,7 +178,7 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
-     }
- }
- 
--void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
-+void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- 
- #define TCG_TARGET_NEED_POOL_LABELS
- 
-diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-index 49f3291f8a..a19a6b06e5 100644
---- a/tcg/tci/tcg-target.h
-+++ b/tcg/tci/tcg-target.h
-@@ -201,11 +201,11 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
- 
- #define TCG_TARGET_HAS_MEMORY_BSWAP     1
- 
--static inline void tb_target_set_jmp_target(uintptr_t tc_ptr,
--                                            uintptr_t jmp_addr, uintptr_t addr)
-+static inline void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
-+                                            uintptr_t jmp_rw, uintptr_t addr)
- {
-     /* patch the branch destination */
--    qatomic_set((int32_t *)jmp_addr, addr - (jmp_addr + 4));
-+    qatomic_set((int32_t *)jmp_rw, addr - (jmp_rx + 4));
-     /* no need to flush icache explicitly */
- }
- 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 1e3cb570f6..4af3faba80 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -354,7 +354,9 @@ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
-     if (TCG_TARGET_HAS_direct_jump) {
-         uintptr_t offset = tb->jmp_target_arg[n];
-         uintptr_t tc_ptr = (uintptr_t)tb->tc.ptr;
--        tb_target_set_jmp_target(tc_ptr, tc_ptr + offset, addr);
-+        uintptr_t jmp_rx = tc_ptr + offset;
-+        uintptr_t jmp_rw = jmp_rx - tcg_rx_mirror_diff;
-+        tb_target_set_jmp_target(tc_ptr, jmp_rx, jmp_rw, addr);
-     } else {
-         tb->jmp_target_arg[n] = addr;
-     }
-diff --git a/tcg/aarch64/tcg-target.c.inc b/tcg/aarch64/tcg-target.c.inc
-index 9ace859db3..fea784cf75 100644
---- a/tcg/aarch64/tcg-target.c.inc
-+++ b/tcg/aarch64/tcg-target.c.inc
-@@ -1340,21 +1340,21 @@ static inline void tcg_out_call(TCGContext *s, const tcg_insn_unit *target)
-     }
- }
- 
--void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
--                              uintptr_t addr)
-+void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
-+                              uintptr_t jmp_rw, uintptr_t addr)
- {
-     tcg_insn_unit i1, i2;
-     TCGType rt = TCG_TYPE_I64;
-     TCGReg  rd = TCG_REG_TMP;
-     uint64_t pair;
- 
--    ptrdiff_t offset = addr - jmp_addr;
-+    ptrdiff_t offset = addr - jmp_rx;
- 
-     if (offset == sextract64(offset, 0, 26)) {
-         i1 = I3206_B | ((offset >> 2) & 0x3ffffff);
-         i2 = NOP;
-     } else {
--        offset = (addr >> 12) - (jmp_addr >> 12);
-+        offset = (addr >> 12) - (jmp_rx >> 12);
- 
-         /* patch ADRP */
-         i1 = I3406_ADRP | (offset & 3) << 29 | (offset & 0x1ffffc) << (5 - 2) | rd;
-@@ -1362,8 +1362,8 @@ void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
-         i2 = I3401_ADDI | rt << 31 | (addr & 0xfff) << 10 | rd << 5 | rd;
-     }
-     pair = (uint64_t)i2 << 32 | i1;
--    qatomic_set((uint64_t *)jmp_addr, pair);
--    flush_idcache_range(jmp_addr, jmp_addr, 8);
-+    qatomic_set((uint64_t *)jmp_rw, pair);
-+    flush_idcache_range(jmp_rx, jmp_rw, 8);
- }
- 
- static inline void tcg_out_goto_label(TCGContext *s, TCGLabel *l)
-diff --git a/tcg/mips/tcg-target.c.inc b/tcg/mips/tcg-target.c.inc
-index b74dc15b86..e87a632637 100644
---- a/tcg/mips/tcg-target.c.inc
-+++ b/tcg/mips/tcg-target.c.inc
-@@ -2656,11 +2656,11 @@ static void tcg_target_init(TCGContext *s)
-     tcg_regset_set_reg(s->reserved_regs, TCG_REG_GP);   /* global pointer */
- }
- 
--void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
--                              uintptr_t addr)
-+void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
-+                              uintptr_t jmp_rw, uintptr_t addr)
- {
--    qatomic_set((uint32_t *)jmp_addr, deposit32(OPC_J, 0, 26, addr >> 2));
--    flush_idcache_range(jmp_addr, jmp_addr, 4);
-+    qatomic_set((uint32_t *)jmp_rw, deposit32(OPC_J, 0, 26, addr >> 2));
-+    flush_idcache_range(jmp_rx, jmp_rw, 4);
- }
- 
- typedef struct {
-diff --git a/tcg/ppc/tcg-target.c.inc b/tcg/ppc/tcg-target.c.inc
-index bdaffeabb3..6a71b81f4e 100644
---- a/tcg/ppc/tcg-target.c.inc
-+++ b/tcg/ppc/tcg-target.c.inc
-@@ -1722,13 +1722,13 @@ static void tcg_out_mb(TCGContext *s, TCGArg a0)
-     tcg_out32(s, insn);
- }
- 
--void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
--                              uintptr_t addr)
-+void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
-+                              uintptr_t jmp_rw, uintptr_t addr)
- {
-     if (TCG_TARGET_REG_BITS == 64) {
-         tcg_insn_unit i1, i2;
-         intptr_t tb_diff = addr - tc_ptr;
--        intptr_t br_diff = addr - (jmp_addr + 4);
-+        intptr_t br_diff = addr - (jmp_rx + 4);
-         uint64_t pair;
- 
-         /* This does not exercise the range of the branch, but we do
-@@ -1752,13 +1752,13 @@ void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
- 
-         /* As per the enclosing if, this is ppc64.  Avoid the _Static_assert
-            within qatomic_set that would fail to build a ppc32 host.  */
--        qatomic_set__nocheck((uint64_t *)jmp_addr, pair);
--        flush_idcache_range(jmp_addr, jmp_addr, 8);
-+        qatomic_set__nocheck((uint64_t *)jmp_rw, pair);
-+        flush_idcache_range(jmp_rx, jmp_rw, 8);
-     } else {
--        intptr_t diff = addr - jmp_addr;
-+        intptr_t diff = addr - jmp_rx;
-         tcg_debug_assert(in_range_b(diff));
--        qatomic_set((uint32_t *)jmp_addr, B | (diff & 0x3fffffc));
--        flush_idcache_range(jmp_addr, jmp_addr, 4);
-+        qatomic_set((uint32_t *)jmp_rw, B | (diff & 0x3fffffc));
-+        flush_idcache_range(jmp_rx, jmp_rw, 4);
-     }
- }
- 
-diff --git a/tcg/sparc/tcg-target.c.inc b/tcg/sparc/tcg-target.c.inc
-index 4c81d5f1c2..d599ae27b5 100644
---- a/tcg/sparc/tcg-target.c.inc
-+++ b/tcg/sparc/tcg-target.c.inc
-@@ -1821,11 +1821,11 @@ void tcg_register_jit(const void *buf, size_t buf_size)
-     tcg_register_jit_int(buf, buf_size, &debug_frame, sizeof(debug_frame));
- }
- 
--void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
--                              uintptr_t addr)
-+void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
-+                              uintptr_t jmp_rw, uintptr_t addr)
- {
-     intptr_t tb_disp = addr - tc_ptr;
--    intptr_t br_disp = addr - jmp_addr;
-+    intptr_t br_disp = addr - jmp_rx;
-     tcg_insn_unit i1, i2;
- 
-     /* We can reach the entire address space for ILP32.
-@@ -1834,9 +1834,9 @@ void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
-     tcg_debug_assert(br_disp == (int32_t)br_disp);
- 
-     if (!USE_REG_TB) {
--        qatomic_set((uint32_t *)jmp_addr,
-+        qatomic_set((uint32_t *)jmp_rw,
- 		    deposit32(CALL, 0, 30, br_disp >> 2));
--        flush_idcache_range(jmp_addr, jmp_addr, 4);
-+        flush_idcache_range(jmp_rx, jmp_rw, 4);
-         return;
-     }
- 
-@@ -1859,6 +1859,6 @@ void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
-               | INSN_IMM13((tb_disp & 0x3ff) | -0x400));
-     }
- 
--    qatomic_set((uint64_t *)jmp_addr, deposit64(i2, 32, 32, i1));
--    flush_idcache_range(jmp_addr, jmp_addr, 8);
-+    qatomic_set((uint64_t *)jmp_rw, deposit64(i2, 32, 32, i1));
-+    flush_idcache_range(jmp_rx, jmp_rw, 8);
- }
--- 
-2.25.1
-
+SW5jbHVkZSB0aGUgZ2VuZXJhdGVkIGZpbGVzIGFuZCBzZXQgdXAgdGhlIGRhdGEgc3RydWN0dXJl
+cwoKU2lnbmVkLW9mZi1ieTogVGF5bG9yIFNpbXBzb24gPHRzaW1wc29uQHF1aWNpbmMuY29tPgot
+LS0KIHRhcmdldC9oZXhhZ29uL2dlbnB0ci5oIHwgIDI1ICsrKysrKwogdGFyZ2V0L2hleGFnb24v
+Z2VucHRyLmMgfCAyMzQgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrCiAyIGZpbGVzIGNoYW5nZWQsIDI1OSBpbnNlcnRpb25zKCspCiBjcmVhdGUgbW9kZSAx
+MDA2NDQgdGFyZ2V0L2hleGFnb24vZ2VucHRyLmgKIGNyZWF0ZSBtb2RlIDEwMDY0NCB0YXJnZXQv
+aGV4YWdvbi9nZW5wdHIuYwoKZGlmZiAtLWdpdCBhL3RhcmdldC9oZXhhZ29uL2dlbnB0ci5oIGIv
+dGFyZ2V0L2hleGFnb24vZ2VucHRyLmgKbmV3IGZpbGUgbW9kZSAxMDA2NDQKaW5kZXggMDAwMDAw
+MC4uNGU4ZjkwMwotLS0gL2Rldi9udWxsCisrKyBiL3RhcmdldC9oZXhhZ29uL2dlbnB0ci5oCkBA
+IC0wLDAgKzEsMjUgQEAKKy8qCisgKiAgQ29weXJpZ2h0KGMpIDIwMTktMjAyMCBRdWFsY29tbSBJ
+bm5vdmF0aW9uIENlbnRlciwgSW5jLiBBbGwgUmlnaHRzIFJlc2VydmVkLgorICoKKyAqICBUaGlz
+IHByb2dyYW0gaXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiByZWRpc3RyaWJ1dGUgaXQgYW5kL29y
+IG1vZGlmeQorICogIGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGlj
+IExpY2Vuc2UgYXMgcHVibGlzaGVkIGJ5CisgKiAgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlv
+bjsgZWl0aGVyIHZlcnNpb24gMiBvZiB0aGUgTGljZW5zZSwgb3IKKyAqICAoYXQgeW91ciBvcHRp
+b24pIGFueSBsYXRlciB2ZXJzaW9uLgorICoKKyAqICBUaGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0
+ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdCB3aWxsIGJlIHVzZWZ1bCwKKyAqICBidXQgV0lUSE9VVCBB
+TlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBvZgorICogIE1F
+UkNIQU5UQUJJTElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4gIFNlZSB0
+aGUKKyAqICBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBmb3IgbW9yZSBkZXRhaWxzLgorICoK
+KyAqICBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJhbCBQ
+dWJsaWMgTGljZW5zZQorICogIGFsb25nIHdpdGggdGhpcyBwcm9ncmFtOyBpZiBub3QsIHNlZSA8
+aHR0cDovL3d3dy5nbnUub3JnL2xpY2Vuc2VzLz4uCisgKi8KKworI2lmbmRlZiBIRVhBR09OX0dF
+TlBUUl9ICisjZGVmaW5lIEhFWEFHT05fR0VOUFRSX0gKKworI2luY2x1ZGUgImluc24uaCIKKwor
+ZXh0ZXJuIGNvbnN0IFNlbWFudGljSW5zbiBvcGNvZGVfZ2VucHRyW107CisKKyNlbmRpZgpkaWZm
+IC0tZ2l0IGEvdGFyZ2V0L2hleGFnb24vZ2VucHRyLmMgYi90YXJnZXQvaGV4YWdvbi9nZW5wdHIu
+YwpuZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi5iYTIzM2E0Ci0tLSAvZGV2L251
+bGwKKysrIGIvdGFyZ2V0L2hleGFnb24vZ2VucHRyLmMKQEAgLTAsMCArMSwyMzQgQEAKKy8qCisg
+KiAgQ29weXJpZ2h0KGMpIDIwMTktMjAyMCBRdWFsY29tbSBJbm5vdmF0aW9uIENlbnRlciwgSW5j
+LiBBbGwgUmlnaHRzIFJlc2VydmVkLgorICoKKyAqICBUaGlzIHByb2dyYW0gaXMgZnJlZSBzb2Z0
+d2FyZTsgeW91IGNhbiByZWRpc3RyaWJ1dGUgaXQgYW5kL29yIG1vZGlmeQorICogIGl0IHVuZGVy
+IHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgYXMgcHVibGlzaGVk
+IGJ5CisgKiAgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbjsgZWl0aGVyIHZlcnNpb24gMiBv
+ZiB0aGUgTGljZW5zZSwgb3IKKyAqICAoYXQgeW91ciBvcHRpb24pIGFueSBsYXRlciB2ZXJzaW9u
+LgorICoKKyAqICBUaGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBp
+dCB3aWxsIGJlIHVzZWZ1bCwKKyAqICBidXQgV0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQg
+ZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBvZgorICogIE1FUkNIQU5UQUJJTElUWSBvciBGSVRO
+RVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4gIFNlZSB0aGUKKyAqICBHTlUgR2VuZXJhbCBQ
+dWJsaWMgTGljZW5zZSBmb3IgbW9yZSBkZXRhaWxzLgorICoKKyAqICBZb3Ugc2hvdWxkIGhhdmUg
+cmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQorICogIGFs
+b25nIHdpdGggdGhpcyBwcm9ncmFtOyBpZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3JnL2xp
+Y2Vuc2VzLz4uCisgKi8KKworI2RlZmluZSBRRU1VX0dFTkVSQVRFCisjaW5jbHVkZSAicWVtdS9v
+c2RlcC5oIgorI2luY2x1ZGUgInFlbXUvbG9nLmgiCisjaW5jbHVkZSAiY3B1LmgiCisjaW5jbHVk
+ZSAiaW50ZXJuYWwuaCIKKyNpbmNsdWRlICJ0Y2cvdGNnLW9wLmgiCisjaW5jbHVkZSAiaW5zbi5o
+IgorI2luY2x1ZGUgIm9wY29kZXMuaCIKKyNpbmNsdWRlICJ0cmFuc2xhdGUuaCIKKyNpbmNsdWRl
+ICJtYWNyb3MuaCIKKyNpbmNsdWRlICJnZW5fdGNnLmgiCisKK3N0YXRpYyBpbmxpbmUgVENHdiBn
+ZW5fcmVhZF9yZWcoVENHdiByZXN1bHQsIGludCBudW0pCit7CisgICAgdGNnX2dlbl9tb3ZfdGwo
+cmVzdWx0LCBoZXhfZ3ByW251bV0pOworICAgIHJldHVybiByZXN1bHQ7Cit9CisKK3N0YXRpYyBp
+bmxpbmUgVENHdiBnZW5fcmVhZF9wcmVnKFRDR3YgcHJlZCwgdWludDhfdCBudW0pCit7CisgICAg
+dGNnX2dlbl9tb3ZfdGwocHJlZCwgaGV4X3ByZWRbbnVtXSk7CisgICAgcmV0dXJuIHByZWQ7Cit9
+CisKK3N0YXRpYyBpbmxpbmUgdm9pZCBnZW5fbG9nX3ByZWRpY2F0ZWRfcmVnX3dyaXRlKGludCBy
+bnVtLCBUQ0d2IHZhbCwgaW50IHNsb3QpCit7CisgICAgVENHdiBvbmUgPSB0Y2dfY29uc3RfdGwo
+MSk7CisgICAgVENHdiB6ZXJvID0gdGNnX2NvbnN0X3RsKDApOworICAgIFRDR3Ygc2xvdF9tYXNr
+ID0gdGNnX3RlbXBfbmV3KCk7CisKKyAgICB0Y2dfZ2VuX2FuZGlfdGwoc2xvdF9tYXNrLCBoZXhf
+c2xvdF9jYW5jZWxsZWQsIDEgPDwgc2xvdCk7CisgICAgdGNnX2dlbl9tb3Zjb25kX3RsKFRDR19D
+T05EX0VRLCBoZXhfbmV3X3ZhbHVlW3JudW1dLCBzbG90X21hc2ssIHplcm8sCisgICAgICAgICAg
+ICAgICAgICAgICAgICAgICB2YWwsIGhleF9uZXdfdmFsdWVbcm51bV0pOworI2lmIEhFWF9ERUJV
+RworICAgIC8qIERvIHRoaXMgc28gSEVMUEVSKGRlYnVnX2NvbW1pdF9lbmQpIHdpbGwga25vdyAq
+LworICAgIHRjZ19nZW5fbW92Y29uZF90bChUQ0dfQ09ORF9FUSwgaGV4X3JlZ193cml0dGVuW3Ju
+dW1dLCBzbG90X21hc2ssIHplcm8sCisgICAgICAgICAgICAgICAgICAgICAgIG9uZSwgaGV4X3Jl
+Z193cml0dGVuW3JudW1dKTsKKyNlbmRpZgorCisgICAgdGNnX3RlbXBfZnJlZShvbmUpOworICAg
+IHRjZ190ZW1wX2ZyZWUoemVybyk7CisgICAgdGNnX3RlbXBfZnJlZShzbG90X21hc2spOworfQor
+CitzdGF0aWMgaW5saW5lIHZvaWQgZ2VuX2xvZ19yZWdfd3JpdGUoaW50IHJudW0sIFRDR3YgdmFs
+KQoreworICAgIHRjZ19nZW5fbW92X3RsKGhleF9uZXdfdmFsdWVbcm51bV0sIHZhbCk7CisjaWYg
+SEVYX0RFQlVHCisgICAgLyogRG8gdGhpcyBzbyBIRUxQRVIoZGVidWdfY29tbWl0X2VuZCkgd2ls
+bCBrbm93ICovCisgICAgdGNnX2dlbl9tb3ZpX3RsKGhleF9yZWdfd3JpdHRlbltybnVtXSwgMSk7
+CisjZW5kaWYKK30KKworc3RhdGljIHZvaWQgZ2VuX2xvZ19wcmVkaWNhdGVkX3JlZ193cml0ZV9w
+YWlyKGludCBybnVtLCBUQ0d2X2k2NCB2YWwsIGludCBzbG90KQoreworICAgIFRDR3YgdmFsMzIg
+PSB0Y2dfdGVtcF9uZXcoKTsKKyAgICBUQ0d2IG9uZSA9IHRjZ19jb25zdF90bCgxKTsKKyAgICBU
+Q0d2IHplcm8gPSB0Y2dfY29uc3RfdGwoMCk7CisgICAgVENHdiBzbG90X21hc2sgPSB0Y2dfdGVt
+cF9uZXcoKTsKKworICAgIHRjZ19nZW5fYW5kaV90bChzbG90X21hc2ssIGhleF9zbG90X2NhbmNl
+bGxlZCwgMSA8PCBzbG90KTsKKyAgICAvKiBMb3cgd29yZCAqLworICAgIHRjZ19nZW5fZXh0cmxf
+aTY0X2kzMih2YWwzMiwgdmFsKTsKKyAgICB0Y2dfZ2VuX21vdmNvbmRfdGwoVENHX0NPTkRfRVEs
+IGhleF9uZXdfdmFsdWVbcm51bV0sIHNsb3RfbWFzaywgemVybywKKyAgICAgICAgICAgICAgICAg
+ICAgICAgdmFsMzIsIGhleF9uZXdfdmFsdWVbcm51bV0pOworI2lmIEhFWF9ERUJVRworICAgIC8q
+IERvIHRoaXMgc28gSEVMUEVSKGRlYnVnX2NvbW1pdF9lbmQpIHdpbGwga25vdyAqLworICAgIHRj
+Z19nZW5fbW92Y29uZF90bChUQ0dfQ09ORF9FUSwgaGV4X3JlZ193cml0dGVuW3JudW1dLAorICAg
+ICAgICAgICAgICAgICAgICAgICBzbG90X21hc2ssIHplcm8sCisgICAgICAgICAgICAgICAgICAg
+ICAgIG9uZSwgaGV4X3JlZ193cml0dGVuW3JudW1dKTsKKyNlbmRpZgorCisgICAgLyogSGlnaCB3
+b3JkICovCisgICAgdGNnX2dlbl9leHRyaF9pNjRfaTMyKHZhbDMyLCB2YWwpOworICAgIHRjZ19n
+ZW5fbW92Y29uZF90bChUQ0dfQ09ORF9FUSwgaGV4X25ld192YWx1ZVtybnVtICsgMV0sCisgICAg
+ICAgICAgICAgICAgICAgICAgIHNsb3RfbWFzaywgemVybywKKyAgICAgICAgICAgICAgICAgICAg
+ICAgdmFsMzIsIGhleF9uZXdfdmFsdWVbcm51bSArIDFdKTsKKyNpZiBIRVhfREVCVUcKKyAgICAv
+KiBEbyB0aGlzIHNvIEhFTFBFUihkZWJ1Z19jb21taXRfZW5kKSB3aWxsIGtub3cgKi8KKyAgICB0
+Y2dfZ2VuX21vdmNvbmRfdGwoVENHX0NPTkRfRVEsIGhleF9yZWdfd3JpdHRlbltybnVtICsgMV0s
+CisgICAgICAgICAgICAgICAgICAgICAgIHNsb3RfbWFzaywgemVybywKKyAgICAgICAgICAgICAg
+ICAgICAgICAgb25lLCBoZXhfcmVnX3dyaXR0ZW5bcm51bSArIDFdKTsKKyNlbmRpZgorCisgICAg
+dGNnX3RlbXBfZnJlZSh2YWwzMik7CisgICAgdGNnX3RlbXBfZnJlZShvbmUpOworICAgIHRjZ190
+ZW1wX2ZyZWUoemVybyk7CisgICAgdGNnX3RlbXBfZnJlZShzbG90X21hc2spOworfQorCitzdGF0
+aWMgdm9pZCBnZW5fbG9nX3JlZ193cml0ZV9wYWlyKGludCBybnVtLCBUQ0d2X2k2NCB2YWwpCit7
+CisgICAgLyogTG93IHdvcmQgKi8KKyAgICB0Y2dfZ2VuX2V4dHJsX2k2NF9pMzIoaGV4X25ld192
+YWx1ZVtybnVtXSwgdmFsKTsKKyNpZiBIRVhfREVCVUcKKyAgICAvKiBEbyB0aGlzIHNvIEhFTFBF
+UihkZWJ1Z19jb21taXRfZW5kKSB3aWxsIGtub3cgKi8KKyAgICB0Y2dfZ2VuX21vdmlfdGwoaGV4
+X3JlZ193cml0dGVuW3JudW1dLCAxKTsKKyNlbmRpZgorCisgICAgLyogSGlnaCB3b3JkICovCisg
+ICAgdGNnX2dlbl9leHRyaF9pNjRfaTMyKGhleF9uZXdfdmFsdWVbcm51bSArIDFdLCB2YWwpOwor
+I2lmIEhFWF9ERUJVRworICAgIC8qIERvIHRoaXMgc28gSEVMUEVSKGRlYnVnX2NvbW1pdF9lbmQp
+IHdpbGwga25vdyAqLworICAgIHRjZ19nZW5fbW92aV90bChoZXhfcmVnX3dyaXR0ZW5bcm51bSAr
+IDFdLCAxKTsKKyNlbmRpZgorfQorCitzdGF0aWMgaW5saW5lIHZvaWQgZ2VuX2xvZ19wcmVkX3dy
+aXRlKGludCBwbnVtLCBUQ0d2IHZhbCkKK3sKKyAgICBUQ0d2IHplcm8gPSB0Y2dfY29uc3RfdGwo
+MCk7CisgICAgVENHdiBiYXNlX3ZhbCA9IHRjZ190ZW1wX25ldygpOworICAgIFRDR3YgYW5kX3Zh
+bCA9IHRjZ190ZW1wX25ldygpOworICAgIFRDR3YgcHJlZF93cml0dGVuID0gdGNnX3RlbXBfbmV3
+KCk7CisKKyAgICAvKiBNdWx0aXBsZSB3cml0ZXMgdG8gdGhlIHNhbWUgcHJlZyBhcmUgYW5kJ2Vk
+IHRvZ2V0aGVyICovCisgICAgdGNnX2dlbl9hbmRpX3RsKGJhc2VfdmFsLCB2YWwsIDB4ZmYpOwor
+ICAgIHRjZ19nZW5fYW5kX3RsKGFuZF92YWwsIGJhc2VfdmFsLCBoZXhfbmV3X3ByZWRfdmFsdWVb
+cG51bV0pOworICAgIHRjZ19nZW5fYW5kaV90bChwcmVkX3dyaXR0ZW4sIGhleF9wcmVkX3dyaXR0
+ZW4sIDEgPDwgcG51bSk7CisgICAgdGNnX2dlbl9tb3Zjb25kX3RsKFRDR19DT05EX05FLCBoZXhf
+bmV3X3ByZWRfdmFsdWVbcG51bV0sCisgICAgICAgICAgICAgICAgICAgICAgIHByZWRfd3JpdHRl
+biwgemVybywKKyAgICAgICAgICAgICAgICAgICAgICAgYW5kX3ZhbCwgYmFzZV92YWwpOworICAg
+IHRjZ19nZW5fb3JpX3RsKGhleF9wcmVkX3dyaXR0ZW4sIGhleF9wcmVkX3dyaXR0ZW4sIDEgPDwg
+cG51bSk7CisKKyAgICB0Y2dfdGVtcF9mcmVlKHplcm8pOworICAgIHRjZ190ZW1wX2ZyZWUoYmFz
+ZV92YWwpOworICAgIHRjZ190ZW1wX2ZyZWUoYW5kX3ZhbCk7CisgICAgdGNnX3RlbXBfZnJlZShw
+cmVkX3dyaXR0ZW4pOworfQorCitzdGF0aWMgaW5saW5lIHZvaWQgZ2VuX3JlYWRfcDNfMChUQ0d2
+IGNvbnRyb2xfcmVnKQoreworICAgIHRjZ19nZW5fbW92aV90bChjb250cm9sX3JlZywgMCk7Cisg
+ICAgZm9yIChpbnQgaSA9IDA7IGkgPCBOVU1fUFJFR1M7IGkrKykgeworICAgICAgICB0Y2dfZ2Vu
+X2RlcG9zaXRfdGwoY29udHJvbF9yZWcsIGNvbnRyb2xfcmVnLCBoZXhfcHJlZFtpXSwgaSAqIDgs
+IDgpOworICAgIH0KK30KKworc3RhdGljIGlubGluZSB2b2lkIGdlbl93cml0ZV9wM18wKFRDR3Yg
+Y29udHJvbF9yZWcpCit7CisgICAgZm9yIChpbnQgaSA9IDA7IGkgPCBOVU1fUFJFR1M7IGkrKykg
+eworICAgICAgICB0Y2dfZ2VuX2V4dHJhY3RfdGwoaGV4X3ByZWRbaV0sIGNvbnRyb2xfcmVnLCBp
+ICogOCwgOCk7CisgICAgfQorfQorCitzdGF0aWMgaW5saW5lIHZvaWQgZ2VuX2xvYWRfbG9ja2Vk
+NHUoVENHdiBkZXN0LCBUQ0d2IHZhZGRyLCBpbnQgbWVtX2luZGV4KQoreworICAgIHRjZ19nZW5f
+cWVtdV9sZDMydShkZXN0LCB2YWRkciwgbWVtX2luZGV4KTsKKyAgICB0Y2dfZ2VuX21vdl90bCho
+ZXhfbGxzY19hZGRyLCB2YWRkcik7CisgICAgdGNnX2dlbl9tb3ZfdGwoaGV4X2xsc2NfdmFsLCBk
+ZXN0KTsKK30KKworc3RhdGljIGlubGluZSB2b2lkIGdlbl9sb2FkX2xvY2tlZDh1KFRDR3ZfaTY0
+IGRlc3QsIFRDR3YgdmFkZHIsIGludCBtZW1faW5kZXgpCit7CisgICAgdGNnX2dlbl9xZW11X2xk
+NjQoZGVzdCwgdmFkZHIsIG1lbV9pbmRleCk7CisgICAgdGNnX2dlbl9tb3ZfdGwoaGV4X2xsc2Nf
+YWRkciwgdmFkZHIpOworICAgIHRjZ19nZW5fbW92X2k2NChoZXhfbGxzY192YWxfaTY0LCBkZXN0
+KTsKK30KKworc3RhdGljIGlubGluZSB2b2lkIGdlbl9zdG9yZV9jb25kaXRpb25hbDQoQ1BVSGV4
+YWdvblN0YXRlICplbnYsCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBEaXNhc0NvbnRleHQgKmN0eCwgaW50IHByZWRudW0sCisgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBUQ0d2IHByZWQsIFRDR3YgdmFkZHIsIFRDR3Ygc3JjKQorewor
+ICAgIFRDR0xhYmVsICpmYWlsID0gZ2VuX25ld19sYWJlbCgpOworICAgIFRDR0xhYmVsICpkb25l
+ID0gZ2VuX25ld19sYWJlbCgpOworCisgICAgdGNnX2dlbl9icmNvbmRfdGwoVENHX0NPTkRfTkUs
+IHZhZGRyLCBoZXhfbGxzY19hZGRyLCBmYWlsKTsKKworICAgIFRDR3Ygb25lID0gdGNnX2NvbnN0
+X3RsKDB4ZmYpOworICAgIFRDR3YgemVybyA9IHRjZ19jb25zdF90bCgwKTsKKyAgICBUQ0d2IHRt
+cCA9IHRjZ190ZW1wX25ldygpOworICAgIHRjZ19nZW5fYXRvbWljX2NtcHhjaGdfdGwodG1wLCBo
+ZXhfbGxzY19hZGRyLCBoZXhfbGxzY192YWwsIHNyYywKKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGN0eC0+bWVtX2lkeCwgTU9fMzIpOworICAgIHRjZ19nZW5fbW92Y29uZF90bChUQ0df
+Q09ORF9FUSwgaGV4X3ByZWRbcHJlZG51bV0sIHRtcCwgaGV4X2xsc2NfdmFsLAorICAgICAgICAg
+ICAgICAgICAgICAgICBvbmUsIHplcm8pOworICAgIHRjZ190ZW1wX2ZyZWUob25lKTsKKyAgICB0
+Y2dfdGVtcF9mcmVlKHplcm8pOworICAgIHRjZ190ZW1wX2ZyZWUodG1wKTsKKyAgICB0Y2dfZ2Vu
+X2JyKGRvbmUpOworCisgICAgZ2VuX3NldF9sYWJlbChmYWlsKTsKKyAgICB0Y2dfZ2VuX21vdmlf
+dGwocHJlZCwgMCk7CisKKyAgICBnZW5fc2V0X2xhYmVsKGRvbmUpOworICAgIHRjZ19nZW5fbW92
+aV90bChoZXhfbGxzY19hZGRyLCB+MCk7Cit9CisKK3N0YXRpYyBpbmxpbmUgdm9pZCBnZW5fc3Rv
+cmVfY29uZGl0aW9uYWw4KENQVUhleGFnb25TdGF0ZSAqZW52LAorICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgRGlzYXNDb250ZXh0ICpjdHgsIGludCBwcmVkbnVtLAor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVENHdiBwcmVkLCBUQ0d2
+IHZhZGRyLCBUQ0d2X2k2NCBzcmMpCit7CisgICAgVENHTGFiZWwgKmZhaWwgPSBnZW5fbmV3X2xh
+YmVsKCk7CisgICAgVENHTGFiZWwgKmRvbmUgPSBnZW5fbmV3X2xhYmVsKCk7CisKKyAgICB0Y2df
+Z2VuX2JyY29uZF90bChUQ0dfQ09ORF9ORSwgdmFkZHIsIGhleF9sbHNjX2FkZHIsIGZhaWwpOwor
+CisgICAgVENHdl9pNjQgb25lID0gdGNnX2NvbnN0X2k2NCgweGZmKTsKKyAgICBUQ0d2X2k2NCB6
+ZXJvID0gdGNnX2NvbnN0X2k2NCgwKTsKKyAgICBUQ0d2X2k2NCB0bXAgPSB0Y2dfdGVtcF9uZXdf
+aTY0KCk7CisgICAgdGNnX2dlbl9hdG9taWNfY21weGNoZ19pNjQodG1wLCBoZXhfbGxzY19hZGRy
+LCBoZXhfbGxzY192YWxfaTY0LCBzcmMsCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+Y3R4LT5tZW1faWR4LCBNT182NCk7CisgICAgdGNnX2dlbl9tb3Zjb25kX2k2NChUQ0dfQ09ORF9F
+USwgdG1wLCB0bXAsIGhleF9sbHNjX3ZhbF9pNjQsCisgICAgICAgICAgICAgICAgICAgICAgICBv
+bmUsIHplcm8pOworICAgIHRjZ19nZW5fZXh0cmxfaTY0X2kzMihoZXhfcHJlZFtwcmVkbnVtXSwg
+dG1wKTsKKyAgICB0Y2dfdGVtcF9mcmVlX2k2NChvbmUpOworICAgIHRjZ190ZW1wX2ZyZWVfaTY0
+KHplcm8pOworICAgIHRjZ190ZW1wX2ZyZWVfaTY0KHRtcCk7CisgICAgdGNnX2dlbl9icihkb25l
+KTsKKworICAgIGdlbl9zZXRfbGFiZWwoZmFpbCk7CisgICAgdGNnX2dlbl9tb3ZpX3RsKHByZWQs
+IDApOworCisgICAgZ2VuX3NldF9sYWJlbChkb25lKTsKKyAgICB0Y2dfZ2VuX21vdmlfdGwoaGV4
+X2xsc2NfYWRkciwgfjApOworfQorCisjaW5jbHVkZSAidGNnX2Z1bmNzX2dlbmVyYXRlZC5oIgor
+I2luY2x1ZGUgInRjZ19mdW5jX3RhYmxlX2dlbmVyYXRlZC5oIgotLSAKMi43LjQKCg==
 
