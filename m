@@ -2,85 +2,110 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88822C00A89
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39AADC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:11:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CACBF206F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E4EE206F7
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:11:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HcolW3HE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CACBF206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lEKqtB3Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E4EE206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYV7E-0002LN-Ot
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:10:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44774)
+	id 1kYV7g-0002rm-8F
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:11:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYV4X-0000fV-07
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:08:05 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:35269)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYV4U-0006et-69
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:08:04 -0400
-Received: by mail-ej1-x641.google.com with SMTP id p5so8833307ejj.2
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 07:08:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0jdxyg+/W60FveLllmFOutmF2VFgoTYPWlaXjYUhGUA=;
- b=HcolW3HEou6QxL8E9C36k0r6xkmCNxcslUvQjoDrLygSIR6cx7k3ck4XaoZ93MZI4e
- T555y0ZqBWRyffBo6SvhPQig4J2S3qav7K9Hma/pzcg5MYcE96ja/Jm4SwZQKv/1NmfK
- CRYyGUhZd6JprasAY0GQRtkyHFllADqQLgDjYCv1AMGUpTcU4yaat+3KfvY5ZNGfPra+
- /tXBCSvC9JMapjh9EBXriGnsww0TsiG64mg+lkVtV9EQGe1JF19jRmnH0vhJp0PrW1io
- yrTaecDeWiHS64KEz99yy2v36YgUyncMuQTH+EU+GsYrSieW7jrCr8NjFc43y/MfPzFJ
- BY/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0jdxyg+/W60FveLllmFOutmF2VFgoTYPWlaXjYUhGUA=;
- b=bLxWkhuckUUZhedVFSHdlb1QC6954rrbdiatwimD6lt0gVjBm07X4mjcJP/omaPia3
- 4B08zLtuamrprwnVAWSB7T8wV910b/gjK2u6At7eQL/4GXMgVtYP5Rf7wOmEQ2zKGGk4
- 3ExaXMvOZxGFgFKbnVFPueIUitKhqlYIyxnbN4NruuT90t95frAO8ZHZy8F+2IYsYYzj
- ug2fvs/O5mz62aJvs/4fTFwEJw11S6xcLRClHJxs+OJQHP9sqoi6/eOtqfghhH7LMUn8
- wJfL+2rh8gK13fLdqpv8swzhBDVXH4mvdefq4egBc6F08gmej7LwXJuH4t1QN5Uj4T7H
- aRjg==
-X-Gm-Message-State: AOAM531jmAKOVgARhAWWe6H48y5GBC7NOAridsdfalhDSNWX8OU/tHuX
- 30jBrweRgDbhOv1PZAk7eamf/Z9Xzixqw7ni89SHvg==
-X-Google-Smtp-Source: ABdhPJwuq2lvpDz7Edo6JDyYMfFidKSr4TJ987o83isQSvvdUkvZumM5dcW8eAPQUCQhYwpsooPCQPHIcNY0rPwWI/w=
-X-Received: by 2002:a17:907:9e3:: with SMTP id ce3mr2708765ejc.4.1604066880567; 
- Fri, 30 Oct 2020 07:08:00 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mark.kanda@oracle.com>)
+ id 1kYV6K-0001tF-Qd
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:09:56 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:36054)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.kanda@oracle.com>)
+ id 1kYV6I-0006pQ-Mi
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:09:56 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09UE9K3e180356;
+ Fri, 30 Oct 2020 14:09:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=uBBxdfos/utwzqMcdShynHcfvBxryRoAMMW/yC1mSpI=;
+ b=lEKqtB3Qr/bAQNrwYUfE7BkhoctkkBaXegJbxU7L52PfniZHHu1/cW6Hflk60i+4NDmR
+ IDA+qifPyjsrzwUN2DFxRKNMsOqpzIMgTch+uoiF4onGKxtc37XyYgIxl7lEJ5eSME4b
+ NzCzR6nLrUFb3iFYWJMpGrGdfNULCOEXYSlWChNaJDb+tqrYulRlpl2hmz5YSmuERA+B
+ Rhl3g6xqnPi6vk+czvHZG5oA4L04MWcEOt1NQHglIbbu/mqtkifG50tbtkHz8B+v0la9
+ 3oztdCYHbtrS93xI5DJcq8HwZgudH6ZsFEbNdXvDzzATpRmpZzHrKBJL9Qw8KFnCFM/P DQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 34cc7m9vnr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Fri, 30 Oct 2020 14:09:29 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09UE6ZEb014980;
+ Fri, 30 Oct 2020 14:09:28 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 34cwur0v40-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 30 Oct 2020 14:09:28 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09UE9PKc007793;
+ Fri, 30 Oct 2020 14:09:25 GMT
+Received: from [192.168.0.244] (/70.123.151.170)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 30 Oct 2020 07:09:25 -0700
+Subject: Re: [PATCH] migration/dirtyrate: simplify inlcudes in dirtyrate.c
+To: Chuan Zheng <zhengchuan@huawei.com>, quintela@redhat.com,
+ dgilbert@redhat.com
+References: <1604030281-112946-1-git-send-email-zhengchuan@huawei.com>
+From: Mark Kanda <mark.kanda@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <e19ac83b-dc05-a783-cb30-e09d592f6a8f@oracle.com>
+Date: Fri, 30 Oct 2020 09:09:17 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-References: <20201030022618.785675-1-richard.henderson@linaro.org>
-In-Reply-To: <20201030022618.785675-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Oct 2020 14:07:48 +0000
-Message-ID: <CAFEAcA8S=uyYTuN-eHdUTkeawGoqBXBAQzPLv_KNpB0rWwSisA@mail.gmail.com>
-Subject: Re: [PATCH v2 00/11] target/arm: Fix neon reg offsets
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1604030281-112946-1-git-send-email-zhengchuan@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9789
+ signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ mlxscore=0 bulkscore=0
+ spamscore=0 adultscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010300107
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9789
+ signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 adultscore=0
+ malwarescore=0 spamscore=0 clxscore=1011 mlxscore=0 suspectscore=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010300108
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=mark.kanda@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 10:09:46
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -46
+X-Spam_score: -4.7
+X-Spam_bar: ----
+X-Spam_report: (-4.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.253, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,27 +118,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: yubihong@huawei.com, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, alex.chen@huawei.com, wanghao232@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 30 Oct 2020 at 02:26, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Much of the existing usage of neon_reg_offset is broken for
-> big-endian hosts, as it computes the offset of the first
-> 32-bit unit, not the offset of the entire vector register.
->
-> Fix this by separating out the different usages.  Make the
-> whole thing look a bit more like the aarch64 code.
->
-> Changes for v2:
->   * Fix two tcg temp leaks.
+On 10/29/2020 10:58 PM, Chuan Zheng wrote:
+> Remove redundant blank line which is left by Commit 662770af7c6e8c,
+> also take this opportunity to remove redundant includes in dirtyrate.c.
+> 
+> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 
+Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
 
-
-Applied to target-arm.next, thanks.
-
--- PMM
+> ---
+>   migration/dirtyrate.c | 5 -----
+>   1 file changed, 5 deletions(-)
+> 
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 8f728d2..ccb9814 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -11,17 +11,12 @@
+>    */
+>   
+>   #include "qemu/osdep.h"
+> -
+>   #include <zlib.h>
+>   #include "qapi/error.h"
+>   #include "cpu.h"
+> -#include "qemu/config-file.h"
+> -#include "exec/memory.h"
+>   #include "exec/ramblock.h"
+> -#include "exec/target_page.h"
+>   #include "qemu/rcu_queue.h"
+>   #include "qapi/qapi-commands-migration.h"
+> -#include "migration.h"
+>   #include "ram.h"
+>   #include "trace.h"
+>   #include "dirtyrate.h"
+> 
 
