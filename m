@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BBAC55179
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E4B0C4741F
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:37:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E6CC20728
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:34:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA4AC206DC
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:37:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPp/ezzW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6CC20728
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AWAD+QL9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA4AC206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYQnu-0008Nj-89
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 05:34:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33750)
+	id 1kYQqe-0001D4-IR
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 05:37:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kYQmp-000780-5R
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:33:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21548)
+ id 1kYQq5-0000nn-1o
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:36:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25910)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kYQmn-0006ee-Ap
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:33:30 -0400
+ id 1kYQq0-0007xd-AC
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:36:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604050408;
+ s=mimecast20190719; t=1604050607;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=9ix7n7d7n8YfkbOQMMWxG9ulRPCtIt+wTJ0pkqTOoIM=;
- b=bPp/ezzWi1kXxzCd3jluVg77HKsmxNpv07VCoYJgC/e/gBxfBK3+A2/S5rSv18W5139HiN
- vaKYWKw917N3awCx38xWaYawql4xnjTYE8dcExXyj6psUjY0D80zfvTLxFazsVf9ZieMbN
- sAs2+86+JGOe26rGc3b3efES0ffGP5k=
+ bh=IKmmMKjQelECBfrVllIIrt5HZhPRzaFN2JiXpKdgcWo=;
+ b=AWAD+QL9U0k8YLBbg4BkKkE44uUCakRfX27w2oQTt/KxUgWOVcsP3BmB6p/mW4GgB3g6yB
+ tSGDEqnxS69Us6mM4v5rsKOjrgg+7gfoYblDCVtTwTCu2uEnm5YPLeDz48RsoDlT2qn69J
+ YhXRoUnbulLKgiOrpvgGao0e3D6T3aE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589-By0528ulMuCp5QBFusIwQw-1; Fri, 30 Oct 2020 05:33:26 -0400
-X-MC-Unique: By0528ulMuCp5QBFusIwQw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-506-he7GpeFpMjaB-__3jAIOHA-1; Fri, 30 Oct 2020 05:36:44 -0400
+X-MC-Unique: he7GpeFpMjaB-__3jAIOHA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 811EA1868408;
- Fri, 30 Oct 2020 09:33:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 840058030A4;
+ Fri, 30 Oct 2020 09:36:43 +0000 (UTC)
 Received: from redhat.com (ovpn-113-50.ams2.redhat.com [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B96775D9D5;
- Fri, 30 Oct 2020 09:33:15 +0000 (UTC)
-Date: Fri, 30 Oct 2020 09:33:12 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D9405C1CF;
+ Fri, 30 Oct 2020 09:36:35 +0000 (UTC)
+Date: Fri, 30 Oct 2020 09:36:32 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 06/11] test-util-sockets: Test the complete abstract
- socket matrix
-Message-ID: <20201030093312.GE99222@redhat.com>
+Subject: Re: [PATCH 03/11] test-util-sockets: Clean up SocketAddress
+ construction
+Message-ID: <20201030093632.GF99222@redhat.com>
 References: <20201029133833.3450220-1-armbru@redhat.com>
- <20201029133833.3450220-7-armbru@redhat.com>
+ <20201029133833.3450220-4-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201029133833.3450220-7-armbru@redhat.com>
+In-Reply-To: <20201029133833.3450220-4-armbru@redhat.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 02:24:40
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,68 +104,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 29, 2020 at 02:38:28PM +0100, Markus Armbruster wrote:
-> The test covers only two out of nine combinations.  Test all nine.
-> Four turn out to be broken.  Marked /* BUG */.
+On Thu, Oct 29, 2020 at 02:38:25PM +0100, Markus Armbruster wrote:
+> The thread functions build the SocketAddress from global variable
+> @abstract_sock_name and the tight flag passed as pointer
+> argument (either NULL or (gpointer)1).  There is no need for such
+> hackery; simply pass the SocketAddress instead.
+> 
+> While there, dumb down g_rand_int_range() to g_random_int().
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  tests/test-util-sockets.c | 86 ++++++++++++++++++++++++++++-----------
->  1 file changed, 63 insertions(+), 23 deletions(-)
+>  tests/test-util-sockets.c | 62 +++++++++++++++------------------------
+>  1 file changed, 24 insertions(+), 38 deletions(-)
 > 
 > diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-> index c2802f69ee..f8b6586e70 100644
+> index 9d317e73a6..b1b5628bd5 100644
 > --- a/tests/test-util-sockets.c
 > +++ b/tests/test-util-sockets.c
-> @@ -230,59 +230,99 @@ static void test_socket_fd_pass_num_nocli(void)
+> @@ -230,25 +230,14 @@ static void test_socket_fd_pass_num_nocli(void)
 >  #endif
 >  
 >  #ifdef __linux__
-> +
-> +#define ABSTRACT_SOCKET_VARIANTS 3
-> +
-> +typedef struct {
-> +    SocketAddress *server, *client[ABSTRACT_SOCKET_VARIANTS];
-> +    bool expect_connect[ABSTRACT_SOCKET_VARIANTS];
-> +} abstract_socket_matrix_row;
-
-snip
-
->  
-> -static void test_socket_unix_abstract_good(void)
-> +static void test_socket_unix_abstract(void)
+> -static gchar *abstract_sock_name;
+> -
+>  static gpointer unix_server_thread_func(gpointer user_data)
 >  {
 > -    SocketAddress addr;
-> +    SocketAddress addr, addr_tight, addr_padded;
-> +    abstract_socket_matrix_row matrix[ABSTRACT_SOCKET_VARIANTS] = {
-> +        { &addr,
-> +          { &addr_tight, &addr_padded, &addr },
-> +          { false /* BUG */, true /* BUG */, true } },
-> +        { &addr_tight,
-> +          { &addr_padded, &addr, &addr_tight },
-> +          { false, false /* BUG */, true } },
-> +        { &addr_padded,
-> +          { &addr, &addr_tight, &addr_padded },
-> +          { true /* BUG */, false, true } }
-> +    };
 
-This is overloading multiple separate tests in one, which is bad for
-test result reporting.
+Keep this but as a pointer, and initialize it to "user_data",
+so that it is clear what data type this parameter is expected
+to be.
 
-
-> @@ -329,8 +369,8 @@ int main(int argc, char **argv)
->      }
+> -    Error *err = NULL;
+> -    int fd = -1;
+> -    int connfd = -1;
+> +    int fd;
+> +    int connfd;
+>      struct sockaddr_un un;
+>      socklen_t len = sizeof(un);
 >  
->  #ifdef __linux__
-> -    g_test_add_func("/util/socket/unix-abstract/good",
-> -                    test_socket_unix_abstract_good);
-> +    g_test_add_func("/util/socket/unix-abstract",
-> +                    test_socket_unix_abstract);
+> -    addr.type = SOCKET_ADDRESS_TYPE_UNIX;
+> -    addr.u.q_unix.path = abstract_sock_name;
+> -    addr.u.q_unix.has_tight = true;
+> -    addr.u.q_unix.tight = user_data != NULL;
+> -    addr.u.q_unix.has_abstract = true;
+> -    addr.u.q_unix.abstract = true;
+> -
+> -    fd = socket_listen(&addr, 1, &err);
+> +    fd = socket_listen(user_data, 1, &error_abort);
 
-We should instead be registering multiple test funcs, passing in
-param to say which scenario to test.  This ensures we still see
-the test name reflecting which scenario is being run.
+Then keep this as passing "addr"
 
+
+>  
+>  static gpointer unix_client_thread_func(gpointer user_data)
+>  {
+> -    SocketAddress addr;
+
+Same note here
+
+> -    Error *err = NULL;
+> -    int fd = -1;
+> -
+> -    addr.type = SOCKET_ADDRESS_TYPE_UNIX;
+> -    addr.u.q_unix.path = abstract_sock_name;
+> -    addr.u.q_unix.has_tight = true;
+> -    addr.u.q_unix.tight = user_data != NULL;
+> -    addr.u.q_unix.has_abstract = true;
+> -    addr.u.q_unix.abstract = true;
+> -
+> -    fd = socket_connect(&addr, &err);
+> +    int fd;
+>  
+> +    fd = socket_connect(user_data, &error_abort);
+>      g_assert_cmpint(fd, >=, 0);
 
 Regards,
 Daniel
