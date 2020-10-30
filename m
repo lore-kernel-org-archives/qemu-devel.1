@@ -2,80 +2,78 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36081C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7453EC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:31:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A7742087E
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:31:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF9C02087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:31:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x2x8mXGw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A7742087E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X2PJEKf2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF9C02087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYVQh-0007W6-0I
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:30:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48312)
+	id 1kYVQn-0007gD-Jk
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:31:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49532)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYVJq-0000BG-LO
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:23:54 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:34064)
+ id 1kYVOp-0005TV-Kp
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:29:03 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:46307)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYVJp-000083-0b
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:23:54 -0400
-Received: by mail-ed1-x541.google.com with SMTP id x1so6876329eds.1
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 07:23:52 -0700 (PDT)
+ id 1kYVOn-0000yV-Mm
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:29:03 -0400
+Received: by mail-ej1-x642.google.com with SMTP id t25so8827982ejd.13
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 07:29:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=w8mo5SQC6j7rWAjT+2Gp+4Gx1U8l4y5jkDLId87z/e0=;
- b=x2x8mXGwxlM4aJSPeMck/cqln55UQxmLOmHkztdUzm1YnUUcSzU1kFSYuR5drfOA1m
- WFw7fsbcJDr3VmWkftTXtW3BhYHqi1xsOntG+Uz+nMRWYOl2KhFSRi9mfwXCUeWIFw1C
- wnt8kjL3SaYz8voDQOOTQw5aZPqxa7xaPO8qJnV8/avojA14wjNxBzmSIoojtrME4JdS
- ljK60Hy1uDRVRg1e9nLqje/WHPtwMwJd52Oe2VggdpJ+YFVurLkabU3vJSmiDng3Xmzr
- WMTRnu3Jn/CGzk14sPFm4ce1kqTAoQFdDbXXjzYO+TSiGkn9HDuAr2DAj+5s5DdH+S9w
- eoAQ==
+ :cc; bh=CrRzD2OxH5662WFncZKSf2Ox7cQn2AYxZntw1toNEbs=;
+ b=X2PJEKf2WVVNxxn4NBDT/5Xpr1Thzq/P2GXXPWAjEMiQmjVFD8XKRmDCqW7TxjX47o
+ aBoF19VB+zGHQaM8KRIc/4mfxah+ArTI8N0lFuhXSVELywcxWfu+2ajfBN2Y9gY+Kq18
+ hs/41zG3bIlOYt7bqIPfa/ct7K5eQSgANmZPDySyHo3e2t2J0qUfZTvNGXmIZ34izupv
+ ep7snExaGXzDpG0GthKKvG478JeZ+H7TEnmi8v4dM6edSHSEB8ufzsUEc2b9pVlubGD2
+ 6Zkc6BUOcPF4GRsUHfpcUCYex4asRW2JDsA/igpFRQWuCeXL47lzHXxLKH1aSS17s4ES
+ 9y/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=w8mo5SQC6j7rWAjT+2Gp+4Gx1U8l4y5jkDLId87z/e0=;
- b=pf80i+xNz2zTLdncPJHiH6GeJtlVPwnjIkBT/PwjH9934SG8gnbjwAKRuwfqEto9dW
- pX9gfU+VE9PEo/PeAkSZUjz33bKl/IfDHztxwyKqadzA8wcw5sbhRxiPTh6YUyVX/E1Q
- ldTqXuEWTtNORhOIJJX7/4EAWDx68TXMyvBPr4bK5Tz5mx4vpWv3mvW0qLZNNy82uYw3
- bTVch2mToLrw5XJX2axZfrMw7uGKEdVmjZdHkQGjjPXidFGfZK+fUdyliDqhXnle9lQ/
- ndy84u1rXTWRcfKI+aUZ6ZkrzeSGtVm55R8vTOhUkjHROS1l9ZSuAbBg/yatHiEm/fxg
- 0yoQ==
-X-Gm-Message-State: AOAM532q2vMWR9ciiKG+fqpv4Lc/QExE2ypQrw+byP9PcAkiwOLPdN/J
- Ha7iZtA4OJ/1T4/toFzM9ZGm0Rirrm/HJ4xjqeEiiA==
-X-Google-Smtp-Source: ABdhPJwFL0OAopGBhumDNGRcgY7PCHK8+B97TJ0S6LApcAVWiG4uTUrZPrK3B6QaCaiv5NEwgfGo5M/qgBvyw3Dpwlc=
-X-Received: by 2002:a05:6402:1482:: with SMTP id
- e2mr2750873edv.36.1604067831443; 
- Fri, 30 Oct 2020 07:23:51 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=CrRzD2OxH5662WFncZKSf2Ox7cQn2AYxZntw1toNEbs=;
+ b=UB43OVmeMa9MoW7CUkNsamJQlhtw5sxGNcdPB1Z8hoV872/cVSreK3Iqtf9PvGUSOS
+ XwhhwzbBSAQcaK3W0bRTXUDa5M+XwC2mKINU3XdYh0WR87afyEABjxEQE5rFgp+sS7/j
+ PlEd7L4k8fugUYiLkHNnWuPXNpWYE71YwgzwP98O9rOFg5WZFxIOVAu07g7F+L46HEXB
+ ZZEEUIyUy1jFRyTWNMGhZj3NwKPq+woVoPq2CbcAX25MS6KR6yoGUF1XHcEasdV8HMOS
+ 2P9uRsSJ6P6GwmS82wyp9qV3mY1l/99Xq9dg3Ig6DxzbjnbhunEI+RhFMffqfQyrQDMD
+ qDaw==
+X-Gm-Message-State: AOAM5338ynJO7hDCoYA6VXvwGIZxvq67vTNHWJdndPTMn6U6Xh2SnGzZ
+ TrXP8KP+NeZz4TyS0YD8XlZHAUBvsCGtRaQrf+t3tA==
+X-Google-Smtp-Source: ABdhPJzjC6cJsDtUPsYVPwW+zCCJr8NDdSfog3dkJ/0lZXEQ5qaw/Vt2bV6vV2Cy1MNlcK6ltK+szkSdVtEo/k/iAuE=
+X-Received: by 2002:a17:906:1f42:: with SMTP id
+ d2mr2667860ejk.407.1604068140154; 
+ Fri, 30 Oct 2020 07:29:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201029202506.9209-1-remi@remlab.net>
-In-Reply-To: <20201029202506.9209-1-remi@remlab.net>
+References: <5F9BE974.3040806@huawei.com>
+In-Reply-To: <5F9BE974.3040806@huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Oct 2020 14:23:40 +0000
-Message-ID: <CAFEAcA-h2gY9vra6w8vL8hWtKxC2sAL82O4g9jhng6Ac=yPX8A@mail.gmail.com>
-Subject: Re: [PATCH 1/1] target/arm: fix LORID_EL1 access check
-To: =?UTF-8?Q?R=C3=A9mi_Denis=2DCourmont?= <remi@remlab.net>, 
- QEMU Developers <qemu-devel@nongnu.org>
+Date: Fri, 30 Oct 2020 14:28:49 +0000
+Message-ID: <CAFEAcA_7xMjOTAWkk+k34oneB_KGCGk_hoBVMX-oDRMLZzR8Wg@mail.gmail.com>
+Subject: Re: [PATCH] hw/display/exynos4210_fimd: Fix potential NULL pointer
+ dereference
+To: AlexChen <alex.chen@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -97,23 +95,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 29 Oct 2020 at 20:25, <remi@remlab.net> wrote:
+On Fri, 30 Oct 2020 at 10:23, AlexChen <alex.chen@huawei.com> wrote:
 >
-> From: R=C3=A9mi Denis-Courmont <remi.denis.courmont@huawei.com>
+> In exynos4210_fimd_update(), the pointer s is dereferenced before
+> being check if it is valid, which may lead to NULL pointer dereference.
+> So move the assignment to global_width after checking that the s is valid
 >
-> Secure mode is not exempted from checking SCR_EL3.TLOR, and in the
-> future HCR_EL2.TLOR when S-EL2 is enabled.
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Alex Chen <alex.chen@huawei.com>
+> ---
+>  hw/display/exynos4210_fimd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Signed-off-by: R=C3=A9mi Denis-Courmont <remi.denis.courmont@huawei.com>
+> diff --git a/hw/display/exynos4210_fimd.c b/hw/display/exynos4210_fimd.c
+> index 4c16e1f5a0..a1179d2f89 100644
+> --- a/hw/display/exynos4210_fimd.c
+> +++ b/hw/display/exynos4210_fimd.c
+> @@ -1275,12 +1275,12 @@ static void exynos4210_fimd_update(void *opaque)
+>      bool blend = false;
+>      uint8_t *host_fb_addr;
+>      bool is_dirty = false;
+> -    const int global_width = (s->vidtcon[2] & FIMD_VIDTCON2_SIZE_MASK) + 1;
+>
+>      if (!s || !s->console || !s->enabled ||
+>          surface_bits_per_pixel(qemu_console_surface(s->console)) == 0) {
+>          return;
+>      }
+> +    const int global_width = (s->vidtcon[2] & FIMD_VIDTCON2_SIZE_MASK) + 1;
+>      exynos4210_update_resolution(s);
+>      surface = qemu_console_surface(s->console);
 
+Yep, this is a bug, but QEMU's coding style doesn't permit
+variable declarations in the middle of functions. You need
+to split the declaration (which stays where it is) and the
+initialization (which can moved down below the !s test.
 
-
-Applied to target-arm.next, thanks.
-
+thanks
 -- PMM
 
