@@ -7,70 +7,72 @@ X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A0DC56201
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 07:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F957C5517A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 07:35:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 091052151B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 07:31:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95E74221E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 07:35:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="juU6YdlG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 091052151B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ujrjISZg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E74221E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYOsi-0002Md-U6
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 03:31:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36084)
+	id 1kYOwB-0003i4-Ie
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 03:35:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kYOr0-0001N1-6b; Fri, 30 Oct 2020 03:29:42 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:40581)
+ id 1kYOvZ-0003DE-Hp; Fri, 30 Oct 2020 03:34:25 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:39804)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kYOqy-0003kd-ER; Fri, 30 Oct 2020 03:29:41 -0400
-Received: by mail-ed1-x542.google.com with SMTP id p93so5573693edd.7;
- Fri, 30 Oct 2020 00:29:38 -0700 (PDT)
+ id 1kYOvX-0005Ps-Vz; Fri, 30 Oct 2020 03:34:25 -0400
+Received: by mail-ed1-x543.google.com with SMTP id g25so4776797edm.6;
+ Fri, 30 Oct 2020 00:34:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=G5Y2ybGQFFg/Q1IWxTbgDWrthNCdA5cUZUHcaXIADVo=;
- b=juU6YdlGOZQXGNSlK6wUIxSw0U6XVMJQsmW5ibCAI622UsHp5E6SjA0yRhdlz6lAIP
- evU517XRKe2S5Fpk9P4VTTju9LQenjJZCPfj3qXLMcjWjYOJTEqL1xZ6oQPcG38NwdHc
- Dh5K7GdPUEmgCh9cOtdLqayGtqbpm5xHi1sS6WWttMqRk+PBBF2s3rw2tQEZw16vsGCs
- PtSBs1A4BvvkqG+sdoFmuTaTPoAchM4twXNwVJQsrRmNuIFvnCTPViRnYIK4Dv8HbhPN
- fmBS+HcBbGvyYgBJNzao06S9VzmPgMFMyTJ7FkhjmEmwWtArTT+zlkYGm5wS8/qIPiCp
- lF1g==
+ :cc; bh=QecOoWQ/HZb8eLncR1EKgGqUdTzbd3QYBazcsejlCn8=;
+ b=ujrjISZg77YgswczqnGmqLCmD8a6h4MPRyt1NHmMmnkpJXhbeT0O+rgJX3GZi8Si+G
+ rDQQy2PQOnNsF3XnHMVYDOXCJuPB6/0XoU81UkR6yMofcbFZcrJX5FvkALRY0hrLJkDh
+ 248wTeLxRhp6GMHvTgkum4wjs1iTw4rKjQ8zRRIsL07x7XxJF5bZomRWcCdRhSyzh4Eh
+ OUGvXipVheIUlmdsYhB8w29X+83G04YAkrQuHd7PpDPMbls4tSr6AF4Eb8Uvebwf1Rtu
+ xcFq8d7jGjV/OA7eeY0MnLVz/t3jEs42qWSICjUZYIAK8btREG2Qj3lmlqizcKYz4yDb
+ fdJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=G5Y2ybGQFFg/Q1IWxTbgDWrthNCdA5cUZUHcaXIADVo=;
- b=pUiLlTroSlVNSjXfT2VjRWpaIZR7Ijgg1e/Ya7AgUs6H0FdsJneOvYz6vqJNGufgJo
- 4GmjZx+/Jqc3CERg7kcZmHL0yf4eR6fOWmJj2zTdeEx1GTkTnNrdIMriW7BjMLc5h7w9
- xnENRkrA8SgvxqGjM8u3zpjvcKpemwg1B2IfxdImupQrNaqaG2B47IH1K7S1fyaE4F03
- TT251ipVFtxCpMWLdb6CQo2RB/suhMHISRkVY3N4ulkOzH1/gQ3vau9NF9M7uHtgrktj
- A9MQWIjyNlABsVzidbopCPkolYEtkDxa3PymEzyPobUTMydJm2e1FOfEmUU99Xat72ZT
- JghQ==
-X-Gm-Message-State: AOAM530Zq1T/IJN9xx1ckJN0YGKcnnn4o2H1DPgN0V9XZPqzFtbFIKQ1
- Dk+cGAmJC6CHyeZv14huxCVxkoesbtdla3GgxBI=
-X-Google-Smtp-Source: ABdhPJzgtC+eSdWPUt4jhEkUAj9Oql/sHSTe5c6CKejoOmRHDQyaVOsgc0U8MOpXF2K9JdY6i3DC7Y1XTKxw/FXy4f4=
-X-Received: by 2002:a50:a441:: with SMTP id v1mr905994edb.30.1604042977710;
- Fri, 30 Oct 2020 00:29:37 -0700 (PDT)
+ bh=QecOoWQ/HZb8eLncR1EKgGqUdTzbd3QYBazcsejlCn8=;
+ b=Py9C4mw5ugJTWMuyMJJtb/pKoWjnQX1l5F1tRFMD/jFUgVu5mg1XeqFbZXwbF2Okyh
+ nB9jHwFL5YO09CJ2hQA89/bbItF5fZTNfq1AW5PmVHtPdx2g+Iar6lPN8W/D73SzDmFn
+ 6dr3evk2nDaR03rDqqiDcdpIfSalGbdJmlegWUvYrzWX8B9jXGWh9fK/pxFQAkZn7W72
+ wvqmPEaLhx6NqTIYfx8EyOu+fUtqpTzhaDFUmGwKrFwT+mLsVXdd9o3gZOcvftZl+9vu
+ EB4riSdzTlXCvEhd8JhRr/1YanFOUlhxntaOcFp0KAVGgOZe+9jDMfRJHZDnNmP64Ez3
+ QjDg==
+X-Gm-Message-State: AOAM533XWGlPSH3aLTd+FnXwprPZhKsIrCaeOBpiJBY51HymCOE/MSsP
+ isYjwKLfFzufZaimCHx/PXWdUzwyNxVUwvwkyAA=
+X-Google-Smtp-Source: ABdhPJwHdlUXIcvql7BaxkEQ5qq2IjRF1QtV14hIqZo+aMFSkt+speVDDuk/H/QhE4pezbuAlNycJUmN/TXFmcdeYIA=
+X-Received: by 2002:a05:6402:6ca:: with SMTP id
+ n10mr927720edy.314.1604043261375; 
+ Fri, 30 Oct 2020 00:34:21 -0700 (PDT)
 MIME-Version: 1.0
 References: <20201029220246.472693-1-ehabkost@redhat.com>
  <20201029220246.472693-10-ehabkost@redhat.com>
-In-Reply-To: <20201029220246.472693-10-ehabkost@redhat.com>
+ <CAJ+F1CKqo3D20=qSAovVKWCGz4otctaWnGC0O5p-Z1ZG9Pj_Mw@mail.gmail.com>
+In-Reply-To: <CAJ+F1CKqo3D20=qSAovVKWCGz4otctaWnGC0O5p-Z1ZG9Pj_Mw@mail.gmail.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 30 Oct 2020 11:29:25 +0400
-Message-ID: <CAJ+F1CKqo3D20=qSAovVKWCGz4otctaWnGC0O5p-Z1ZG9Pj_Mw@mail.gmail.com>
+Date: Fri, 30 Oct 2020 11:34:09 +0400
+Message-ID: <CAJ+F1CKLtKeoP43OV5dpbHLFNO8OnMdsjD=atDo=pjqvFkX2fg@mail.gmail.com>
 Subject: Re: [PATCH 09/36] qdev: Make qdev_get_prop_ptr() get Object* arg
 To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000e41a3005b2de5b99"
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x542.google.com
+Content-Type: multipart/alternative; boundary="000000000000cc7dc705b2de6c6f"
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,46 +113,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e41a3005b2de5b99
+--000000000000cc7dc705b2de6c6f
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 30, 2020 at 2:07 AM Eduardo Habkost <ehabkost@redhat.com> wrote=
-:
+On Fri, Oct 30, 2020 at 11:29 AM Marc-Andr=C3=A9 Lureau <
+marcandre.lureau@gmail.com> wrote:
 
-> Make the code more generic and not specific to TYPE_DEVICE.
 >
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 >
-
-Nice cleanup!, but fails to build atm
-
-../hw/block/xen-block.c:403:9: error: =E2=80=98dev=E2=80=99 undeclared (fir=
-st use in this
-function); did you mean =E2=80=98vdev=E2=80=99?
-  403 |     if (dev->realized) {
+> On Fri, Oct 30, 2020 at 2:07 AM Eduardo Habkost <ehabkost@redhat.com>
+> wrote:
+>
+>> Make the code more generic and not specific to TYPE_DEVICE.
+>>
+>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>
+>
+> Nice cleanup!, but fails to build atm
+>
+> ../hw/block/xen-block.c:403:9: error: =E2=80=98dev=E2=80=99 undeclared (f=
+irst use in this
+> function); did you mean =E2=80=98vdev=E2=80=99?
+>   403 |     if (dev->realized) {
+>
+>
+That seems to be the only issue though, so with that fixed:
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 --=20
 Marc-Andr=C3=A9 Lureau
 
---000000000000e41a3005b2de5b99
+--000000000000cc7dc705b2de6c6f
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 30, 2020 at 2:07 AM Eduar=
-do Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.com</=
-a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
-x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Ma=
-ke the code more generic and not specific to TYPE_DEVICE.<br>
+<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 30, 2020 at 11:29 AM Marc=
+-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@gmail.com">marcan=
+dre.lureau@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quo=
+te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
+);padding-left:1ex"><div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div cl=
+ass=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 30, 2=
+020 at 2:07 AM Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" t=
+arget=3D"_blank">ehabkost@redhat.com</a>&gt; wrote:<br></div><blockquote cl=
+ass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid=
+ rgb(204,204,204);padding-left:1ex">Make the code more generic and not spec=
+ific to TYPE_DEVICE.<br>
 <br>
 Signed-off-by: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" t=
 arget=3D"_blank">ehabkost@redhat.com</a>&gt;<br></blockquote><div><br></div=
 ><div>Nice cleanup!, but fails to build atm</div><div><br></div><div>../hw/=
 block/xen-block.c:403:9: error: =E2=80=98dev=E2=80=99 undeclared (first use=
  in this function); did you mean =E2=80=98vdev=E2=80=99?<br>=C2=A0 403 | =
-=C2=A0 =C2=A0 if (dev-&gt;realized) {</div><br></div>-- <br><div dir=3D"ltr=
-" class=3D"gmail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+=C2=A0 =C2=A0 if (dev-&gt;realized) {</div><br></div></div></blockquote></d=
+iv><div class=3D"gmail_quote"><br></div><div class=3D"gmail_quote">That see=
+ms to be the only issue though, so with that fixed:</div><div class=3D"gmai=
+l_quote">Reviewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandr=
+e.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;</div><div class=3D=
+"gmail_quote"><br></div>-- <br><div dir=3D"ltr" class=3D"gmail_signature">M=
+arc-Andr=C3=A9 Lureau<br></div></div>
 
---000000000000e41a3005b2de5b99--
+--000000000000cc7dc705b2de6c6f--
 
