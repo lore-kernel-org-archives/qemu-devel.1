@@ -2,74 +2,87 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DECFDC55179
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6151C4741F
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:59:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B9C42072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:56:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B9C42072C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 0E1CF206CA
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:59:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YsBo0+TO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E1CF206CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYR9O-0006AO-0M
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 05:56:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38646)
+	id 1kYRCC-0007XE-0p
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 05:59:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kYR8D-0005ZL-C1; Fri, 30 Oct 2020 05:55:37 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:32873)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kYR8A-0006T4-II; Fri, 30 Oct 2020 05:55:37 -0400
-Received: from [192.168.100.1] ([82.252.154.198]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MiaLn-1juzmC2oK7-00fkGo; Fri, 30 Oct 2020 10:55:19 +0100
-Subject: Re: [PATCH v2 4/8] linux-user/mips/cpu_loop: silence the compiler
- warnings
-To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20201030004046.2191790-1-kuhn.chenqun@huawei.com>
- <20201030004046.2191790-5-kuhn.chenqun@huawei.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <b3a0569a-d4a9-d73f-8c20-6e8c6251dace@vivier.eu>
-Date: Fri, 30 Oct 2020 10:55:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kYR9q-0006YY-6l
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:57:19 -0400
+Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:35384)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kYR9m-00071f-8A
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:57:17 -0400
+Received: by mail-ed1-x533.google.com with SMTP id w25so6019696edx.2
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 02:57:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EZQyMPA/EtXcANhDC2yUvcrmLvC4fWgBHmKeLWLcv2E=;
+ b=YsBo0+TOoaB/XkDd+diWc0nxDmyPeR7OUebzWs6PMvVXMn7WKVoNthJ6JMTlrpre+N
+ CqzFog5cIwIv6GFgDGp09qbaH+wEBT8QSYdps5vryTNgeM87qZyk1JSzYCWcOF4R6caQ
+ xdS35c+dJQPdkLAjJqwBT2pEB8DrDHR8eInDKothjFCSwkkEgkDwP8PERMltBJnIlx+r
+ pLERytDgmjXzOg/mRDalGCq7mgWW2bSCV5yc5H+U7Lk6Fe6OnZ08EGKndP/VYFpuaU1r
+ 1uHW1D4KLYy2aR4AiVWoht45TPz7ozPklbPOtoNTINt03ZpjD1vhS3hixX4/rUTAYabO
+ 5BJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EZQyMPA/EtXcANhDC2yUvcrmLvC4fWgBHmKeLWLcv2E=;
+ b=Y0Sr9+7Er4GAA1idpB4lssJfWaVhLcpv10+1iCyyjMchLin0BVYRHqByXTOiAT53Cr
+ WtW2zRttWoH6Bf+50M2lA6veIOyKEtm58hHWJzjlgDUiZfqYSoLaCtfzqxPzV3y2yu8+
+ BiCwndT7uOVf7nDVNJiHbvUbkahseoOC+NeHQ/EJ2QzXqeccdXzkH3oAhwXYQAbOC02x
+ Ouqn3pgFvk+M/zFt/24UCqcvMSkxdbYZE4D7uGD9PsFkoqOZphOtIw0mnUFfoHnxV3Oi
+ l7Jixukq+bQpGdWLrkqbkj0jcLR0+3h3L4bcxjEWszKAdEo8HsMn7SgcMA+Lz+HCCJaB
+ MzTA==
+X-Gm-Message-State: AOAM532b614KWyPFpv3b3U09f9vJPZpjXZIxTLGavC7QKGFRGpOXv/EV
+ jXFXVrfNK2dpAVr8u4CEjzxh4v6QYS/TfeRE54s=
+X-Google-Smtp-Source: ABdhPJzR2ZtblOBxdeFCzLNxY28NETGgwjbHsG5V/Q434u0uo9q17WWgzZnlj4xCr52XYbiiYJPZiJb/IIGlDinlf/U=
+X-Received: by 2002:aa7:dd42:: with SMTP id o2mr1341547edw.53.1604051830987;
+ Fri, 30 Oct 2020 02:57:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201030004046.2191790-5-kuhn.chenqun@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:wM3TDhl3eTI04EfWMRg+X7tQTtHdvtFty5B0VweV2RnshYf5rFI
- 7t4Bpvq6fz3Dbb4XvDgD7ymfAjqiyvC540DYatGhWlWp3ud++Vk/hfdLQK5+dTxwYjWBikR
- qBQtBvTWdMshhCH35UEJ6AVNbtUyfC0nrB9xlpahPr63zmi2ktirwFmFIePvKrFb9M5MpdV
- 9DInIwLoXy+5jUHKkXciA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:HxEIL71dBHo=:PUXhlMFFr46YCl9KiSPHJS
- 9cKsGJOz8Okw7EH6K3z4v9QNOheWglaDCeSvpLjtD1UouOmkTXfwqtNqXH8vVZs3Py8BHmQ8T
- oMVPeLdEThj3LdkTwCz6zVcabM7Dd/rhCshqHCbcT7LSbbslh08/GAFzsque+KK9ai1u25e6W
- YZ545ucB9aeyG/t0EgsstJU20QHOxzahpcTBt/bc1sL9my7eXjl4u2WsDs7IvvWyylUcYHGYQ
- 7r3ebYNpfgoT6tBfUBHZWNAVvteYp+wxi+CZhR+jjSLbs0jLMuE/MUt2CEuvg4vetgLmiNdzz
- R1QXQd1cLPmtviqvR2F74UOR/5bhznj51PHLUEk4Rs/RFbjUTb22H7hgiABRz2VZ8Y7k7mmeR
- ediB4MfRuiT8+HhCLcEYNfR4E5x6E+yfJimZ5KSWfNkhtqBRNlO+Gypdzh/eD
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 05:55:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+References: <20201029220246.472693-1-ehabkost@redhat.com>
+ <20201029220246.472693-18-ehabkost@redhat.com>
+In-Reply-To: <20201029220246.472693-18-ehabkost@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 30 Oct 2020 13:56:59 +0400
+Message-ID: <CAJ+F1CL3noqv4eLWnSuM15uVzq6uX_PwybFKxNGf_UVcHDhLBw@mail.gmail.com>
+Subject: Re: [PATCH 17/36] qdev: Separate generic and device-specific property
+ registration
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000096635a05b2e06bbd"
+Received-SPF: pass client-ip=2a00:1450:4864:20::533;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x533.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.261,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,73 +95,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com,
- ganqixin@huawei.com, Euler Robot <euler.robot@huawei.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 30/10/2020 à 01:40, Chen Qun a écrit :
-> When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warning:
-> linux-user/mips/cpu_loop.c: In function ‘cpu_loop’:
-> linux-user/mips/cpu_loop.c:104:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
->   104 |                     if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
->       |                        ^
-> linux-user/mips/cpu_loop.c:107:17: note: here
->   107 |                 case 7:
->       |                 ^~~~
-> linux-user/mips/cpu_loop.c:108:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
->   108 |                     if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
->       |                        ^
-> linux-user/mips/cpu_loop.c:111:17: note: here
->   111 |                 case 6:
->       |                 ^~~~
-> linux-user/mips/cpu_loop.c:112:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
->   112 |                     if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
->       |                        ^
-> linux-user/mips/cpu_loop.c:115:17: note: here
->   115 |                 case 5:
->       |                 ^~~~
-> 
-> Add the corresponding "fall through" comment to fix it.
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> ---
->  linux-user/mips/cpu_loop.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-> index 553e8ca7f5..cfe7ba5c47 100644
-> --- a/linux-user/mips/cpu_loop.c
-> +++ b/linux-user/mips/cpu_loop.c
-> @@ -104,18 +104,22 @@ void cpu_loop(CPUMIPSState *env)
->                      if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
->                          goto done_syscall;
->                      }
-> +                    /* fall through */
->                  case 7:
->                      if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
->                          goto done_syscall;
->                      }
-> +                    /* fall through */
->                  case 6:
->                      if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
->                          goto done_syscall;
->                      }
-> +                    /* fall through */
->                  case 5:
->                      if ((ret = get_user_ual(arg5, sp_reg + 16)) != 0) {
->                          goto done_syscall;
->                      }
-> +                    /* fall through */
->                  default:
->                      break;
->                  }
-> 
+--00000000000096635a05b2e06bbd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Hi
+
+On Fri, Oct 30, 2020 at 2:19 AM Eduardo Habkost <ehabkost@redhat.com> wrote=
+:
+
+> qdev_class_add_property() and qdev_property_add_static() will
+> have code that's specific for device types.
+>
+> object_class_property_add_static(),
+> object_class_add_static_props(), and object_property_add_static()
+> will be generic and part of the QOM static property API.
+>
+> The declarations for the new functions are being added to
+> qdev-properties.h, but they will be moved to a QOM header later.
+>
+>
+Might be worth to mention that you also changed *property_add_static() to
+return the ObjectProperty. Probably useful in a later patch.
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+--=20
+Marc-Andr=C3=A9 Lureau
+
+--00000000000096635a05b2e06bbd
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
+"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 30, 2020 at 2:19 AM Edu=
+ardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.com=
+</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:=
+0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">=
+qdev_class_add_property() and qdev_property_add_static() will<br>
+have code that&#39;s specific for device types.<br>
+<br>
+object_class_property_add_static(),<br>
+object_class_add_static_props(), and object_property_add_static()<br>
+will be generic and part of the QOM static property API.<br>
+<br>
+The declarations for the new functions are being added to<br>
+qdev-properties.h, but they will be moved to a QOM header later.<br>
+<br></blockquote><div><br></div><div>Might be worth to mention that you als=
+o changed *property_add_static() to return the ObjectProperty. Probably use=
+ful in a later patch.</div></div><div class=3D"gmail_quote"><br></div><div =
+class=3D"gmail_quote">Reviewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"ma=
+ilto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;</div>=
+<div><br></div><div>-- </div><div dir=3D"ltr" class=3D"gmail_signature">Mar=
+c-Andr=C3=A9 Lureau<br></div></div>
+
+--00000000000096635a05b2e06bbd--
 
