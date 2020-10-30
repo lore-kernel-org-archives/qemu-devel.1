@@ -2,85 +2,144 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0162FC55179
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 08:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0672AC00A89
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 08:06:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 135612220B
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 08:02:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2980422228
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 08:06:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G1YmshXI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 135612220B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="ioI5SGkY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2980422228
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYPN3-0003hM-Qz
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 04:02:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42536)
+	id 1kYPQz-0005QO-Ts
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 04:06:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kYPLF-0002ak-Gl; Fri, 30 Oct 2020 04:00:57 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:39053)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kYPL5-0006jx-KT; Fri, 30 Oct 2020 04:00:57 -0400
-Received: by mail-ed1-x541.google.com with SMTP id g25so4835414edm.6;
- Fri, 30 Oct 2020 01:00:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=U1K8KyovCyPjr0KO5SLxyHMBmxgiHKo7LDpZ8J0whKo=;
- b=G1YmshXIBH8mzDvLhFe+DTC647CaQzSETnEItZkn57lcU3snIM/OjVhigW/Cn/e8zz
- j8EwC0XWNunktDcA79Avn42ybGmEt6FgiDpCDNFhi+6Jb7WsVpX6aRzPpM+aeGhqlGmk
- 3xsTBix3dTXUY2P/JNSYUNNdy/6xjGr20EamgeKozUG3KkB9ERUncoDIUnq4PeLAdiya
- 5XFja1aTu5TnVLUkDEUSKlVTpAh1ZfyGY2PC7lmL/m5/zqby4bPJa5dpmNpZm0MMdM68
- ocuyUA6WTj+M1wX4j+W3FlAi7iFGBumH+VGgkabtW1CdFIV9h1zqO9HB2tSS05WWKkZL
- 7Xxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=U1K8KyovCyPjr0KO5SLxyHMBmxgiHKo7LDpZ8J0whKo=;
- b=DDTxXkIcEyah0yiGlmVKovbUR+1FBYFjODi9Yko1qc9FSu3RmZ3lS7JXKECB086UfC
- 9MQagB5aJVKpukhsTZQRVAMBBnkUiK/b3YzYbDvWRcrDbQd4tX0RGALa1uEAyVp2TbBh
- dlGxERdHE+FaIQtBsz9RMpZNobL2zHtWp/KIRD4P1Y/PbN+xa6bQtPVRkWZJiDQoawDI
- MQjgh2C5SNtg4kDwlP8Mf10jHTW2PJkHauSaQ3BotVSCHN6cfNJQ2P5+69cqa1uuDWTL
- 5YlG7R1w1pTc/VmHY7q2Mtbab1xtff+d37WJBe3khrAWObr/9C8nvOVsC2xQEKEaRiDM
- jUvg==
-X-Gm-Message-State: AOAM5339BSvnpiPNy+A8wUdUYRc7LSOkFmYppqBPYUcPYwF1I9+IMwCA
- hlccooeaLaHaKPCJB/fFPex+7+X/eSI/Ym4JEmU=
-X-Google-Smtp-Source: ABdhPJwldWxgVzojJ2G+wCzdSa+ydcni6sTFO8YXAJ0AMt4lgwTXprP4ov/q4RixmJbJH0Rqv8xKNOwZgnEcn3WEInY=
-X-Received: by 2002:a05:6402:195:: with SMTP id
- r21mr980115edv.164.1604044845119; 
- Fri, 30 Oct 2020 01:00:45 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kevin.tian@intel.com>)
+ id 1kYPPG-0004SA-Jo
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 04:05:06 -0400
+Received: from mga11.intel.com ([192.55.52.93]:40880)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kevin.tian@intel.com>)
+ id 1kYPPD-0008AI-K1
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 04:05:05 -0400
+IronPort-SDR: EGSnROUFsW9kkt9D3HeGijEo4xCKqRtsyl9VuKGCb+1A/soCjpf+5CqRvEdImcbLQmkGryDf3G
+ NRmsxkhfMAjA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9789"; a="165077625"
+X-IronPort-AV: E=Sophos;i="5.77,432,1596524400"; d="scan'208";a="165077625"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 30 Oct 2020 01:04:59 -0700
+IronPort-SDR: +r9CoGHPmMM8gPsly3DSA7WUCt6pfGykFkx87n80FjR4aAHNhJx/IzJIGJTSHEjsNrkgg3s3LB
+ H+0VYuUvSVeA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,432,1596524400"; d="scan'208";a="304869549"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+ by fmsmga007.fm.intel.com with ESMTP; 30 Oct 2020 01:04:59 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 30 Oct 2020 01:04:58 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Fri, 30 Oct 2020 01:04:58 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.176)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1713.5; Fri, 30 Oct 2020 01:04:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RgyLHqu0ElF+7+mBuHCEIac7ZawES+Joi5XpYgLb4WvuEfKi3R/sYvHRMznUt839WxYN0/ZLXKT+hkdfH0Apz2gfkfBzWlUmv6SOsxLsPHcywQLGnFhD4yC5ElrCuuaFoChjqaqULV5tMbWnYsA4aHtAmak8RUxL0VgpoAyOj0iRUQmWs0Dvy2aToJxckpc5d0fe+ykhZReTkk0M0/lD9a0UorYwVmqE7pTnz/aluePI3QvmmPlBR13/UWuy0gIIygTvgAKdIKvZGbWnvauF0XnbV9vr87Py5PmYfxSWgt0YdQI9LS61JWVyttv+yps3Znz24RcYUpeVPTtUydcp3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+v5R9lavaqsW304bMnPvk2RaF4qGizFLQp/puAjVPi0=;
+ b=F3DPU9j9LCNdlzacH0bjKV72dTQqJwBRmiXVN7s71MIHxYq+o3o3OCpcJ0xWkwFksww+Af/0l11T9cXEOZIFsz1DmTXvMQeesUKD13rORXCfDsTBPhZ8/iXF3da4Krh/smEHX3NZO8YYDUnaPb8IQtfl48MPbabWoNMicOzLn1vQ0EWiOju7vahkZN8SQB7HFIRnxGMFi2ySgdigrz3EdfOTePhsH3hrRgb5wWzD4NCsmzJ0NhYyF/Zd84EHfPNiSLs9fkFI+GadoYfGRTytLK9XRxj3zxUOPCpj/mMxKvlbXVmgH1NNHUmbRzx8c8I7su0hN810NuFy2QZXr50Ulw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com; 
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+v5R9lavaqsW304bMnPvk2RaF4qGizFLQp/puAjVPi0=;
+ b=ioI5SGkYvzZPvwH+ymqQZbjZRxBJ31h6tZKj8nyuBaymJ0npUvZs26FSiiRVP3mcn9SRTgev9BMsqO7AiaZWr2c50x5hobLbdISjoNbkW7BFclSlfE6qkeO5IFJOENUuRsj1u0C9wL79+F+pMUzIALhhquiCk2t2Jof6IQjUfsI=
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com (2603:10b6:301:b::12)
+ by MWHPR1101MB2285.namprd11.prod.outlook.com (2603:10b6:301:57::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Fri, 30 Oct
+ 2020 08:04:54 +0000
+Received: from MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::c88f:585f:f117:930b]) by MWHPR11MB1645.namprd11.prod.outlook.com
+ ([fe80::c88f:585f:f117:930b%8]) with mapi id 15.20.3477.034; Fri, 30 Oct 2020
+ 08:04:54 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: ENQCMD
+Thread-Topic: ENQCMD
+Thread-Index: AQHWrpFph6cQOfVFrUiBr+s3ZPoYi6mvxf9A
+Date: Fri, 30 Oct 2020 08:04:54 +0000
+Message-ID: <MWHPR11MB164567FA998B13128EB284D48C150@MWHPR11MB1645.namprd11.prod.outlook.com>
+References: <20201030075046.GA307361@stefanha-x1.localdomain>
+In-Reply-To: <20201030075046.GA307361@stefanha-x1.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.147.194]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 79e31d81-dc4d-4509-8d51-08d87caa7c73
+x-ms-traffictypediagnostic: MWHPR1101MB2285:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR1101MB228551A67B25C1515E90C5678C150@MWHPR1101MB2285.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /ogM1s2lMT6hV6L/jLerOq76IKA3ywpPdTwD1jqOx+GmhLhZQwZFSxCpy7hSZ6at+7VyNmiBdLjyQ5U7e1pKpgRLlQ+O4VfCjclO4Tk8mOI1+cM1EXgx9XGH90wpvU1QKAMYAN/07O7mcAN53qbvKVdoCSoBudlDXg24jZP2PmkJcEs5KEd1z3ZuL92Zm+aGPB154OL1gh97gXuVicYpjjV1aPrB8DhXrt5NYQNt+5YISQ6YbLPdiyYy0ztoeb56+e/5TcmKW7cy/B3x9ZhjGWEZ3mCueGGfiLUl63+xmzOA+rvMs43bptag6IIaVvOnORXv0Z31G403eoSpkUbCZZINzt2MK1bs6iMhRk+fbW0X9niJz+CRJJ2itHYl16jZ517paLge0w4J+ek7K19TsA==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR11MB1645.namprd11.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(39860400002)(366004)(136003)(396003)(346002)(376002)(54906003)(110136005)(5660300002)(107886003)(4326008)(26005)(2906002)(83380400001)(66946007)(7696005)(6506007)(64756008)(66556008)(66446008)(66476007)(33656002)(55016002)(6636002)(9686003)(76116006)(7116003)(71200400001)(86362001)(52536014)(3480700007)(186003)(8936002)(966005)(316002)(8676002)(478600001);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: j3nPLaHDN0mxG5byJeMVGHP0q39vaO6sEp0wFxgZJHwLqvbUYdy2+wF80QeFJnCdzNv92gKyvfoeDPqWkQ8/p9nCMqCCh1b5tuvpNCKTqeEfIyvmRMnMCkQqePLp8z0D0j9kXcuWLuh04z1B++R6yB+tDLC2j2NM9p/GrBYQn/t98wrWRRiBFaQqdRDfRvSwqsSxlb9oWHS+u/kIMz76IiIqDEJqx7XRrDySDfRvp8Tzha1s86RDQtwFWogD5M0U5tAmpjqeVqAkZ3hmyL/qh8WkctDL3fwZs93hgse2W9Y5gQatlvHQpztZFH7TaRL8nWQNUbSyrhpxEanngsJawgF3ES3zwS/g2mg9vJvI4E7rBrKuO6tF1VHU0MWagSBbR3Yyyzs3pVycTqoO8jlV0L9RTLiRST6dF78Th5nZJAM7BqFBznPGoTLO+IucScAMUDmk/3IiEEXU1uNsm+KlpzUddZwKUbL3thKEnBQtiRzXieCDNcK8bmGkogDhvlcLiT92Gs1Z/K1th3I1QUD+hby/QZKBIZAeqngvXpPwl3V3goYP3dvbx7lQEvvkEAMfKlgrdYmaFzrQ43ATU68sONiiEMIJXRfO9irW2vCaCdhIi8nb2lOgcCiZh99/eMqH4HPosYJ7/O/PadxkDAPcFA==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20201029220246.472693-1-ehabkost@redhat.com>
- <20201029220246.472693-13-ehabkost@redhat.com>
-In-Reply-To: <20201029220246.472693-13-ehabkost@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 30 Oct 2020 12:00:33 +0400
-Message-ID: <CAJ+F1CK6qoCW1L8Bdo2eFV2-O62QxW3+Q3+htxUdv5wzGeRZ4g@mail.gmail.com>
-Subject: Re: [PATCH 12/36] qdev: Make error_set_from_qdev_prop_error() get
- Object* argument
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000327f2f05b2decb74"
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1645.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79e31d81-dc4d-4509-8d51-08d87caa7c73
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Oct 2020 08:04:54.6057 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sCY/HaJhXujpFE3iOftKX7L+1LuXHzCdJF9T2DwmmBpW5tbXaFNrtgEdZo4ymiqU5nslmtqia+PtUcJ8q3dZcA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1101MB2285
+X-OriginatorOrg: intel.com
+Received-SPF: pass client-ip=192.55.52.93; envelope-from=kevin.tian@intel.com;
+ helo=mga11.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 04:04:59
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,64 +153,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
- David Hildenbrand <david@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Qemu-s390x list <qemu-s390x@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Raj,
+ Ashok" <ashok.raj@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000327f2f05b2decb74
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Oct 30, 2020 at 2:16 AM Eduardo Habkost <ehabkost@redhat.com> wrote=
-:
-
-> Make the code more generic and not specific to TYPE_DEVICE.
->
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->
-
-What about dropping _qdev from the function name too?
-
-Also, I am not sure it's a well designed function.. I would rather have 3
-different helper functions than dispatching with an errno... Might be worth
-a TODO note :)
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---000000000000327f2f05b2decb74
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 30, 2020 at 2:16 AM Eduar=
-do Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.com</=
-a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
-x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Ma=
-ke the code more generic and not specific to TYPE_DEVICE.<br>
-<br>
-Signed-off-by: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" t=
-arget=3D"_blank">ehabkost@redhat.com</a>&gt;<br></blockquote><div><br></div=
-><div>What about dropping _qdev from the function name too?</div><div><br><=
-/div><div>Also, I am not sure it&#39;s a well designed function.. I would r=
-ather have 3 different helper functions than dispatching with an errno... M=
-ight be worth a TODO note :)<br></div><div><br></div><div>Reviewed-by: Marc=
--Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marca=
-ndre.lureau@redhat.com</a>&gt; </div></div><br clear=3D"all"><br>-- <br><di=
-v dir=3D"ltr" class=3D"gmail_signature">Marc-Andr=C3=A9 Lureau<br></div></d=
-iv>
-
---000000000000327f2f05b2decb74--
+PiBGcm9tOiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+DQo+IFNlbnQ6IEZy
+aWRheSwgT2N0b2JlciAzMCwgMjAyMCAzOjUxIFBNDQo+IA0KPiBIaSwNCj4gVGhlICJTY2FsYWJs
+ZSBXb3JrIFN1Ym1pc3Npb24gaW4gRGV2aWNlIFZpcnR1YWxpemF0aW9uIiB0YWxrIGF0IEtWTQ0K
+PiBGb3J1bSAyMDIwIHdhcyBpbnRlcmVzdGluZyBhbmQgSSBoYXZlIHNvbWUgYmVnaW5uZXIgcXVl
+c3Rpb25zIGFib3V0DQo+IEVOUUNNRDoNCj4gaHR0cHM6Ly9zdGF0aWMuc2NoZWQuY29tL2hvc3Rl
+ZF9maWxlcy9rdm1mb3J1bTIwMjAvMjIvU2NhbGFibGVfV29ya19TdQ0KPiBibWlzc2lvbl9Jbl9E
+ZXZpY2VfVmlydHVhbGl6YXRpb24ucGRmDQo+IA0KPiBTZWN1cml0eQ0KPiAtLS0tLS0tLQ0KPiBJ
+ZiB0aGUgRU5RQ01EIGluc3RydWN0aW9uIGlzIGFsbG93ZWQgZm9yIHVzZXJzcGFjZSBhcHBsaWNh
+dGlvbnMsIGhvdyBjYW4NCj4gdGhleSBiZSBwcmV2ZW50ZWQgZnJvbSB3cml0aW5nIHRvIHRoZSBN
+TUlPIGFkZHJlc3MgZGlyZWN0bHkgKHdpdGhvdXQgdGhlDQo+IEVOUUNNRCBpbnN0cnVjdGlvbikg
+YW5kIGZha2luZyB0aGUgNjQtYnl0ZSBlbnF1ZXVlIHJlZ2lzdGVyIGRhdGEgZm9ybWF0Pw0KPiBG
+b3IgZXhhbXBsZSwgdGhleSBjb3VsZCBzZXQgdGhlIFBSSVYgYml0IG9yIGFuIGFyYml0cmFyeSBQ
+QVNJRC4NCg0KRU5RQ01EIHBheWxvYWQgaXMgdHJhbnNtaXR0ZWQgdGhyb3VnaCBETVdyIHRyYW5z
+YWN0aW9ucyAoc2xpZGUgMTApLCB3aGljaA0KY2Fubm90IGJlIHRyaWdnZXJlZCB0aHJvdWdoIG90
+aGVyIG1lbW9yeSBpbnN0cnVjdGlvbnMuIFRoZSBkZXZpY2UgcG9ydGFsDQpvbmx5IGhhbmRsZXMg
+RE1XciB0cmFuc2FjdGlvbnMuDQoNClBSSVYgY2Fubm90IGJlIHNldCBieSBFTlFDTUQuIE9ubHkg
+YnkgRU5RQ01EUyAoaW4gcmluZzApLg0KDQpQQVNJRCBpcyBjb3BpZWQgZnJvbSBhIE1TUiB3aGVu
+IEVOUUNNRCBpcyBleGVjdXRlZC4gdGhlIE1TUiBpcyBtYW5hZ2VkDQpieSB0aGUga2VybmVsLiBV
+c2Vyc3BhY2UgY2Fubm90IHNwZWNpZnkgaXQgZGlyZWN0bHkuDQoNCj4gDQo+IFdvcmsgUXVldWUg
+RGVzaWduDQo+IC0tLS0tLS0tLS0tLS0tLS0tDQo+IEhhdmUgeW91IGxvb2tlZCBhdCBleHRlbmRp
+bmcgZXhpc3RpbmcgaGFyZHdhcmUgaW50ZXJmYWNlcyBsaWtlIE5WTWUgb3INCj4gVklSVElPIHRv
+IHN1cHBvcnQgZW5xdWV1ZSByZWdpc3RlcnM/DQoNClRoZSBmaXJzdCBkZXZpY2VzIHN1cHBvcnRp
+bmcgRU5RQ01EIGFyZSBEU0EvSUFYLiBUaGUgbmF0aXZlIHN1cHBvcnQgDQpqdXN0IGxhbmRlZCBp
+biB0aGUga2VybmVsLiBJbiBjb25jZXB0IGFueSBkZXZpY2Ugd2hpY2ggd2FudHMgdG8gc3VwcG9y
+dA0Kc2hhcmVkIHdvcmsgcXVldWUgY2FuIGltcGxlbWVudCB0aGlzIGNhcGFiaWxpdHkuDQoNCj4g
+DQo+IEhhdmUgeW91IGJlbmNobWFya2VkIE5WTWUgb3IgVklSVElPIGRldmljZXMgdXNpbmcgRU5R
+Q01EIGluc3RlYWQgb2YNCj4gdGhlIHRyYWRpdGlvbmFsIHN1Ym1pc3Npb24gcXVldWluZyBtZWNo
+YW5pc20/DQoNCk5vLiBXZSBkb24ndCBoYXZlIHN1Y2ggZGV2aWNlcyB5ZXQuDQoNCj4gDQo+IElz
+IEVOUUNNRCBmYXN0ZXIgdGhhbiB0cmFkaXRpb25hbCBJL08gcmVxdWVzdCBzdWJtaXNzaW9uPyBJ
+ZiBub3QsIHRoZW4gSQ0KPiBndWVzcyBpdCdzIG9ubHkgaW50ZW5kZWQgZm9yIHNoYXJlZCBxdWV1
+ZXMgd2hlcmUgdGhlIFBBU0lEIHRyYW5zbGF0aW9uDQo+IGlzIG5lZWRlZD8NCg0KRU5RQ01EIGlz
+IG5vbi1wb3N0ZWQgdHJhbnNhY3Rpb24uIFNvIGl0J3MgYSBsaXR0bGUgYml0IHNsb3dlciB0aGFu
+IG5vcm1hbA0Kd3JpdGVzLiBUaGUgcG9pbnQgaXMgdG8gY2FycnkgJ3JldHJ5JyBzaWduYWwgYmFj
+ayBpbiBjYXNlIG9mIHJlc291cmNlIGNvbnRlbnRpb24uDQoNCmFuZCA2NGJ5dGVzIHBheWxvYWQg
+aXMgYWxzbyBhbiBhZHZhbnRhZ2UuIGUuZy4gZm9yIERTQS9JQVggdGhlIHdob2xlDQp3b3JrIGRl
+c2NyaXB0b3IgY2FuIGJlIGluY2x1ZGVkIGluIHRoZSBFTlFDTUQgcGF5bG9hZC4NCg0KPiANCj4g
+QSBmZXcgdGhvdWdodHMgY29tZSB0byBtaW5kOg0KPiANCj4gICogVHJhZGl0aW9uYWwgc3VibWlz
+c2lvbiBxdWV1ZXMgYXJlIG5vIGxvbmdlciBuZWVkZWQgYW5kIGNhbiBiZQ0KPiAgICByZXBsYWNl
+ZCBieSBhbiBlbnF1ZXVlIHJlZ2lzdGVyLiBOVk1lIHNxcyBhbmQgVklSVElPIGF2YWlsIHJpbmdz
+DQo+ICAgIGFyZW4ndCBuZWVkZWQgYW55bW9yZSwgYWx0aG91Z2ggdGhlIHNxZXMgYW5kIHZyaW5n
+IGRlc2NyaXB0b3JzIGFyZQ0KPiAgICBzdGlsbCBuZWVkZWQgdG8gcmVwcmVzZW50IGNvbW1hbmRz
+IGFuZCBidWZmZXJzLg0KDQp5ZXMsIHRoaXMgaXMgb25lIHBvc3NpYmxlIGVuaGFuY2VtZW50Lg0K
+DQo+IA0KPiAgICBPciB0aGUgZW5xdWV1ZSByZWdpc3RlciBjYW4gYmUgdXNlZCBzaW1wbHkgYXMg
+YSBkb29yYmVsbCB0byBzdGFydCBETUENCj4gICAgcmVhZGluZyByZXF1ZXN0cyBmcm9tIGEgdHJh
+ZGl0aW9uYWwgc3VibWlzc2lvbiBxdWV1ZS4gSW4gdGhpcyBjYXNlDQo+ICAgIHRoZSBhZHZhbnRh
+Z2UgaXMgdGhhdCBhIHNpbmdsZSBzaGFyZWQgaGFyZHdhcmUgdW5pdCAoQURJKSBjYW4gZW11bGF0
+ZQ0KPiAgICBtdWx0aXBsZSBxdWV1ZXMgYXQgdGhlIHNhbWUgdGltZS4NCj4gDQo+ICAqIEluIG9y
+ZGVyIHRvIHN1cHBvcnQgc3VibWl0dGluZyBtdWx0aXBsZSByZXF1ZXN0cyBpbiBhIHNpbmdsZSBl
+bnF1ZXVlDQo+ICAgIHJlZ2lzdGVyIGFjY2VzcyB0aGVyZSBuZWVkcyB0byBiZSBzb21lIGtpbmQg
+b2YgY2hhaW5pbmcgbWVjaGFuaXNtLg0KPiAgICBGb3IgZXhhbXBsZSwgdGhlIERldmljZSBTcGVj
+aWZpYyBDb21tYW5kIGZpZWxkIGNvbnRhaW5zIGEgbnVtX3JlcXMNCj4gICAgZmllbGQgdGVsbGlu
+ZyB0aGUgZGV2aWNlIGhvdyBtYW55IHJlcXVlc3RzIHRvIERNQS4NCg0KeWVzLCB0aGlzIGxlYXZl
+cyB0byBkZXZpY2Ugc3BlY2lmaWMgZm9ybWF0LiBlLmcuIERTQSBkZWZpbmVzIGEgY2hhaW5pbmcN
+CmRlc2NyaXB0IHR5cGUgdG8gY2hhaW4gbXVsdGlwbGUgcmVxdWVzdHMgdG9nZXRoZXIuDQoNCj4g
+DQo+IEkgZG9uJ3Qga25vdyBtdWNoIGFib3V0IEVOUUNNRCBhbmQgYW0gdHJ5aW5nIHRvIGZpZ3Vy
+ZSBvdXQgd2hlcmUgaXQgZml0cw0KPiBpbi4gUGxlYXNlIGxldCBtZSBrbm93IGlmIHRoaXMgbWF0
+Y2hlcyBob3cgdGhpcyBmZWF0dXJlIGlzIGludGVuZGVkIHRvDQo+IGJlIHVzZWQuDQo+IA0KDQpJ
+IHRoaW5rIHlvdSBjYXB0dXJlZCBtb3N0IG9mIHRoZSBpbnRlbnRpb24gb2YgIEVOUUNNRC4g8J+Y
+ig0KDQpUaGFua3MNCktldmluDQo=
 
