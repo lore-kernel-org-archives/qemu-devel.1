@@ -6,72 +6,72 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12411C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A2FC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:08:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E9AD2087E
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:06:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28823206F7
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:08:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hdX5puXB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E9AD2087E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvmhXteQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28823206F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYV2n-0007bR-EQ
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:06:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43452)
+	id 1kYV4b-0000L8-PU
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:08:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kYUzs-0005gE-I1
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:03:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42964)
+ id 1kYV0g-0006HO-6I
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:04:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45904)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kYUzq-00064i-T7
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:03:16 -0400
+ id 1kYV0U-00068A-BJ
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:04:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604066594;
+ s=mimecast20190719; t=1604066633;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=r1DPYxLZH7BlcgZFEnXlAc5nOgWHXwHLFiH93ba/avE=;
- b=hdX5puXBp03NBzeq53gqOCLBFKhhyb3V2lJLH+b6TaF7pg1x2Er6P3lsR8B8b0GKGQdgVM
- v5DelVF4BHnrSNqmvtj9ZEyWPnO3TBRZdTsemUrrvJIIspooFsW6eqMAOYmQ4ssS465Y8z
- 0+vr0P0YirA3WjlTjqi7D9U2V9jDfO4=
+ bh=+DWrWQeUTGCs6mcbq3lWKQHOnc4S05aAIx37995cxv4=;
+ b=gvmhXteQxDgM//iLFHR60hslgMDryhRL/gpvSJJpyWsiACP3136PKU+b3FYB3i9sxOU1H7
+ QOqugPvNk4WIuDPUuv/QraCzqr/e68LuFW3JNPKWZUZt5E2+OBzPIxnFkM7xUrQYQWwozb
+ 8L8fM60fx5Fc/xNhkZiBnaDO2NdDs0Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-a3YBB8ZqPPS8LXNT75xmDA-1; Fri, 30 Oct 2020 10:03:08 -0400
-X-MC-Unique: a3YBB8ZqPPS8LXNT75xmDA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-502-AQTnpW2EOAKIaAJaekk41A-1; Fri, 30 Oct 2020 10:03:51 -0400
+X-MC-Unique: AQTnpW2EOAKIaAJaekk41A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 252AC1007286;
- Fri, 30 Oct 2020 14:03:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C52C01005A9;
+ Fri, 30 Oct 2020 14:03:45 +0000 (UTC)
 Received: from localhost (ovpn-113-41.ams2.redhat.com [10.36.113.41])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BF51A55798;
- Fri, 30 Oct 2020 14:03:02 +0000 (UTC)
-Date: Fri, 30 Oct 2020 14:03:01 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 17DD019C71;
+ Fri, 30 Oct 2020 14:03:40 +0000 (UTC)
+Date: Fri, 30 Oct 2020 14:03:40 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.2 v2 10/25] block/nvme: Make nvme_identify() return
- boolean indicating error
-Message-ID: <20201030140301.GC330921@stefanha-x1.localdomain>
+Subject: Re: [PATCH-for-5.2 v2 12/25] block/nvme: Introduce Completion Queue
+ definitions
+Message-ID: <20201030140340.GD330921@stefanha-x1.localdomain>
 References: <20201029093306.1063879-1-philmd@redhat.com>
- <20201029093306.1063879-11-philmd@redhat.com>
+ <20201029093306.1063879-13-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201029093306.1063879-11-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201029093306.1063879-13-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ncSAzJYg3Aa9+CRW"
+ protocol="application/pgp-signature"; boundary="Hf61M2y+wYpnELGG"
 Content-Disposition: inline
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -104,41 +104,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---ncSAzJYg3Aa9+CRW
+--Hf61M2y+wYpnELGG
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 29, 2020 at 10:32:51AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Just for consistency, following the example documented since
-> commit e3fe3988d7 ("error: Document Error API usage rules"),
-> return a boolean value indicating an error is set or not.
-> Directly pass errp as the local_err is not requested in our
-> case.
+On Thu, Oct 29, 2020 at 10:32:53AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Rename Submission Queue flags with 'Sq' to differentiate
+> submission queue flags from command queue flags, and introduce
+> Completion Queue flag definitions.
 >=20
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 > Tested-by: Eric Auger <eric.auger@redhat.com>
 > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 > ---
->  block/nvme.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
+>  include/block/nvme.h | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
+
+I mentioned more possible cleanups in the previous revision, but they
+are not a blocker:
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---ncSAzJYg3Aa9+CRW
+--Hf61M2y+wYpnELGG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+cHRUACgkQnKSrs4Gr
-c8iBBggAlFvQ8gIFxaMkP/OAb0EEvMri1MzC7AKiMntDbhR5cYDs8mDc/Uxc/epA
-UeUmKAAAprUKYZDOYat8OV49mFj+6H3ITlQyeDly05UPqEb2U7MG6Nzbx+lUEYsf
-/MU1D+plKm3EcMFV+KLLkgz3mMQ7xT+u+0Bpgz0s7T80zkejMraeNZhr/zPII8/Y
-LU58YLBE2UX3z3xpXy4gK8BHPIFbafoU/AO+lT34Tcg2VNMna0XmfzPioncxOFB3
-/NflOIdj48ZXjBSCIhBHp0LAcO15i3QrW1qg6sd1otOIj3zjDWyC7TtGYqm80/Mp
-71yXVw5VlgP4x42tp8EcjA+NLP7EBQ==
-=QWE8
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+cHTwACgkQnKSrs4Gr
+c8gZ+AgAjsqk0Q865rKWD4kXoEwXMYZlX7QbH8U0mAwXMXtVMFGlxXhAPo4BSApO
+hWAi2pVzTTKEqlA4VRAQLPdj+gpic7jpvKE90N3PJmeqwFE7fJsMObwKua0alNug
+doIfG4eBORrDrdr+hD31Wua27Iddc9U1kTJyY1hS3fju5FqktuUHwE+3quAjCsbw
+dEM6ciAmy5Pxw4ho7j1xGDqAjpluSL7HNnkUVrU41spD2P3GVLnVZm6z4o0bWka+
+BforO0284aiIBWhrfk0c4o2c78LKYrk10bYl31ULNIKiG+MgEBPmSGxkRKgmJodk
+yZmnwnZ4qnJ4vim8cCkGFeb6jK6KJw==
+=fSeJ
 -----END PGP SIGNATURE-----
 
---ncSAzJYg3Aa9+CRW--
+--Hf61M2y+wYpnELGG--
 
 
