@@ -2,87 +2,99 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 764F3C5517A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A2BC55179
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:47:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC3CF20756
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:46:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CE282076E
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:47:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uoXhTt8S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC3CF20756
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0y/7Jxy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE282076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYQzL-0003DH-Gw
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 05:46:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36658)
+	id 1kYR0c-00046k-Hw
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 05:47:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36954)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kYQya-0002fv-68
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:45:41 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:36326)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kYQyV-0002up-Tg
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:45:39 -0400
-Received: by mail-ej1-x643.google.com with SMTP id o21so686143ejb.3
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 02:45:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QC3UutznicSZrdvaN94nX6+ZFJ6gIW8uSMDkwy5ce7E=;
- b=uoXhTt8SNvWrhcccMo61VY95TymzaTUkK50u/amnUZBaJXNzxi4qCJ1w/OvkzGNN7o
- wbJEF1/c5y7LWpX0pJWc2sATsZ9FzupacP5YU0xTiu2WwBmSRarpdPeipLNVo0AmIpDz
- 1I5NzSB0U/Ae9Ann4BYBu65u4RxIrXFINkBdxj9GMRVmDDaBDvExjsQiAHnE2LccLX6Y
- s3FLswA9RBVCPUWiy634+UOSjoDSpo7X+oLLwuIgdlU2JNvKXIJL640eQ6ViVHzk0VEW
- xT8RB67Sd7iz2g4m6keznA5tQAdpbuvP/L6hXaF8fkkJKf0bw1YT1NKpBgooPDmOvmNq
- EDvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QC3UutznicSZrdvaN94nX6+ZFJ6gIW8uSMDkwy5ce7E=;
- b=p3kn7TyS7sTWSIAu9a8ANcQ8SI8qhwEb0+77V5LBERhWVEV6VUoi2tM/PzfC/Qp7Gb
- EYqvTO+vsLnulShJaEN0MTBilaHoPnxn8dClUFrrE/UDIIDUQ7uwNX5yxwWAFwdMLVR2
- QY2lsH+NrMnMCblEWluv+c7gHwmdx06PH3NAnQDAGxAKEoteBwT6Rbz/tp9L2OzX37xM
- D4KXR9Vo9Ot7l9Dyn0nBC3iZT5pv1B7SZX6sPyNobucnxxz6Kiw6/Wt0JZm86hF7+dfb
- aXpAq7RlbxRiGXkBW/3fsTfVuPQk/GTZA+qfk5zK0vgo0A5KaRsS7qrQdkTTstNhuVkn
- hulg==
-X-Gm-Message-State: AOAM530yu2e7GrcrqkokFYovFj/jw8ChHS88ebqLbB+YPqqOdnk4XHIY
- hom70qFxWur1nyYwUkirFr/uMgQRrsTIs9RdQyg=
-X-Google-Smtp-Source: ABdhPJzLx2eCOQ5lEX6kU7ZQUcZ6U6ASV9OxkshIMKvwEHfQg4B7OH4vWwEp3rEQmKEZzxxdmH0lVDoDSexzWsP+2MI=
-X-Received: by 2002:a17:906:f6cf:: with SMTP id
- jo15mr1529167ejb.105.1604051131831; 
- Fri, 30 Oct 2020 02:45:31 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kYQzt-0003aV-Ce
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:47:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34917)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kYQzk-0003Pv-J6
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:47:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604051208;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=42XMSpBP3eGnc2HU2aJCjYLCV/J1dq1VdPf8rTJkJ3w=;
+ b=L0y/7JxyU3NWU9sXtiS4PZjHrDE15qWs3A1OOZ6iv6vTVApmF5EQHdR5p3YXa9HIOcwo5D
+ puNpu8O/kg2WVBQXFcuK6zCVzo567GegljCHL5T2RC77yaVLXs1REWRFlQItfoXx1Y7Y7h
+ KajL0uQbXktmSI/89l69il8gDt/u+4s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-oycL2sqZN0KXIoNFEChNrw-1; Fri, 30 Oct 2020 05:46:45 -0400
+X-MC-Unique: oycL2sqZN0KXIoNFEChNrw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EA161018727;
+ Fri, 30 Oct 2020 09:46:42 +0000 (UTC)
+Received: from [10.72.12.248] (ovpn-12-248.pek2.redhat.com [10.72.12.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8797E5D9D5;
+ Fri, 30 Oct 2020 09:46:02 +0000 (UTC)
+Subject: Re: Out-of-Process Device Emulation session at KVM Forum 2020
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>
+References: <20201027151400.GA138065@stefanha-x1.localdomain>
+ <CAJSP0QWrmNN1Ci-M-4WDFZBOGHyeZvF71utg0w2ajCbOLtynJw@mail.gmail.com>
+ <c4e5b631-1607-a0ec-ee88-6c5a9493e3de@redhat.com>
+ <20201029083130.0617a28f@w520.home>
+ <b85405de-d525-bf59-826c-737fa7bbdfef@redhat.com>
+ <20201029094603.15382476@w520.home>
+ <d4f7df42-7b02-6505-c2c7-245bf813b513@redhat.com>
+ <20201029210407.33d6f008@x1.home>
+ <CAJSP0QVto+xFEnWv-aj=-0mZ72SzfeAvg4q0RCoLGK-N7C-WEw@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <04179584-3324-994e-d793-04be18d2dab2@redhat.com>
+Date: Fri, 30 Oct 2020 17:45:58 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20201029220246.472693-1-ehabkost@redhat.com>
- <20201029220246.472693-17-ehabkost@redhat.com>
-In-Reply-To: <20201029220246.472693-17-ehabkost@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 30 Oct 2020 13:45:20 +0400
-Message-ID: <CAJ+F1CK=mTevr4m0fvRkQj6=E6uAcDNoWdL06v1-hy-XX+qLFQ@mail.gmail.com>
-Subject: Re: [PATCH 16/36] qdev: Make qdev_class_add_property() more flexible
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000ea1ce405b2e04194"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <CAJSP0QVto+xFEnWv-aj=-0mZ72SzfeAvg4q0RCoLGK-N7C-WEw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.261, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,183 +108,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ Janosch Frank <frankja@linux.vnet.ibm.com>,
+ "mst@redhat.com" <mtsirkin@redhat.com>,
+ John G Johnson <john.g.johnson@oracle.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Yan Vugenfirer <yan@daynix.com>, Jag Raman <jag.raman@oracle.com>,
+ =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+ Anup Patel <anup@brainfault.org>,
+ Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Roman Kagan <rkagan@virtuozzo.com>, Felipe Franciosi <felipe@nutanix.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Jens Freimann <jfreimann@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>,
+ Darren Kenny <darren.kenny@oracle.com>, Liran Alon <liran.alon@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ Halil Pasic <pasic@linux.vnet.ibm.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, fam <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ea1ce405b2e04194
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 30, 2020 at 2:13 AM Eduardo Habkost <ehabkost@redhat.com> wrote=
-:
+On 2020/10/30 下午2:21, Stefan Hajnoczi wrote:
+> On Fri, Oct 30, 2020 at 3:04 AM Alex Williamson
+> <alex.williamson@redhat.com> wrote:
+>> It's great to revisit ideas, but proclaiming a uAPI is bad solely
+>> because the data transfer is opaque, without defining why that's bad,
+>> evaluating the feasibility and implementation of defining a well
+>> specified data format rather than protocol, including cross-vendor
+>> support, or proposing any sort of alternative is not so helpful imo.
+> The migration approaches in VFIO and vDPA/vhost were designed for
+> different requirements and I think this is why there are different
+> perspectives on this. Here is a comparison and how VFIO could be
+> extended in the future. I see 3 levels of device state compatibility:
+>
+> 1. The device cannot save/load state blobs, instead userspace fetches
+> and restores specific values of the device's runtime state (e.g. last
+> processed ring index). This is the vhost approach.
+>
+> 2. The device can save/load state in a standard format. This is
+> similar to #1 except that there is a single read/write blob interface
+> instead of fine-grained get_FOO()/set_FOO() interfaces. This approach
+> pushes the migration state parsing into the device so that userspace
+> doesn't need knowledge of every device type. With this approach it is
+> possible for a device from vendor A to migrate to a device from vendor
+> B, as long as they both implement the same standard migration format.
+> The limitation of this approach is that vendor-specific state cannot
+> be transferred.
+>
+> 3. The device can save/load opaque blobs. This is the initial VFIO
+> approach.
 
-> Support Property.set_default and PropertyInfo.description even if
-> PropertyInfo.create is set.
+
+I still don't get why it must be opaque.
+
+
+>   A device from vendor A cannot migrate to a device from
+> vendor B because the format is incompatible. This approach works well
+> when devices have unique guest-visible hardware interfaces so the
+> guest wouldn't be able to handle migrating a device from vendor A to a
+> device from vendor B anyway.
+
+
+For VFIO I guess cross vendor live migration can't succeed unless we do 
+some cheats in device/vendor id.
+
+
 >
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->  hw/core/qdev-properties.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
+> I think we will see more NVMe and VIRTIO hardware VFIO devices in the
+> future. Those are standard guest-visible hardware interfaces. It makes
+> sense to define standard migration formats so it's possible to migrate
+> a device from vendor A to a device from vendor B.
+
+
+Yes.
+
+
 >
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 89e292dc25..ad685f371d 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -912,24 +912,25 @@ void qdev_property_add_static(DeviceState *dev,
-> Property *prop)
->  static void qdev_class_add_property(DeviceClass *klass, Property *prop)
->  {
->      ObjectClass *oc =3D OBJECT_CLASS(klass);
-> +    ObjectProperty *op;
+> This can be achieved as follows:
+> 1. The VFIO migration blob starts with a unique format identifier such
+> as a UUID. This way the destination device can identify standard
+> device state formats and parse them.
+> 2. The VFIO device state ioctl is extended so userspace can enumerate
+> and select device state formats. This way it's possible to check
+> available formats on the source and destination devices before
+> migration and to configure the source device to produce device state
+> in a common format.
 >
->      if (prop->info->create) {
-> -        prop->info->create(oc, prop);
-> +        op =3D prop->info->create(oc, prop);
->      } else {
-> -        ObjectProperty *op;
-> -
->          op =3D object_class_property_add(oc,
->                                         prop->name, prop->info->name,
->                                         static_prop_getter(prop->info),
->                                         static_prop_setter(prop->info),
->                                         prop->info->release,
->                                         prop);
-> -        if (prop->set_default) {
-> -            prop->info->set_default_value(op, prop);
-> -        }
->      }
-> -    object_class_property_set_description(oc, prop->name,
-> -                                          prop->info->description);
-> +    if (prop->set_default) {
-> +        prop->info->set_default_value(op, prop);
-> +    }
-> +    if (prop->info->description) {
-> +        object_class_property_set_description(oc, prop->name,
-> +                                            prop->info->description);
+> To me it seems #3 makes sense as an initial approach for VFIO since
+> guest-visible hardware interfaces are often not compatible between PCI
+> devices. #2 can be added in the future, especially when VFIO drivers
+> from different vendors become available that present the same
+> guest-visible hardware interface (NVMe, VIRTIO, etc).
+
+
+For at least virtio, they will still go with virtio/vDPA. The advantages 
+are:
+
+1) virtio/vDPA can serve kernel subsystems which VFIO can't, this is 
+very important for containers
+2) virtio/vDPA is bus independent, we can present a virtio-mmio device 
+which is based on vDPA PCI hardware for e.g microvm
+
+I'm not familiar with NVME but they should go with the same way instead 
+of depending on VFIO.
+
+Thanks
+
+
+>
+> Stefan
 >
 
-indentation is off, other than that:
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-+    }
->  }
->
->  /**
-> --
-> 2.28.0
->
->
->
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---000000000000ea1ce405b2e04194
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 30, 2020 at 2:13 AM Eduar=
-do Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.com</=
-a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
-x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Su=
-pport Property.set_default and PropertyInfo.description even if<br>
-PropertyInfo.create is set.<br>
-<br>
-Signed-off-by: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" t=
-arget=3D"_blank">ehabkost@redhat.com</a>&gt;<br>
----<br>
-Cc: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" target=3D"_bla=
-nk">pbonzini@redhat.com</a>&gt;<br>
-Cc: &quot;Daniel P. Berrang=C3=A9&quot; &lt;<a href=3D"mailto:berrange@redh=
-at.com" target=3D"_blank">berrange@redhat.com</a>&gt;<br>
-Cc: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" target=3D"_b=
-lank">ehabkost@redhat.com</a>&gt;<br>
-Cc: <a href=3D"mailto:qemu-devel@nongnu.org" target=3D"_blank">qemu-devel@n=
-ongnu.org</a><br>
----<br>
-=C2=A0hw/core/qdev-properties.c | 17 +++++++++--------<br>
-=C2=A01 file changed, 9 insertions(+), 8 deletions(-)<br>
-<br>
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c<br>
-index 89e292dc25..ad685f371d 100644<br>
---- a/hw/core/qdev-properties.c<br>
-+++ b/hw/core/qdev-properties.c<br>
-@@ -912,24 +912,25 @@ void qdev_property_add_static(DeviceState *dev, Prope=
-rty *prop)<br>
-=C2=A0static void qdev_class_add_property(DeviceClass *klass, Property *pro=
-p)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0ObjectClass *oc =3D OBJECT_CLASS(klass);<br>
-+=C2=A0 =C2=A0 ObjectProperty *op;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0if (prop-&gt;info-&gt;create) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 prop-&gt;info-&gt;create(oc, prop);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 op =3D prop-&gt;info-&gt;create(oc, prop);<br>
-=C2=A0 =C2=A0 =C2=A0} else {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 ObjectProperty *op;<br>
--<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0op =3D object_class_property_add(oc,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 prop-&gt=
-;name, prop-&gt;info-&gt;name,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 static_p=
-rop_getter(prop-&gt;info),<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 static_p=
-rop_setter(prop-&gt;info),<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 prop-&gt=
-;info-&gt;release,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 prop);<b=
-r>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (prop-&gt;set_default) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 prop-&gt;info-&gt;set_default_va=
-lue(op, prop);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
--=C2=A0 =C2=A0 object_class_property_set_description(oc, prop-&gt;name,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 p=
-rop-&gt;info-&gt;description);<br>
-+=C2=A0 =C2=A0 if (prop-&gt;set_default) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 prop-&gt;info-&gt;set_default_value(op, prop);=
-<br>
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 if (prop-&gt;info-&gt;description) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 object_class_property_set_description(oc, prop=
--&gt;name,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 prop-&gt;info-&gt;description);<br></blockquote><div><br></div><div>=
-indentation is off, other than that:</div><div>Reviewed-by: Marc-Andr=C3=A9=
- Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau=
-@redhat.com</a>&gt;</div><div> <br></div><blockquote class=3D"gmail_quote" =
-style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pa=
-dding-left:1ex">
-+=C2=A0 =C2=A0 }<br>
-=C2=A0}<br>
-<br>
-=C2=A0/**<br>
--- <br>
-2.28.0<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---000000000000ea1ce405b2e04194--
 
