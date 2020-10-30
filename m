@@ -2,70 +2,101 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53726C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21989C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:00:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41FB92075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:00:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41FB92075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2EF09206FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 13:00:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rj+dZb1c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EF09206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYU0e-00085p-6y
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 09:00:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54074)
+	id 1kYU0w-0008Gb-0h
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 09:00:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kYTno-0001uw-K5
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:46:44 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:60757)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmm-0000nO-1l
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50086)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kYTnm-00012j-QZ
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:46:44 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-DAXwkZIFPw2uPBBY7rJoxw-1; Fri, 30 Oct 2020 08:46:37 -0400
-X-MC-Unique: DAXwkZIFPw2uPBBY7rJoxw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDFF310B9CA0;
- Fri, 30 Oct 2020 12:46:35 +0000 (UTC)
-Received: from bahia.lan (ovpn-113-123.ams2.redhat.com [10.36.113.123])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 723795B4BC;
- Fri, 30 Oct 2020 12:46:35 +0000 (UTC)
-Subject: [PATCH] tests/9pfs: Force removing of local 9pfs test directory
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Fri, 30 Oct 2020 13:46:34 +0100
-Message-ID: <160406199444.312256.8319835906008559151.stgit@bahia.lan>
-User-Agent: StGit/0.21
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmk-0000k2-4F
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604061937;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=l6Xr3YozF4IKRpFrhD0A/HyzyCVetEbDlqfMsE4vvfI=;
+ b=Rj+dZb1cnyhHVDVA3llTOQmF8EnC7twtBYZc7lWJxlvS6jlYtEYVDF7DwWHoSE1BnHS7D2
+ vNr8WwObkSBdt2g2sMNms3zAdfa2+D4Px0pPC24q3g05WfJ65zrs4oFx9y07Pvzw5oR+Eg
+ Chi1Rp0mw3hIOqv5DTNwPuanyW38Fl8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-1gqGr0d4P6apkzAijwHwhg-1; Fri, 30 Oct 2020 08:45:35 -0400
+X-MC-Unique: 1gqGr0d4P6apkzAijwHwhg-1
+Received: by mail-wr1-f69.google.com with SMTP id q15so2613928wrw.8
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 05:45:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=l6Xr3YozF4IKRpFrhD0A/HyzyCVetEbDlqfMsE4vvfI=;
+ b=ZkSvUGgaJN4dp5UP+leIInkjWnxtqymjRRRneqFLZiswOT+d4q275QQzEzM3TMSBf6
+ 2XJeAYiR7g/hTmJ5PwyMm+seDP6ISsHka6eBJss994pfjnBpcheNLLbnLvfu9b2BKknE
+ Tbc54fg6oFie3r5BtkPjaUEXv6yhg6hr8aAGUkele5R2narTXi1JSSZXDQxYgJ60CvOl
+ UOHiX6xDokeRT59zb1yYL6CnPYP1NSkRupMqEvaXQUa3Vvm6vNciYM407ivUKNIVFtQE
+ ijBjQCCW4/5ulovtlg7JNwhdxATs+JkeFLdKw39SOz762rItXsF+I7mvOieqExf46Xzv
+ gm8w==
+X-Gm-Message-State: AOAM531/dfOhKxnjukz0qu+ChvKxTC6g3D6v75PJi5ziYA73i+ebQK86
+ kCfn2qB00qCeTrbTzfilHKwul0pG2rNvk0DWcFdJ1QaGyXAo0+s60U9+wruVVOyntKXmyM/4qJ5
+ Cv+uRecwAhG8iHRw=
+X-Received: by 2002:adf:e4c4:: with SMTP id v4mr2908742wrm.79.1604061933960;
+ Fri, 30 Oct 2020 05:45:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwKriC5/odzbgXjmhIsEptvw7i0gYvqxcwi6uAUNEO5v+vf374JoW67otf1/m/0BT9BsSXypA==
+X-Received: by 2002:adf:e4c4:: with SMTP id v4mr2908729wrm.79.1604061933823;
+ Fri, 30 Oct 2020 05:45:33 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
+ by smtp.gmail.com with ESMTPSA id c8sm9682361wrv.26.2020.10.30.05.45.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 30 Oct 2020 05:45:33 -0700 (PDT)
+Date: Fri, 30 Oct 2020 08:45:31 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 12/15] pci: Disallow improper BAR registration for type 1
+Message-ID: <20201030124454.854286-13-mst@redhat.com>
+References: <20201030124454.854286-1-mst@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20201030124454.854286-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=207.211.30.44; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-44.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 08:46:40
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 02:24:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,38 +109,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Ben Widawsky <ben.widawsky@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No need to get a complaint from "rm" if some path disappeared for some
-reason.
+From: Ben Widawsky <ben.widawsky@intel.com>
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Prevent future developers working on root complexes, root ports, or
+bridges that also wish to implement a BAR for those, from shooting
+themselves in the foot. PCI type 1 headers only support 2 base address
+registers. It is incorrect and difficult to figure out what is wrong
+with the device when this mistake is made. With this, it is immediate
+and obvious what has gone wrong.
+
+Signed-off-by: Ben Widawsky <ben.widawsky@intel.com>
+Message-Id: <20201015181411.89104-2-ben.widawsky@intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
+ hw/pci/pci.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-I remember seeing a "rm: cannot remove 'some-path': No such file or directo=
-ry"
-recently but I can't reproduce it with current master :)
----
- tests/qtest/libqos/virtio-9p.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.=
-c
-index 6b22fa0e9a49..ab9d88a9b7de 100644
---- a/tests/qtest/libqos/virtio-9p.c
-+++ b/tests/qtest/libqos/virtio-9p.c
-@@ -62,7 +62,7 @@ static void create_local_test_dir(void)
- static void remove_local_test_dir(void)
- {
-     g_assert(local_test_path !=3D NULL);
--    char *cmd =3D g_strdup_printf("rm -r '%s'\n", local_test_path);
-+    char *cmd =3D g_strdup_printf("rm -fr '%s'\n", local_test_path);
-     int res =3D system(cmd);
-     if (res < 0) {
-         /* ignore error, dummy check to prevent compiler error */
-
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index e5b7c9a42b..0131d9d02c 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1148,11 +1148,17 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+     uint32_t addr; /* offset in pci config space */
+     uint64_t wmask;
+     pcibus_t size = memory_region_size(memory);
++    uint8_t hdr_type;
+ 
+     assert(region_num >= 0);
+     assert(region_num < PCI_NUM_REGIONS);
+     assert(is_power_of_2(size));
+ 
++    /* A PCI bridge device (with Type 1 header) may only have at most 2 BARs */
++    hdr_type =
++        pci_dev->config[PCI_HEADER_TYPE] & ~PCI_HEADER_TYPE_MULTI_FUNCTION;
++    assert(hdr_type != PCI_HEADER_TYPE_BRIDGE || region_num < 2);
++
+     r = &pci_dev->io_regions[region_num];
+     r->addr = PCI_BAR_UNMAPPED;
+     r->size = size;
+-- 
+MST
 
 
