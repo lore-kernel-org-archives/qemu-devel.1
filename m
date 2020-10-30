@@ -2,90 +2,98 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C985BC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A07C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:35:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17DC820739
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:35:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AC3F20756
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 02:35:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RUI9yWx5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17DC820739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="rcaC8qU5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AC3F20756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYKGE-0000VI-0L
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 22:35:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39920)
+	id 1kYKGa-0000l6-87
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 22:35:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kYK7l-0005Kn-Pa
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 22:26:41 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37071)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kYK7i-0005vy-II
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 22:26:41 -0400
-Received: by mail-pg1-x541.google.com with SMTP id h6so3924595pgk.4
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 19:26:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=/srvkEMVHhjFuX4GEztdA7BtJNAKhyCjy2OjjjYFdsY=;
- b=RUI9yWx5Ixh8M4p1inbRmcRCRBOSB1rxWNuVyYBrxxZZzmNzXSaPvYj9pccDCn7B6D
- dk/WwcOF1Ff4CCgVyw89CBegAP/BhIx4MKGiGsNz6SO1HyYTSQPjLg/t4LArloBYb0tX
- 3o/stimnlG8DZAAOu1b8HRRYJ3qw/CSo95hIFhf8LAkTp3IBKzstiQeZYtQJaO/3y0tJ
- 5mtEvwbKr4jZ3b4NzSquIHXJXWBofKA/qZ7idF0/EUXUtwPaywzn7XMWPPbaPoBfNiGI
- pXqtoM7CDdK0+QM9tOTx5hGkbd/3yCj8jauni6wzzygK4Y0jTfwHOMaf+WU17ZKxqy5b
- hXNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=/srvkEMVHhjFuX4GEztdA7BtJNAKhyCjy2OjjjYFdsY=;
- b=Np98nVNhTMrpHwpHNP/EuFthRKvNEeqG7F+WbBs4iBBe7BAPchni7ebhCGnEAKk5Dq
- wgNQWqB/S0YAuv30zCKhh8y58v1HxR7OcK+Rstk7eEsNTiyAfa6GO5S9lwttxSp2Kd3Q
- 5kcrjbdwRtTjNRrTqnfCBDzsbWOnhhbyj+q9p7oCR8Kk1G8fm3UQnKXHqf5YSCWeeU2d
- bSZT60o/uYRbrdv9TWjGAXuG3AaQyU06pcxVMW8XiLkq1Y/S8G0mXQqXDRMB8CEUCn04
- oOKsXDJZcnEtEqfsC+DMUfStyeKkULH1zJBbjWt1F21KA5G+GeU9nPq0HgwEINA6fN6p
- Qn1g==
-X-Gm-Message-State: AOAM530tjoeuqNevJXA36U/73WfxabL1LXufC+3HXDrZOvNjTbG13bBM
- IBRjtvkk+kJznGcJSAEWwAxiHAt2lSPatg==
-X-Google-Smtp-Source: ABdhPJzKzloWAgDl8KsMNg+x9WyjzJ9YGL3SskZv9lNO6pX6C5tMytxDEyhmrven5nN75H7GzBQdBA==
-X-Received: by 2002:a17:90a:1903:: with SMTP id 3mr127263pjg.74.1604024795293; 
- Thu, 29 Oct 2020 19:26:35 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id b7sm4446517pfr.171.2020.10.29.19.26.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Oct 2020 19:26:34 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 11/11] target/arm: Improve do_prewiden_3d
-Date: Thu, 29 Oct 2020 19:26:18 -0700
-Message-Id: <20201030022618.785675-12-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201030022618.785675-1-richard.henderson@linaro.org>
-References: <20201030022618.785675-1-richard.henderson@linaro.org>
+ (Exim 4.90_1)
+ (envelope-from <prvs=56530b5a8=dmitry.fomichev@wdc.com>)
+ id 1kYKDo-0005dv-N1; Thu, 29 Oct 2020 22:32:56 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:10987)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=56530b5a8=dmitry.fomichev@wdc.com>)
+ id 1kYKDm-0006dF-M3; Thu, 29 Oct 2020 22:32:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1604025174; x=1635561174;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=vaHsQrbzTnR4ns1fW2MjJ4Z6RM4+LbcIywqdOEdAqqg=;
+ b=rcaC8qU5rgQoKc8QQjlEbljarTtcDTrji/LRiz5ZUdbFXDN7MjrvtwU9
+ zdrQ1/b5unUzbPPN4SryKpXERRi8YZ3VWBymRTDNjK7FyOPQSFmhZxuFh
+ dzkakkJZVzfhJmLAu+9vAA4KycX63g4cKsIjb57plB2ASAXVyWUYtKnK5
+ Ro/xqnSX2JMopHajAXJW2FroFPOW6CSWw8Lth00+6rPXvatK2erclLZqi
+ uhvmI+Ds7iEclOF+r5Ib+q+DD0mlsQZidfUKPvXPxWP/O99nf12Zu+v+d
+ IeyHoWNbMQuGxxcPGDjTgOQpvd9w2HFCi8Cvk2Ndv1ks9eVU3GE1xVjBN A==;
+IronPort-SDR: yPX86ATQes2vRuBX6W884rG5r64OJB03Q4gcx0HlyzMYa5u9dSJHoGhoHIZBI+H34W2vdB2Evj
+ kmWNwnWvWh3Tor2sDR16aSpdhbgpTu49LG1I4BddSjdLNMQFL/90gy5tmbZ5bpeW8yD6NNX07z
+ /RyxbPgzkA/KeyxDqxtg4cF/ahcJIO3PcGe3KRPju8T1TzWne8TIoGv/skahJI9rVXnGX/Tczw
+ IEEW509z2mFqKaxoJSpFxGTpXN1XntgfO8pMfD8k2I8qMZX3p4/giCZCnoIOyB5/TNzPFO923S
+ lrA=
+X-IronPort-AV: E=Sophos;i="5.77,431,1596470400"; d="scan'208";a="155748054"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 30 Oct 2020 10:32:52 +0800
+IronPort-SDR: IBRKlva+jUYvwyLJplQp6CwAPBjSIVm0cARVmrAFw9Ku9ffcOgGc5TDFeHkmRGriIWv6kN9bT5
+ N4qW8N0ufyjkoUJoDNomxx2iEQGq1RTTU7NPplwO2RDEnXvFu2hj2eUtRs+2e04fLSUPFTWUoq
+ 7IhibtVM6dcsiH0f0rAihBmS+i9o/DM/e0VijBTL2KzqjnXv3PQ5zXET3wfjEqxfuoMHXq8uDP
+ TCXcm2yHrDOApFqEmWds76DMKkXYSTLeAeQVjAsGBxbQLGwoGgAAuyoizacx4LSScCBoJa2zGv
+ 4AsFRMQlTThcd7wfuYwVLkJn
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 29 Oct 2020 19:17:57 -0700
+IronPort-SDR: Y8dCoky6bjV++GDOR8wphz+MIGlJmNVp3In5uMbrrNnJkxWJVss9wy7uWjwyY+LCu6C/lsWEKn
+ X59fK9Z9z8oPZIjr7hl4+bBASPLCsOIsjOXlIB/FpHnQsdiVLJhv4U0hstK8s3bPXMy8rIRFZL
+ 5H5PR+7iLoYcC4xn4NEQssj3g5f6VMG90yPZXqW1+XnJUU4sC81Q4SszJZIg6jLHF3SBUn1Yqz
+ TBIfgic5irOtXSwp2oHKrqPvAj0gzXkkP0vSKsoOrbFvZB1cukMr9sFJlm92z0luWT64613V1y
+ WWE=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 19:32:52 -0700
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
+Subject: [PATCH v8 02/11] hw/block/nvme: Generate namespace UUIDs
+Date: Fri, 30 Oct 2020 11:32:33 +0900
+Message-Id: <20201030023242.5204-3-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20201030023242.5204-1-dmitry.fomichev@wdc.com>
+References: <20201030023242.5204-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Received-SPF: pass client-ip=216.71.153.141;
+ envelope-from=prvs=56530b5a8=dmitry.fomichev@wdc.com; helo=esa3.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 22:32:49
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,179 +107,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We can use proper widening loads to extend 32-bit inputs,
-and skip the "widenfn" step.
+In NVMe 1.4, a namespace must report an ID descriptor of UUID type
+if it doesn't support EUI64 or NGUID. Add a new namespace property,
+"uuid", that provides the user the option to either specify the UUID
+explicitly or have a UUID generated automatically every time a
+namespace is initialized.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Suggested-by: Klaus Jensen <its@irrelevant.dk>
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Reviewed-by: Klaus Jensen <its@irrelevant.dk>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Niklas Cassel <Niklas.Cassel@wdc.com>
 ---
- target/arm/translate.c          |  6 +++
- target/arm/translate-neon.c.inc | 66 ++++++++++++++++++---------------
- 2 files changed, 43 insertions(+), 29 deletions(-)
+ hw/block/nvme-ns.c | 1 +
+ hw/block/nvme-ns.h | 1 +
+ hw/block/nvme.c    | 9 +++++----
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 7611c1f0f1..29ea1eb781 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -1183,6 +1183,12 @@ static void read_neon_element64(TCGv_i64 dest, int reg, int ele, MemOp memop)
-     long off = neon_element_offset(reg, ele, memop);
+diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
+index b69cdaf27e..de735eb9f3 100644
+--- a/hw/block/nvme-ns.c
++++ b/hw/block/nvme-ns.c
+@@ -129,6 +129,7 @@ static void nvme_ns_realize(DeviceState *dev, Error **errp)
+ static Property nvme_ns_props[] = {
+     DEFINE_BLOCK_PROPERTIES(NvmeNamespace, blkconf),
+     DEFINE_PROP_UINT32("nsid", NvmeNamespace, params.nsid, 0),
++    DEFINE_PROP_UUID("uuid", NvmeNamespace, params.uuid),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-     switch (memop) {
-+    case MO_SL:
-+        tcg_gen_ld32s_i64(dest, cpu_env, off);
-+        break;
-+    case MO_UL:
-+        tcg_gen_ld32u_i64(dest, cpu_env, off);
-+        break;
-     case MO_Q:
-         tcg_gen_ld_i64(dest, cpu_env, off);
-         break;
-diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
-index 1c16c56e7e..59368cb243 100644
---- a/target/arm/translate-neon.c.inc
-+++ b/target/arm/translate-neon.c.inc
-@@ -1788,11 +1788,10 @@ static bool trans_Vimm_1r(DisasContext *s, arg_1reg_imm *a)
- static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
-                            NeonGenWidenFn *widenfn,
-                            NeonGenTwo64OpFn *opfn,
--                           bool src1_wide)
-+                           int src1_mop, int src2_mop)
+diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
+index ea8c2f785d..a38071884a 100644
+--- a/hw/block/nvme-ns.h
++++ b/hw/block/nvme-ns.h
+@@ -21,6 +21,7 @@
+ 
+ typedef struct NvmeNamespaceParams {
+     uint32_t nsid;
++    QemuUUID uuid;
+ } NvmeNamespaceParams;
+ 
+ typedef struct NvmeNamespace {
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 9fed061a9d..1ec8ccb3e6 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1572,6 +1572,7 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
+ 
+ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
  {
-     /* 3-regs different lengths, prewidening case (VADDL/VSUBL/VAADW/VSUBW) */
-     TCGv_i64 rn0_64, rn1_64, rm_64;
--    TCGv_i32 rm;
- 
-     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-         return false;
-@@ -1804,12 +1803,12 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
-         return false;
++    NvmeNamespace *ns;
+     NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
+     uint32_t nsid = le32_to_cpu(c->nsid);
+     uint8_t list[NVME_IDENTIFY_DATA_SIZE];
+@@ -1591,7 +1592,8 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
+         return NVME_INVALID_NSID | NVME_DNR;
      }
  
--    if (!widenfn || !opfn) {
-+    if (!opfn) {
-         /* size == 3 case, which is an entirely different insn group */
-         return false;
+-    if (unlikely(!nvme_ns(n, nsid))) {
++    ns = nvme_ns(n, nsid);
++    if (unlikely(!ns)) {
+         return NVME_INVALID_FIELD | NVME_DNR;
      }
  
--    if ((a->vd & 1) || (src1_wide && (a->vn & 1))) {
-+    if ((a->vd & 1) || (src1_mop == MO_Q && (a->vn & 1))) {
-         return false;
-     }
- 
-@@ -1821,40 +1820,48 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
-     rn1_64 = tcg_temp_new_i64();
-     rm_64 = tcg_temp_new_i64();
- 
--    if (src1_wide) {
--        read_neon_element64(rn0_64, a->vn, 0, MO_64);
-+    if (src1_mop >= 0) {
-+        read_neon_element64(rn0_64, a->vn, 0, src1_mop);
-     } else {
-         TCGv_i32 tmp = tcg_temp_new_i32();
-         read_neon_element32(tmp, a->vn, 0, MO_32);
-         widenfn(rn0_64, tmp);
-         tcg_temp_free_i32(tmp);
-     }
--    rm = tcg_temp_new_i32();
--    read_neon_element32(rm, a->vm, 0, MO_32);
-+    if (src2_mop >= 0) {
-+        read_neon_element64(rm_64, a->vm, 0, src2_mop);
-+    } else {
-+        TCGv_i32 tmp = tcg_temp_new_i32();
-+        read_neon_element32(tmp, a->vm, 0, MO_32);
-+        widenfn(rm_64, tmp);
-+        tcg_temp_free_i32(tmp);
-+    }
- 
--    widenfn(rm_64, rm);
--    tcg_temp_free_i32(rm);
-     opfn(rn0_64, rn0_64, rm_64);
- 
+@@ -1600,12 +1602,11 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
      /*
-      * Load second pass inputs before storing the first pass result, to
-      * avoid incorrect results if a narrow input overlaps with the result.
+      * Because the NGUID and EUI64 fields are 0 in the Identify Namespace data
+      * structure, a Namespace UUID (nidt = 0x3) must be reported in the
+-     * Namespace Identification Descriptor. Add a very basic Namespace UUID
+-     * here.
++     * Namespace Identification Descriptor. Add the namespace UUID here.
       */
--    if (src1_wide) {
--        read_neon_element64(rn1_64, a->vn, 1, MO_64);
-+    if (src1_mop >= 0) {
-+        read_neon_element64(rn1_64, a->vn, 1, src1_mop);
-     } else {
-         TCGv_i32 tmp = tcg_temp_new_i32();
-         read_neon_element32(tmp, a->vn, 1, MO_32);
-         widenfn(rn1_64, tmp);
-         tcg_temp_free_i32(tmp);
-     }
--    rm = tcg_temp_new_i32();
--    read_neon_element32(rm, a->vm, 1, MO_32);
-+    if (src2_mop >= 0) {
-+        read_neon_element64(rm_64, a->vm, 1, src2_mop);
-+    } else {
-+        TCGv_i32 tmp = tcg_temp_new_i32();
-+        read_neon_element32(tmp, a->vm, 1, MO_32);
-+        widenfn(rm_64, tmp);
-+        tcg_temp_free_i32(tmp);
-+    }
+     ns_descrs->uuid.hdr.nidt = NVME_NIDT_UUID;
+     ns_descrs->uuid.hdr.nidl = NVME_NIDT_UUID_LEN;
+-    stl_be_p(&ns_descrs->uuid.v, nsid);
++    memcpy(&ns_descrs->uuid.v, ns->params.uuid.data, NVME_NIDT_UUID_LEN);
  
-     write_neon_element64(rn0_64, a->vd, 0, MO_64);
- 
--    widenfn(rm_64, rm);
--    tcg_temp_free_i32(rm);
-     opfn(rn1_64, rn1_64, rm_64);
-     write_neon_element64(rn1_64, a->vd, 1, MO_64);
- 
-@@ -1865,14 +1872,13 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
-     return true;
- }
- 
--#define DO_PREWIDEN(INSN, S, EXT, OP, SRC1WIDE)                         \
-+#define DO_PREWIDEN(INSN, S, OP, SRC1WIDE, SIGN)                        \
-     static bool trans_##INSN##_3d(DisasContext *s, arg_3diff *a)        \
-     {                                                                   \
-         static NeonGenWidenFn * const widenfn[] = {                     \
-             gen_helper_neon_widen_##S##8,                               \
-             gen_helper_neon_widen_##S##16,                              \
--            tcg_gen_##EXT##_i32_i64,                                    \
--            NULL,                                                       \
-+            NULL, NULL,                                                 \
-         };                                                              \
-         static NeonGenTwo64OpFn * const addfn[] = {                     \
-             gen_helper_neon_##OP##l_u16,                                \
-@@ -1880,18 +1886,20 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
-             tcg_gen_##OP##_i64,                                         \
-             NULL,                                                       \
-         };                                                              \
--        return do_prewiden_3d(s, a, widenfn[a->size],                   \
--                              addfn[a->size], SRC1WIDE);                \
-+        int narrow_mop = a->size == MO_32 ? MO_32 | SIGN : -1;          \
-+        return do_prewiden_3d(s, a, widenfn[a->size], addfn[a->size],   \
-+                              SRC1WIDE ? MO_Q : narrow_mop,             \
-+                              narrow_mop);                              \
-     }
- 
--DO_PREWIDEN(VADDL_S, s, ext, add, false)
--DO_PREWIDEN(VADDL_U, u, extu, add, false)
--DO_PREWIDEN(VSUBL_S, s, ext, sub, false)
--DO_PREWIDEN(VSUBL_U, u, extu, sub, false)
--DO_PREWIDEN(VADDW_S, s, ext, add, true)
--DO_PREWIDEN(VADDW_U, u, extu, add, true)
--DO_PREWIDEN(VSUBW_S, s, ext, sub, true)
--DO_PREWIDEN(VSUBW_U, u, extu, sub, true)
-+DO_PREWIDEN(VADDL_S, s, add, false, MO_SIGN)
-+DO_PREWIDEN(VADDL_U, u, add, false, 0)
-+DO_PREWIDEN(VSUBL_S, s, sub, false, MO_SIGN)
-+DO_PREWIDEN(VSUBL_U, u, sub, false, 0)
-+DO_PREWIDEN(VADDW_S, s, add, true, MO_SIGN)
-+DO_PREWIDEN(VADDW_U, u, add, true, 0)
-+DO_PREWIDEN(VSUBW_S, s, sub, true, MO_SIGN)
-+DO_PREWIDEN(VSUBW_U, u, sub, true, 0)
- 
- static bool do_narrow_3d(DisasContext *s, arg_3diff *a,
-                          NeonGenTwo64OpFn *opfn, NeonGenNarrowFn *narrowfn)
+     return nvme_dma(n, list, NVME_IDENTIFY_DATA_SIZE,
+                     DMA_DIRECTION_FROM_DEVICE, req);
 -- 
-2.25.1
+2.21.0
 
 
