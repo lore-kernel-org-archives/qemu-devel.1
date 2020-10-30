@@ -2,100 +2,100 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A58C00A89
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29709C4363A
 	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:47:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 954942072C
+	by mail.kernel.org (Postfix) with ESMTPS id 88D1720725
 	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 12:47:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ekf0EsxG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 954942072C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VMPDAlWj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88D1720725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYToQ-00027S-ED
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 08:47:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53644)
+	id 1kYToP-00025q-MR
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 08:47:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmR-0000Ra-8T
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38823)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmM-0000Qc-JN
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47414)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmO-0000OB-3p
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:18 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kYTmK-0000KW-CB
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 08:45:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604061914;
+ s=mimecast20190719; t=1604061909;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=3iN6qY5085FKhuB3oQvig3p5w7EA9qYLRFEmWUtLf20=;
- b=Ekf0EsxGC+CF945+FzV7sQYPjnqFTTvTdUFlRfWFespjWOBVIaYCSOI9us39nvMXrCjIl9
- LBWQMBvPGGMFg5kB1mdJXc6bLO3YIJg9BdTFZyovAuNmN2K0NZ/UBzLtkNEU6hfAIVkRyz
- zfr+wqxXdJH3FNhbqsHNZuxcwt7bcpc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-Hs-yZCXAOdSozU6uimPVtQ-1; Fri, 30 Oct 2020 08:45:12 -0400
-X-MC-Unique: Hs-yZCXAOdSozU6uimPVtQ-1
-Received: by mail-wm1-f69.google.com with SMTP id r19so1191234wmh.9
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 05:45:12 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=VQON/qkHfDHAcqI32ttgHuJ36suArQZ7MBSOwD5g+6Y=;
+ b=VMPDAlWjbeGzdNfPJ/4FFfs9UyCnPE1EE/P2o4k6kVUpHxjkfUWbcsLnSqeKBLTfS1wSeN
+ D7kf5S+0w8dvx4f41Njs8IrUptb1apPo6YNoFdW+pg/RKwizU9zRpi9GmuHBIomySJk/+g
+ nDHvFLIBoXzGthaxXwZJSzKokFzFpgI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-XQDtYldNM_yPDOFPWx5M_Q-1; Fri, 30 Oct 2020 08:45:08 -0400
+X-MC-Unique: XQDtYldNM_yPDOFPWx5M_Q-1
+Received: by mail-wr1-f70.google.com with SMTP id n14so2616102wrp.1
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 05:45:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=3iN6qY5085FKhuB3oQvig3p5w7EA9qYLRFEmWUtLf20=;
- b=hi2aj6NX0L4zK6l/EtKXONPaGe4vvHL1B9FPMNPoGMauMdY2L4AtFJn2SeqH52vWUn
- PwSVGLFWRwpApDPZ26QSmp3zw8gSTmL38sEve0sC9JCpVMtNH02ePVAonjtFFHSXXrBO
- RG3RFeLxcPtHCYN6LlC1hkXWVFqnSU038Q46At4Z5m6VFSvFvDhsK8s2fR5EozhGIeTm
- WTiSwEpAkY0C5NswktBsqfvpEIQ6sn91bFVQB94Sx2DpwAnA9xlL3M+CnSQ21ba70Nd7
- l4wa7zGzyOFzQQ99lydnzPvruT889JHB3LEgVtFCfgV0iXGKyhbaqsUkEM5Bq+Yr+ttV
- AkVg==
-X-Gm-Message-State: AOAM532Pv3rnltdcSejOV5NE8UIScrLCMxzr31fxny24Wy0WXppCEyXE
- 3Iy4XZHo9Nr6Zima6zYaZg+bFKuaCjc8YJdsbcHePftcZ+3SkEtLqsVYjaxnXz4GmNnnCJC6QFT
- t7o1ZCgXOzVj1BuY=
-X-Received: by 2002:adf:8b92:: with SMTP id o18mr3048477wra.54.1604061910839; 
- Fri, 30 Oct 2020 05:45:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwG9Rt9d5JmobisJu8EXZDZM6LJOjVNOERpPm9s5cAXkQovbKn8RTzxUxYTit4SfhofXr/lzQ==
-X-Received: by 2002:adf:8b92:: with SMTP id o18mr3048457wra.54.1604061910668; 
- Fri, 30 Oct 2020 05:45:10 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition:content-transfer-encoding;
+ bh=VQON/qkHfDHAcqI32ttgHuJ36suArQZ7MBSOwD5g+6Y=;
+ b=LtSwRG1GvNKd+m/yFW7HZOWmDzcomBk6XmY2/kK1E+gruCTkUkzTzI58psJt7GnbP+
+ qoaH9Bkx+9WAvXW7NMOnQ1vLyy4gObLw3ZdsVVsVirmhSTf7ULrzKneHUXYaxmng12aG
+ Vw0yKebJB1eB9mHbzUv+eQ4gIrEKqY9BWkbY/l3YmBUDaozD6HJOE95wosKaVjlk0qeK
+ rpctd8JOQdX/tkeuaCuE8w22i65F/oOD4nSSvms5NxL0sp3rAazezxFEx/iIN8nOtUIX
+ 4SFpAXSWIj2Hwysjgiu7o4mwpcASZD2cZV5MG4FeQ+G+m+GqkeHhaJs2vSQOSnCfLzl3
+ J/pg==
+X-Gm-Message-State: AOAM532SA/JwCvRF/LTW8y9+R/UWegETLwbVQvpkkPCRejpWZajV4tt/
+ 6R8QCHqVuEAvB26fq5eO98Ndf7f3N73sYtYssF4xe5kinKQzKQpDE6eCQeXTwkig4KampnidFlk
+ cw8YGr7Sne1GVYn8=
+X-Received: by 2002:a1c:3d54:: with SMTP id k81mr2640168wma.144.1604061906376; 
+ Fri, 30 Oct 2020 05:45:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyQXoq4HHkVVEzPfrCzKk/9c3SYote7ULp1yu6VAG+Zlf1u5ZVbXyC+ihsCeOYT1j9VUXsSNA==
+X-Received: by 2002:a1c:3d54:: with SMTP id k81mr2640156wma.144.1604061906216; 
+ Fri, 30 Oct 2020 05:45:06 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id h128sm4679767wme.38.2020.10.30.05.45.09
+ by smtp.gmail.com with ESMTPSA id a17sm10585283wra.29.2020.10.30.05.45.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Oct 2020 05:45:10 -0700 (PDT)
-Date: Fri, 30 Oct 2020 08:45:08 -0400
+ Fri, 30 Oct 2020 05:45:05 -0700 (PDT)
+Date: Fri, 30 Oct 2020 08:45:04 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/15] vhost-vsock: set vhostfd to non-blocking mode
-Message-ID: <20201030124454.854286-3-mst@redhat.com>
-References: <20201030124454.854286-1-mst@redhat.com>
+Subject: [PULL 00/15] pc,pci,vhost,virtio: misc fixes
+Message-ID: <20201030124454.854286-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201030124454.854286-1-mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 02:24:40
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,70 +109,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+The following changes since commit 802427bcdae1ad2eceea8a8877ecad835e3f8fde:
 
-vhost IOTLB API uses read()/write() to exchange iotlb messages with
-the kernel module.
-The QEMU implementation expects a non-blocking fd, indeed commit
-c471ad0e9b ("vhost_net: device IOTLB support") set it for vhost-net.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20201027-1' into staging (2020-10-29 11:40:04 +0000)
 
-Without this patch, if we enable iommu for the vhost-vsock device,
-QEMU can hang when exchanging IOTLB messages.
+are available in the Git repository at:
 
-As commit 894022e616 ("net: check if the file descriptor is valid
-before using it") did for tap, let's use qemu_try_set_nonblock()
-when fd is provided by the user.
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20201029144849.70958-1-sgarzare@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+for you to fetch changes up to 73beb01ec54969f76ab32d1e0605a759b6c95ab0:
+
+  intel_iommu: Fix two misuse of "0x%u" prints (2020-10-30 06:48:53 -0400)
+
+----------------------------------------------------------------
+pc,pci,vhost,virtio: misc fixes
+
+Just a bunch of bugfixes all over the place.
+
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/virtio/vhost-vsock.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
 
-diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
-index f9db4beb47..8ddfb9abfe 100644
---- a/hw/virtio/vhost-vsock.c
-+++ b/hw/virtio/vhost-vsock.c
-@@ -16,6 +16,7 @@
- #include "qapi/error.h"
- #include "hw/virtio/virtio-access.h"
- #include "qemu/error-report.h"
-+#include "qemu/sockets.h"
- #include "hw/qdev-properties.h"
- #include "hw/virtio/vhost-vsock.h"
- #include "monitor/monitor.h"
-@@ -148,6 +149,13 @@ static void vhost_vsock_device_realize(DeviceState *dev, Error **errp)
-             error_prepend(errp, "vhost-vsock: unable to parse vhostfd: ");
-             return;
-         }
-+
-+        ret = qemu_try_set_nonblock(vhostfd);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret,
-+                             "vhost-vsock: unable to set non-blocking mode");
-+            return;
-+        }
-     } else {
-         vhostfd = open("/dev/vhost-vsock", O_RDWR);
-         if (vhostfd < 0) {
-@@ -155,6 +163,8 @@ static void vhost_vsock_device_realize(DeviceState *dev, Error **errp)
-                              "vhost-vsock: failed to open vhost device");
-             return;
-         }
-+
-+        qemu_set_nonblock(vhostfd);
-     }
- 
-     vhost_vsock_common_realize(vdev, "vhost-vsock");
--- 
-MST
+----------------------------------------------------------------
+Ben Widawsky (4):
+      acpi/crs: Prevent bad ranges for host bridges
+      acpi/crs: Support ranges > 32b for hosts
+      pci: Change error_report to assert(3)
+      pci: Disallow improper BAR registration for type 1
+
+Eduardo Habkost (1):
+      pc: Implement -no-hpet as sugar for -machine hpet=on
+
+Felipe Franciosi (1):
+      virtio: skip guest index check on device load
+
+Greg Kurz (1):
+      vhost: Don't special case vq->used_phys in vhost_get_log_size()
+
+Jason Wang (1):
+      pci: advertise a page aligned ATS
+
+Jin Yu (1):
+      vhost-blk: set features before setting inflight feature
+
+Mark Cave-Ayland (1):
+      pci: Assert irqnum is between 0 and bus->nirqs in pci_bus_change_irq_level
+
+Peter Xu (1):
+      intel_iommu: Fix two misuse of "0x%u" prints
+
+Philippe Mathieu-Daudé (2):
+      hw/virtio/vhost-vdpa: Fix Coverity CID 1432864
+      hw/pci: Extract pci_bus_change_irq_level() from pci_change_irq_level()
+
+Si-Wei Liu (1):
+      vhost-vdpa: negotiate VIRTIO_NET_F_STATUS with driver
+
+Stefano Garzarella (1):
+      vhost-vsock: set vhostfd to non-blocking mode
+
+ include/hw/i386/pc.h      |  1 +
+ include/hw/i386/x86.h     |  3 ---
+ include/hw/virtio/vhost.h |  1 +
+ hw/block/vhost-user-blk.c |  6 +++++
+ hw/i386/acpi-build.c      | 12 +++++++--
+ hw/i386/intel_iommu.c     |  4 +--
+ hw/i386/pc.c              | 63 ++++++++++++++++++++++++++++++++---------------
+ hw/i386/pc_piix.c         |  2 +-
+ hw/pci/pci.c              | 23 +++++++++++------
+ hw/pci/pcie.c             |  5 ++--
+ hw/virtio/vhost-vdpa.c    |  4 +--
+ hw/virtio/vhost-vsock.c   | 10 ++++++++
+ hw/virtio/vhost.c         | 28 +++++++++++++--------
+ hw/virtio/virtio.c        | 13 +++++-----
+ net/vhost-vdpa.c          |  1 +
+ softmmu/vl.c              |  4 +--
+ 16 files changed, 123 insertions(+), 57 deletions(-)
 
 
