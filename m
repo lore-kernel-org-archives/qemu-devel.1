@@ -2,86 +2,67 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 607F3C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:46:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44274C00A89
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:46:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8D1120731
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:46:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 728D820724
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 14:46:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lKJSVKy/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8D1120731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="bhLeLXCB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 728D820724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYVg8-0002Ia-LP
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:46:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53476)
+	id 1kYVg9-0002M4-AP
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 10:46:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYVdw-0000S2-MR
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:44:41 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34619)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYVdr-00037o-8Q
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:44:40 -0400
-Received: by mail-pg1-x542.google.com with SMTP id t14so5408762pgg.1
- for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 07:44:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ivI4Ncp5Qg6ZNoGJ1oMnyqt4jaqTVo68mwPVvnV0TSk=;
- b=lKJSVKy/xse1T3X28X1pj4zxjrFvSwpBEb7/o4lXErGCLg793xFmAEwKtR65O7vK5A
- 8qM3+NLpqt6iN9vjc457nEMwrB4F7du6IbyEn54fnyeZYJKONcYp3wESHoF8AM95EiQm
- G1sxZy5FuqlC/rBGyToS+NRgMOR2bBXGG3ep6XAQ6YeICtWiwv4ngftdkilBqHjcKNoc
- PLAslERG042V2tv6yEJX05qF/tf6NYsJbwN1UYkOSTTg4SCfIXYPPM3bUNU3KQYGNX9x
- IG/BgquYa2u4Z1YKB7xvBKDMKSnLgTeVbahZtcxvX/iwi711pQFaNUWRBHkqlBkTI6jp
- n4Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ivI4Ncp5Qg6ZNoGJ1oMnyqt4jaqTVo68mwPVvnV0TSk=;
- b=mJiQrOGY1bRzaty5R4LssDcp7hFnZ3UhfsOKwlMlLdlvjPmlcsVL1yQhSjN/z34SQ6
- VEeVvMf0NG2xmOIRxMpORgMYHPuBUpx9r5PIy/oGwnUMZlyZ9PKtMxH6RnMTQ+RsEROs
- OI0ZBk62X9ECuYOaWYKx7B+WwOiksgpkie+NN0ULr4+jJuhHs5ufi12uEZZpia+yBHN1
- Ex03k8iUPpV4rqThqdSG9j2JEf/ltQntIiv7B10tioomY1WZC9sv88tfe9HwM+75GjrX
- 2fNT7VJLTG7nHEu0CZIzuo3uD5T1X9G7hWxpgegKu/GR0C6qBju365jBT+wP0QBIJ0Ax
- W+1A==
-X-Gm-Message-State: AOAM533Be222WdjY8tXNBVPotRhDUuyu4DW3R/QJV/Ej1Qx//AM8p//L
- RHTpJMZ0ONdahDmH3VMnXPk1hlqWCNegVHhoO40vqg==
-X-Google-Smtp-Source: ABdhPJxl5GG5HxZRva54cNzKVXl2LEBcNoZeUSovB9NWgKRW9eACmPM2xHmtQQi3Yg4akjB6C1/VD5bCLYUeMSO/2+A=
-X-Received: by 2002:a63:e453:: with SMTP id i19mr2306203pgk.397.1604069072140; 
- Fri, 30 Oct 2020 07:44:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201009153904.28529-1-peter.maydell@linaro.org>
-In-Reply-To: <20201009153904.28529-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Oct 2020 14:44:20 +0000
-Message-ID: <CAFEAcA_LBy7kx2uP_uRzyv8jbob3uR5RVDMTtPAYwwdAKuDx7Q@mail.gmail.com>
-Subject: Re: [PATCH] hw/intc/arm_gicv3_cpuif: Make GIC maintenance interrupts
- work
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=peter.maydell@linaro.org; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+ (Exim 4.90_1)
+ (envelope-from <69067bf1436aab1c84b98b8461e81a9633ec7872@lizzy.crudebyte.com>)
+ id 1kYVe6-0000Tj-V1
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:44:52 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:39609)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <69067bf1436aab1c84b98b8461e81a9633ec7872@lizzy.crudebyte.com>)
+ id 1kYVe4-00033o-28
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 10:44:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:Message-Id:Content-Type:
+ Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Content-ID:
+ Content-Description; bh=soKAdxEUl44HPNXcdEE/GOtcPss5ahvax6Cp3SYa/pk=; b=bhLeL
+ XCByjtNOu/MEWg4PoX6SR+4Xdou7PT3rYCzSntG2ykJKhdtAkIM2tLJiIpBAc1AV5i1Wx7rYDn7G+
+ omoSfnKcV6VETe2gepZCKfA+A2wEoyN7NNhkmKguylyfRUUIyOmLnCJsbPHQwQ9aEqWIlNG3SzF5F
+ VRXEd99gOyvp/YVcCro5LI/zs+FD5VrS22hk+2KJo3+Xo/RNfuTYJnq2hme5dy1ojjtmGlamyOoms
+ O8dTn6Nt33yylVnS84D9V72fwckksakdzr4Q8Z//l6F+3POp75pnT3n8yzwpKFlbSQjSoVZiv4+uk
+ 7tYynjsSoDnXYMIYq/2WJlEcH20dw==;
+Message-Id: <cover.1604067568.git.qemu_oss@crudebyte.com>
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Date: Fri, 30 Oct 2020 15:19:28 +0100
+Subject: [PULL v2 00/16] 9p queue (previous 2020-10-23)
+To: qemu-devel@nongnu.org,
+    Peter Maydell <peter.maydell@linaro.org>
+Cc: Greg Kurz <groug@kaod.org>
+Received-SPF: none client-ip=91.194.90.13;
+ envelope-from=69067bf1436aab1c84b98b8461e81a9633ec7872@lizzy.crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 07:59:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,94 +75,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jose Martins <josemartins90@gmail.com>, Marc Zyngier <maz@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping for code review, please?
+The following changes since commit a19d4bc452532a9402f90b77d2aaaed9fe1df046:
 
-thanks
--- PMM
+  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-5.2-20201028' into staging (2020-10-29 14:30:58 +0000)
 
-On Fri, 9 Oct 2020 at 16:39, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> In gicv3_init_cpuif() we copy the ARMCPU gicv3_maintenance_interrupt
-> into the GICv3CPUState struct's maintenance_irq field.  This will
-> only work if the board happens to have already wired up the CPU
-> maintenance IRQ before the GIC was realized.  Unfortunately this is
-> not the case for the 'virt' board, and so the value that gets copied
-> is NULL (since a qemu_irq is really a pointer to an IRQState struct
-> under the hood).  The effect is that the CPU interface code never
-> actually raises the maintenance interrupt line.
->
-> Instead, since the GICv3CPUState has a pointer to the CPUState, make
-> the dereference at the point where we want to raise the interrupt, to
-> avoid an implicit requirement on board code to wire things up in a
-> particular order.
->
-> Reported-by: Jose Martins <josemartins90@gmail.com>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->
-> QEMU's implementation here is a bit odd because we've put all the
-> logic into the "GIC" device where in real hardware it's split between
-> a GIC device and the CPU interface part in the CPU.  If we had
-> arranged it in that way then we wouldn't have this odd bit of code
-> where the GIC device needs to raise an IRQ line that belongs to the
-> CPU.
->
-> Not sure why we've never noticed this bug previously with KVM as a
-> guest, you'd think we'd have spotted "maintenance interrupts just
-> don't work"...
-> ---
->  include/hw/intc/arm_gicv3_common.h | 1 -
->  hw/intc/arm_gicv3_cpuif.c          | 5 ++---
->  2 files changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-> index 0331b0ffdb8..91491a2f664 100644
-> --- a/include/hw/intc/arm_gicv3_common.h
-> +++ b/include/hw/intc/arm_gicv3_common.h
-> @@ -153,7 +153,6 @@ struct GICv3CPUState {
->      qemu_irq parent_fiq;
->      qemu_irq parent_virq;
->      qemu_irq parent_vfiq;
-> -    qemu_irq maintenance_irq;
->
->      /* Redistributor */
->      uint32_t level;                  /* Current IRQ level */
-> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-> index 08e000e33c6..43ef1d7a840 100644
-> --- a/hw/intc/arm_gicv3_cpuif.c
-> +++ b/hw/intc/arm_gicv3_cpuif.c
-> @@ -399,6 +399,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
->      int irqlevel = 0;
->      int fiqlevel = 0;
->      int maintlevel = 0;
-> +    ARMCPU *cpu = ARM_CPU(cs->cpu);
->
->      idx = hppvi_index(cs);
->      trace_gicv3_cpuif_virt_update(gicv3_redist_affid(cs), idx);
-> @@ -424,7 +425,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
->
->      qemu_set_irq(cs->parent_vfiq, fiqlevel);
->      qemu_set_irq(cs->parent_virq, irqlevel);
-> -    qemu_set_irq(cs->maintenance_irq, maintlevel);
-> +    qemu_set_irq(cpu->gicv3_maintenance_interrupt, maintlevel);
->  }
->
->  static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
-> @@ -2624,8 +2625,6 @@ void gicv3_init_cpuif(GICv3State *s)
->              && cpu->gic_num_lrs) {
->              int j;
->
-> -            cs->maintenance_irq = cpu->gicv3_maintenance_interrupt;
-> -
->              cs->num_list_regs = cpu->gic_num_lrs;
->              cs->vpribits = cpu->gic_vpribits;
->              cs->vprebits = cpu->gic_vprebits;
-> --
-> 2.20.1
->
+are available in the Git repository at:
+
+  https://github.com/cschoenebeck/qemu.git tags/pull-9p-20201030
+
+for you to fetch changes up to 69067bf1436aab1c84b98b8461e81a9633ec7872:
+
+  tests/9pfs: add local Tunlinkat hard link test (2020-10-30 14:59:39 +0100)
+
+----------------------------------------------------------------
+9pfs: more tests using local fs driver
+
+Only 9pfs test case changes this time:
+
+* Fix occasional test failures with parallel tests.
+
+* Fix coverity error in test code.
+
+* Avoid error when auto removing test directory if disappeared for
+  some reason.
+
+* Refactor: Rename functions to make top-level test functions fs_*()
+  easily distinguishable from utility test functions do_*().
+
+* Refactor: Drop unnecessary function arguments in utility test
+  functions.
+
+* More test cases using the 9pfs 'local' filesystem driver backend,
+  namely for the following 9p requests: Tunlinkat, Tlcreate, Tsymlink
+  and Tlink.
+
+----------------------------------------------------------------
+Christian Schoenebeck (10):
+      tests/9pfs: fix test dir for parallel tests
+      tests/9pfs: fix coverity error in create_local_test_dir()
+      tests/9pfs: simplify do_mkdir()
+      tests/9pfs: add local Tunlinkat directory test
+      tests/9pfs: add local Tlcreate test
+      tests/9pfs: add local Tunlinkat file test
+      tests/9pfs: add local Tsymlink test
+      tests/9pfs: add local Tunlinkat symlink test
+      tests/9pfs: add local Tlink test
+      tests/9pfs: add local Tunlinkat hard link test
+
+Greg Kurz (6):
+      tests/9pfs: Force removing of local 9pfs test directory
+      tests/9pfs: Factor out do_version() helper
+      tests/9pfs: Set alloc in fs_create_dir()
+      tests/9pfs: Factor out do_attach() helper
+      tests/9pfs: Turn fs_readdir_split() into a helper
+      tests/9pfs: Turn fs_mkdir() into a helper
+
+ tests/qtest/libqos/virtio-9p.c |  34 ++-
+ tests/qtest/virtio-9p-test.c   | 467 +++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 457 insertions(+), 44 deletions(-)
 
