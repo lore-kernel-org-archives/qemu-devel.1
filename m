@@ -2,88 +2,87 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E6B3C00A89
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:04:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BF0C00A89
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:04:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AA66206F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:04:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 092B3206F7
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 20:04:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FvHl04ie"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AA66206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KwXxRPaM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 092B3206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYad3-0002c7-Ue
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 16:04:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49000)
+	id 1kYadL-00031M-RN
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 16:04:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kYabM-0001sP-7X
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:02:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30951)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kYabI-00057u-PO
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:02:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604088133;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=bHl21Z7sG4nypwLIfEu22dhTq1cpEIBlU9pBBsxEzlA=;
- b=FvHl04ieE7ilotzvJQlublYMDE6vVlf96qZr5DYrUSyaKUG6a+HHm2T9okzmq8+xtwj9JJ
- EEX+d3HM+DRIP4HsUViwFq16tvqGPRhPFnkrHWBT9iUZGQ1RUD3PZFtGYqbmU6qwlZf+Lv
- uFsRBtjXpcOeHjUBq2O+QM1OJ/4Zbws=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-126-OY0WqwL4MLiA3yHOXZFfhw-1; Fri, 30 Oct 2020 16:02:09 -0400
-X-MC-Unique: OY0WqwL4MLiA3yHOXZFfhw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08D268015FA;
- Fri, 30 Oct 2020 20:02:08 +0000 (UTC)
-Received: from work-vm (ovpn-114-198.ams2.redhat.com [10.36.114.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C92825B4D5;
- Fri, 30 Oct 2020 20:02:05 +0000 (UTC)
-Date: Fri, 30 Oct 2020 20:02:02 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
-Subject: Re: RFC: Fast Migration for SEV and SEV-ES - blueprint and proof of
- concept
-Message-ID: <20201030200202.GA19776@work-vm>
-References: <8b824c44-6a51-c3a7-6596-921dc47fea39@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kYabg-00026Y-8r
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:02:45 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:43487)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kYabd-0005A2-Vx
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 16:02:39 -0400
+Received: by mail-ed1-x542.google.com with SMTP id dn5so7851632edb.10
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 13:02:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=02vH7YJREuXx7JXqcCpqu+sa0reoOnN01mTCOw+Mcpk=;
+ b=KwXxRPaMoZYuiiEi39KbHv1HMmephb09FdVnr2nTzuArZ1FZeQY+PsWgrhx+0b5Lg4
+ XSVr3AH7GNIlVRcAcvBCW22nCWuqd2w9NFq7rcMGOD8AI0U7t9kgV1u91EVr18iZim0J
+ SjOPj4ouyuf2OP91kwGWEeEhKWDPzOlnN+hJIFvaOMipfoQKTQergetrqci20UWXE6hw
+ M9VUVj/U4LobG9zMhUT+GjQ0dfGRZDL4E3kfJfKGMDYX9Rh2xu0Z8Eoh+y07Z5RMnuVX
+ oBTI+fQ4ZhClbX81bcdtHoo4DtBjH8QbaHKjMRWwU0+uK+DUYFlfL9Dq3/IPU2y9fNah
+ PUxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=02vH7YJREuXx7JXqcCpqu+sa0reoOnN01mTCOw+Mcpk=;
+ b=Fg76b6WS1CHBuHu4vCE2ZAjScbs7vQcPGIcTY/bN+Urr5c6DyOINCCnGBjx+FWvMt9
+ bztCf8JYQmYgdRmUBRfqTlIULN0TUzs7Q14IaPCwVYMs/WGBEud1FGpE3wdy81tQW2+r
+ Q5QTfDRyDLohc5auGhCYqjC+EbrZH5LRdXrD6KO7Gq6fsjKEsgP+yopYdFyiaYc8ee9p
+ PwRHmSwDNdZRYuso66IcJ+ilfh14WQ6hwFsCi00DHgCD6GdJiYoeGfksmlrJZQs/WOCV
+ Rp3K/Fw2xJuY76xjfK+1Sq1P03IBkZcxiIwc4fLJdYpUKyyNQVH/luDwyJwhRTN9/2eP
+ JJ1Q==
+X-Gm-Message-State: AOAM531zNp50WpaiQM//lmAYatKTpnM7IA2xKj275B6cWK+24px0K0MM
+ Fx3Qw6eDB18qbMcnkbRufShU0bBnBYWQVjUzS76tBQ==
+X-Google-Smtp-Source: ABdhPJxTVZSo9Bo5Ua0Nyyj3XaPWBVUgMlUlzfF3YSTLm0n7gckV+PdaRFZT+/l+HzWtxMD0FsaQQMoXZlLYXT9/04E=
+X-Received: by 2002:a05:6402:4c6:: with SMTP id
+ n6mr4371439edw.204.1604088156154; 
+ Fri, 30 Oct 2020 13:02:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <8b824c44-6a51-c3a7-6596-921dc47fea39@linux.ibm.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 01:22:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201030174700.7204-1-peter.maydell@linaro.org>
+ <7ef49ead-40e1-1705-afc3-e94cac2bf5c9@redhat.com>
+ <CAFEAcA-qOWGvuzyvht+J_kmj+gBvqPdhiMPVj67R4ds50PjfPQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-qOWGvuzyvht+J_kmj+gBvqPdhiMPVj67R4ds50PjfPQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 30 Oct 2020 20:02:25 +0000
+Message-ID: <CAFEAcA_7dbapFgDQeWObejCTqZOUQ9TxaKfwyELGsKMh+dUQuw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] docs: Fix building with Sphinx 3.2
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,58 +95,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ashish.kalra@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
- jon.grimm@amd.com, tobin@ibm.com, qemu-devel@nongnu.org,
- dovmurik@linux.vnet.ibm.com, Dov.Murik1@il.ibm.com, pbonzini@redhat.com
+Cc: =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Tobin Feldman-Fitzthum (tobin@linux.ibm.com) wrote:
-> Hello,
-> 
-> Dov Murik, James Bottomley, Hubertus Franke, and I have been working on a
-> plan for fast live migration with SEV and SEV-ES. We just posted an RFC
-> about it to the edk2 list. It includes a proof-of-concept for what we feel
-> to be the most difficult part of fast live migration with SEV-ES.
-> 
-> https://edk2.groups.io/g/devel/topic/77875297
-> 
-> This was posted to the edk2 list because OVMF is one of the main components
-> of our approach to live migration. With SEV/SEV-ES the hypervisor generally
-> does not have access to guest memory/CPU state. We propose a Migration
-> Handler in OVMF that runs inside the guest and assists the hypervisor with
-> migration. One major challenge to this approach is that for SEV-ES this
-> Migration Handler must be able to set the CPU state of the target to the CPU
-> state of the source while the target is running. Our demo shows that this is
-> feasible.
-> 
-> While OVMF is a major component of our approach, QEMU obviously has a huge
-> part to play as well. We want to start thinking about the best way to
-> support fast live migration for SEV and for encrypted VMs in general. A
-> handful of issues are starting to come into focus. For instance, the target
-> VM needs to be started before we begin receiving pages from the source VM.
+On Fri, 30 Oct 2020 at 19:12, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 30 Oct 2020 at 18:20, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > On 30/10/20 18:46, Peter Maydell wrote:
+> > >
+> > > This does mean our kernel-doc gets another patch that makes
+> > > it diverge a little from the kernel's version, but we already
+> > > have one of those (commit 152d1967f650f67b7e). I do want to
+> > > try to upstream these to the kernel, but that will require
+> > > more work I suspect since the kernel makes much more extensive
+> > > use of kernel-doc and probably also has other issues when
+> > > building with newer Sphinxes. For the moment I would like us
+> > > to release QEMU 5.2 with docs that build with all the Sphinxes
+> > > we know about.
+> >
+> > FWIW I've sent to Linux our other two local patches, and if you are okay
+> > with it I can also do the sync in the other direction before 5.2 (the
+> > plan was to do it afterwards).
+>
+> Probably safer to sync afterwards. Do you have a link to the
+> patches you've sent in the Linux direction ?
 
-That might not be that hard to fudge; we already start the VM in
-postcopy mode before we have all of RAM; now in that we have to do stuff
-to protect the RAM because we expect the guest to access it; in this
-case you possibly don't need to.
+Having actually looked at the current state of the kernel's
+kernel-doc script I see somebody has already done the
+necessary updates for Sphinx 3 compatibility. So we have
+two choices for 5.2:
+ * take this patch 1 as a minimal fix
+ * do the sync of the kernel's version of the script
 
-> We will also need to start an extra vCPU for the Migration Handler to run
-> on. We are currently working on a demo of end-to-end live migration for SEV
-> (non-ES) VMs that should help crystallize these issues. It should be on the
-> list around the end of the year. For now, check out our other post, which
-> has a lot more information and let me know if you have any thoughts.
+I'll have a look at how painful or otherwise the sync is, I guess.
+We only use the kerneldoc stuff in the 'devel' manual which
+is not really userfacing anyway.
 
-I don't think I understood why you'd want to map the VMSA, or why it
-would be encrypted in such a way it was useful to you.
-
-Dave
-
-
-> -Tobin
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+thanks
+-- PMM
 
