@@ -2,87 +2,87 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5977DC00A89
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 16:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5711C00A89
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 16:49:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B65AA20725
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 16:48:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BB3B20725
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 16:49:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="XrCobd9q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B65AA20725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWVKjCl2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BB3B20725
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYXZk-0004IQ-9O
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 12:48:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55908)
+	id 1kYXaY-0005kx-41
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 12:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1kYXTF-0004qA-QK; Fri, 30 Oct 2020 12:41:45 -0400
-Received: from mout.web.de ([212.227.17.11]:33509)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1kYXTD-00031J-V0; Fri, 30 Oct 2020 12:41:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1604076096;
- bh=X7NTJwhv339GojGnpIWvTWY2vjpKyTMPXb5fxDVgfME=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=XrCobd9qYSkI5vMWkHWErBjadoIzk2DrPx1xpX8aSq+9GiC4sYcqQSYSf1rOdZbEa
- AWHmdE2hkljCap+W4Oed2eJnATcpSCt7R4EiNxfPCzsIVUPESk27Ca0RDUojoddu20
- Bw9Th7gQjV0aVPnqdSTgQmjXOQ8ZR/VDtggKeOrg=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([87.123.206.100]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MXGK4-1krmUY1bva-00Yiek; Fri, 30
- Oct 2020 17:41:36 +0100
-Date: Fri, 30 Oct 2020 17:41:34 +0100
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v10 6/8] io: Document qmp oob suitability of
- qio_channel_shutdown and io_shutdown
-Message-ID: <20201030174134.531eed50@luklap>
-In-Reply-To: <cover.1604075469.git.lukasstraub2@web.de>
-References: <cover.1604075469.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kYXUH-0006Ei-3x
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 12:42:49 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:37799)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kYXUF-000355-AH
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 12:42:48 -0400
+Received: by mail-ed1-x543.google.com with SMTP id o18so7346173edq.4
+ for <qemu-devel@nongnu.org>; Fri, 30 Oct 2020 09:42:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6yYkPSmtTyZx4Tr/CmInbdlIjHzB+3zaylgHbwePlrE=;
+ b=OWVKjCl2bDe8Ns8ptJY1ywc0gySD2qRZEyhi7JulPX/DeiegaT2SJWzjAp2m/at7Hj
+ rAoIMpX4Xl5j5D4llox8XYfCpm1RSFd3j0BNOgYHGOLeIURHhCWVs6dTh7PIV2awNOkj
+ qYQ0fVlDxuRC1YqJAqpahFHLsCdA0rYBlufSmJ4piabxF/2teeD/1+G6N47gHm05e2tg
+ AqOCyo5OnJMsq7zgH8wGlacPRS8oH3U+ha3+k73jy24N5IpflJfIRlN8HZF3qp4ZiY0b
+ M0JL7+yKBLWboWWRG4cJU798jXyyhXAk7gvobv9gpHz6DNNvi5YT74HtDZ8Zo/oLtTHm
+ GF9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6yYkPSmtTyZx4Tr/CmInbdlIjHzB+3zaylgHbwePlrE=;
+ b=YhRIxje18zZkhAX2ETINMgwk4Sjqfmj4tQS3KDIxlqQ8FZfj9w5bsLdQLyxUjhO0rg
+ weSs6DHTu5inZ+2t9+5d+5puQ4u5OiOpp59JPcgM0OzPYA0T0GIVkfq1pk9hK0KidEqz
+ R4dSr5YWOch4Is5ginSl1662t3x42LbA50lXEVykzpJPyoD+MkF9ZBMYe/IMzqAcjQ8m
+ 7nFw+2QS2hLHU4E97IYAyHxpAb2wvnE8P/EG9855NNKqxiNmchfLTOJ1egWijTU8q9+/
+ jPgrkPW3FbGEjtTcuzQZU1ENDft4nwAnoJY6/HldDVUAqVE1vcZ9vEgcHfbCXFTK4bp8
+ Hqhw==
+X-Gm-Message-State: AOAM531/pJ88rp1ctZmsufI6OrUes5AhY/GPANPh/ph+jl5fQFfhpHS3
+ Ix1biorLeMo9ic7sh8JrDmaNzoVDPdJqUJUdjJs=
+X-Google-Smtp-Source: ABdhPJwY36Y2LLPTeOgELwkLC3pugXbYsz86fpJTIWhi0sgxiBdR8rNxx0lg9GcrvGr3MwzlQ3Pn/hG/iYLlYgfOgKU=
+X-Received: by 2002:a05:6402:6ca:: with SMTP id
+ n10mr3411385edy.314.1604076164769; 
+ Fri, 30 Oct 2020 09:42:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/xHxb8Q3cJGCnDAn7EYdcPgF";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:/6QXYb2vV0dW0aZhPO9ZwUQTEa4PFsnCwGKwvflxPve9zGKf/VY
- 6i4gFx5JOGB0NPvy2q63KvRyCNJQA4w8gQhhKdBqORajrbP9F+cTdHv+FBpnGwciREMgNj/
- cEBZnQ+GaRMxnaTvF00wWzRWJv3rp8g7SYEGJFsDpjGXX15btmoOuCd50ZttEMQNgnsisRP
- IFp3WMKX1bMxA6x3j/D9g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:F1jVa089wr8=:phEhAUtDD42ipz2kscGEsQ
- PEXWXvuvneozr2aoprv4W5bHF1y01xsLztGqd9/dHQVmYLtUAOUgl9PhtlsabnUZmQLk+GrqN
- WpWN/gdsXbunTY0tTaK6haAEVdTW2m11jEhIPlEhC40cgp44t08jEpX8yIPAc7+KrBFEWXved
- gFtiIMtBhUKWWm1OkrepAIIhqOdf27XtbxABQnvLF5jF7FPN03/SBjIcxWVbCFWgpopQ6eBhE
- liFCFz+30vbfWXJ6df+1bazUU/osCKhpHj6vPp09OJeMOy7a2blV5lwUG7mXpnD/OMLbi7FaZ
- gCw3ySHLeosYwwda2AmXrCWlYFPLitsi8YSp426mMmcQqF7MjcAr8i+h6yRKdng7KREZvYR+2
- pwvc7gCPA4SG4AGAhRanAK7lsKDxrH++Xj0W5fqBX5ogvhWBza/Ov6RZ+IU8yfRDHDn+j7EZx
- 5Lpq8MV7zn9e0ZTrhPvtSlOw58a6u+JwEQkHsSk/ohZWJgW2Y/InBDjywL1lf69QirIb8hvZy
- q9vCzBstGyqh7KPzZpgyncX5lCov8y6mj/YMHk4kbn24DORtgKus/o4nR3hcPtBZrPH5LnyiN
- A0sZxk1tonga11aOQGsI5d3pSTXGjnM+5tvvYeiH/z8vMO+SW6dCy/X4OkleBHPGQdPDo1+sM
- vF4oE12mPHnvE3eMZTwITfJHkQK3JdgRl8nLLB5AmCe2eE4Vif1ijUKIpR76LXgBJPXiOxWfR
- vI4qD9UF5n8UUTecVXMeoKhmwtOoJtB7KzEorrEzz/xESa4xHCWvBmzRz7jn9WbW1j4DOzCnH
- viEXajpJ/nzLAukug1Tcyd6kWSX1y7OBYtwF1eGs/PO+IrWafNyK7Bm8j2Fq194wVovGL2g7T
- bt1XrYO4oh3acEycy2NA==
-Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 11:19:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
+References: <20201029220246.472693-1-ehabkost@redhat.com>
+ <20201029220246.472693-23-ehabkost@redhat.com>
+In-Reply-To: <20201029220246.472693-23-ehabkost@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 30 Oct 2020 20:42:32 +0400
+Message-ID: <CAJ+F1CJGW3q=x4_DHxeSOuPaNdub6kHeb13WaFH-E_uMx_54LA@mail.gmail.com>
+Subject: Re: [PATCH 22/36] qdev: Make qdev_prop_allow_set() a property
+ allow_set callback
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000fe6c0f05b2e615ed"
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,79 +96,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/xHxb8Q3cJGCnDAn7EYdcPgF
-Content-Type: text/plain; charset=UTF-8
+--000000000000fe6c0f05b2e615ed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Migration and yank code assume that qio_channel_shutdown is thread
--safe and can be called from qmp oob handler. Document this after
-checking the code.
+On Fri, Oct 30, 2020 at 2:15 AM Eduardo Habkost <ehabkost@redhat.com> wrote=
+:
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- include/io/channel.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/include/io/channel.h b/include/io/channel.h
-index 3c04f0edda..e0b9fc615d 100644
---- a/include/io/channel.h
-+++ b/include/io/channel.h
-@@ -92,7 +92,8 @@ struct QIOChannel {
-  * provide additional optional features.
-  *
-  * Consult the corresponding public API docs for a description
-- * of the semantics of each callback
-+ * of the semantics of each callback. io_shutdown in particular
-+ * must be thread-safe, terminate quickly and must not block.
-  */
- struct QIOChannelClass {
-     ObjectClass parent;
-@@ -510,6 +511,8 @@ int qio_channel_close(QIOChannel *ioc,
-  * QIO_CHANNEL_FEATURE_SHUTDOWN prior to calling
-  * this method.
-  *
-+ * This function is thread-safe, terminates quickly and does not block.
-+ *
-  * Returns: 0 on success, -1 on error
-  */
- int qio_channel_shutdown(QIOChannel *ioc,
---
-2.20.1
+> This removes the last remaining DeviceState-specific line of code
+> inside qdev property registration code, and will allow us to make
+> static properties a core QOM feature.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>
 
 
---Sig_/xHxb8Q3cJGCnDAn7EYdcPgF
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
------BEGIN PGP SIGNATURE-----
+--=20
+Marc-Andr=C3=A9 Lureau
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl+cQj4ACgkQNasLKJxd
-sli3Nw/+KnSvgXD5Qex+AjAlZdEht8HxnvAItcAbUh6M2TPBZkDgqGZKaJdDPAHd
-9Quu1KpKcQBdLLeViEHLGj6HwXO+pVWfpZieKL/uJNuQk6YAr/WOYIJQtNkSgS/2
-pxe7oHRr+rx+40eJl0mGoCcfBcwZ/8tq3FHIc4ezLNu0wneZMFsXb9CavG5JC3gE
-k/BRJNj7NqOi/Tm+Fk6g54LDPqHNc0rcdyhCEUMwyTpoCmmjmzg1oNdoUTmRjyo2
-4lfRumXzqRQ2/Zo1zYhxzAUKKErdblFFB/8hZ2dh+XlrwjEscMsW9yc8n1S3+cbx
-FfOUBKFBVFOV2RuYBZmKsS+v6cEEPaMED1FESdGunIb2r00BivTOg7jwWKRLKmB3
-FZ8NXnVOFnCmq7YkPdHvOwoQLMK+wV/oiZh0R09tIHc/ljOiNZsw8UD1zt9OJFxb
-qjf9ewm1orNA7PbMqmKe7l/aRC2WbIB/09zQy2KZlFYp3sm/dfiTf6sCa/JtP7co
-32q2GkKGBOH21yx4qrWaSwoO0T/rBgCTnO9mU0cP9HAs0JJsw2/cLVDksTbqC3bn
-IHnj9P/SlmlvA1+nmnOpfB4nh+GSdlM0H98c2omKwP++Jm1IkkFWXNBAGtmbXorJ
-l3rWk2jyxLu44pYvz+bNdLqPWnQCs5zmr8cNxp9GWg2ow6C5DT0=
-=mXwJ
------END PGP SIGNATURE-----
+--000000000000fe6c0f05b2e615ed
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---Sig_/xHxb8Q3cJGCnDAn7EYdcPgF--
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 30, 2020 at 2:15 AM Eduar=
+do Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.com</=
+a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
+x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Th=
+is removes the last remaining DeviceState-specific line of code<br>
+inside qdev property registration code, and will allow us to make<br>
+static properties a core QOM feature.<br>
+<br>
+Signed-off-by: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@redhat.com" t=
+arget=3D"_blank">ehabkost@redhat.com</a>&gt;<br></blockquote><blockquote cl=
+ass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid=
+ rgb(204,204,204);padding-left:1ex">
+</blockquote></div><div><br></div><div><br></div><div>Reviewed-by: Marc-And=
+r=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marcandre=
+.lureau@redhat.com</a>&gt;</div><br>-- <br><div dir=3D"ltr" class=3D"gmail_=
+signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+
+--000000000000fe6c0f05b2e615ed--
 
