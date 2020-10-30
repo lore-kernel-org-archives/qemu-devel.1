@@ -2,81 +2,77 @@ Return-Path: <SRS0=q+n2=EF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D23FC55179
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30622C55179
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:27:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6072E221FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:26:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F23F206F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 09:27:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AfPl860B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6072E221FA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2Wc4Tnn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F23F206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYQg6-0003SG-UV
-	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 05:26:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59592)
+	id 1kYQgw-0004Od-3t
+	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 05:27:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59954)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kYQf0-0002sh-5o
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:25:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21331)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kYQgN-0003uW-CX
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:26:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39138)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kYQey-0003fa-9o
- for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:25:25 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kYQgL-0004Ce-O1
+ for qemu-devel@nongnu.org; Fri, 30 Oct 2020 05:26:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604049923;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=bWmO3fJ83aQfjtTtQNtK4UnT0BfjMHaMiAN921rNkLY=;
- b=AfPl860BuRXdV8tdaAL+3NqRu65UV5irD2M+k2b5oHHG3tcfG3+wpF0TQFZ6ClSPWoImcJ
- 7gCS3ub1rqW7FDNiiOlLoldYfywMFdy19PkfHIpBl44/aQ5MSseV+hyoEQgYOJ3OQEJd8/
- VT1/11lTcrMJ21jvvMpZVog8uPQzaMg=
+ s=mimecast20190719; t=1604050009;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=nWjeAFn5k1IamNEoD0dqWQGomfDy+fktuXv7mBnmcyo=;
+ b=D2Wc4TnnK/r+XJY5QohwNfPl3tII4W+WUo9REQF/kFZXoZLw2eR88PFda2i3PUw2w1eQrV
+ ivbVCU8fFndA9oSYgW+srVKZSnEu4pA2bhjYhQZPrwUC2fcx3AabYfn6CmJmcZvf4F5RMM
+ jVIxlRr0anu7wr1olYHs93w5GTlp7Vw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-Dh5uKN-4NEi4DjadxIQxAw-1; Fri, 30 Oct 2020 05:25:21 -0400
-X-MC-Unique: Dh5uKN-4NEi4DjadxIQxAw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-469-IatgEWhiPPqI37BNSCJ9GQ-1; Fri, 30 Oct 2020 05:26:47 -0400
+X-MC-Unique: IatgEWhiPPqI37BNSCJ9GQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51A9210E2187;
- Fri, 30 Oct 2020 09:25:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D17055792;
- Fri, 30 Oct 2020 09:25:13 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 08D42113865F; Fri, 30 Oct 2020 10:25:12 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 11/11] sockets: Make abstract UnixSocketAddress depend
- on CONFIG_LINUX
-References: <20201029133833.3450220-1-armbru@redhat.com>
- <20201029133833.3450220-12-armbru@redhat.com>
- <77c4d3b2-44f0-2bf8-feb6-bc760b2b8c46@redhat.com>
-Date: Fri, 30 Oct 2020 10:25:11 +0100
-In-Reply-To: <77c4d3b2-44f0-2bf8-feb6-bc760b2b8c46@redhat.com> (Eric Blake's
- message of "Thu, 29 Oct 2020 14:54:38 -0500")
-Message-ID: <877dr8xdzc.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC4BF10E2184;
+ Fri, 30 Oct 2020 09:26:45 +0000 (UTC)
+Received: from redhat.com (ovpn-113-50.ams2.redhat.com [10.36.113.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1855B5B4A1;
+ Fri, 30 Oct 2020 09:26:44 +0000 (UTC)
+Date: Fri, 30 Oct 2020 09:26:42 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Antti Antinoja <reader@fennosys.fi>
+Subject: Re: Live migration not possible from 5.0 to 5.1?
+Message-ID: <20201030092642.GD99222@redhat.com>
+References: <20201030120218.57ce841be22970274491be08@fennosys.fi>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201030120218.57ce841be22970274491be08@fennosys.fi>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/30 02:24:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -99,180 +95,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, zxq_yx_007@163.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, marcandre.lureau@redhat.com,
- pbonzini@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+On Fri, Oct 30, 2020 at 12:02:18PM +0800, Antti Antinoja wrote:
+> Hi All,
+> 
+> I couldn't find any mention about live migration incompatibility between 5.0 and 5.1 in the release notes but at least on our AMD based platform live migration from 5.0 to 5.1 is not possible.
+> 
+> The upgraded host had identical versions with it's pair before the upgrade was started:
+> * qemu 5.0.0-r2
+> * kernel 5.7.17
+> 
+> After upgrade:
+> * qemu 5.1.0-r1
+> * kernel 5.8.16
+> 
+> After reverting qemu back to 5.0.0-r2 migration worked normally.
+> 
+> On the sending end "info migrate" shows:
+> (qemu) info migrate
+> info migrate
+> globals:
+> store-global-state: on
+> only-migratable: off
+> send-configuration: on
+> send-section-footer: on
+> decompress-error-check: on
+> clear-bitmap-shift: 18
+> Migration status: failed (Unable to write to socket: Broken pipe)
+> total time: 0 milliseconds
+> 
+> At least once the receiving end died (while running 5.1.0-r1). All attempts resulted a "Broken pipe" error on the sending (5.0.0-r2) end.
 
-> On 10/29/20 8:38 AM, Markus Armbruster wrote:
->> The abstract socket namespace is a non-portable Linux extension.  An
->> attempt to use it elsewhere should fail with ENOENT (the abstract
->> address looks like a "" pathname, which does not resolve).  We report
->> this failure like
->> 
->>     Failed to connect socket abc: No such file or directory
->> 
->> Tolerable, although ENOTSUP would be better.
->> 
->> However, introspection lies: it has @abstract regardless of host
->> support.  Easy enough to fix: since Linux provides them since 2.2,
->> 'if': 'defined(CONFIG_LINUX)' should do.
->> 
->> The above failure becomes
->> 
->>     Parameter 'backend.data.addr.data.abstract' is unexpected
->> 
->> I consider this an improvement.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->
->> +++ b/qapi/sockets.json
->> @@ -74,18 +74,20 @@
->>  # Captures a socket address in the local ("Unix socket") namespace.
->>  #
->>  # @path: filesystem path to use
->> -# @tight: pass a socket address length confined to the minimum length of the
->> -#         abstract string, rather than the full sockaddr_un record length
->> -#         (only matters for abstract sockets, default true). (Since 5.1)
->> -# @abstract: whether this is an abstract address, default false. (Since 5.1)
->> +# @abstract: if true, this is a Linux abstract socket address.  @path
->> +#            will be prefixed by a null byte, and optionally padded
->> +#            with null bytes.  Defaults to false.  (Since 5.1)
->> +# @tight: if false, pad an abstract socket address with enough null
->> +#         bytes to make it fill struct sockaddr_un member sun_path.
->> +#         Defaults to true.  (Since 5.1)
->
-> Do we need to mention that @tight is ignored (or even make it an error)
-> if @abstract is false?
+You'll need to provide more information, most importantly how are you
+launching QEMU - if manually, what CLI args are you giving it.
 
-We could make presence of @tight an error unless @abstract is true.  But
-again, this series aims for less wrong, not for less ugly.
-
-For me, the description "if false, pad an abstract socket address..."
-implies "no effect when the socket address is not abstract".  If you'd
-like to suggest a clearer phrasing, go right ahead.
-
->>  #
->>  # Since: 1.3
->>  ##
->>  { 'struct': 'UnixSocketAddress',
->>    'data': {
->>      'path': 'str',
->> -    '*tight': 'bool',
->> -    '*abstract': 'bool' } }
->> +    '*tight': { 'type': 'bool', 'if': 'defined(CONFIG_LINUX)' },
->> +    '*abstract': { 'type': 'bool', 'if': 'defined(CONFIG_LINUX)' } } }
->
-> So we document @abstract before @tight, but declare them in reverse
-> order.  I guess our doc generator doesn't care?
-
-It doesn't.  I flipped them in the comment for readability, but
-neglected to flop the code.  Flipping them now.
-
->>  
->>  ##
->>  # @VsockSocketAddress:
->> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
->> index dc1cf86ecf..1d2b2efb13 100644
->> --- a/chardev/char-socket.c
->> +++ b/chardev/char-socket.c
->> @@ -444,14 +444,20 @@ static char *qemu_chr_socket_address(SocketChardev *s, const char *prefix)
->>          break;
->>      case SOCKET_ADDRESS_TYPE_UNIX:
->>      {
->> +#ifdef CONFIG_LINUX
->>          UnixSocketAddress *sa = &s->addr->u.q_unix;
->> +#endif
->>  
->>          return g_strdup_printf("%sunix:%s%s%s%s", prefix,
->>                                 s->addr->u.q_unix.path,
->
-> Why did we need the #ifdef above, which means we can't we use sa here?
-
-Tunnel vision.  I'll simplify.
-
->> +#ifdef CONFIG_LINUX
->>                                 sa->has_abstract && sa->abstract
->
-> I hate mid-()-expression #ifdefs.  If g_strdup_printf() were itself a
-> macro expansion, things break.  Can you come up with a saner way of
-> writing this?
->
->>                                 ? ",abstract" : "",
->>                                 sa->has_tight && sa->tight
->>                                 ? ",tight" : "",
->> +#else
->> +                               "", "",
->> +#endif
->>                                 s->is_listen ? ",server" : "");
->
-> I suggest:
->
->     const char *tight = "", *abstract = "";
->     UnixSocketAddress *sa = &s->addr->u.q_unix;
->
-> #ifdef CONFIG_LINUX
->     if (sa->has_abstract && sa->abstract) {
->         abstract = ",abstract";
->         if (sa->has_tight && sa->tight) {
->             tight = ",tight";
->         }
->     }
-> #endif
->
->     return g_strdup_printf("%sunix:%s%s%s%s", prefix, sa->path,
->                            abstract, tight,
->                            s->is_listen ? ", server" : "");
-
-I don't care either way, so I'm taking yours.
-
->> +++ b/util/qemu-sockets.c
->> @@ -854,10 +854,29 @@ static int vsock_parse(VsockSocketAddress *addr, const char *str,
->>  
->>  #ifndef _WIN32
->>  
->> +static bool saddr_is_abstract(UnixSocketAddress *saddr)
->> +{
->> +#ifdef CONFIG_LINUX
->> +    return saddr->abstract;
->> +#else
->> +    return false;
->> +#endif
->> +}
->> +
->> +static bool saddr_is_tight(UnixSocketAddress *saddr)
->> +{
->> +#ifdef CONFIG_LINUX
->> +    return !saddr->has_tight || saddr->tight;
->
-> Should this also look at abstract?
-
-It's used in just two places, both guarded by if (abstract).
-
-I added the helpers only because the code creating a struct sockaddr_un
-is duplicated, and de-duplication is too hard to bother due to the
-(racy) "if path="" pick one" feature.
-
->> +#else
->> +    return false;
->> +#endif
->> +}
->> +
->
-> Is it any easier to split the patch, first into the introduction of
-> saddr_is_* and adjusting all clients, and second into adding the 'if' to
-> the QAPI declaration?
-
-I doubt it.  But If you guys think it makes the patch easier to
-understand, I'll gladly do it.
-
-> But the idea makes sense.
-
-Thanks!
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
