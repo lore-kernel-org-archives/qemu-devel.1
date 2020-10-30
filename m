@@ -7,40 +7,41 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE12C00A89
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7861CC56201
 	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 04:37:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39283221E2
+	by mail.kernel.org (Postfix) with ESMTPS id AC2E02151B
 	for <qemu-devel@archiver.kernel.org>; Fri, 30 Oct 2020 04:37:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39283221E2
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC2E02151B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYMAc-0005Xw-34
+	id 1kYMAc-0005Yz-Hu
 	for qemu-devel@archiver.kernel.org; Fri, 30 Oct 2020 00:37:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35196)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhangxinhao1@huawei.com>)
- id 1kYM9W-0004Tg-SX; Fri, 30 Oct 2020 00:36:38 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:2119)
+ id 1kYM9W-0004Td-Mg; Fri, 30 Oct 2020 00:36:38 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:2120)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhangxinhao1@huawei.com>)
- id 1kYM9U-00016b-9q; Fri, 30 Oct 2020 00:36:38 -0400
+ id 1kYM9U-00016X-4k; Fri, 30 Oct 2020 00:36:38 -0400
 Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CMqJX2t6Wz6vgC;
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CMqJX32rrz6vmm;
  Fri, 30 Oct 2020 12:36:28 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS409-HUB.china.huawei.com
  (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Fri, 30 Oct 2020
  12:36:18 +0800
 From: Xinhao Zhang <zhangxinhao1@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v3 3/3] hw/9pfs : add space before the open parenthesis '('
-Date: Fri, 30 Oct 2020 12:35:15 +0800
-Message-ID: <20201030043515.1030223-3-zhangxinhao1@huawei.com>
+Subject: [PATCH v3 2/3] hw/9pfs : open brace '{' following struct go on the
+ same line
+Date: Fri, 30 Oct 2020 12:35:14 +0800
+Message-ID: <20201030043515.1030223-2-zhangxinhao1@huawei.com>
 X-Mailer: git-send-email 2.29.0-rc1
 In-Reply-To: <20201030043515.1030223-1-zhangxinhao1@huawei.com>
 References: <20201030043515.1030223-1-zhangxinhao1@huawei.com>
@@ -77,29 +78,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix code style. Space required before the open parenthesis '('.
+Fix code style. Open braces for struct should go on the same line.
 
 Signed-off-by: Xinhao Zhang <zhangxinhao1@huawei.com>
 Signed-off-by: Kai Deng <dengkai1@huawei.com>
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/9pfs/cofs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/9pfs/9p.h | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/hw/9pfs/cofs.c b/hw/9pfs/cofs.c
-index 55991916ec..0b321b456e 100644
---- a/hw/9pfs/cofs.c
-+++ b/hw/9pfs/cofs.c
-@@ -23,7 +23,7 @@ static ssize_t __readlink(V9fsState *s, V9fsPath *path, V9fsString *buf)
-     ssize_t len, maxlen = PATH_MAX;
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index 3dd1b50b1a..32df81f360 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -143,8 +143,7 @@ typedef struct {
+  */
+ QEMU_BUILD_BUG_ON(sizeof(P9MsgHeader) != 7);
  
-     buf->data = g_malloc(PATH_MAX);
--    for(;;) {
-+    for (;;) {
-         len = s->ops->readlink(&s->ctx, path, buf->data, maxlen);
-         if (len < 0) {
-             g_free(buf->data);
+-struct V9fsPDU
+-{
++struct V9fsPDU {
+     uint32_t size;
+     uint16_t tag;
+     uint8_t id;
+@@ -270,8 +269,7 @@ union V9fsFidOpenState {
+     void *private;
+ };
+ 
+-struct V9fsFidState
+-{
++struct V9fsFidState {
+     int fid_type;
+     int32_t fid;
+     V9fsPath path;
+@@ -338,8 +336,7 @@ typedef struct {
+     uint64_t path;
+ } QpfEntry;
+ 
+-struct V9fsState
+-{
++struct V9fsState {
+     QLIST_HEAD(, V9fsPDU) free_list;
+     QLIST_HEAD(, V9fsPDU) active_list;
+     V9fsFidState *fid_list;
 -- 
 2.29.0-rc1
 
