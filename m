@@ -2,84 +2,109 @@ Return-Path: <SRS0=iivN=EG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27EA9C388F9
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Oct 2020 14:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3664EC388F7
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Oct 2020 14:59:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E094206DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Oct 2020 14:56:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 901DE206E9
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Oct 2020 14:59:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sBlAeQgq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E094206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1fUHcWB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 901DE206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYsIS-0006eM-HW
-	for qemu-devel@archiver.kernel.org; Sat, 31 Oct 2020 10:56:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33024)
+	id 1kYsM5-0000mv-N4
+	for qemu-devel@archiver.kernel.org; Sat, 31 Oct 2020 10:59:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYsHe-00067z-NH
- for qemu-devel@nongnu.org; Sat, 31 Oct 2020 10:55:10 -0400
-Received: from mail-ed1-x534.google.com ([2a00:1450:4864:20::534]:46198)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kYsHc-0004L2-GF
- for qemu-devel@nongnu.org; Sat, 31 Oct 2020 10:55:10 -0400
-Received: by mail-ed1-x534.google.com with SMTP id t11so9609737edj.13
- for <qemu-devel@nongnu.org>; Sat, 31 Oct 2020 07:55:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Npv/0mAaLi6Pe4LWT9ZNMhfpch68nueGIFjKVQr3v20=;
- b=sBlAeQgqi7FbvyMUhuZ7SAIMz0wnGesnvrr5FW7lEamdOU4Hyv4ACKTIGl0+0PqPr4
- 57H6Uq1IUGnJ4HSYQYirZHs5Z+UmRZOIu+aTaEQtb9lWVpS1NamzbJMTLXzWz6fMkdOa
- UnRJh3t4uTiWVkxk/ax18DFcjZythtHBgmsgkEWShogW6DErcTtPcI/Dx07dssrRx9Iq
- Iyy2MfMkdLfOlXEkUWVpLGpPByWYSG71fCQT7VoJ59VGWlM/V0LvUafHTYqheVvWR9iA
- /OhxlG53MhEkxFkYZEFoqkI0Za9NsRlCTljFJTCxLPEqlexqgMwTWC4ttBq4TO3wIrVl
- oTIA==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kYsKo-0008RY-Dh
+ for qemu-devel@nongnu.org; Sat, 31 Oct 2020 10:58:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46743)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kYsKj-0004xN-59
+ for qemu-devel@nongnu.org; Sat, 31 Oct 2020 10:58:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604156300;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=H6/TIwrKN199Hqu/RMOB5UcPBufI+HtrWBOUpNDaYN4=;
+ b=g1fUHcWBQr+5gi2E/f5zmwIxMIfGI7WAHAfzvsSRA6CIjU1Y7SKgU5nFha7ayWYqA+QtgP
+ Lk2gC+ym1rFaAskCj+LcXceDEc+vpXXkF3OQn8kbUrVpPFXyF/8Xoc6Yff+KvwAaV5qRd8
+ 0RGv9Y5h2XkmgF42YxhJ9yRJGor1Dck=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-Ar1ps6ZDMHSMDKD_xj8a7A-1; Sat, 31 Oct 2020 10:58:18 -0400
+X-MC-Unique: Ar1ps6ZDMHSMDKD_xj8a7A-1
+Received: by mail-wr1-f70.google.com with SMTP id t14so4124338wrs.2
+ for <qemu-devel@nongnu.org>; Sat, 31 Oct 2020 07:58:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Npv/0mAaLi6Pe4LWT9ZNMhfpch68nueGIFjKVQr3v20=;
- b=AxtNBBg+iNv9HMbJ1eodCRVt5luCJ476sITcrFcHlpqmefEChziGbWR50E8RpNHlkd
- AoEDhxqIuUNsVBQLc2pL9WwYjwE4utJz7epRQxVc8kTYVAIOKHkqZFFPa8AzomO6LIb4
- RV8wSoIx414d5PPZ+0OD62NjJRKmRdMvDPqCoQmDCmGpdAkg4iyeHz27JvHzqcBN39KC
- g4ZQvMFDCbPSrYNkoQHwcQeX9aIDXJD6dR9CS+iDoO9MtewPp35woOfy1VBYZrggmLYp
- DUu1Ag+xi2h6njYfnaisF15HYvovs423DUWPNkf3RLNt5/SRsu2XOHmk/HOzrmDz1Wzd
- 25xw==
-X-Gm-Message-State: AOAM5320Lte4GCxnjqYwtp6Thy6Y/lIQVTnZ27CuDILCg6B+LBxFsU0c
- rdHqWmcD8SbT7e6VxKyM49XXmSz+hvctj8gPQNxQCA==
-X-Google-Smtp-Source: ABdhPJz+fF4qxplEj6w6MM4jYsBolSW3QzcJTBnk7j5h/JeIEf7MU180XnmeHwWrNruo7Va+SR8aBqjD5tmhlopqQ9Q=
-X-Received: by 2002:a50:f41a:: with SMTP id r26mr7704239edm.251.1604156105419; 
- Sat, 31 Oct 2020 07:55:05 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=H6/TIwrKN199Hqu/RMOB5UcPBufI+HtrWBOUpNDaYN4=;
+ b=P68LnE77xjHxyrzLdTxJix5X0eGf2v9slf70DlPJWEiOUwWvCISc8HI5W88sDUDzgj
+ VdYpVrUgNWMXUp3wb7FO7ex7cfVm7bYThKLWsIc3BjWhkVB5wUxvuLIMa3RUuPWBkJ8w
+ mPMRmNvdI11NulvgAiYkZfkCfnQ2yRnpiT9lab38mPZovY/JLdn4Cu4AGDo2PlYvAtps
+ K6Ig09b5ozg4c1ch5UriDIQ0k9ffP4+sf9h6udNJicR1RluWtg4G90kVpDjhAJVLcp/4
+ OhsZzUPexSZ0Q26CpriKbTTs1wqCJV1EtO+nU2D8M4RnA/mRDTgRmT7YC/vNrPBBRJO8
+ ohuw==
+X-Gm-Message-State: AOAM532sdkqLTgAs6f6nL7RMD6/TmTnXh7HuH/OUwE92eww3NqArD0hP
+ mNi1XagYEJscatM34wDgvks4VyzZ/P85Rkehjy496NzO0uIIgtPv7VdnHncJ+hQtdfYLG/UiFPj
+ elMqruAfaqsoM23I=
+X-Received: by 2002:a5d:6086:: with SMTP id w6mr9414265wrt.231.1604156296878; 
+ Sat, 31 Oct 2020 07:58:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwawXjzI26XmUjmv4hlTDs4nBsjRBNz+ALvRVYCuStI1XmaCad2auE6nxf6RniCSWOgy+pedg==
+X-Received: by 2002:a5d:6086:: with SMTP id w6mr9414256wrt.231.1604156296728; 
+ Sat, 31 Oct 2020 07:58:16 -0700 (PDT)
+Received: from [192.168.178.64] ([151.20.250.56])
+ by smtp.gmail.com with ESMTPSA id f17sm8470173wmh.10.2020.10.31.07.58.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 31 Oct 2020 07:58:16 -0700 (PDT)
+Subject: Re: [PATCH 0/2] docs: Fix building with Sphinx 3.2
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20201030174700.7204-1-peter.maydell@linaro.org>
+ <7ef49ead-40e1-1705-afc3-e94cac2bf5c9@redhat.com>
+ <CAFEAcA-qOWGvuzyvht+J_kmj+gBvqPdhiMPVj67R4ds50PjfPQ@mail.gmail.com>
+ <CAFEAcA_7dbapFgDQeWObejCTqZOUQ9TxaKfwyELGsKMh+dUQuw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6c1bf7ce-1bfa-ec49-8b9c-098c2a0bf37c@redhat.com>
+Date: Sat, 31 Oct 2020 15:58:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <160390309510.12234.8858324597971641979.stgit@gimli.home>
-In-Reply-To: <160390309510.12234.8858324597971641979.stgit@gimli.home>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 31 Oct 2020 14:54:54 +0000
-Message-ID: <CAFEAcA-z32b81E6u0gsnFnW-QqvM4dheF6ornTAp1g7YadGeYQ@mail.gmail.com>
-Subject: Re: [PULL v2 00/32] VFIO updates 2020-10-28 (for QEMU 5.2 soft-freeze)
-To: Alex Williamson <alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::534;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x534.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <CAFEAcA_7dbapFgDQeWObejCTqZOUQ9TxaKfwyELGsKMh+dUQuw@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/31 08:00:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.257, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,87 +118,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Artem Polyakov <artemp@nvidia.com>, Zhengui li <lizhengui@huawei.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Neo Jia <cjia@nvidia.com>,
- Amey Narkhede <ameynarkhede03@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>
+Cc: =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 28 Oct 2020 at 16:42, Alex Williamson
-<alex.williamson@redhat.com> wrote:
->
-> The following changes since commit 33dc9914eac581dea9bdea35dcda4d542531d66a:
->
->   Revert series: virtiofsd: Announce submounts to the guest (2020-10-28 13:17:32 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/awilliam/qemu-vfio.git tags/vfio-update-20201028.0
->
-> for you to fetch changes up to 83d64f2efe383f1f70e180cf1579d3bbe2fbcdf5:
->
->   vfio: fix incorrect print type (2020-10-28 10:30:37 -0600)
->
-> ----------------------------------------------------------------
-> VFIO update 2020-10-28
->
->  * Migration support (Kirti Wankhede)
->  * s390 DMA limiting (Matthew Rosato)
->  * zPCI hardware info (Matthew Rosato)
->  * Lock guard (Amey Narkhede)
->  * Print fixes (Zhengui li)
->  * Warning/build fixes
->
+On 30/10/20 21:02, Peter Maydell wrote:
+> Having actually looked at the current state of the kernel's
+> kernel-doc script I see somebody has already done the
+> necessary updates for Sphinx 3 compatibility. So we have
+> two choices for 5.2:
+>  * take this patch 1 as a minimal fix
+>  * do the sync of the kernel's version of the script
+> 
+> I'll have a look at how painful or otherwise the sync is, I guess.
+> We only use the kerneldoc stuff in the 'devel' manual which
+> is not really userfacing anyway.
 
-Hi; this fails to build on OSX and the BSDs:
+Oh nice! I had a slightly older Linux checkout and it wasn't there yet.
+ I think you can go ahead with these two patches, I'll take care of the
+sync for 6.0.
 
-../../hw/s390x/s390-pci-vfio.c:13:10: fatal error: 'linux/vfio.h' file not found
-#include <linux/vfio.h>
-         ^~~~~~~~~~~~~~
+Here are our two patches.
 
-fails differently but on the same file on windows builds:
+https://lore.kernel.org/linux-doc/20201030144713.201372-1-pbonzini@redhat.com/T/#t
 
-../../hw/s390x/s390-pci-vfio.c:12:23: fatal error: sys/ioctl.h: No
-such file or directory
-
-and has this error on 32-bit hosts:
-
-../../hw/vfio/common.c: In function 'vfio_dma_unmap_bitmap':
-../../hw/vfio/common.c:414:48: error: passing argument 1 of
-'cpu_physical_memory_set_dirty_lebitmap' from incompatible pointer
-type [-Werror=incompatible-pointer-types]
-         cpu_physical_memory_set_dirty_lebitmap((uint64_t *)bitmap->data,
-                                                ^
-In file included from ../../hw/vfio/common.c:32:0:
-/home/peter.maydell/qemu/include/exec/ram_addr.h:337:20: note:
-expected 'long unsigned int *' but argument is of type 'uint64_t *
-{aka long long unsigned int *}'
- static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned
-long *bitmap,
-                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../../hw/vfio/common.c: In function 'vfio_get_dirty_bitmap':
-../../hw/vfio/common.c:1008:44: error: passing argument 1 of
-'cpu_physical_memory_set_dirty_lebitmap' from incompatible pointer
-type [-Werror=incompatible-pointer-types]
-     cpu_physical_memory_set_dirty_lebitmap((uint64_t *)range->bitmap.data,
-                                            ^
-In file included from ../../hw/vfio/common.c:32:0:
-/home/peter.maydell/qemu/include/exec/ram_addr.h:337:20: note:
-expected 'long unsigned int *' but argument is of type 'uint64_t *
-{aka long long unsigned int *}'
- static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned
-long *bitmap,
-                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-thanks
--- PMM
 
