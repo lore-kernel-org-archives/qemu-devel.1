@@ -2,69 +2,125 @@ Return-Path: <SRS0=iivN=EG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A72EC388F7
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Oct 2020 13:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D46C388F7
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Oct 2020 13:24:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF9812068D
-	for <qemu-devel@archiver.kernel.org>; Sat, 31 Oct 2020 13:21:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB9D920723
+	for <qemu-devel@archiver.kernel.org>; Sat, 31 Oct 2020 13:24:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="mbRlCyYz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF9812068D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="W00FwDDd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB9D920723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYqp9-0004xW-He
-	for qemu-devel@archiver.kernel.org; Sat, 31 Oct 2020 09:21:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47788)
+	id 1kYqs6-0006A5-4B
+	for qemu-devel@archiver.kernel.org; Sat, 31 Oct 2020 09:24:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kYqo7-0004Me-Fy
- for qemu-devel@nongnu.org; Sat, 31 Oct 2020 09:20:35 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:42789)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kYqrU-0005kG-MQ; Sat, 31 Oct 2020 09:24:04 -0400
+Received: from mail-eopbgr50094.outbound.protection.outlook.com
+ ([40.107.5.94]:50662 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kYqo5-0008SH-3t
- for qemu-devel@nongnu.org; Sat, 31 Oct 2020 09:20:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=WbDiM3VKjfxUeUJk4F43pQgNUSEHhs7ZBqOAkj8C8sI=; b=mbRlCyYzJV0f5qGJ8l7fVn4hte
- hRU+UOAzGoVw2ZP5GgcGC0kq3t/xLcJj7fV4GDCWq1Hn55nS84fhEZ26kge573bws/X/GjPuSgmrK
- nLN/CXH1j3FPd0+1u/felpZ7++OnvqFdYWpxroaoezyhoS/xrZKhKzcvCrzQwFUtRuzlXkZWUrc5V
- W++KX97q6QiyQLf4eFQ0b/Ab8npEUQhoT5KrkVGivj6gbTXAHsNyu6KRQxl0ivuoVLfzYCaZHB7P0
- pXIkTin9Xht2F7yuZBPumCnNwLsP+lk7s62c/yoBJ65kXmrevslmwsXCxCsuqWpCWkygohU9RhzEc
- 7IP+GJ2Q==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
-Subject: Re: [PULL v2 01/16] tests/9pfs: fix test dir for parallel tests
-Date: Sat, 31 Oct 2020 14:20:27 +0100
-Message-ID: <5877759.JlKFulrene@silver>
-In-Reply-To: <fd3237f7b005b1b73c954ccd5c6011e8228e19a3.1604067568.git.qemu_oss@crudebyte.com>
-References: <cover.1604067568.git.qemu_oss@crudebyte.com>
- <fd3237f7b005b1b73c954ccd5c6011e8228e19a3.1604067568.git.qemu_oss@crudebyte.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kYqrP-0001Eg-Th; Sat, 31 Oct 2020 09:24:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iis2R+g05eYSd0i23edDvrO35hJmGK4PaoJFglsmOPxYFKiyjW8qsEcJ6heYuEcFjrQt1ywiI8qxJ0KiKYKFy9JFyNSxSGIuTOPF7s1O1DbMsQrHUsZ+yaC/2DvtSxBfpoPixwHsX6PDEobwHx951cAEyFFl1How4IEs+3Ws5BqpeJbUywZN6/CKkBjqJjqL79U8kmRxiD+21q5I5WUvavn/gJ/yFCneO31y/y8jpWddVWW3VzSQTajXgUBNRQSOYHQ8pnQwRLIrx9QttN1ZQePwILSzwvC0GgI6dM0Hrgf3RBZNMvatopskwnvfxXFePDG97UlM9bgZxjvFJTmLSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HeZaKwG5kEiAScwRL03S8rI7HnPu8afYF5T3Crc/vTo=;
+ b=SrV7BL53AeyTipy200aAjq4VBXyWOxK6n2JXOynTB8/eR62/z8+aLqgxqfalwSVRslxdrgrnw++lrVZ2oLevHpLhVz90iPFF9enVZua42ijQ9iwQ1AmDRWvThN1EjouELqPB6WiHRyNqmgnrXBp14rjpDYaXjWrXfwid/Klg8mHa5vrHbgxRskr6BjJ7lR+fw6QUdu24ZNnrH+Sl41cQf5F8VZE9tMatJuDYQSxEiGZjMBo+WwhIx2J970uugdA7mvXiQ1uOaqoubpkcQk/pFWCrpBlLnt+pI+y4tIQub5uU9AAePnI9kLSLyiU4F4n2CsEqEAvhvAYvXVxRCAzVaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HeZaKwG5kEiAScwRL03S8rI7HnPu8afYF5T3Crc/vTo=;
+ b=W00FwDDdjvHJ4N7OGdqR53kTkuh/62gRorV4gZSIEctDscF8koiQsbvJE/67GV9yPA28ENhoD19f8MF3C6oCrlD/cwdw7nZu+qnkF0EY00Syrmer/IBVT6Q4XIMQ9juBVTcQ4YDAu2Gy8kTf4pDZO0ClCpfmq6gus+UVKVFw1tk=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4849.eurprd08.prod.outlook.com (2603:10a6:20b:c3::18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.27; Sat, 31 Oct
+ 2020 13:23:52 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.029; Sat, 31 Oct 2020
+ 13:23:46 +0000
+Subject: Re: [PATCH 2/2] block: assert that permission commit sets same
+ permissions
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+References: <20201031123502.4558-1-vsementsov@virtuozzo.com>
+ <20201031123502.4558-3-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <12a20c72-8ed3-d20d-eba5-6bc2bd0eb7d0@virtuozzo.com>
+Date: Sat, 31 Oct 2020 16:23:44 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+In-Reply-To: <20201031123502.4558-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [185.215.60.113]
+X-ClientProxiedBy: AM8P191CA0026.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21a::31) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/31 09:20:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.113) by
+ AM8P191CA0026.EURP191.PROD.OUTLOOK.COM (2603:10a6:20b:21a::31) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3499.19 via Frontend Transport; Sat, 31 Oct 2020 13:23:46 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c0942a0d-4f32-4682-0d41-08d87da03248
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4849:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB48499C2F36BA868D0F9D2028C1120@AM6PR08MB4849.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:165;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fQtxNGN3VnVSKd4iZsEkJrD9oDSGeyLFbzDZUCY2dBRkR7eg+2JqTOr72MRpSSRjOUuYghYf735aoGjbYnXJZ4eFvQZUNGZIV6q+L8ufXJ/QRQ+kaQ6Ud/lO8GG9h0prYQZoHv8b2IZSsPxnEIwqbN+MWoH+17phqAemUgYRnXi443RghrtcSm4zEmg0u5U6aK/B8rNaYm45d/FFn6zoccN66uun7GDSlb0wdNwIRijBbHII6XhHc8OdRyeQvxUG+kktCyUTOCjNNPNA9S93cIwCWdvFFdHhi9/nHS71ldOb01ile8LoVfDyJUjsZ07e1q9FEi5dF+vrwsLzHfJutajvKn33LuTLjuoKKovFerZE9hbk5+hYFigMk/tpt5yz
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(39830400003)(346002)(396003)(136003)(366004)(8936002)(8676002)(6486002)(956004)(31686004)(6916009)(2616005)(4326008)(2906002)(186003)(16526019)(478600001)(86362001)(107886003)(66556008)(16576012)(66476007)(66946007)(316002)(36756003)(83380400001)(52116002)(31696002)(26005)(5660300002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: pWlYJ2Epl7boih5YpxzyfaId2x++1HvtS1aeJrYGCoqhbwsBsZBZvleAvB4kL6AaNARZdyA7R9Fwyt3B76p01Qylo86cbwkBwTqzXjsylDqoeeCMW9j4EhMlGesXP6px5RFznWNm+emIjJEXkREmEzqDC36hSk2yeiTBHvH1xRfIzOHN2QGhaRB4cGn2jVcS97J6FHF3y8bw79of+2v1Kcog2Xk7qRKQSIUsYRKZWN45/9L3XbKiUkOp92iG6JN8368xex/1efOZ4gKqZDMEEEtZwAPRgZxn73hljlr+uVCMLon3As/bpwZYWIEA1xdUKOxICybmCKotzCXY6S2Q02UHiq2V8t6Xo3fdKNxn2GNls+RtR+UnxpXS5uX7aVGUwsMmdlC2ZSJflMqhyyFcIbwulwD/XvPhcMebfQLo4utmFMoH7XIofS5HrNztXA6tkoFtrq0yTq45IZw5QfkjbRVmADyIDzMVVa5vCJYxmnmRdw6heT3aV/yu+VdHuyKR3OXKBI7fIzg6/3Q1RF9Q9wU/eC0g5E4jvSGwfEQKgFl6ce4kMyBfLDBG57mSdbR5yOR8LOKiGrIwOqFuef0+Pij1EWYtypI1aRBWO/cZ6erk48BmXNEN8OJ+bxx3yQX9dub1VXgGjJKcS4YhwVZkWA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0942a0d-4f32-4682-0d41-08d87da03248
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2020 13:23:46.6161 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2q/wcIT7NZQrqStSxpbQBI0GXewXlz/mPWDr07ohBJDapQNYSgH9wzSS4Xs3oI1DoiFmADt7Pv42q/5F5fqvx2J31D3qM+yLnDh/ExmvRjE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4849
+Received-SPF: pass client-ip=40.107.5.94;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/31 09:23:55
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.257, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,123 +138,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Freitag, 30. Oktober 2020 13:07:03 CET Christian Schoenebeck wrote:
-> Use mkdtemp() to generate a unique directory for the 9p 'local' tests.
+31.10.2020 15:35, Vladimir Sementsov-Ogievskiy wrote:
+> On permission update commit we must set same permissions as on _check_.
+> Let's add assertions. Next step may be to drop permission parameters
+> from _set_.
 > 
-> This fixes occasional 9p test failures when running 'make check -jN' if
-> QEMU was compiled for multiple target architectures, because the individual
-> architecture's test suites would run in parallel and interfere with each
-> other's data as the test directory was previously hard coded and hence the
-> same directory was used by all of them simultaniously.
+> Note that prior to previous commit, fixing bdrv_drop_intermediate(),
+> new assertion in bdrv_child_set_perm() crashes on iotests 30 and 40.
 > 
-> This also requires a change how the test directory is created and deleted:
-> As the test path is now randomized and virtio_9p_register_nodes() being
-> called in a somewhat undeterministic way, that's no longer an appropriate
-> place to create and remove the test directory. Use a constructor and
-> destructor function for creating and removing the test directory instead.
-> Unfortunately libqos currently does not support setup/teardown callbacks
-> to handle this more cleanly.
-
-Peter, please ignore this PR. This patch needs rework:
-
-ERROR:../tests/qtest/test-x86-cpuid-compat.c:208:test_plus_minus: stdout of
-child process (/x86/cpuid/parsing-plus-minus/subprocess [34856]) failed to
-match: 
-
-stdout was:
-
-# mkdir('/home/travis/build/cschoenebeck/qemu/build/qtest-9p-local-PwY2nQ')
-failed: File exists
-
-ERROR qtest-x86_64/test-x86-cpuid-compat - Bail out! ERROR:../tests/qtest/
-test-x86-cpuid-compat.c:208:test_plus_minus: stdout of child process (/x86/
-cpuid/parsing-plus-minus/subprocess [34856]) failed to match:
-
-make: *** [Makefile.mtest:1793: run-test-222] Error 1
-
-https://travis-ci.org/github/cschoenebeck/qemu/jobs/740199494
-
-> 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> Tested-by: Greg Kurz <groug@kaod.org>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> Message-Id:
-> <a37fbc713614f7615b11d0a3cb8d9adc3b8fba4b.1604061839.git.qemu_oss@crudebyte
-> .com> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  tests/qtest/libqos/virtio-9p.c | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
+>   block.c | 11 +++++++++--
+>   1 file changed, 9 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
-> index d43647b3b7..6b22fa0e9a 100644
-> --- a/tests/qtest/libqos/virtio-9p.c
-> +++ b/tests/qtest/libqos/virtio-9p.c
-> @@ -35,7 +35,12 @@ static char *concat_path(const char* a, const char* b)
->  static void init_local_test_path(void)
->  {
->      char *pwd = g_get_current_dir();
-> -    local_test_path = concat_path(pwd, "qtest-9p-local");
-> +    char *template = concat_path(pwd, "qtest-9p-local-XXXXXX");
-> +    local_test_path = mkdtemp(template);
-> +    if (!local_test_path) {
-> +        g_test_message("mkdtemp('%s') failed: %s", template,
-> strerror(errno)); +    }
-> +    g_assert(local_test_path);
->      g_free(pwd);
->  }
-> 
-> @@ -246,11 +251,6 @@ static void virtio_9p_register_nodes(void)
->      const char *str_simple = "fsdev=fsdev0,mount_tag=" MOUNT_TAG;
->      const char *str_addr = "fsdev=fsdev0,addr=04.0,mount_tag=" MOUNT_TAG;
-> 
-> -    /* make sure test dir for the 'local' tests exists and is clean */
-> -    init_local_test_path();
-> -    remove_local_test_dir();
-> -    create_local_test_dir();
-> -
->      QPCIAddress addr = {
->          .devfn = QPCI_DEVFN(4, 0),
->      };
-> @@ -278,3 +278,16 @@ static void virtio_9p_register_nodes(void)
->  }
-> 
->  libqos_init(virtio_9p_register_nodes);
+> diff --git a/block.c b/block.c
+> index bd9f4e534b..0f4da59a6c 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2105,9 +2105,10 @@ static void bdrv_abort_perm_update(BlockDriverState *bs)
+>       }
+>   }
+>   
+> -static void bdrv_set_perm(BlockDriverState *bs, uint64_t cumulative_perms,
+> -                          uint64_t cumulative_shared_perms)
+> +static void bdrv_set_perm(BlockDriverState *bs, uint64_t _cumulative_perms,
+> +                          uint64_t _cumulative_shared_perms)
+>   {
+> +    uint64_t cumulative_perms, cumulative_shared_perms;
+>       BlockDriver *drv = bs->drv;
+>       BdrvChild *c;
+>   
+> @@ -2115,6 +2116,10 @@ static void bdrv_set_perm(BlockDriverState *bs, uint64_t cumulative_perms,
+>           return;
+>       }
+>   
+> +    bdrv_get_cumulative_perm(bs, &cumulative_perms, &cumulative_shared_perms);
+> +    assert(_cumulative_perms == cumulative_perms);
+> +    assert(_cumulative_shared_perms == cumulative_shared_perms);
 > +
-> +static void __attribute__((constructor)) construct_virtio_9p(void)
-> +{
-> +    /* make sure test dir for the 'local' tests exists */
-> +    init_local_test_path();
-> +    create_local_test_dir();
-> +}
+>       /* Update this node */
+>       if (drv->bdrv_set_perm) {
+>           drv->bdrv_set_perm(bs, cumulative_perms, cumulative_shared_perms);
+> @@ -2301,6 +2306,8 @@ static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared)
+>   
+>       c->has_backup_perm = false;
+>   
+> +    assert(c->perm == perm);
+> +    assert(c->shared_perm == shared);
+>       c->perm = perm;
+>       c->shared_perm = shared;
+>   
+> 
 
-I'm not sure yet what happens there exactly. One problem that I can see is 
-that this constructor function is executed before main() is entered, it 
-generates a random test path as global variable, creates that test directory, 
-then main() is entered and qost-test.c might now call g_test_trap_subprocess() 
-(depending on the config) which would fork the process for the individual test 
-cases, probably ending up with a shared test dir path unintentionally. So this 
-constructor solution is probably wrong anyway.
+squash:
 
-But that does not explain what I'm seeing in above's CI error: that error 
-message suggests that create_local_test_dir() was called in parallel with the 
-same test path. A GCC constructor function being called again on fork() is not 
-an expected behaviour to me, but assuming it does on some system, the address 
-space should have deviated at this point and hence each subprocess should end 
-up with overwriting the global test path variable with their own test 
-directory path in this case.
-
-It's too late for touching libqos for this, so I hope we can find a temporary 
-workaround for this problem for 5.2 release. For instance by using a TLS 
-(__thread) variable instead of a regular global variable for the test path, 
-but I would still like to understand the precise (mis)behaviour observed 
-there.
-
-> +
-> +static void __attribute__((destructor)) destruct_virtio_9p(void)
-> +{
-> +    /* remove previously created test dir when test suite completed */
-> +    remove_local_test_dir();
-> +}
+@@ -2308,8 +2308,6 @@ static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared)
+  
+      assert(c->perm == perm);
+      assert(c->shared_perm == shared);
+-    c->perm = perm;
+-    c->shared_perm = shared;
+  
+      bdrv_get_cumulative_perm(c->bs, &cumulative_perms,
+                               &cumulative_shared_perms);
 
 
+
+-- 
+Best regards,
+Vladimir
 
