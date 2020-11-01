@@ -2,70 +2,74 @@ Return-Path: <SRS0=Dm/C=EH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A3EC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 19:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07705C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 19:33:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E272208E4
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 19:18:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="fIaoc7gU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E272208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	by mail.kernel.org (Postfix) with ESMTPS id 30D13208B6
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 19:33:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D13208B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZIsS-0007lU-KR
-	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 14:18:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42002)
+	id 1kZJ6W-000433-WD
+	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 14:33:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kZIrT-0007Cd-Ia
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 14:17:55 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:45591)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kZJ4j-0003H6-Nx
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 14:31:37 -0500
+Received: from 2.mo52.mail-out.ovh.net ([178.33.105.233]:35314)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kZIrR-0000vC-52
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 14:17:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=7SpEP3Nn5KYdAwaVncvg+43PvrnVQau3AK/m0QlgX5A=; b=fIaoc7gUYi6DWEWVrLjCXG6oZ9
- hbpd+Ma+0cyhUK2dJ7zZ1Ua0dkGf653Nrhpaq+w7WnE3rcyIbGVjCq7xzQFlI11Y7hoLizl7LDYIz
- rXbxSW9vMtkfqs/kJzRKO1v8DGMEChHeYVUDQIdNFRa07VNIf5QW0V0XprD9obQwCbmFyL41hN5dY
- a09kbILxZNCnP5RU5zM0/Xug1OOX++9Q0k5aHInFrNkgrsQtyHDo943RO76tbrPy5jGj0VlUPOjqm
- PjLn4Khrn/CysbwNH+iR1+enWZKvPNCO9EbiR0qI1Y/wyyxnyHCCtPfMXfx7t5E/HPsWA94zI11Y1
- y7wNyNzw==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v3 0/2] 9pfs: test suite fixes
-Date: Sun, 01 Nov 2020 20:17:50 +0100
-Message-ID: <2977702.F8LXnbqENp@silver>
-In-Reply-To: <061f1d9c-86d8-76b9-b868-59749542d9a2@ilande.co.uk>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kZJ4h-0002jg-EY
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 14:31:37 -0500
+Received: from mxplan5.mail.ovh.net (unknown [10.109.138.132])
+ by mo52.mail-out.ovh.net (Postfix) with ESMTPS id 742162006A5;
+ Sun,  1 Nov 2020 20:31:30 +0100 (CET)
+Received: from kaod.org (37.59.142.106) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Sun, 1 Nov 2020
+ 20:31:29 +0100
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-106R0064fb7f3c9-0e30-4752-8f54-e40249670e75,
+ 510A72FFAFC78B4C24D608C8B6637C1151DF677A) smtp.auth=groug@kaod.org
+Date: Sun, 1 Nov 2020 20:31:28 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v3 2/2] tests/9pfs: fix test dir for parallel tests
+Message-ID: <20201101203128.40a013ad@bahia.lan>
+In-Reply-To: <2531717.KjLcWJ8QnQ@silver>
 References: <cover.1604243521.git.qemu_oss@crudebyte.com>
- <061f1d9c-86d8-76b9-b868-59749542d9a2@ilande.co.uk>
+ <7746f42d8f557593898d3d9d8e57c46e872dfb4f.1604243521.git.qemu_oss@crudebyte.com>
+ <20201101184444.0da77d03@bahia.lan> <2531717.KjLcWJ8QnQ@silver>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/01 14:14:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.106]
+X-ClientProxiedBy: DAG3EX1.mxp5.local (172.16.2.21) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: c8142b01-62f8-4e66-a304-107674fc2b11
+X-Ovh-Tracer-Id: 941815274138605978
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrleelgdduvdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepueffteeuffekveffhfffueejkeeitdfgjedvtdelgfettdffgfffieeijefftdevnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=178.33.105.233; envelope-from=groug@kaod.org;
+ helo=2.mo52.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/01 14:31:31
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,100 +83,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sonntag, 1. November 2020 19:02:28 CET Mark Cave-Ayland wrote:
-> On 01/11/2020 15:12, Christian Schoenebeck wrote:
-> > Fixes test failures with the 9pfs 'local' tests as discussed with latest
-> > 9P PR. See the discussion of that PR v2 (Fri, Oct 30th) for details.
-> > 
-> > In conjunction with Peter Xu's two migration patches (fixing occasional
-> > lockups of migration tests) overall situation appears to be smooth now:
-> > https://lore.kernel.org/qemu-devel/20201030135350.GA588069@xz-x1/
-> > 
-> > v2->v3:
-> >    - Make the two functions for creating and removing the 9pfs test
-> >    directory
-> >    
-> >      public [NEW patch 1].
-> >    
-> >    - Place the constructor and destructor functions in virtio-9p-test.c,
-> >    not
-> >    
-> >      in virtio-9p.c, because the latter location would cause the
-> >      constructor
-> >      to be executed whenever libqos is loaded, which would break other,
-> >      completely unrelated tests suites that just link to libqos [patch 2].
-> >    
-> >    - Previous patch 2 (coverity fix) is already queued, no changes, hence
-> >    
-> >      omitted in this v3.
-> > 
-> > v1->v2:
-> >    - Added Greg's tested-by tag [patch 1].
-> >    
-> >    - Log an info-level message if mkdir() failed [patch 2].
-> >    
-> >    - Update commit log message about coverity being the reporter and
-> >    
-> >      details of the coverity report [patch 2].
-> > 
-> > Christian Schoenebeck (2):
-> >    tests/9pfs: make create/remove test dir public
-> >    tests/9pfs: fix test dir for parallel tests
-> >   
-> >   tests/qtest/libqos/virtio-9p.c | 20 ++++++++++----------
-> >   tests/qtest/libqos/virtio-9p.h | 10 ++++++++++
-> >   tests/qtest/virtio-9p-test.c   | 12 ++++++++++++
-> >   3 files changed, 32 insertions(+), 10 deletions(-)
-> 
-> FWIW one thing I've noticed recently is that my builds for
-> qemu-system-sparc64 have started giving this warning about a missing
-> "qtest-9p-local" directory during make check:
-> 
-> ...
-> ...
-> Running test QAPI schema regression tests
-> Running test qtest-sparc64/endianness-test
-> Running test qtest-sparc64/prom-env-test
-> Running test qtest-sparc64/boot-serial-test
-> Running test qtest-sparc64/cdrom-test
-> Running test qtest-sparc64/device-introspect-test
-> Running test qtest-sparc64/machine-none-test
-> Running test qtest-sparc64/qmp-test
-> Running test qtest-sparc64/qmp-cmd-test
-> Running test qtest-sparc64/qom-test
-> Running test qtest-sparc64/test-hmp
-> Running test qtest-sparc64/qos-test
-> rm: cannot remove '/home/build/src/qemu/git/qemu/build/qtest-9p-local': No
-> such file or directory
->    TEST    iotest-qcow2: 001
->    TEST    iotest-qcow2: 002
->    TEST    iotest-qcow2: 003
->    TEST    iotest-qcow2: 004
->    TEST    iotest-qcow2: 005
-> ...
-> ...
-> 
-> Would this get resolved by the changes to the test directory in this
-> patchset? The build is a simple configure run with
-> "--target-list=sparc64-softmmu".
-> 
-> 
-> ATB,
-> 
-> Mark.
+On Sun, 01 Nov 2020 20:14:16 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-Yes, that should be resolved with the next 9p PR as well, additionally with 
-the following patch that is:
-https://github.com/cschoenebeck/qemu/commit/603cc76a6069
+> On Sonntag, 1. November 2020 18:44:44 CET Greg Kurz wrote:
+> > On Sun, 1 Nov 2020 15:37:12 +0100
+> > 
+> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > > Use mkdtemp() to generate a unique directory for the 9p 'local' tests.
+> > > 
+> > > This fixes occasional 9p test failures when running 'make check -jN' if
+> > > QEMU was compiled for multiple target architectures, because the
+> > > individual
+> > > architecture's test suites would run in parallel and interfere with each
+> > > other's data as the test directory was previously hard coded and hence the
+> > > same directory was used by all of them simultaniously.
+> > > 
+> > > This also requires a change how the test directory is created and deleted:
+> > > As the test path is now randomized and virtio_9p_register_nodes() being
+> > > called in a somewhat undeterministic way, that's no longer an appropriate
+> > > place to create and remove the test directory. Use a constructor and
+> > > destructor function for creating and removing the test directory instead.
+> > > Unfortunately libqos currently does not support setup/teardown callbacks
+> > > to handle this more cleanly.
+> > > 
+> > > The constructor functions needs to be in virtio-9p-test.c, not in
+> > > virtio-9p.c, because in the latter location it would cause all apps that
+> > > link to libqos (i.e. entirely unrelated test suites) to create a 9pfs
+> > > test directory as well, which would even break other test suites.
+> > > 
+> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > > ---
+> > 
+> > Reviewed-by: Greg Kurz <groug@kaod.org>
+> 
+> Thanks for the overtime, on a Sunday!
+> 
+> Queued on 9p.next:
+> https://github.com/cschoenebeck/qemu/commits/9p.next
+> 
+> And this one with Peter Xu's patches on top, just for testing:
+> https://github.com/cschoenebeck/qemu/commits/9p.experimental.2
+> 
+> > I could run 'make check -j' with 4 archs (ppc64, x86_64, aarch64, s390x)
+> > on a POWER9 system with 128 cpus, for ~1 hour without seeing any failure.
+> > 
+> > Tested-by: Greg Kurz <groug@kaod.org>
+> 
+> OO Sounds like having advantages working for IBM. Respect. I start to get envy 
+> as these beasts are running towards PCIe 6, while we regular x86 users would 
+> already be glad having PCIe 4.
+> 
 
-Thanks for the feedback!
+I work for Red Hat now but yes, this allows easier access to bigger systems.
 
-Best regards,
-Christian Schoenebeck
+> I give it some more spinning hours this time, just to be sure, before sending 
+> the PR tomorrow morning. But I think it's all right now.
+> 
 
+Cool ! :)
+
+> Thanks!
+> 
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
 
 
