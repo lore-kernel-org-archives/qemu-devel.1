@@ -2,88 +2,88 @@ Return-Path: <SRS0=Dm/C=EH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23626C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76432C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:19:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DD2A22246
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:18:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E70FC207C3
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:19:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iF2WCkZf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD2A22246
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K0BRoGYO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70FC207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZKkQ-00055Y-N1
-	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 16:18:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60726)
+	id 1kZKlN-0006lg-1u
+	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 16:19:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kZKV3-00084M-OK
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:02:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45282)
+ id 1kZKVl-0000Sq-9c
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:03:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41229)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kZKV1-0005Ya-8T
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:02:53 -0500
+ id 1kZKVj-0005ca-00
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:03:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604264570;
+ s=mimecast20190719; t=1604264614;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RTxBmygDERd7u6ZWhe5+4M837aOgBWgoLyLRTNOBCUw=;
- b=iF2WCkZfEXcUKlb/L8j05NCE9W8Q0y+bKaO0GTmDxyod+HqUec+2rXR7Q2cN57KhgpQToT
- huGeHB+pI/lz70TE2WFnePweuzWTCM6kJdvpWvGx8Uh8gKt9lvRNrQ1pNbrQitCrFDKByg
- knCFNx6O3rPx9LDK7M+rqHdh/wIL6Rk=
+ bh=1pTJYrQcWoNUCvyzp4rJ9qbcRwtZ2fTZovZ/x+ugX04=;
+ b=K0BRoGYOehmZkMB9y9qW6NC2J+59NdNuc9T6RHhiTgBS8rabEKQDaNGDcU4Q9KvlHFIZGx
+ tzXop4xFvWqFQh0dkbjpkw76FP1j3JNstEGWQqWVJGNEQyHAX+Cf7MQMSfnb4SulMo6vo3
+ HUw+YKMLTpkMtuE8DMa9Vj6eeFosaCo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-IJwHxpNvNrKWZsL0D-jfTw-1; Sun, 01 Nov 2020 16:02:48 -0500
-X-MC-Unique: IJwHxpNvNrKWZsL0D-jfTw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-386-gBvNgj6CNCm9w7iiDWXxFQ-1; Sun, 01 Nov 2020 16:03:31 -0500
+X-MC-Unique: gBvNgj6CNCm9w7iiDWXxFQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 778281006C83;
- Sun,  1 Nov 2020 21:02:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC8ED57050;
+ Sun,  1 Nov 2020 21:03:30 +0000 (UTC)
 Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1A4085C1A3;
- Sun,  1 Nov 2020 21:02:47 +0000 (UTC)
-Subject: [PULL v3 26/32] s390x/pci: use a PCI Group structure
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B48DB55776;
+ Sun,  1 Nov 2020 21:03:27 +0000 (UTC)
+Subject: [PULL v3 31/32] hw/vfio: Use lock guard macros
 From: Alex Williamson <alex.williamson@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 01 Nov 2020 14:02:46 -0700
-Message-ID: <160426456672.24886.4745091679423774723.stgit@gimli.home>
+Date: Sun, 01 Nov 2020 14:03:27 -0700
+Message-ID: <160426460736.24886.752943316593613476.stgit@gimli.home>
 In-Reply-To: <160426371498.24886.12193840637250368669.stgit@gimli.home>
 References: <160426371498.24886.12193840637250368669.stgit@gimli.home>
 User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124;
+Received-SPF: pass client-ip=63.128.21.124;
  envelope-from=alex.williamson@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/01 15:46:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/01 15:59:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,173 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- Pierre Morel <pmorel@linux.ibm.com>
+Cc: Amey Narkhede <ameynarkhede03@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pierre Morel <pmorel@linux.ibm.com>
+From: Amey Narkhede <ameynarkhede03@gmail.com>
 
-We use a S390PCIGroup structure to hold the information related to a
-zPCI Function group.
+Use qemu LOCK_GUARD macros in hw/vfio.
+Saves manual unlock calls
 
-This allows us to be ready to support multiple groups and to retrieve
-the group information from the host.
-
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Amey Narkhede <ameynarkhede03@gmail.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c         |   42 +++++++++++++++++++++++++++++++++++++++
- hw/s390x/s390-pci-inst.c        |   23 +++++++++++++--------
- include/hw/s390x/s390-pci-bus.h |   10 +++++++++
- 3 files changed, 66 insertions(+), 9 deletions(-)
+ hw/vfio/platform.c |    7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 218717397ae1..4c7f06d5cf95 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -738,6 +738,46 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
-     object_unref(OBJECT(iommu));
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index 869ed2c39dcd..cc3f66f7e44c 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -166,7 +166,7 @@ static void vfio_intp_mmap_enable(void *opaque)
+     VFIOINTp *tmp;
+     VFIOPlatformDevice *vdev = (VFIOPlatformDevice *)opaque;
+ 
+-    qemu_mutex_lock(&vdev->intp_mutex);
++    QEMU_LOCK_GUARD(&vdev->intp_mutex);
+     QLIST_FOREACH(tmp, &vdev->intp_list, next) {
+         if (tmp->state == VFIO_IRQ_ACTIVE) {
+             trace_vfio_platform_intp_mmap_enable(tmp->pin);
+@@ -174,12 +174,10 @@ static void vfio_intp_mmap_enable(void *opaque)
+             timer_mod(vdev->mmap_timer,
+                       qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+                           vdev->mmap_timeout);
+-            qemu_mutex_unlock(&vdev->intp_mutex);
+             return;
+         }
+     }
+     vfio_mmap_set_enabled(vdev, true);
+-    qemu_mutex_unlock(&vdev->intp_mutex);
  }
  
-+static S390PCIGroup *s390_group_create(int id)
-+{
-+    S390PCIGroup *group;
-+    S390pciState *s = s390_get_phb();
-+
-+    group = g_new0(S390PCIGroup, 1);
-+    group->id = id;
-+    QTAILQ_INSERT_TAIL(&s->zpci_groups, group, link);
-+    return group;
-+}
-+
-+S390PCIGroup *s390_group_find(int id)
-+{
-+    S390PCIGroup *group;
-+    S390pciState *s = s390_get_phb();
-+
-+    QTAILQ_FOREACH(group, &s->zpci_groups, link) {
-+        if (group->id == id) {
-+            return group;
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void s390_pci_init_default_group(void)
-+{
-+    S390PCIGroup *group;
-+    ClpRspQueryPciGrp *resgrp;
-+
-+    group = s390_group_create(ZPCI_DEFAULT_FN_GRP);
-+    resgrp = &group->zpci_group;
-+    resgrp->fr = 1;
-+    stq_p(&resgrp->dasm, 0);
-+    stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
-+    stw_p(&resgrp->mui, DEFAULT_MUI);
-+    stw_p(&resgrp->i, 128);
-+    stw_p(&resgrp->maxstbl, 128);
-+    resgrp->version = 0;
-+}
-+
- static void s390_pcihost_realize(DeviceState *dev, Error **errp)
- {
-     PCIBus *b;
-@@ -766,7 +806,9 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
-     QTAILQ_INIT(&s->pending_sei);
-     QTAILQ_INIT(&s->zpci_devs);
-     QTAILQ_INIT(&s->zpci_dma_limit);
-+    QTAILQ_INIT(&s->zpci_groups);
+ /**
+@@ -289,7 +287,7 @@ static void vfio_platform_eoi(VFIODevice *vbasedev)
+     VFIOPlatformDevice *vdev =
+         container_of(vbasedev, VFIOPlatformDevice, vbasedev);
  
-+    s390_pci_init_default_group();
-     css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
-                              S390_ADAPTER_SUPPRESSIBLE, errp);
+-    qemu_mutex_lock(&vdev->intp_mutex);
++    QEMU_LOCK_GUARD(&vdev->intp_mutex);
+     QLIST_FOREACH(intp, &vdev->intp_list, next) {
+         if (intp->state == VFIO_IRQ_ACTIVE) {
+             trace_vfio_platform_eoi(intp->pin,
+@@ -314,7 +312,6 @@ static void vfio_platform_eoi(VFIODevice *vbasedev)
+         vfio_intp_inject_pending_lockheld(intp);
+         QSIMPLEQ_REMOVE_HEAD(&vdev->pending_intp_queue, pqnext);
+     }
+-    qemu_mutex_unlock(&vdev->intp_mutex);
  }
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 4eadd9e79416..c25b2a67efe0 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -298,21 +298,25 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintptr_t ra)
-         stq_p(&resquery->edma, ZPCI_EDMA_ADDR);
-         stl_p(&resquery->fid, pbdev->fid);
-         stw_p(&resquery->pchid, 0);
--        stw_p(&resquery->ug, 1);
-+        stw_p(&resquery->ug, ZPCI_DEFAULT_FN_GRP);
-         stl_p(&resquery->uid, pbdev->uid);
-         stw_p(&resquery->hdr.rsp, CLP_RC_OK);
-         break;
-     }
-     case CLP_QUERY_PCI_FNGRP: {
-         ClpRspQueryPciGrp *resgrp = (ClpRspQueryPciGrp *)resh;
--        resgrp->fr = 1;
--        stq_p(&resgrp->dasm, 0);
--        stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
--        stw_p(&resgrp->mui, DEFAULT_MUI);
--        stw_p(&resgrp->i, 128);
--        stw_p(&resgrp->maxstbl, 128);
--        resgrp->version = 0;
  
-+        ClpReqQueryPciGrp *reqgrp = (ClpReqQueryPciGrp *)reqh;
-+        S390PCIGroup *group;
-+
-+        group = s390_group_find(reqgrp->g);
-+        if (!group) {
-+            /* We do not allow access to unknown groups */
-+            /* The group must have been obtained with a vfio device */
-+            stw_p(&resgrp->hdr.rsp, CLP_RC_QUERYPCIFG_PFGID);
-+            goto out;
-+        }
-+        memcpy(resgrp, &group->zpci_group, sizeof(ClpRspQueryPciGrp));
-         stw_p(&resgrp->hdr.rsp, CLP_RC_OK);
-         break;
-     }
-@@ -787,7 +791,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
-     }
-     /* Length must be greater than 8, a multiple of 8 */
-     /* and not greater than maxstbl */
--    if ((len <= 8) || (len % 8) || (len > pbdev->maxstbl)) {
-+    if ((len <= 8) || (len % 8) ||
-+        (len > pbdev->pci_group->zpci_group.maxstbl)) {
-         goto specification_error;
-     }
-     /* Do not cross a 4K-byte boundary */
-diff --git a/include/hw/s390x/s390-pci-bus.h b/include/hw/s390x/s390-pci-bus.h
-index 5f339e57fb68..869c0f254b7f 100644
---- a/include/hw/s390x/s390-pci-bus.h
-+++ b/include/hw/s390x/s390-pci-bus.h
-@@ -316,6 +316,14 @@ typedef struct ZpciFmb {
- } ZpciFmb;
- QEMU_BUILD_BUG_MSG(offsetof(ZpciFmb, fmt0) != 48, "padding in ZpciFmb");
- 
-+#define ZPCI_DEFAULT_FN_GRP 0x20
-+typedef struct S390PCIGroup {
-+    ClpRspQueryPciGrp zpci_group;
-+    int id;
-+    QTAILQ_ENTRY(S390PCIGroup) link;
-+} S390PCIGroup;
-+S390PCIGroup *s390_group_find(int id);
-+
- struct S390PCIBusDevice {
-     DeviceState qdev;
-     PCIDevice *pdev;
-@@ -333,6 +341,7 @@ struct S390PCIBusDevice {
-     uint16_t noi;
-     uint16_t maxstbl;
-     uint8_t sum;
-+    S390PCIGroup *pci_group;
-     S390MsixInfo msix;
-     AdapterRoutes routes;
-     S390PCIIOMMU *iommu;
-@@ -358,6 +367,7 @@ struct S390pciState {
-     QTAILQ_HEAD(, SeiContainer) pending_sei;
-     QTAILQ_HEAD(, S390PCIBusDevice) zpci_devs;
-     QTAILQ_HEAD(, S390PCIDMACount) zpci_dma_limit;
-+    QTAILQ_HEAD(, S390PCIGroup) zpci_groups;
- };
- 
- S390pciState *s390_get_phb(void);
+ /**
 
 
