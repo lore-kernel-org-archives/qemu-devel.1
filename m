@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D23C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23626C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:18:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3014B207C3
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:18:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DD2A22246
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:18:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FtSbc0Z5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3014B207C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iF2WCkZf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD2A22246
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZKjr-0004LM-Av
-	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 16:18:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60688)
+	id 1kZKkQ-00055Y-N1
+	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 16:18:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kZKUh-0007lI-Vf
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:02:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29068)
+ id 1kZKV3-00084M-OK
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:02:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45282)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kZKUe-0005Xv-U6
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:02:31 -0500
+ id 1kZKV1-0005Ya-8T
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:02:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604264547;
+ s=mimecast20190719; t=1604264570;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GALTamawMQd+DiBSsIujZ4umsLO0+NjMAJKMCCMwB5w=;
- b=FtSbc0Z5+gcDu3+Re/KWqz8s1kMv2L6EWEKL+u/h0rssGyU+qOZk2smiRCW1ecIIuYesf7
- zhjqAf3gdRZ6Ow2YBbaZyn6JQ5KGW8EYeOIFNtWIEzbvaz428wwxRewOCuYjrfEe1//gg2
- kUo6tpn93Qku8uNkBB1mnDOiyk5IOmw=
+ bh=RTxBmygDERd7u6ZWhe5+4M837aOgBWgoLyLRTNOBCUw=;
+ b=iF2WCkZfEXcUKlb/L8j05NCE9W8Q0y+bKaO0GTmDxyod+HqUec+2rXR7Q2cN57KhgpQToT
+ huGeHB+pI/lz70TE2WFnePweuzWTCM6kJdvpWvGx8Uh8gKt9lvRNrQ1pNbrQitCrFDKByg
+ knCFNx6O3rPx9LDK7M+rqHdh/wIL6Rk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-aaOvrhTdNoy4AY0Et-UPHQ-1; Sun, 01 Nov 2020 16:02:25 -0500
-X-MC-Unique: aaOvrhTdNoy4AY0Et-UPHQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-55-IJwHxpNvNrKWZsL0D-jfTw-1; Sun, 01 Nov 2020 16:02:48 -0500
+X-MC-Unique: IJwHxpNvNrKWZsL0D-jfTw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F8211087D63;
- Sun,  1 Nov 2020 21:02:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 778281006C83;
+ Sun,  1 Nov 2020 21:02:47 +0000 (UTC)
 Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E54835DA60;
- Sun,  1 Nov 2020 21:02:21 +0000 (UTC)
-Subject: [PULL v3 23/32] s390x/pci: Add routine to get the vfio dma
- available count
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1A4085C1A3;
+ Sun,  1 Nov 2020 21:02:47 +0000 (UTC)
+Subject: [PULL v3 26/32] s390x/pci: use a PCI Group structure
 From: Alex Williamson <alex.williamson@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 01 Nov 2020 14:02:20 -0700
-Message-ID: <160426454077.24886.1574050205264167707.stgit@gimli.home>
+Date: Sun, 01 Nov 2020 14:02:46 -0700
+Message-ID: <160426456672.24886.4745091679423774723.stgit@gimli.home>
 In-Reply-To: <160426371498.24886.12193840637250368669.stgit@gimli.home>
 References: <160426371498.24886.12193840637250368669.stgit@gimli.home>
 User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -98,130 +97,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
+ Pierre Morel <pmorel@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Matthew Rosato <mjrosato@linux.ibm.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
 
-Create new files for separating out vfio-specific work for s390
-pci. Add the first such routine, which issues VFIO_IOMMU_GET_INFO
-ioctl to collect the current dma available count.
+We use a S390PCIGroup structure to hold the information related to a
+zPCI Function group.
 
+This allows us to be ready to support multiple groups and to retrieve
+the group information from the host.
+
+Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-[aw: Fix non-Linux build with CONFIG_LINUX]
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/s390x/meson.build             |    1 +
- hw/s390x/s390-pci-vfio.c         |   54 ++++++++++++++++++++++++++++++++++++++
- include/hw/s390x/s390-pci-vfio.h |   24 +++++++++++++++++
- 3 files changed, 79 insertions(+)
- create mode 100644 hw/s390x/s390-pci-vfio.c
- create mode 100644 include/hw/s390x/s390-pci-vfio.h
+ hw/s390x/s390-pci-bus.c         |   42 +++++++++++++++++++++++++++++++++++++++
+ hw/s390x/s390-pci-inst.c        |   23 +++++++++++++--------
+ include/hw/s390x/s390-pci-bus.h |   10 +++++++++
+ 3 files changed, 66 insertions(+), 9 deletions(-)
 
-diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
-index 948ceae7a7b3..f4663a835514 100644
---- a/hw/s390x/meson.build
-+++ b/hw/s390x/meson.build
-@@ -27,6 +27,7 @@ s390x_ss.add(when: 'CONFIG_KVM', if_true: files(
- ))
- s390x_ss.add(when: 'CONFIG_S390_CCW_VIRTIO', if_true: files('s390-virtio-ccw.c'))
- s390x_ss.add(when: 'CONFIG_TERMINAL3270', if_true: files('3270-ccw.c'))
-+s390x_ss.add(when: 'CONFIG_LINUX', if_true: files('s390-pci-vfio.c'))
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 218717397ae1..4c7f06d5cf95 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -738,6 +738,46 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
+     object_unref(OBJECT(iommu));
+ }
  
- virtio_ss = ss.source_set()
- virtio_ss.add(files('virtio-ccw.c'))
-diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
-new file mode 100644
-index 000000000000..cb3f4d98adf8
---- /dev/null
-+++ b/hw/s390x/s390-pci-vfio.c
-@@ -0,0 +1,54 @@
-+/*
-+ * s390 vfio-pci interfaces
-+ *
-+ * Copyright 2020 IBM Corp.
-+ * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include <sys/ioctl.h>
-+
-+#include "qemu/osdep.h"
-+#include "hw/s390x/s390-pci-vfio.h"
-+#include "hw/vfio/vfio-common.h"
-+
-+/*
-+ * Get the current DMA available count from vfio.  Returns true if vfio is
-+ * limiting DMA requests, false otherwise.  The current available count read
-+ * from vfio is returned in avail.
-+ */
-+bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
++static S390PCIGroup *s390_group_create(int id)
 +{
-+    g_autofree struct vfio_iommu_type1_info *info;
-+    uint32_t argsz;
++    S390PCIGroup *group;
++    S390pciState *s = s390_get_phb();
 +
-+    assert(avail);
-+
-+    argsz = sizeof(struct vfio_iommu_type1_info);
-+    info = g_malloc0(argsz);
-+
-+    /*
-+     * If the specified argsz is not large enough to contain all capabilities
-+     * it will be updated upon return from the ioctl.  Retry until we have
-+     * a big enough buffer to hold the entire capability chain.
-+     */
-+retry:
-+    info->argsz = argsz;
-+
-+    if (ioctl(fd, VFIO_IOMMU_GET_INFO, info)) {
-+        return false;
-+    }
-+
-+    if (info->argsz > argsz) {
-+        argsz = info->argsz;
-+        info = g_realloc(info, argsz);
-+        goto retry;
-+    }
-+
-+    /* If the capability exists, update with the current value */
-+    return vfio_get_info_dma_avail(info, avail);
++    group = g_new0(S390PCIGroup, 1);
++    group->id = id;
++    QTAILQ_INSERT_TAIL(&s->zpci_groups, group, link);
++    return group;
 +}
 +
-diff --git a/include/hw/s390x/s390-pci-vfio.h b/include/hw/s390x/s390-pci-vfio.h
-new file mode 100644
-index 000000000000..1727292e9b5d
---- /dev/null
-+++ b/include/hw/s390x/s390-pci-vfio.h
-@@ -0,0 +1,24 @@
-+/*
-+ * s390 vfio-pci interfaces
-+ *
-+ * Copyright 2020 IBM Corp.
-+ * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef HW_S390_PCI_VFIO_H
-+#define HW_S390_PCI_VFIO_H
-+
-+#ifdef CONFIG_LINUX
-+bool s390_pci_update_dma_avail(int fd, unsigned int *avail);
-+#else
-+static inline bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
++S390PCIGroup *s390_group_find(int id)
 +{
-+    return false;
-+}
-+#endif
++    S390PCIGroup *group;
++    S390pciState *s = s390_get_phb();
 +
-+#endif
++    QTAILQ_FOREACH(group, &s->zpci_groups, link) {
++        if (group->id == id) {
++            return group;
++        }
++    }
++    return NULL;
++}
++
++static void s390_pci_init_default_group(void)
++{
++    S390PCIGroup *group;
++    ClpRspQueryPciGrp *resgrp;
++
++    group = s390_group_create(ZPCI_DEFAULT_FN_GRP);
++    resgrp = &group->zpci_group;
++    resgrp->fr = 1;
++    stq_p(&resgrp->dasm, 0);
++    stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
++    stw_p(&resgrp->mui, DEFAULT_MUI);
++    stw_p(&resgrp->i, 128);
++    stw_p(&resgrp->maxstbl, 128);
++    resgrp->version = 0;
++}
++
+ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+ {
+     PCIBus *b;
+@@ -766,7 +806,9 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+     QTAILQ_INIT(&s->pending_sei);
+     QTAILQ_INIT(&s->zpci_devs);
+     QTAILQ_INIT(&s->zpci_dma_limit);
++    QTAILQ_INIT(&s->zpci_groups);
+ 
++    s390_pci_init_default_group();
+     css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
+                              S390_ADAPTER_SUPPRESSIBLE, errp);
+ }
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 4eadd9e79416..c25b2a67efe0 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -298,21 +298,25 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintptr_t ra)
+         stq_p(&resquery->edma, ZPCI_EDMA_ADDR);
+         stl_p(&resquery->fid, pbdev->fid);
+         stw_p(&resquery->pchid, 0);
+-        stw_p(&resquery->ug, 1);
++        stw_p(&resquery->ug, ZPCI_DEFAULT_FN_GRP);
+         stl_p(&resquery->uid, pbdev->uid);
+         stw_p(&resquery->hdr.rsp, CLP_RC_OK);
+         break;
+     }
+     case CLP_QUERY_PCI_FNGRP: {
+         ClpRspQueryPciGrp *resgrp = (ClpRspQueryPciGrp *)resh;
+-        resgrp->fr = 1;
+-        stq_p(&resgrp->dasm, 0);
+-        stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
+-        stw_p(&resgrp->mui, DEFAULT_MUI);
+-        stw_p(&resgrp->i, 128);
+-        stw_p(&resgrp->maxstbl, 128);
+-        resgrp->version = 0;
+ 
++        ClpReqQueryPciGrp *reqgrp = (ClpReqQueryPciGrp *)reqh;
++        S390PCIGroup *group;
++
++        group = s390_group_find(reqgrp->g);
++        if (!group) {
++            /* We do not allow access to unknown groups */
++            /* The group must have been obtained with a vfio device */
++            stw_p(&resgrp->hdr.rsp, CLP_RC_QUERYPCIFG_PFGID);
++            goto out;
++        }
++        memcpy(resgrp, &group->zpci_group, sizeof(ClpRspQueryPciGrp));
+         stw_p(&resgrp->hdr.rsp, CLP_RC_OK);
+         break;
+     }
+@@ -787,7 +791,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+     }
+     /* Length must be greater than 8, a multiple of 8 */
+     /* and not greater than maxstbl */
+-    if ((len <= 8) || (len % 8) || (len > pbdev->maxstbl)) {
++    if ((len <= 8) || (len % 8) ||
++        (len > pbdev->pci_group->zpci_group.maxstbl)) {
+         goto specification_error;
+     }
+     /* Do not cross a 4K-byte boundary */
+diff --git a/include/hw/s390x/s390-pci-bus.h b/include/hw/s390x/s390-pci-bus.h
+index 5f339e57fb68..869c0f254b7f 100644
+--- a/include/hw/s390x/s390-pci-bus.h
++++ b/include/hw/s390x/s390-pci-bus.h
+@@ -316,6 +316,14 @@ typedef struct ZpciFmb {
+ } ZpciFmb;
+ QEMU_BUILD_BUG_MSG(offsetof(ZpciFmb, fmt0) != 48, "padding in ZpciFmb");
+ 
++#define ZPCI_DEFAULT_FN_GRP 0x20
++typedef struct S390PCIGroup {
++    ClpRspQueryPciGrp zpci_group;
++    int id;
++    QTAILQ_ENTRY(S390PCIGroup) link;
++} S390PCIGroup;
++S390PCIGroup *s390_group_find(int id);
++
+ struct S390PCIBusDevice {
+     DeviceState qdev;
+     PCIDevice *pdev;
+@@ -333,6 +341,7 @@ struct S390PCIBusDevice {
+     uint16_t noi;
+     uint16_t maxstbl;
+     uint8_t sum;
++    S390PCIGroup *pci_group;
+     S390MsixInfo msix;
+     AdapterRoutes routes;
+     S390PCIIOMMU *iommu;
+@@ -358,6 +367,7 @@ struct S390pciState {
+     QTAILQ_HEAD(, SeiContainer) pending_sei;
+     QTAILQ_HEAD(, S390PCIBusDevice) zpci_devs;
+     QTAILQ_HEAD(, S390PCIDMACount) zpci_dma_limit;
++    QTAILQ_HEAD(, S390PCIGroup) zpci_groups;
+ };
+ 
+ S390pciState *s390_get_phb(void);
 
 
