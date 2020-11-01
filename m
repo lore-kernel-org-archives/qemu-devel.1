@@ -2,67 +2,67 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C020C388F9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0778BC00A89
 	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:59:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8E52222E8
+	by mail.kernel.org (Postfix) with ESMTPS id 5FD51222B9
 	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:59:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="MZaaiwJw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E52222E8
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="i+LNF9yp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FD51222B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZWcF-0004d4-K5
+	id 1kZWcF-0004c9-8M
 	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 04:59:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49336)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <382619eff506bd229c7ba0d5671c84b6f1a0a415@lizzy.crudebyte.com>)
- id 1kZWTu-0002O7-VI
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:50:31 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:57319)
+ (envelope-from <136b7af22774a6f0fb44c9c1b8c088b52e2e92ed@lizzy.crudebyte.com>)
+ id 1kZWTL-0001sw-NS
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:49:55 -0500
+Received: from lizzy.crudebyte.com ([91.194.90.13]:58301)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <382619eff506bd229c7ba0d5671c84b6f1a0a415@lizzy.crudebyte.com>)
- id 1kZWTt-0006q1-Ne
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:50:30 -0500
+ (envelope-from <136b7af22774a6f0fb44c9c1b8c088b52e2e92ed@lizzy.crudebyte.com>)
+ id 1kZWTJ-0006cm-V8
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:49:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=WMCfNs2uGPY8dPeNDE/WSVYNFrsHd3Yq7E9fSS3IzcA=; b=MZaai
- wJw/REuPIBQUKXSUCA/OuIv+4h/9gdbEUv/3yiiYu0V+591dP49uCpRTVUwZmzwT0DURSkSgGIfda
- nRUbfqGmkhWXHXQQMUpF/kBVywiIry8++z+Oo8WM/P07wBLwqzLxF/MKRczUT7/F51tJQ+ga8V1fi
- 8t1T6qNDj54JAYwvDUSL34nUFyuKNO/U8Je0fi/28X7VukBWhqcH1PIM6B6V8zVCB7iTp0gWBYRT8
- kcjNIxhzkCoQNH1slsAiDsQJN0N2VGNpAKk2RbO/B8eQsPENr67EM+cqONKAsEbdcRE8hFNihCy3U
- mOWyonrnPMR4EcLzM/k51iQbHdAtw==;
-Message-Id: <382619eff506bd229c7ba0d5671c84b6f1a0a415.1604309512.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=tO675tDFEeFMR7lltQjZleg7qUOrV75TbEgjX8683Fk=; b=i+LNF
+ 9yp3r/ZqfvduzDsaF4v1EjTAvW/n1nwIugLSmdxtjSH7UyKz+4VaePRv0Rg/BQu/n4eOxyK16lw9C
+ WwqPf+NKFgGfjxeoLikIXn5olCPzIc4SkE0vDp0UCIvS354BTTfTwa8ODoZ+L4ZvxCuCvQtM93bLj
+ CB6JZLmTeVS0ZoHmBrlLsCJAHVVnfvWnA+45Ef/rZ3MrTKKuNu7ycn1RxDOwPAkwfm9o7h5z2P3xp
+ 0k4BbjGdTEHZOI9DOSfUfSd+rH/lBKNitsIJsXQZPeMHreaqKDOYD7sBMQx+orPjsUsESGwj28eU+
+ 5DV427lH3GXKlChJwv/FKzSdoX8fg==;
+Message-Id: <136b7af22774a6f0fb44c9c1b8c088b52e2e92ed.1604309512.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1604309512.git.qemu_oss@crudebyte.com>
 References: <cover.1604309512.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Tue, 20 Oct 2020 18:09:27 +0200
-Subject: [PULL v3 06/17] tests/9pfs: Set alloc in fs_create_dir()
+Date: Sun, 1 Nov 2020 15:37:12 +0100
+Subject: [PULL v3 02/17] tests/9pfs: fix test dir for parallel tests
 To: qemu-devel@nongnu.org,
     Peter Maydell <peter.maydell@linaro.org>
 Cc: Greg Kurz <groug@kaod.org>
 Received-SPF: none client-ip=91.194.90.13;
- envelope-from=382619eff506bd229c7ba0d5671c84b6f1a0a415@lizzy.crudebyte.com;
+ envelope-from=136b7af22774a6f0fb44c9c1b8c088b52e2e92ed@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 04:48:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: 13
-X-Spam_score: 1.3
-X-Spam_bar: +
-X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_96_XX=3.405,
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_12_24=1.049,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
@@ -81,29 +81,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+Use mkdtemp() to generate a unique directory for the 9p 'local' tests.
 
-fs_create_dir() is a top level test function. It should set alloc.
+This fixes occasional 9p test failures when running 'make check -jN' if
+QEMU was compiled for multiple target architectures, because the individual
+architecture's test suites would run in parallel and interfere with each
+other's data as the test directory was previously hard coded and hence the
+same directory was used by all of them simultaniously.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <160321016764.266767.3763279057643874020.stgit@bahia.lan>
+This also requires a change how the test directory is created and deleted:
+As the test path is now randomized and virtio_9p_register_nodes() being
+called in a somewhat undeterministic way, that's no longer an appropriate
+place to create and remove the test directory. Use a constructor and
+destructor function for creating and removing the test directory instead.
+Unfortunately libqos currently does not support setup/teardown callbacks
+to handle this more cleanly.
+
+The constructor functions needs to be in virtio-9p-test.c, not in
+virtio-9p.c, because in the latter location it would cause all apps that
+link to libqos (i.e. entirely unrelated test suites) to create a 9pfs
+test directory as well, which would even break other test suites.
+
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Tested-by: Greg Kurz <groug@kaod.org>
+Message-Id: <7746f42d8f557593898d3d9d8e57c46e872dfb4f.1604243521.git.qemu_oss@crudebyte.com>
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- tests/qtest/virtio-9p-test.c | 1 +
- 1 file changed, 1 insertion(+)
+ tests/qtest/libqos/virtio-9p.c | 14 ++++++++------
+ tests/qtest/virtio-9p-test.c   | 12 ++++++++++++
+ 2 files changed, 20 insertions(+), 6 deletions(-)
 
+diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
+index 2736e9ae2a..586e700b24 100644
+--- a/tests/qtest/libqos/virtio-9p.c
++++ b/tests/qtest/libqos/virtio-9p.c
+@@ -35,7 +35,12 @@ static char *concat_path(const char* a, const char* b)
+ static void init_local_test_path(void)
+ {
+     char *pwd = g_get_current_dir();
+-    local_test_path = concat_path(pwd, "qtest-9p-local");
++    char *template = concat_path(pwd, "qtest-9p-local-XXXXXX");
++    local_test_path = mkdtemp(template);
++    if (!local_test_path) {
++        g_test_message("mkdtemp('%s') failed: %s", template, strerror(errno));
++    }
++    g_assert(local_test_path);
+     g_free(pwd);
+ }
+ 
+@@ -43,6 +48,8 @@ void virtio_9p_create_local_test_dir(void)
+ {
+     struct stat st;
+ 
++    init_local_test_path();
++
+     g_assert(local_test_path != NULL);
+     mkdir(local_test_path, 0777);
+ 
+@@ -244,11 +251,6 @@ static void virtio_9p_register_nodes(void)
+     const char *str_simple = "fsdev=fsdev0,mount_tag=" MOUNT_TAG;
+     const char *str_addr = "fsdev=fsdev0,addr=04.0,mount_tag=" MOUNT_TAG;
+ 
+-    /* make sure test dir for the 'local' tests exists and is clean */
+-    init_local_test_path();
+-    virtio_9p_remove_local_test_dir();
+-    virtio_9p_create_local_test_dir();
+-
+     QPCIAddress addr = {
+         .devfn = QPCI_DEVFN(4, 0),
+     };
 diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index 92d12f5e02..ab59431d79 100644
+index c15908f27b..6401d4f564 100644
 --- a/tests/qtest/virtio-9p-test.c
 +++ b/tests/qtest/virtio-9p-test.c
-@@ -1019,6 +1019,7 @@ static void fs_readdir_split_512(void *obj, void *data,
- static void fs_create_dir(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-     QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-     struct stat st;
-     char *root_path = virtio_9p_test_path("");
-     char *new_dir = virtio_9p_test_path("01");
+@@ -1076,3 +1076,15 @@ static void register_virtio_9p_test(void)
+ }
+ 
+ libqos_init(register_virtio_9p_test);
++
++static void __attribute__((constructor)) construct_9p_test(void)
++{
++    /* make sure test dir for the 'local' tests exists */
++    virtio_9p_create_local_test_dir();
++}
++
++static void __attribute__((destructor)) destruct_9p_test(void)
++{
++    /* remove previously created test dir when test suite completed */
++    virtio_9p_remove_local_test_dir();
++}
 -- 
 2.20.1
 
