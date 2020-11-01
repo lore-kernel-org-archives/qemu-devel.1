@@ -2,94 +2,78 @@ Return-Path: <SRS0=Dm/C=EH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0497DC4741F
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 20:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B74F9C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 20:51:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F1BA2225C
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 20:47:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bt2wF3nY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F1BA2225C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3450721527
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 20:51:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3450721527
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZKG5-0006tI-74
-	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 15:47:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58254)
+	id 1kZKJk-0008Id-AE
+	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 15:51:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kZKFS-0006Cs-Cd
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 15:46:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52550)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kZKFP-0003lD-IE
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 15:46:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604263601;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=y6MpFSdZ/5BgRhQWo5A57kOGYS5mIdpmUQ24WCbvYM0=;
- b=Bt2wF3nYzqjHwWQCdrWKOaZFB3L/HpQI0gubU5/N76T1lb4vsD8LmZ5FVt1lkaQui6Zbx4
- PKqovMNZ1LJj3SErYRXyieKCBTqfKK6Vi82fIG+Pdvn0m1AH5zMxPx1BAp1F2G+/KPUwSB
- JNvcMM6H6ZM8zTOPPbv3E2YcLZfPlIY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-EVu_h9OoPemHbZys8ZFnjw-1; Sun, 01 Nov 2020 15:46:39 -0500
-X-MC-Unique: EVu_h9OoPemHbZys8ZFnjw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53E3D425F2;
- Sun,  1 Nov 2020 20:46:37 +0000 (UTC)
-Received: from x1.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3CFFD5C1A3;
- Sun,  1 Nov 2020 20:46:32 +0000 (UTC)
-Date: Sun, 1 Nov 2020 13:46:00 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL v2 00/32] VFIO updates 2020-10-28 (for QEMU 5.2 soft-freeze)
-Message-ID: <20201101134600.4784ebfc@x1.home>
-In-Reply-To: <CAFEAcA-z32b81E6u0gsnFnW-QqvM4dheF6ornTAp1g7YadGeYQ@mail.gmail.com>
-References: <160390309510.12234.8858324597971641979.stgit@gimli.home>
- <CAFEAcA-z32b81E6u0gsnFnW-QqvM4dheF6ornTAp1g7YadGeYQ@mail.gmail.com>
-Organization: Red Hat
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kZKJB-0007o5-9p
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 15:50:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56270)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kZKJ9-0004Bs-6f
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 15:50:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kZKJ6-0005AD-W3
+ for <qemu-devel@nongnu.org>; Sun, 01 Nov 2020 20:50:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EDF642E811E
+ for <qemu-devel@nongnu.org>; Sun,  1 Nov 2020 20:50:32 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=alex.williamson@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/01 15:46:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 01 Nov 2020 20:43:07 -0000
+From: Luis <1902451@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: qubasa
+X-Launchpad-Bug-Reporter: Luis (qubasa)
+X-Launchpad-Bug-Modifier: Luis (qubasa)
+Message-Id: <160426338728.14730.2439588061093712843.malonedeb@wampee.canonical.com>
+Subject: [Bug 1902451] [NEW] incorrect cpuid feature detection
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="96ff31b88b65a0d0ea73b89333fe7c4a2669d8fb"; Instance="production"
+X-Launchpad-Hash: d5394b35f58bd78eeff3fd887be8edefeaf6c7af
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/01 15:50:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -66
+X-Spam_score: -6.7
+X-Spam_bar: ------
+X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,99 +82,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Artem Polyakov <artemp@nvidia.com>, Zhengui li <lizhengui@huawei.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Eric Auger <eric.auger@redhat.com>,
- Kirti Wankhede <kwankhede@nvidia.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Neo Jia <cjia@nvidia.com>, Amey Narkhede <ameynarkhede03@gmail.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>
+Reply-To: Bug 1902451 <1902451@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 31 Oct 2020 14:54:54 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+Public bug reported:
 
-> On Wed, 28 Oct 2020 at 16:42, Alex Williamson
-> <alex.williamson@redhat.com> wrote:
-> >
-> > The following changes since commit 33dc9914eac581dea9bdea35dcda4d542531d66a:
-> >
-> >   Revert series: virtiofsd: Announce submounts to the guest (2020-10-28 13:17:32 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/awilliam/qemu-vfio.git tags/vfio-update-20201028.0
-> >
-> > for you to fetch changes up to 83d64f2efe383f1f70e180cf1579d3bbe2fbcdf5:
-> >
-> >   vfio: fix incorrect print type (2020-10-28 10:30:37 -0600)
-> >
-> > ----------------------------------------------------------------
-> > VFIO update 2020-10-28
-> >
-> >  * Migration support (Kirti Wankhede)
-> >  * s390 DMA limiting (Matthew Rosato)
-> >  * zPCI hardware info (Matthew Rosato)
-> >  * Lock guard (Amey Narkhede)
-> >  * Print fixes (Zhengui li)
-> >  * Warning/build fixes
-> >  
-> 
-> Hi; this fails to build on OSX and the BSDs:
-> 
-> ../../hw/s390x/s390-pci-vfio.c:13:10: fatal error: 'linux/vfio.h' file not found
-> #include <linux/vfio.h>
->          ^~~~~~~~~~~~~~
-> 
-> fails differently but on the same file on windows builds:
-> 
-> ../../hw/s390x/s390-pci-vfio.c:12:23: fatal error: sys/ioctl.h: No
-> such file or directory
+Hello,
 
-I think this can be solved by making s390-pci-vfio.c only compiled
-under CONFIG_LINUX and stubbing the functions with static inlines in
-the header.  It seems to resolve the windows warning in a mingw build.
+I am currently developing a x64 kernel and I wanted to check through
+cpuid if some features are available in the guest. When I try to enable
+cpu features like vmcb_clean or constant_tsc qemu is saying that my host
+doesn't support the requested features. However cat /proc/cpuinfo tells
+a different story:
 
-> and has this error on 32-bit hosts:
-> 
-> ../../hw/vfio/common.c: In function 'vfio_dma_unmap_bitmap':
-> ../../hw/vfio/common.c:414:48: error: passing argument 1 of
-> 'cpu_physical_memory_set_dirty_lebitmap' from incompatible pointer
-> type [-Werror=incompatible-pointer-types]
->          cpu_physical_memory_set_dirty_lebitmap((uint64_t *)bitmap->data,
->                                                 ^
-> In file included from ../../hw/vfio/common.c:32:0:
-> /home/peter.maydell/qemu/include/exec/ram_addr.h:337:20: note:
-> expected 'long unsigned int *' but argument is of type 'uint64_t *
-> {aka long long unsigned int *}'
->  static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned
-> long *bitmap,
->                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> ../../hw/vfio/common.c: In function 'vfio_get_dirty_bitmap':
-> ../../hw/vfio/common.c:1008:44: error: passing argument 1 of
-> 'cpu_physical_memory_set_dirty_lebitmap' from incompatible pointer
-> type [-Werror=incompatible-pointer-types]
->      cpu_physical_memory_set_dirty_lebitmap((uint64_t *)range->bitmap.data,
->                                             ^
-> In file included from ../../hw/vfio/common.c:32:0:
-> /home/peter.maydell/qemu/include/exec/ram_addr.h:337:20: note:
-> expected 'long unsigned int *' but argument is of type 'uint64_t *
-> {aka long long unsigned int *}'
->  static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned
-> long *bitmap,
->                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+model name:  AMD Ryzen 5 3500U
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
+pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtsc=
+p lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pn=
+i pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx=
+ f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignss=
+e 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext p=
+erfctr_llc mwaitx cpb hw_pstate sme pti ssbd sev ibpb vmmcall fsgsbase bmi1=
+ avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 x=
+saves clzero irperf xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale v=
+mcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_v=
+mload vgif overflow_recov succor smca
 
-Seems that our bitmap in just being incorrectly cast as a uint64_t*
-rather than an unsigned long*.
+I also checked it myself by running cpuid and check the bits as in the
+AMD Manual. Everything checks out but qemu still fails.
 
-Both fixes being rolled into the next pull request, which I've build 32
-and 64 bit and with mingw.  Thanks,
+QEMU version: QEMU emulator version 4.2.0
 
-Alex
+$ qemu-system-x86_64 -cpu host,+vmcb_clean,enforce -enable-kvm -drive forma=
+t=3Draw,file=3Dtarget/x86_64-os/debug/bootimage-my_kernel.bin -serial stdio=
+ -display none
+qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.=
+8000000AH:EDX.vmcb-clean [bit 5]
+qemu-system-x86_64: Host doesn't support requested features
 
+or
+
+$ qemu-system-x86_64 -cpu host,+constant_tsc,enforce -enable-kvm -drive for=
+mat=3Draw,file=3Dtarget/x86_64-os/debug/bootimage-my_kernel.bin -serial std=
+io -display none
+qemu-system-x86_64: Property '.constant_tsc' not found
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1902451
+
+Title:
+  incorrect cpuid feature detection
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  I am currently developing a x64 kernel and I wanted to check through
+  cpuid if some features are available in the guest. When I try to
+  enable cpu features like vmcb_clean or constant_tsc qemu is saying
+  that my host doesn't support the requested features. However cat
+  /proc/cpuinfo tells a different story:
+
+  model name:  AMD Ryzen 5 3500U
+  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
+t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
+scp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf =
+pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave a=
+vx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalign=
+sse 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext=
+ perfctr_llc mwaitx cpb hw_pstate sme pti ssbd sev ibpb vmmcall fsgsbase bm=
+i1 avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1=
+ xsaves clzero irperf xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale=
+ vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave=
+_vmload vgif overflow_recov succor smca
+
+  I also checked it myself by running cpuid and check the bits as in the
+  AMD Manual. Everything checks out but qemu still fails.
+
+  QEMU version: QEMU emulator version 4.2.0
+
+  $ qemu-system-x86_64 -cpu host,+vmcb_clean,enforce -enable-kvm -drive for=
+mat=3Draw,file=3Dtarget/x86_64-os/debug/bootimage-my_kernel.bin -serial std=
+io -display none
+  qemu-system-x86_64: warning: host doesn't support requested feature: CPUI=
+D.8000000AH:EDX.vmcb-clean [bit 5]
+  qemu-system-x86_64: Host doesn't support requested features
+
+  or
+
+  $ qemu-system-x86_64 -cpu host,+constant_tsc,enforce -enable-kvm -drive f=
+ormat=3Draw,file=3Dtarget/x86_64-os/debug/bootimage-my_kernel.bin -serial s=
+tdio -display none
+  qemu-system-x86_64: Property '.constant_tsc' not found
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1902451/+subscriptions
 
