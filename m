@@ -2,69 +2,86 @@ Return-Path: <SRS0=Dm/C=EH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 282CEC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 18:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24027C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 19:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35E5221534
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 18:03:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35E5221534
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 678BF208E4
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 19:06:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xbHyfH5W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 678BF208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZHhM-0007Nc-9O
-	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 13:03:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56560)
+	id 1kZIgR-0003lc-DN
+	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 14:06:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kZHgc-0006sF-2j
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 13:02:38 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:57706
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kZHgY-0008S6-I1
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 13:02:37 -0500
-Received: from host81-158-111-11.range81-158.btcentralplus.com
- ([81.158.111.11] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kZHgf-0000Y2-3s; Sun, 01 Nov 2020 18:02:41 +0000
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
-References: <cover.1604243521.git.qemu_oss@crudebyte.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <061f1d9c-86d8-76b9-b868-59749542d9a2@ilande.co.uk>
-Date: Sun, 1 Nov 2020 18:02:28 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kZIfb-0003Eg-Fs
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 14:05:39 -0500
+Received: from mail-ej1-x62e.google.com ([2a00:1450:4864:20::62e]:32769)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kZIfY-0007wi-Vh
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 14:05:39 -0500
+Received: by mail-ej1-x62e.google.com with SMTP id 7so15692119ejm.0
+ for <qemu-devel@nongnu.org>; Sun, 01 Nov 2020 11:05:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2pyT2Y5H9CSJSZhAQQWv2AmWpVdl61TMS1tj9FpI76U=;
+ b=xbHyfH5W2ufGmBnbhh9hoMBlzF1MFGBqm6Sib/WMJ/MRtXP7zqs4/bU3P/Sq14pOpd
+ 2ojSDmOeMtOgGQUVJVvvAp6nTTqbKu0rDv2xKOiyv5d/aM00wqKFJIaz6O2aawY+yv61
+ HK0w0FaToBVFBJKeHR2IqxuB+fn9o4D41AOhRaZaQaoEm+U0o765+xihbfRYw8fzDRKG
+ Vx8DVRgnDXObem1SzqaaD+k55gpjrkArfm/oZFokIoIsTvdBBXFePP8OinEmEOSuNbIj
+ FX5yEepu3ApAIFS/c2rHvoZOQYfD33+74VgRWMf/Q933xQSlbyGecqMW3AIU+OmPFZ2h
+ VkSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2pyT2Y5H9CSJSZhAQQWv2AmWpVdl61TMS1tj9FpI76U=;
+ b=rjw/lZhMLcXG1r4rHxEpotjkCrOUcfOlX3EaBjeXal8VBQvBywxAYTu165MUWISQqL
+ iVI7RSar0+OLcbYaUygRqopvibMgQ+srYpHpinVUw7YAB6zojPurXEV74H5eZ/uFXy1Z
+ XbsVfPCa/Mpkatz5Vo8xzXYBrBMrab6tks08jNj7IXvd2HfNgMHTuhhV0jBTcChKv1XG
+ 5zqP2K59om76woLXAt+QwWlnWLQbl7+A7nT7TohA9TPKQw2i0lHIJFj90yJOwQ4D5wFR
+ gjM04Noum/jyzV3EwdmQN4wXNxy295CWZAlKird8+zeeEn64KlyN+Vw8DyS46A1Dos4j
+ hb7Q==
+X-Gm-Message-State: AOAM532GmkQY2gnOAnXFMtO2CijJigdf85QV79z5A1bvMDTl2EBbGGaD
+ LA3R8IjkTEWK8Qz4go8E29XeX4q+OljEMdy21PKYjQ==
+X-Google-Smtp-Source: ABdhPJz4U4p+hdpJX+T0wR1X4CfM7H4EmMP0/3+Ce0akydramK7L1/85HwLqAwxOHTFka7MEHriqJFxqPWteYJwYvyQ=
+X-Received: by 2002:a17:907:9e3:: with SMTP id
+ ce3mr12320308ejc.4.1604257534748; 
+ Sun, 01 Nov 2020 11:05:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <cover.1604243521.git.qemu_oss@crudebyte.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 81.158.111.11
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v3 0/2] 9pfs: test suite fixes
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+References: <20201030141136.1013521-1-mst@redhat.com>
+In-Reply-To: <20201030141136.1013521-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 1 Nov 2020 19:05:23 +0000
+Message-ID: <CAFEAcA93GGtoh5yie7x1BuTazpHe6iosJN7Osqwi5ni0mGDd+A@mail.gmail.com>
+Subject: Re: [PULL 00/15] pc,pci,vhost,virtio: misc fixes
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62e;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,83 +94,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/11/2020 15:12, Christian Schoenebeck wrote:
-
-> Fixes test failures with the 9pfs 'local' tests as discussed with latest
-> 9P PR. See the discussion of that PR v2 (Fri, Oct 30th) for details.
-> 
-> In conjunction with Peter Xu's two migration patches (fixing occasional
-> lockups of migration tests) overall situation appears to be smooth now:
-> https://lore.kernel.org/qemu-devel/20201030135350.GA588069@xz-x1/
-> 
-> v2->v3:
-> 
->    - Make the two functions for creating and removing the 9pfs test directory
->      public [NEW patch 1].
-> 
->    - Place the constructor and destructor functions in virtio-9p-test.c, not
->      in virtio-9p.c, because the latter location would cause the constructor
->      to be executed whenever libqos is loaded, which would break other,
->      completely unrelated tests suites that just link to libqos [patch 2].
-> 
->    - Previous patch 2 (coverity fix) is already queued, no changes, hence
->      omitted in this v3.
-> 
-> v1->v2:
-> 
->    - Added Greg's tested-by tag [patch 1].
-> 
->    - Log an info-level message if mkdir() failed [patch 2].
-> 
->    - Update commit log message about coverity being the reporter and
->      details of the coverity report [patch 2].
-> 
-> Christian Schoenebeck (2):
->    tests/9pfs: make create/remove test dir public
->    tests/9pfs: fix test dir for parallel tests
-> 
->   tests/qtest/libqos/virtio-9p.c | 20 ++++++++++----------
->   tests/qtest/libqos/virtio-9p.h | 10 ++++++++++
->   tests/qtest/virtio-9p-test.c   | 12 ++++++++++++
->   3 files changed, 32 insertions(+), 10 deletions(-)
-
-FWIW one thing I've noticed recently is that my builds for qemu-system-sparc64 have 
-started giving this warning about a missing "qtest-9p-local" directory during make check:
-
-...
-...
-Running test QAPI schema regression tests
-Running test qtest-sparc64/endianness-test
-Running test qtest-sparc64/prom-env-test
-Running test qtest-sparc64/boot-serial-test
-Running test qtest-sparc64/cdrom-test
-Running test qtest-sparc64/device-introspect-test
-Running test qtest-sparc64/machine-none-test
-Running test qtest-sparc64/qmp-test
-Running test qtest-sparc64/qmp-cmd-test
-Running test qtest-sparc64/qom-test
-Running test qtest-sparc64/test-hmp
-Running test qtest-sparc64/qos-test
-rm: cannot remove '/home/build/src/qemu/git/qemu/build/qtest-9p-local': No such file 
-or directory
-   TEST    iotest-qcow2: 001
-   TEST    iotest-qcow2: 002
-   TEST    iotest-qcow2: 003
-   TEST    iotest-qcow2: 004
-   TEST    iotest-qcow2: 005
-...
-...
-
-Would this get resolved by the changes to the test directory in this patchset? The 
-build is a simple configure run with "--target-list=sparc64-softmmu".
+On Fri, 30 Oct 2020 at 14:11, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> The following changes since commit 802427bcdae1ad2eceea8a8877ecad835e3f8fde:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20201027-1' into staging (2020-10-29 11:40:04 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 73beb01ec54969f76ab32d1e0605a759b6c95ab0:
+>
+>   intel_iommu: Fix two misuse of "0x%u" prints (2020-10-30 06:48:53 -0400)
+>
+> ----------------------------------------------------------------
+> pc,pci,vhost,virtio: misc fixes
+>
+> Just a bunch of bugfixes all over the place.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
 
 
-ATB,
+Applied, thanks.
 
-Mark.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
