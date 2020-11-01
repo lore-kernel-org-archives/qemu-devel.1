@@ -2,72 +2,71 @@ Return-Path: <SRS0=Dm/C=EH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA7AC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E9DBC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:12:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16DAD205CB
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:12:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7ECDD205CB
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Nov 2020 21:12:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LCyEABNq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16DAD205CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XzcP0Rop"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ECDD205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZKe0-0004Zk-6G
-	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 16:12:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60464)
+	id 1kZKeG-0004zW-Im
+	for qemu-devel@archiver.kernel.org; Sun, 01 Nov 2020 16:12:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kZKTh-0006HJ-FM
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:01:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57063)
+ id 1kZKVD-00087d-2t
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:03:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40542)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kZKTf-0005Tn-BI
- for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:01:29 -0500
+ id 1kZKVA-0005aA-Pc
+ for qemu-devel@nongnu.org; Sun, 01 Nov 2020 16:03:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604264486;
+ s=mimecast20190719; t=1604264579;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/Hu7XHUgUFuXjFxp7/nhYOgLYoiXZ5bnq8q2Cm/SPeA=;
- b=LCyEABNqTGH0+tlRD9G1HRS8TjcvcrZL+JKHuYOOWShxAp5IZhHfU6j4Y9cTf4WjBj8Jkr
- cD+FRtsn7qyceih4jMoIXPTWWoLGKbGWBFU7kGGKmdcUNYhyG5UHYsrJyi/w2sTQT6rOKL
- lnHzvHHDvJC7wfrSH/dCkkaTRLPydS8=
+ bh=6hLE+ft5dxG9Mkv1Oy8pLGor0YljIw2ZtPZFwzWF+RU=;
+ b=XzcP0Ropqr9cTxPRFn6HK6bEfNqDMRDevgMsI6gIKzHx+mtTFWr62hFxuP99ES/NQJtqez
+ U1mJqy20ssvtEIDlhzbctXOUYHw5gt0QHKh+dDHg5lAc/LrLc12dqggT45SwMNdt5ef0iV
+ FYwaRu1ZF7FsPfW9S3pW1+pZQkcn4aE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-2tSEx7D0OWOBLEW7pIcBBQ-1; Sun, 01 Nov 2020 16:01:24 -0500
-X-MC-Unique: 2tSEx7D0OWOBLEW7pIcBBQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-353-8n0e00-MNz-V_NRXXx8hnA-1; Sun, 01 Nov 2020 16:02:57 -0500
+X-MC-Unique: 8n0e00-MNz-V_NRXXx8hnA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71C7E1006C83;
- Sun,  1 Nov 2020 21:01:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7406E801FDE;
+ Sun,  1 Nov 2020 21:02:56 +0000 (UTC)
 Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 21D105578C;
- Sun,  1 Nov 2020 21:01:20 +0000 (UTC)
-Subject: [PULL v3 15/32] vfio: Add ioctl to get dirty pages bitmap during
- dma unmap
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0433E1A8AC;
+ Sun,  1 Nov 2020 21:02:52 +0000 (UTC)
+Subject: [PULL v3 27/32] s390x/pci: clean up s390 PCI groups
 From: Alex Williamson <alex.williamson@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 01 Nov 2020 14:01:20 -0700
-Message-ID: <160426447993.24886.10237011487367170903.stgit@gimli.home>
+Date: Sun, 01 Nov 2020 14:02:52 -0700
+Message-ID: <160426457255.24886.10524865426922792046.stgit@gimli.home>
 In-Reply-To: <160426371498.24886.12193840637250368669.stgit@gimli.home>
 References: <160426371498.24886.12193840637250368669.stgit@gimli.home>
 User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -98,166 +97,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, Neo Jia <cjia@nvidia.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kirti Wankhede <kwankhede@nvidia.com>
+From: Matthew Rosato <mjrosato@linux.ibm.com>
 
-With vIOMMU, IO virtual address range can get unmapped while in pre-copy
-phase of migration. In that case, unmap ioctl should return pages pinned
-in that range and QEMU should find its correcponding guest physical
-addresses and report those dirty.
+Add a step to remove all stashed PCI groups to avoid stale data between
+machine resets.
 
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
-[aw: fix error_report types, fix cpu_physical_memory_set_dirty_lebitmap() cast]
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/common.c |   97 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 93 insertions(+), 4 deletions(-)
+ hw/s390x/s390-pci-bus.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 43e6e89090f2..620358a3d804 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -321,11 +321,95 @@ static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
-     return true;
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 4c7f06d5cf95..036cf4635a7e 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -813,6 +813,17 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+                              S390_ADAPTER_SUPPRESSIBLE, errp);
  }
  
-+static bool vfio_devices_all_running_and_saving(VFIOContainer *container)
++static void s390_pcihost_unrealize(DeviceState *dev)
 +{
-+    VFIOGroup *group;
-+    VFIODevice *vbasedev;
-+    MigrationState *ms = migrate_get_current();
++    S390PCIGroup *group;
++    S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
 +
-+    if (!migration_is_setup_or_active(ms->state)) {
-+        return false;
++    while (!QTAILQ_EMPTY(&s->zpci_groups)) {
++        group = QTAILQ_FIRST(&s->zpci_groups);
++        QTAILQ_REMOVE(&s->zpci_groups, group, link);
 +    }
-+
-+    QLIST_FOREACH(group, &container->group_list, container_next) {
-+        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-+            VFIOMigration *migration = vbasedev->migration;
-+
-+            if (!migration) {
-+                return false;
-+            }
-+
-+            if ((migration->device_state & VFIO_DEVICE_STATE_SAVING) &&
-+                (migration->device_state & VFIO_DEVICE_STATE_RUNNING)) {
-+                continue;
-+            } else {
-+                return false;
-+            }
-+        }
-+    }
-+    return true;
 +}
 +
-+static int vfio_dma_unmap_bitmap(VFIOContainer *container,
-+                                 hwaddr iova, ram_addr_t size,
-+                                 IOMMUTLBEntry *iotlb)
-+{
-+    struct vfio_iommu_type1_dma_unmap *unmap;
-+    struct vfio_bitmap *bitmap;
-+    uint64_t pages = TARGET_PAGE_ALIGN(size) >> TARGET_PAGE_BITS;
-+    int ret;
-+
-+    unmap = g_malloc0(sizeof(*unmap) + sizeof(*bitmap));
-+
-+    unmap->argsz = sizeof(*unmap) + sizeof(*bitmap);
-+    unmap->iova = iova;
-+    unmap->size = size;
-+    unmap->flags |= VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP;
-+    bitmap = (struct vfio_bitmap *)&unmap->data;
-+
-+    /*
-+     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
-+     * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap_pgsize to
-+     * TARGET_PAGE_SIZE.
-+     */
-+
-+    bitmap->pgsize = TARGET_PAGE_SIZE;
-+    bitmap->size = ROUND_UP(pages, sizeof(__u64) * BITS_PER_BYTE) /
-+                   BITS_PER_BYTE;
-+
-+    if (bitmap->size > container->max_dirty_bitmap_size) {
-+        error_report("UNMAP: Size of bitmap too big 0x%"PRIx64,
-+                     (uint64_t)bitmap->size);
-+        ret = -E2BIG;
-+        goto unmap_exit;
-+    }
-+
-+    bitmap->data = g_try_malloc0(bitmap->size);
-+    if (!bitmap->data) {
-+        ret = -ENOMEM;
-+        goto unmap_exit;
-+    }
-+
-+    ret = ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, unmap);
-+    if (!ret) {
-+        cpu_physical_memory_set_dirty_lebitmap((unsigned long *)bitmap->data,
-+                iotlb->translated_addr, pages);
-+    } else {
-+        error_report("VFIO_UNMAP_DMA with DIRTY_BITMAP : %m");
-+    }
-+
-+    g_free(bitmap->data);
-+unmap_exit:
-+    g_free(unmap);
-+    return ret;
-+}
-+
- /*
-  * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
-  */
- static int vfio_dma_unmap(VFIOContainer *container,
--                          hwaddr iova, ram_addr_t size)
-+                          hwaddr iova, ram_addr_t size,
-+                          IOMMUTLBEntry *iotlb)
+ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
  {
-     struct vfio_iommu_type1_dma_unmap unmap = {
-         .argsz = sizeof(unmap),
-@@ -334,6 +418,11 @@ static int vfio_dma_unmap(VFIOContainer *container,
-         .size = size,
-     };
+     char *name;
+@@ -1171,6 +1182,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
  
-+    if (iotlb && container->dirty_pages_supported &&
-+        vfio_devices_all_running_and_saving(container)) {
-+        return vfio_dma_unmap_bitmap(container, iova, size, iotlb);
-+    }
-+
-     while (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
-         /*
-          * The type1 backend has an off-by-one bug in the kernel (71a7d3d78e3c
-@@ -381,7 +470,7 @@ static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
-      * the VGA ROM space.
-      */
-     if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
--        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
-+        (errno == EBUSY && vfio_dma_unmap(container, iova, size, NULL) == 0 &&
-          ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
-         return 0;
-     }
-@@ -531,7 +620,7 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-                          iotlb->addr_mask + 1, vaddr, ret);
-         }
-     } else {
--        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
-+        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1, iotlb);
-         if (ret) {
-             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-                          "0x%"HWADDR_PRIx") = %d (%m)",
-@@ -834,7 +923,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
-     }
- 
-     if (try_unmap) {
--        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-+        ret = vfio_dma_unmap(container, iova, int128_get64(llsize), NULL);
-         if (ret) {
-             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-                          "0x%"HWADDR_PRIx") = %d (%m)",
+     dc->reset = s390_pcihost_reset;
+     dc->realize = s390_pcihost_realize;
++    dc->unrealize = s390_pcihost_unrealize;
+     hc->pre_plug = s390_pcihost_pre_plug;
+     hc->plug = s390_pcihost_plug;
+     hc->unplug_request = s390_pcihost_unplug_request;
 
 
