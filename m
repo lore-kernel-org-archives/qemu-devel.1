@@ -2,72 +2,76 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7D7C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 577F4C388F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:11:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 332B5206F8
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:11:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90F3E206F8
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:11:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OAgfqhpw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 332B5206F8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b/nbZo5V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F3E206F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZZc0-0005RP-1s
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 08:11:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38886)
+	id 1kZZc6-0005dc-Jq
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 08:11:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZZac-0004HZ-S0
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:09:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43011)
+ id 1kZZah-0004M8-SB
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:09:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59869)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZZab-0003Jr-7B
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:09:38 -0500
+ id 1kZZag-0003Ls-7Q
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:09:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604322576;
+ s=mimecast20190719; t=1604322581;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=62Z5otvSY2jDhstcDaZWgQa/3DkqUPBW4+N3X48ruxk=;
- b=OAgfqhpwpyVSaJ0iJhqBXRPRQJ5GF3ceo98Et/Lx8XvW8RVy8xTJlxURZfexRTbRrXB0RJ
- OyZl2x57pAFxqGVKfCi8o11CGZUnh36dlbXNpaz6Humn1NUa6xVnW8M+jO6wrJ7L1nGNOS
- w6xk1oVjjr6WT2xJg55pCHfifrAF1wA=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=B/LM4wfIa4cVIdLEi2TuLjN3k4rymWp18Mv8P2Vo+Ao=;
+ b=b/nbZo5VsWBLEqcGOaTgwV58uAZJXicXsEcqBG/J7XQ/+c/7P3cmoEWgcETT7ttpCESgre
+ HsLCnkB0AOR8USn+hrPeOIz8uHmuorPl8V++rSnTEJwhCI9lKyYHpyOhh22nNSBoXk/RSS
+ qE66OBhiptz4avBI12mznAlJm/tDQoI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-QksZQEUTMQWLTcdgHW8-Aw-1; Mon, 02 Nov 2020 08:09:34 -0500
-X-MC-Unique: QksZQEUTMQWLTcdgHW8-Aw-1
+ us-mta-531-9abRmovSO0mfh-oGsS17pw-1; Mon, 02 Nov 2020 08:09:39 -0500
+X-MC-Unique: 9abRmovSO0mfh-oGsS17pw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF7FF1800D41;
- Mon,  2 Nov 2020 13:09:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2BBE809DD3;
+ Mon,  2 Nov 2020 13:09:38 +0000 (UTC)
 Received: from fedora.redhat.com (ovpn-114-136.ams2.redhat.com [10.36.114.136])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E21011002C21;
- Mon,  2 Nov 2020 13:09:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9075D1002C21;
+ Mon,  2 Nov 2020 13:09:36 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/4] Publish docs as GitLab Pages
-Date: Mon,  2 Nov 2020 13:09:22 +0000
-Message-Id: <20201102130926.161183-1-berrange@redhat.com>
+Subject: [PATCH 2/4] gitlab: force enable docs build in Fedora, Ubuntu, Debian
+Date: Mon,  2 Nov 2020 13:09:24 +0000
+Message-Id: <20201102130926.161183-3-berrange@redhat.com>
+In-Reply-To: <20201102130926.161183-1-berrange@redhat.com>
+References: <20201102130926.161183-1-berrange@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
@@ -100,39 +104,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This publishes the various docs as GitLab Pages, allowing users to=0D
-browse the docs generated in CI before sending patch series to the=0D
-mailing list. It also introduces a sidebar link to the original page=0D
-source to show readers what file to modify if they want to contribute to=0D
-the docs.=0D
-=0D
-Daniel P. Berrang=C3=A9 (4):=0D
-  gitlab: publish the docs built during CI=0D
-  gitlab: force enable docs build in Fedora, Ubuntu, Debian=0D
-  docs: show stdout/stderr when meson fails build test=0D
-  docs: add "page source" link to sphinx documentation=0D
-=0D
- .gitlab-ci.yml                        | 18 +++++++++++++++++-=0D
- docs/_templates/editpage.html         |  5 +++++=0D
- docs/conf.py                          |  1 +=0D
- docs/devel/_templates/editpage.html   |  5 +++++=0D
- docs/interop/_templates/editpage.html |  5 +++++=0D
- docs/meson.build                      |  7 ++++---=0D
- docs/specs/_templates/editpage.html   |  5 +++++=0D
- docs/system/_templates/editpage.html  |  5 +++++=0D
- docs/tools/_templates/editpage.html   |  5 +++++=0D
- docs/user/_templates/editpage.html    |  5 +++++=0D
- 10 files changed, 57 insertions(+), 4 deletions(-)=0D
- create mode 100644 docs/_templates/editpage.html=0D
- create mode 100644 docs/devel/_templates/editpage.html=0D
- create mode 100644 docs/interop/_templates/editpage.html=0D
- create mode 100644 docs/specs/_templates/editpage.html=0D
- create mode 100644 docs/system/_templates/editpage.html=0D
- create mode 100644 docs/tools/_templates/editpage.html=0D
- create mode 100644 docs/user/_templates/editpage.html=0D
-=0D
---=20=0D
-2.28.0=0D
-=0D
+Meson runs a test to see if Sphinx works, and automatically disables it
+on error. This can lead to the CI jobs skipping docs build without
+maintainers noticing the problem. Use --enable-docs to force a fatal
+error if Sphinx doesn't work on the jobs where we expect it to be OK.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ .gitlab-ci.yml | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index a41725d6f7..f17bff652d 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -80,6 +80,7 @@ build-system-ubuntu:
+     TARGETS: aarch64-softmmu alpha-softmmu cris-softmmu hppa-softmmu
+       moxie-softmmu microblazeel-softmmu mips64el-softmmu
+     MAKE_CHECK_ARGS: check-build
++    CONFIGURE_ARGS: --enable-docs
+   artifacts:
+     expire_in: 2 days
+     paths:
+@@ -111,6 +112,7 @@ build-system-debian:
+     TARGETS: arm-softmmu avr-softmmu i386-softmmu mipsel-softmmu
+       riscv64-softmmu sh4eb-softmmu sparc-softmmu xtensaeb-softmmu
+     MAKE_CHECK_ARGS: check-build
++    CONFIGURE_ARGS: --enable-docs
+   artifacts:
+     expire_in: 2 days
+     paths:
+@@ -139,7 +141,7 @@ build-system-fedora:
+   <<: *native_build_job_definition
+   variables:
+     IMAGE: fedora
+-    CONFIGURE_ARGS: --disable-gcrypt --enable-nettle
++    CONFIGURE_ARGS: --disable-gcrypt --enable-nettle --enable-docs
+     TARGETS: tricore-softmmu microblaze-softmmu mips-softmmu
+       xtensa-softmmu m68k-softmmu riscv32-softmmu ppc-softmmu sparc64-softmmu
+     MAKE_CHECK_ARGS: check-build
+-- 
+2.28.0
 
 
