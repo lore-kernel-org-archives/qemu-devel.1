@@ -2,88 +2,103 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51185C4742C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 11:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9ED0C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 11:28:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B343207C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 11:24:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 221CE223AC
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 11:28:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i7QrubM1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B343207C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nk5EK53J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221CE223AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZXxD-0006i7-M7
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 06:24:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45088)
+	id 1kZY0j-00081Q-W6
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 06:28:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kZXwf-0006DT-8k
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 06:24:17 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:44844)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kZXzs-0007TB-Bx
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 06:27:36 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41375)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kZXwd-0007lL-52
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 06:24:16 -0500
-Received: by mail-pl1-x644.google.com with SMTP id t6so6651674plq.11
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 03:24:14 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kZXzp-0000kz-GS
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 06:27:36 -0500
+Received: by mail-wr1-x444.google.com with SMTP id s9so14134746wro.8
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 03:27:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mYbIFK1vPZMCZXBjfRyftvToN2oZtamsI1KveVMp7e0=;
- b=i7QrubM1wDznm0N2gjc+MTjGDi1avfr6dynaPuQ+X8T9hegJX7NzYaDjMiQVAKzzeY
- WAIf9APVN+EHaJT/YTdke3oYld8dxCpauegfuLgSkXRM2JoL7Vrj4VdRLUUCqc+3mOEA
- yYU4pt5Mlstym0ow9Ngey0FNg3BubrJwn8XNjjF7KO6JAWt91dbd93PCE67tho3WV2wJ
- 03NejerwvcfTFSx0LRFzCNuyYjWEU9LKmYYY+N5GpX3xlssHRpaEPUzc1DlX/4/MCv1o
- LJ7nSzJpJWZp4AGgL07/fiajPebKM2JKULAcl7+UwwftOvFiQx+7HxxnXTCubEiezyyV
- G60Q==
+ h=sender:subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=+UQxUGvYBw5NmbjbsXv4t3SXmzCVMv6bpGeEDwNTdpw=;
+ b=Nk5EK53JmNMr3YkkV5RXULybpvoxC1Plu8JHR0oDNxvJAMXMBlKym79Zku/eBWRm/h
+ ExDDX64PitfCmkWdEiCrqy0W+Xm5KLLZVGhBsh43bN/Um6os/PwItFl2FM3ZCTjjyZrv
+ XgJfq4BLh8WyOtERKDQnmg0ZZ91/O5cPBPL8yxymGpbrnvPECcStNgKXTSoeniw5WWr4
+ N4J+3l1Rjl2pWdvrm+jWer17S4gGAvF5VPDL2R2idOS0E0Hou3rMI0t1lnZNV+ar91uN
+ 4km8mFboORdjoPHboCQB64vQ4koqVIZE5YjbgJgZq+wVnK9gDVv3RKAj6cIRSJWXVFx9
+ kS5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mYbIFK1vPZMCZXBjfRyftvToN2oZtamsI1KveVMp7e0=;
- b=ENunbzFUrUra08JeCCPraHciMPgD5DTTnBoUs6MWeeMdppGASDS4vn23MlazD1zFE1
- 2zYdLiF5PZSIsCumlm6Fro99FqZeDheCwJJgP+SCgNId91+cCRuUbeyttm8+zJY7nQXk
- n2CatC4dNGbI8j+j4o899uVa8oM4UqsoNYayViu8Xn8ndtXfbOyuA223VCMAZFLmRjZp
- jMH8ZKu9RJisIQ4Ah9PQ2e56K8hTU5VrOuJztp8OuEunNaKYnmi77eZSlGZGDmeuVyfA
- 850h7jvex/ZYopDJ9uyudrEXQeq+WcLhQIk2sZXl0a1mMMJDSZQzCl31uFCZT3sQoq2W
- nyBA==
-X-Gm-Message-State: AOAM530a0mkf6cHUN0CoXRf+DISZvE/0axtpwOUxTSwz6nmPCU4NIUtB
- 2bSuigUpe58DGuxQA+opDBEFiZ1LvMVs53ObEfQ=
-X-Google-Smtp-Source: ABdhPJxYBg8kt5WVVcuAXa3a+Tr9cucHHNDKgcSGeHRw1qDkdJaPsOZpENbl3swU9CnnDLN1kHgbHkfo6nf/lQh1JQ8=
-X-Received: by 2002:a17:902:9697:b029:d6:c3f6:8dcf with SMTP id
- n23-20020a1709029697b02900d6c3f68dcfmr7233574plp.8.1604316253821; Mon, 02 Nov
- 2020 03:24:13 -0800 (PST)
+ h=x-gm-message-state:sender:subject:from:to:cc:references:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+UQxUGvYBw5NmbjbsXv4t3SXmzCVMv6bpGeEDwNTdpw=;
+ b=qkfDPEokwL+Y96K35XHxWSNpW2mIIpWT3epVPleODL1hAY+UaGZ4bTATLRwQTr5HRr
+ cZnjFPuIbs6GKS7OKz+goZJKCBM7DyUO2bUu/JyrWkAwAAEUTBYsx+z83BayGELxp9QS
+ fXyKHg+twiUEF/FGNQyyiGqqkXGOwOzpBRLC0CE4IoMNQmuDEhxVHIk1mVeDtK6yvtO3
+ KLjoefeNkUuduq4Lc4yngQ9Tk2YDwxOj/Oal2GuiwPnfsa9/V7EwC+DRwrP3mc1sQmD2
+ fAEpypz4pLQ/xXbywPr45doQHhJcVQlg6zPzwbvAy/uJ19sY7BOndteMxLSlAMYl4zrf
+ 1/oA==
+X-Gm-Message-State: AOAM533mBXPxuhXeHe6p7IZAgE+acjPk0Q9Qmw+EoJK8s+MX0JxVVNiI
+ /EGUBxDDOF38JaqqxaIndHGrB3xHJcs=
+X-Google-Smtp-Source: ABdhPJwQL4S0C7fZKLAvHDeZF+x4YDTwOCH5RNgPFICZvTDvoIqZmQRN1+8ly+Xhqc8mjM6mZTDIXw==
+X-Received: by 2002:a5d:494c:: with SMTP id r12mr19249807wrs.406.1604316451733; 
+ Mon, 02 Nov 2020 03:27:31 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id m1sm15015622wme.48.2020.11.02.03.27.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Nov 2020 03:27:31 -0800 (PST)
+Subject: Re: target/mips: Deprecate nanoMIPS ISA?
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Paul Burton <paulburton@kernel.org>
+References: <CA+Lzsy=o9yshAAAacuTwcs3Hfr4MfWiX-SiUf5A2Fds3vGOrAQ@mail.gmail.com>
+ <CAFEAcA9ap=c=1XZ6wpphiE=FYtCU+vdNCX8THW-m-hUp_XyGmg@mail.gmail.com>
+ <b384912c-0e62-604d-df0b-b5181c2e7f3d@linaro.org>
+ <05afa227-3db0-4b11-d541-7fce7139729d@amsat.org>
+ <38441531-1509-724f-4643-2ff2db253e3f@amsat.org>
+Message-ID: <81ca64fb-f207-2414-0bd8-b0ccb019199e@amsat.org>
+Date: Mon, 2 Nov 2020 12:27:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <20201030174700.7204-1-peter.maydell@linaro.org>
- <20201030174700.7204-2-peter.maydell@linaro.org>
-In-Reply-To: <20201030174700.7204-2-peter.maydell@linaro.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 2 Nov 2020 11:24:02 +0000
-Message-ID: <CAJSP0QWTwUW5HrtczzT0G_i5HCxHbzMOiQ7jUnf8-9MNf_wf0Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] scripts/kerneldoc: For Sphinx 3 use c:macro for
- macros with arguments
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=stefanha@gmail.com; helo=mail-pl1-x644.google.com
+In-Reply-To: <38441531-1509-724f-4643-2ff2db253e3f@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,45 +111,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: James Hogan <jhogan@kernel.org>,
+ Marcin Nowakowski <marcin.nowakowski@fungible.com>,
+ zou xu <iwatchnima@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 30, 2020 at 5:47 PM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> The kerneldoc script currently emits Sphinx markup for a macro with
-> arguments that uses the c:function directive. This is correct for
-> Sphinx versions earlier than Sphinx 3, where c:macro doesn't allow
-> documentation of macros with arguments and c:function is not picky
-> about the syntax of what it is passed. However, in Sphinx 3 the
-> c:macro directive was enhanced to support macros with arguments,
-> and c:function was made more picky about what syntax it accepted.
->
-> When kerneldoc is told that it needs to produce output for Sphinx
-> 3 or later, make it emit c:function only for functions and c:macro
-> for macros with arguments. We assume that anything with a return
-> type is a function and anything without is a macro.
->
-> This fixes the Sphinx error:
->
-> /home/petmay01/linaro/qemu-from-laptop/qemu/docs/../include/qom/object.h:155:Error in declarator
-> If declarator-id with parameters (e.g., 'void f(int arg)'):
->   Invalid C declaration: Expected identifier in nested name. [error at 25]
->     DECLARE_INSTANCE_CHECKER ( InstanceType,  OBJ_NAME,  TYPENAME)
->     -------------------------^
-> If parenthesis in noptr-declarator (e.g., 'void (*f(int arg))(double)'):
->   Error in declarator or parameters
->   Invalid C declaration: Expecting "(" in parameters. [error at 39]
->     DECLARE_INSTANCE_CHECKER ( InstanceType,  OBJ_NAME,  TYPENAME)
->     ---------------------------------------^
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  scripts/kernel-doc | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
+On 11/2/20 11:00 AM, Philippe Mathieu-Daudé wrote:
+> Hi Richard,
+> 
+> Cc'ing developers who introduced nanoMIPS.
 
-Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Who are now unreachable, as I got:
+
+Your message to Stefan.Markovic@mips.com couldn't be delivered.
+
+Your message to smarkovic@wavecomp.com couldn't be delivered.
+
+Couldn't deliver the message to the following recipients:
+Robert.Suchanek@mips.com, matthew.fortune@mips.com,
+marcin.nowakowski@mips.com
+
+> 
+> On 9/11/20 7:23 PM, Philippe Mathieu-Daudé wrote:
+>> On 9/11/20 6:55 PM, Richard Henderson wrote:
+>>> On 9/11/20 3:41 AM, Peter Maydell wrote:
+>>>>> +    /* Detect store by reading the instruction at the program counter. */
+>>>>> +    uint32_t insn = *(uint32_t *)pc;
+>>>>> +    switch(insn>>29) {
+>>>>> +    case 0x5:
+>>>>> +        switch((insn>>26) & 0x7) {
+>>>>
+>>>> Here we mask to get a 3-bit field...
+>>>>
+>>>>> +        case 0x0: /* SB */
+>>>>> +        case 0x1: /* SH */
+>>>>> +        case 0x2: /* SWL */
+>>>>> +        case 0x3: /* SW */
+>>>>> +        case 0x4: /* SDL */
+>>>>> +        case 0x5: /* SDR */
+>>>>> +        case 0x6: /* SWR */
+>>>>> +        case 0x7: /* CACHE */
+>>>>> +            is_write = 1;
+>>>>
+>>>> ...but here all 8 cases are handled identically.
+>>>> Is there a typo/logic error here, or should this
+>>>> really just be
+>>>>
+>>>>     case 0x5:
+>>>>         /* SB, SH, SWL, SW, SDL, SDR, SWR, CACHE */
+>>>>         is_write = 1;
+>>>>
+>>>> ?
+>>>>
+>>>> Is CACHE really a write insn ?
+>>>
+>>> Indeed not.  However, it's also illegal for user-mode, so we cannot arrive here
+>>> with SIGSEGV by executing it.  So we could ignore that case and not decode this
+>>> field.
+>>>
+>>>>> +    case 0x7:
+>>>>> +        switch((insn>>26) & 0x7) {
+>>>>> +        case 0x0: /* SC */
+>>>>> +        case 0x1: /* SWC1 */
+>>>>> +        case 0x2: /* SWC2 */
+>>>>> +        case 0x4: /* SCD */
+>>>>> +        case 0x5: /* SDC1 */
+>>>>> +        case 0x6: /* SDC2 */
+>>>>> +        case 0x7: /* SD */
+>>>>> +            is_write = 1;
+>>>
+>>> Well, the unconditional check of SWC2/SDC2 is not quite right. MIPS64R6 removes
+>>> them and replaces them with some compact branches.  That's easy enough to
+>>> include here, using
+>>>
+>>> #if !defined(__mips_isa_rev) || __mips_isa_rev < 6
+>>>     case 2: /* SWC2 */
+>>>     case 6: /* SDC2 */
+>>> #endif
+>>>
+>>> We should also add
+>>>
+>>> #if defined(__mips16) || defined(__mips_micromips)
+>>> # error "Unsupported encoding"
+>>> #endif
+>>>
+>>> I see no upstream compiler support for nanomips at all, so there's no point in
+>>> checking for that encoding.  (Indeed, I wonder at the code in target/mips...
+>>> how could it be tested?)
+>>
+>> I took the information from commit f7d257cb4a1
+>> ("qemu-doc: Add nanoMIPS ISA information") to add
+>> the tests in  f375ad6a0d6 ("BootLinuxConsoleTest:
+>> Test nanoMIPS kernels on the I7200 CPU"), but I
+>> haven't tried to recompile these files myself.
+> 
+> I checked the various nanoMIPS announcements:
+> GCC:   https://gcc.gnu.org/legacy-ml/gcc/2018-05/msg00012.html
+> Linux: https://lwn.net/Articles/753605/
+> QEMU:  https://www.mail-archive.com/qemu-devel@nongnu.org/msg530721.html
+> 
+> Unfortunately www.mips.com doesn't work anymore.
+> 
+> From this Wayback machine link:
+> https://web.archive.org/web/20180904044530/https://www.mips.com/develop/tools/compilers/
+> 
+> I found this working web (the toolchain is a later release than the
+> one referenced in the announcement mails):
+> http://codescape.mips.com/components/toolchain/nanomips/2018.04-02/downloads.html
+> 
+> The toolchain page mention LLVM but simply links http://llvm.org/
+> where I couldn't find any reference on nanoMIPS.
+> 
+> The only reference in the GCC mailing list, is the nanoMIPS
+> announcement: https://gcc.gnu.org/pipermail/gcc/2018-May.txt
+> 
+> 
+> It looks safe for QEMU to declare nanoMIPS deprecated (it has no
+> maintainer), to give time to interested parties to finish upstreaming
+> process and step in to maintain it.
+> Thoughts?
+> 
+> Regards,
+> 
+> Phil.
+> 
 
