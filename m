@@ -2,80 +2,96 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C675C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 20:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE13C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 20:28:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E32C21D40
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 20:26:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E32C21D40
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8766920719
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 20:28:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZnNfx/11"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8766920719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZgPm-0001cl-1P
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 15:26:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43240)
+	id 1kZgRD-00030G-Jf
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 15:28:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kZgOc-0001Cw-Rz
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 15:25:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57866)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kZgQA-0002Fz-87
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 15:27:18 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40722)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kZgOY-0005sz-VU
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 15:25:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kZgOX-00061F-4Q
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 20:25:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1EC6E2E804B
- for <qemu-devel@nongnu.org>; Mon,  2 Nov 2020 20:25:37 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Nov 2020 20:16:38 -0000
-From: "Dr. David Alan Gilbert" <1902470@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kZgQ6-0006Ep-Cn
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 15:27:17 -0500
+Received: by mail-wr1-x444.google.com with SMTP id 33so5307866wrl.7
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 12:27:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=uqHENuL4QJbfUEuOBxABwE/aayi9/vXG1LiDAXkWbaA=;
+ b=ZnNfx/11NvuV2dUksK4uEjaBptqr8qcrWGd6CQjp32bXAg5rpMzIwQ8njZq64xmXMw
+ FqFwcqwoPE70AcN/19srB4FSHNljn3q9tsWE/5KlvOh9z2i3t6Aohvwr+ITZ03aQXVRI
+ tdXv/ybPFJkS89Fe+joMCFDl0tqZvJKQdYvQyEQ/ajtZzZ52xoynmqLNINtzhVuON0hN
+ 6Op4AGS0S9zSVCZL46jmSK6pc1A6wiP5i9pQjuXUOPK8e1PQhu2jZvZafEQWnOPRF0MU
+ BmngoRSIilW9Ql70RLid9PjINaueebbPmEfnjVbIL/+I39KChB4iOXP9DUJfEk8v1QpX
+ fZQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=uqHENuL4QJbfUEuOBxABwE/aayi9/vXG1LiDAXkWbaA=;
+ b=rNVZOUfEUSojjvSJEL0upr7L05rz474Hwoa/l1+5BK+HHF/FIyBx1efTfbIrG9w3oi
+ JKBP297GbSzyr5Eo6wJIub0yqW+T4QERyN7WSorVDkWjMBvM1amvRISMkM4KifUrIuEo
+ FCH3cl7bXvOkXu6THWUoVwrGBpE9Ljn3NNC6KNTUeJ3KvmGzzxWWzToYbCw1Wk2+HAXG
+ 3CvIjiqBAfHWzrXL2kNnHujwbwDn58sWe/gIdU0E01j6M/IbQS7yzvWGEc00p8J9icFy
+ /Oh5snKYR0jVdR4yNSg6Cp+2AsIMv35fUXTY9J6vaWdeJ5kHU86EGv2qSe1id1y1bAz9
+ TCrA==
+X-Gm-Message-State: AOAM5335ZdiZXO7s3HEqwRB8gAC60W71yQfLfh3XmeGH7fxvOmJ5ITVT
+ B/bDc8vc4zXXF7OX3ZL9MIGc8I+dBlw=
+X-Google-Smtp-Source: ABdhPJwq/h5xiSMNaHM9qshSLqkxVJeyuFcbM6/z8CCE+J83T7LmIwt6TpIGa1aDzUDy7GFYW5iNCw==
+X-Received: by 2002:adf:a553:: with SMTP id j19mr22069442wrb.349.1604348832482; 
+ Mon, 02 Nov 2020 12:27:12 -0800 (PST)
+Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id k22sm587400wmi.34.2020.11.02.12.27.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Nov 2020 12:27:11 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h yanjin
-X-Launchpad-Bug-Reporter: Yan Jin (yanjin)
-X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
-References: <160428587851.31102.18083040677647005532.malonedeb@gac.canonical.com>
-Message-ID: <20201102201638.GD4845@work-vm>
-Subject: Re: [Bug 1902470] Re: migration with TLS-MultiFD is stuck when the
- dst-libvirtd service restarts
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="96ff31b88b65a0d0ea73b89333fe7c4a2669d8fb"; Instance="production"
-X-Launchpad-Hash: 4615470550ac94400cb78c10c6b453c73d0c248d
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 15:25:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH-for-5.2] target/mips: Deprecate nanoMIPS ISA
+Date: Mon,  2 Nov 2020 21:27:10 +0100
+Message-Id: <20201102202710.2224691-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,687 +100,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1902470 <1902470@bugs.launchpad.net>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Paul Burton <paulburton@kernel.org>, libvir-list@redhat.com,
+ James Hogan <jhogan@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Marcin Nowakowski <marcin.nowakowski@fungible.com>,
+ Thomas Huth <thuth@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20201102201638.78BCAoMbyxIza2KegUt9UldwFQTBzbBLhsqg0YOojLs@z>
 
-* zhengchuan (zhengchuan@huawei.com) wrote:
-> Anyone who could help this would be appreciated since we have stuck for t=
-hree days:(
-> =
+The nanoMIPS ISA has been announced in 2018 for various projects:
 
-> IIUC, the client (Src) has sent first hello message to sever(Dst), howeve=
-r due to something happened while restarted libvirtd,
-> The messages is lost, and both of them are waiting which leading to hang =
-forever, but I could find out how for now.
+GCC:   https://gcc.gnu.org/legacy-ml/gcc/2018-05/msg00012.html
+Linux: https://lwn.net/Articles/753605/
+QEMU:  https://www.mail-archive.com/qemu-devel@nongnu.org/msg530721.html
 
-If you need to un-break things, I suggest killing the destination might
-free it; but I'm not sure.
+Unfortunately the links referenced doesn't work anymore (www.mips.com).
 
-An interesting question is if we can make migration-cancel work in this
-case.
+From this Wayback machine link [1] we can get to a working place to
+download a toolchain (a more recent release than the one referenced
+in the announcement mails):
+http://codescape.mips.com/components/toolchain/nanomips/2018.04-02/downloads.html
 
-Dave
+The toolchain page mention LLVM but simply links http://llvm.org/
+where there is no reference on nanoMIPS.
 
-> -----Original Message-----
-> From: Qemu-devel [mailto:qemu-devel-bounces+zhengchuan=3Dhuawei.com@nongn=
-u.org] On Behalf Of Yan Jin
-> Sent: 2020=E5=B9=B411=E6=9C=882=E6=97=A5 11:12
-> To: qemu-devel@nongnu.org
-> Subject: [Bug 1902470] Re: migration with TLS-MultiFD is stuck when the d=
-st-libvirtd service restarts
-> =
+The only reference in the GCC mailing list, is the nanoMIPS
+announcement: https://gcc.gnu.org/pipermail/gcc/2018-May.txt
 
-> ** Description changed:
-> =
+The developer who authored the announcements have been emailed [2]
+to ask for more information but all their emails are now bouncing:
 
->   hi,
->   =
+- Your message to Stefan.Markovic@mips.com couldn't be delivered.
 
->   I found that the multi-channel TLS-handshake will be stuck when the dst-
->   libvirtd restarts, both the src and dst sockets are blocked in recvmsg.
->   In the meantime, live_migration thread is blocked in
->   multifd_send_sync_main, so migration cannot be cancelled though src-
->   libvirt has delivered the QMP command.
->   =
+- Your message to smarkovic@wavecomp.com couldn't be delivered.
 
->   Is there any way to exit migration when the multi-channel TLS-handshake
-> - is stuck? Does setting TLS handshake timeout function take effect?
-> + is stuck? Does setting TLS-handshake timeout function take effect?
->   =
+- Couldn't deliver the message to the following recipients:
+    Robert.Suchanek@mips.com, matthew.fortune@mips.com,
+    marcin.nowakowski@mips.com
 
->   The stack trace are as follows:
->   =
+Our deprecation policy do not allow feature removal before 2 release,
+therefore declare the nanoMIPS ISA code deprecated as of QEMU 5.2.
+This gives time to developers to update the QEMU community, or
+interested parties to step in to maintain this code.
 
->   =3D=3D=3D=3D=3Dsrc qemu-system-aar stack=3D=3D=3D=3D=3D:
->   #0  0x0000ffff87d6f28c in recvmsg () from target:/usr/lib64/libpthread.=
-so.0
->   #1  0x0000aaaae3817424 in qio_channel_socket_readv (ioc=3D0xaaaae9e30a3=
-0, iov=3D0xffffdb58e8a8, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ..=
-/io/channel-socket.c:502
->   #2  0x0000aaaae380f468 in qio_channel_readv_full (ioc=3D0xaaaae9e30a30,=
- iov=3D0xffffdb58e8a8, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ../i=
-o/channel.c:66
->   #3  0x0000aaaae380f9e8 in qio_channel_read (ioc=3D0xaaaae9e30a30, buf=
-=3D0xaaaaea204e9b "\026\003\001\001L\001", buflen=3D5, errp=3D0x0) at ../io=
-/channel.c:217
->   #4  0x0000aaaae380e7d4 in qio_channel_tls_read_handler (buf=3D0xaaaaea2=
-04e9b "\026\003\001\001L\001", len=3D5, opaque=3D0xfffd38001190) at ../io/c=
-hannel-tls.c:53
->   #5  0x0000aaaae3801114 in qcrypto_tls_session_pull (opaque=3D0xaaaae99d=
-5700, buf=3D0xaaaaea204e9b, len=3D5) at ../crypto/tlssession.c:89
->   #6  0x0000ffff8822ed30 in _gnutls_stream_read (ms=3D0xffffdb58eaac, pul=
-l_func=3D0xfffd38001870, size=3D5, bufel=3D<synthetic pointer>, session=3D0=
-xaaaae983cd60) at buffers.c:346
->   #7  _gnutls_read (ms=3D0xffffdb58eaac, pull_func=3D0xfffd38001870, size=
-=3D5, bufel=3D<synthetic pointer>, session=3D0xaaaae983cd60) at buffers.c:4=
-26
->   #8  _gnutls_io_read_buffered (session=3Dsession@entry=3D0xaaaae983cd60,=
- total=3D5, recv_type=3Drecv_type@entry=3D4294967295, ms=3D0xffffdb58eaac) =
-at buffers.c:581
->   #9  0x0000ffff88224954 in recv_headers (ms=3D<optimized out>, record=3D=
-0xffff883cd000 <gnutls_x509_ext_export_name_constraints@got.plt>, htype=3D6=
-5535, type=3D2284006288, record_params=3D0xaaaae9e22a60, session=3D0xaaaae9=
-83cd60) at record.c:1163
->   #10 _gnutls_recv_in_buffers (session=3Dsession@entry=3D0xaaaae983cd60, =
-type=3D2284006288, type@entry=3DGNUTLS_HANDSHAKE, htype=3D65535, htype@entr=
-y=3DGNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST, ms=3D<optimized out>, ms@entry=3D=
-0) at record.c:1302
->   #11 0x0000ffff88230568 in _gnutls_handshake_io_recv_int (session=3Dsess=
-ion@entry=3D0xaaaae983cd60, htype=3Dhtype@entry=3DGNUTLS_HANDSHAKE_HELLO_RE=
-TRY_REQUEST, hsk=3Dhsk@entry=3D0xffffdb58ec38, optional=3Doptional@entry=3D=
-1) at buffers.c:1445
->   #12 0x0000ffff88232b90 in _gnutls_recv_handshake (session=3Dsession@ent=
-ry=3D0xaaaae983cd60, type=3Dtype@entry=3DGNUTLS_HANDSHAKE_HELLO_RETRY_REQUE=
-ST, optional=3Doptional@entry=3D1, buf=3Dbuf@entry=3D0x0) at handshake.c:15=
-34
->   #13 0x0000ffff88235b40 in handshake_client (session=3Dsession@entry=3D0=
-xaaaae983cd60) at handshake.c:2925
->   #14 0x0000ffff88237824 in gnutls_handshake (session=3D0xaaaae983cd60) a=
-t handshake.c:2739
->   #15 0x0000aaaae380213c in qcrypto_tls_session_handshake (session=3D0xaa=
-aae99d5700, errp=3D0xffffdb58ee58) at ../crypto/tlssession.c:493
->   #16 0x0000aaaae380ea40 in qio_channel_tls_handshake_task (ioc=3D0xfffd3=
-8001190, task=3D0xaaaaea61d4e0, context=3D0x0) at ../io/channel-tls.c:161
->   #17 0x0000aaaae380ec60 in qio_channel_tls_handshake (ioc=3D0xfffd380011=
-90, func=3D0xaaaae3394d20 <multifd_tls_outgoing_handshake>, opaque=3D0xaaaa=
-ea189c30, destroy=3D0x0, context=3D0x0) at ../io/channel-tls.c:239
->   #18 0x0000aaaae3394e78 in multifd_tls_channel_connect (p=3D0xaaaaea189c=
-30, ioc=3D0xaaaae9e30a30, errp=3D0xffffdb58ef28) at ../migration/multifd.c:=
-782
->   #19 0x0000aaaae3394f30 in multifd_channel_connect (p=3D0xaaaaea189c30, =
-ioc=3D0xaaaae9e30a30, error=3D0x0) at ../migration/multifd.c:804
->   #20 0x0000aaaae33950b8 in multifd_new_send_channel_async (task=3D0xaaaa=
-ea6855a0, opaque=3D0xaaaaea189c30) at ../migration/multifd.c:858
->   #21 0x0000aaaae3810cf8 in qio_task_complete (task=3D0xaaaaea6855a0) at =
-../io/task.c:197
->   #22 0x0000aaaae381096c in qio_task_thread_result (opaque=3D0xaaaaea6855=
-a0) at ../io/task.c:112
->   #23 0x0000ffff88701df8 in ?? () from target:/usr/lib64/libglib-2.0.so.0
->   #24 0x0000ffff88705a7c in g_main_context_dispatch () from target:/usr/l=
-ib64/libglib-2.0.so.0
->   #25 0x0000aaaae3a5a29c in glib_pollfds_poll () at ../util/main-loop.c:2=
-21
->   #26 0x0000aaaae3a5a324 in os_host_main_loop_wait (timeout=3D0) at ../ut=
-il/main-loop.c:244
->   #27 0x0000aaaae3a5a444 in main_loop_wait (nonblocking=3D0) at ../util/m=
-ain-loop.c:520
->   #28 0x0000aaaae3696b20 in qemu_main_loop () at ../softmmu/vl.c:1677
->   #29 0x0000aaaae30949e4 in main (argc=3D81, argv=3D0xffffdb58f2c8, envp=
-=3D0xffffdb58f558) at ../softmmu/main.c:50
->   =
+[1] https://web.archive.org/web/20180904044530/https://www.mips.com/develop/tools/compilers/
+[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg756392.html
 
->   =3D=3D=3D=3D=3Dsrc live_migration stack=3D=3D=3D=3D=3D:
->   #0  0x0000ffff87d6a5d8 in pthread_cond_wait () from target:/usr/lib64/l=
-ibpthread.so.0
->   #1  0x0000aaaae3a5f3ec in qemu_sem_wait (sem=3D0xaaaaea189d40) at ../ut=
-il/qemu-thread-posix.c:328
->   #2  0x0000aaaae3394838 in multifd_send_sync_main (f=3D0xaaaae983f0e0) a=
-t ../migration/multifd.c:638
->   #3  0x0000aaaae37de310 in ram_save_setup (f=3D0xaaaae983f0e0, opaque=3D=
-0xaaaae4198708 <ram_state>) at ../migration/ram.c:2588
->   #4  0x0000aaaae31cf7ac in qemu_savevm_state_setup (f=3D0xaaaae983f0e0) =
-at ../migration/savevm.c:1176
->   #5  0x0000aaaae3248360 in migration_thread (opaque=3D0xaaaae9829f20) at=
- ../migration/migration.c:3521
->   #6  0x0000aaaae3a5f8fc in qemu_thread_start (args=3D0xaaaaea513ee0) at =
-../util/qemu-thread-posix.c:521
->   #7  0x0000ffff87d647ac in ?? () from target:/usr/lib64/libpthread.so.0
->   #8  0x0000ffff87cba6ec in ?? () from target:/usr/lib64/libc.so.6
->   =
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ docs/system/deprecated.rst | 23 +++++++++++++++++++++++
+ MAINTAINERS                |  6 +++++-
+ 2 files changed, 28 insertions(+), 1 deletion(-)
 
->   =3D=3D=3D=3D=3Ddst qemu-system-aar stack=3D=3D=3D=3D=3D:
->   #0  0x0000ffff7f17d28c in recvmsg () from target:/usr/lib64/libpthread.=
-so.0
->   #1  0x0000aaaae263a424 in qio_channel_socket_readv (ioc=3D0xaaaaf998a80=
-0, iov=3D0xfffff5d22f78, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ..=
-/io/channel-socket.c:502
->   #2  0x0000aaaae2632468 in qio_channel_readv_full (ioc=3D0xaaaaf998a800,=
- iov=3D0xfffff5d22f78, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ../i=
-o/channel.c:66
->   #3  0x0000aaaae26329e8 in qio_channel_read (ioc=3D0xaaaaf998a800, buf=
-=3D0xaaaafa926dbb "q\024\335\365=C8=A3'\221,\\\357\246w\253\242=D1=A0=D8=B5=
-I\247(N(K=3D\256\316DH\227QNf\371\"\271\017\226^\223\026\373\245z\255\227\0=
-25R.\244\205\254\002\031T\033\312:h\226\a=DD=94\204=D4=AA\324\351K\341\365\=
-247\032\354+\277\005O'*l\301cXx\340~?\346\b\324k\225\223D\276\252\376\257_0=
-\036\223\022\006\212D|7h\257\226\300&n','\005zL\203M=CD=86\023\213\237(o\27=
-2\025_\305s\372\362\351\002\367Ph\016\347\371E\n\030Y\340\002\r\362^&`\021\=
-203}\353\324A\340=D2=B3(\207]\300l}h\026\037H\372\n=3D\"C\024\t\200\325\334=
-&=3D\333>\212=C6=8FE\214]_\372\264]"..., buflen=3D5, errp=3D0x0) at ../io/c=
-hannel.c:217
->   #4  0x0000aaaae26317d4 in qio_channel_tls_read_handler (buf=3D0xaaaafa9=
-26dbb "q\024\335\365=C8=A3'\221,\\\357\246w\253\242=D1=A0=D8=B5I\247(N(K=3D=
-\256\316DH\227QNf\371\"\271\017\226^\223\026\373\245z\255\227\025R.\244\205=
-\254\002\031T\033\312:h\226\a=DD=94\204=D4=AA\324\351K\341\365\247\032\354+=
-\277\005O'*l\301cXx\340~?\346\b\324k\225\223D\276\252\376\257_0\036\223\022=
-\006\212D|7h\257\226\300&n','\005zL\203M=CD=86\023\213\237(o\272\025_\305s\=
-372\362\351\002\367Ph\016\347\371E\n\030Y\340\002\r\362^&`\021\203}\353\324=
-A\340=D2=B3(\207]\300l}h\026\037H\372\n=3D\"C\024\t\200\325\334&=3D\333>\21=
-2=C6=8FE\214]_\372\264]"..., len=3D5, opaque=3D0xaaaaf9c4c400) at ../io/cha=
-nnel-tls.c:53
->   #5  0x0000aaaae2624114 in qcrypto_tls_session_pull (opaque=3D0xaaaafa4a=
-3d90, buf=3D0xaaaafa926dbb, len=3D5) at ../crypto/tlssession.c:89
->   #6  0x0000ffff7f63cd30 in _gnutls_stream_read (ms=3D0xfffff5d2317c, pul=
-l_func=3D0xaaaafa81a380, size=3D5, bufel=3D<synthetic pointer>, session=3D0=
-xaaaafa58b9d0) at buffers.c:346
->   #7  _gnutls_read (ms=3D0xfffff5d2317c, pull_func=3D0xaaaafa81a380, size=
-=3D5, bufel=3D<synthetic pointer>, session=3D0xaaaafa58b9d0) at buffers.c:4=
-26
->   #8  _gnutls_io_read_buffered (session=3Dsession@entry=3D0xaaaafa58b9d0,=
- total=3D5, recv_type=3Drecv_type@entry=3D4294967295, ms=3D0xfffff5d2317c) =
-at buffers.c:581
->   #9  0x0000ffff7f632954 in recv_headers (ms=3D<optimized out>, record=3D=
-0x1ee2a9fa78, htype=3D65535, type=3D2137262992, record_params=3D0xaaaafa4b7=
-1a0, session=3D0xaaaafa58b9d0) at record.c:1163
->   #10 _gnutls_recv_in_buffers (session=3Dsession@entry=3D0xaaaafa58b9d0, =
-type=3D2137262992, type@entry=3DGNUTLS_HANDSHAKE, htype=3D65535, htype@entr=
-y=3DGNUTLS_HANDSHAKE_CLIENT_HELLO, ms=3D<optimized out>, ms@entry=3D0) at r=
-ecord.c:1302
->   #11 0x0000ffff7f63e568 in _gnutls_handshake_io_recv_int (session=3Dsess=
-ion@entry=3D0xaaaafa58b9d0, htype=3Dhtype@entry=3DGNUTLS_HANDSHAKE_CLIENT_H=
-ELLO, hsk=3Dhsk@entry=3D0xfffff5d23308, optional=3Doptional@entry=3D0) at b=
-uffers.c:1445
->   #12 0x0000ffff7f640b90 in _gnutls_recv_handshake (session=3Dsession@ent=
-ry=3D0xaaaafa58b9d0, type=3Dtype@entry=3DGNUTLS_HANDSHAKE_CLIENT_HELLO, opt=
-ional=3Doptional@entry=3D0, buf=3Dbuf@entry=3D0x0) at handshake.c:1534
->   #13 0x0000ffff7f645f18 in handshake_server (session=3D<optimized out>) =
-at handshake.c:3351
->   #14 gnutls_handshake (session=3D0xaaaafa58b9d0) at handshake.c:2742
->   #15 0x0000aaaae262513c in qcrypto_tls_session_handshake (session=3D0xaa=
-aafa4a3d90, errp=3D0xfffff5d23478) at ../crypto/tlssession.c:493
->   #16 0x0000aaaae2631a40 in qio_channel_tls_handshake_task (ioc=3D0xaaaaf=
-9c4c400, task=3D0xaaaafa70e600, context=3D0x0) at ../io/channel-tls.c:161
->   #17 0x0000aaaae2631c60 in qio_channel_tls_handshake (ioc=3D0xaaaaf9c4c4=
-00, func=3D0xaaaae20d4b58 <migration_tls_incoming_handshake>, opaque=3D0x0,=
- destroy=3D0x0, context=3D0x0) at ../io/channel-tls.c:239
->   #18 0x0000aaaae20d4ca8 in migration_tls_channel_process_incoming (s=3D0=
-xaaaaf9b2ef20, ioc=3D0xaaaaf998a800, errp=3D0xfffff5d23548) at ../migration=
-/tls.c:103
->   #19 0x0000aaaae20f9f7c in migration_channel_process_incoming (ioc=3D0xa=
-aaaf998a800) at ../migration/channel.c:42
->   #20 0x0000aaaae1f484a8 in socket_accept_incoming_migration (listener=3D=
-0xffff64007a40, cioc=3D0xaaaaf998a800, opaque=3D0x0) at ../migration/socket=
-.c:130
->   #21 0x0000aaaae2638570 in qio_net_listener_channel_func (ioc=3D0xaaaafa=
-410600, condition=3DG_IO_IN, opaque=3D0xffff64007a40) at ../io/net-listener=
-.c:54
->   #22 0x0000aaaae263ac4c in qio_channel_fd_source_dispatch (source=3D0xaa=
-aafa81a380, callback=3D0xaaaae26384f8 <qio_net_listener_channel_func>, user=
-_data=3D0xffff64007a40) at ../io/channel-watch.c:84
->   #23 0x0000ffff7fb13a7c in g_main_context_dispatch () from target:/usr/l=
-ib64/libglib-2.0.so.0
->   #24 0x0000aaaae287d29c in glib_pollfds_poll () at ../util/main-loop.c:2=
-21
->   #25 0x0000aaaae287d324 in os_host_main_loop_wait (timeout=3D571000000) =
-at ../util/main-loop.c:244
->   #26 0x0000aaaae287d444 in main_loop_wait (nonblocking=3D0) at ../util/m=
-ain-loop.c:520
->   #27 0x0000aaaae24b9b20 in qemu_main_loop () at ../softmmu/vl.c:1677
->   #28 0x0000aaaae1eb79e4 in main (argc=3D83, argv=3D0xfffff5d238c8, envp=
-=3D0xfffff5d23b68) at ../softmmu/main.c:50
-> =
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 32a0e620dbb..a26af200c73 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -310,6 +310,13 @@ to build binaries for it.
+ ``Icelake-Client`` CPU Models are deprecated. Use ``Icelake-Server`` CPU
+ Models instead.
+ 
++MIPS ``I7200`` CPU Model (since 5.2)
++''''''''''''''''''''''''''''''''''''
++
++The ``I7200`` guest CPU relies on the nanoMIPS ISA, which is deprecated
++(the ISA has never been upstreamed to a compiler toolchain). Therefore
++this CPU is also deprecated.
++
+ System emulator devices
+ -----------------------
+ 
+@@ -413,6 +420,13 @@ The ``ppc64abi32`` architecture has a number of issues which regularly
+ trip up our CI testing and is suspected to be quite broken. For that
+ reason the maintainers strongly suspect no one actually uses it.
+ 
++MIPS ``I7200`` CPU (since 5.2)
++''''''''''''''''''''''''''''''
++
++The ``I7200`` guest CPU relies on the nanoMIPS ISA, which is deprecated
++(the ISA has never been upstreamed to a compiler toolchain). Therefore
++this CPU is also deprecated.
++
+ Related binaries
+ ----------------
+ 
+@@ -477,6 +491,15 @@ versions, aliases will point to newer CPU model versions
+ depending on the machine type, so management software must
+ resolve CPU model aliases before starting a virtual machine.
+ 
++Guest Emulator ISAs
++-------------------
++
++nanoMIPS ISA
++''''''''''''
++
++The ``nanoMIPS`` ISA has never been upstreamed to any compiler toolchain.
++As it is hard to generate binaries for it, declare it deprecated.
++
+ 
+ Recently removed features
+ =========================
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2c22bbca5ac..4f701012eea 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -227,7 +227,7 @@ R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+ S: Odd Fixes
+ F: target/mips/
+ F: default-configs/*mips*
+-F: disas/*mips*
++F: disas/mips.c
+ F: docs/system/cpu-models-mips.rst.inc
+ F: hw/intc/mips_gic.c
+ F: hw/mips/
+@@ -240,6 +240,10 @@ F: include/hw/timer/mips_gictimer.h
+ F: tests/tcg/mips/
+ K: ^Subject:.*(?i)mips
+ 
++MIPS TCG CPUs (nanoMIPS ISA)
++S: Orphan
++F: disas/nanomips.*
++
+ Moxie TCG CPUs
+ M: Anthony Green <green@moxielogic.com>
+ S: Maintained
+-- 
+2.26.2
 
-> --
-> You received this bug notification because you are a member of qemu- deve=
-l-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1902470
-> =
-
-> Title:
->   migration with TLS-MultiFD is stuck when the dst-libvirtd service
->   restarts
-> =
-
-> Status in QEMU:
->   New
-> =
-
-> Bug description:
->   hi,
-> =
-
->   I found that the multi-channel TLS-handshake will be stuck when the
->   dst-libvirtd restarts, both the src and dst sockets are blocked in
->   recvmsg. In the meantime, live_migration thread is blocked in
->   multifd_send_sync_main, so migration cannot be cancelled though src-
->   libvirt has delivered the QMP command.
-> =
-
->   Is there any way to exit migration when the multi-channel TLS-
->   handshake is stuck? Does setting TLS-handshake timeout function take
->   effect?
-> =
-
->   The stack trace are as follows:
-> =
-
->   =3D=3D=3D=3D=3Dsrc qemu-system-aar stack=3D=3D=3D=3D=3D:
->   #0  0x0000ffff87d6f28c in recvmsg () from target:/usr/lib64/libpthread.=
-so.0
->   #1  0x0000aaaae3817424 in qio_channel_socket_readv (ioc=3D0xaaaae9e30a3=
-0, iov=3D0xffffdb58e8a8, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ..=
-/io/channel-socket.c:502
->   #2  0x0000aaaae380f468 in qio_channel_readv_full (ioc=3D0xaaaae9e30a30,=
- iov=3D0xffffdb58e8a8, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ../i=
-o/channel.c:66
->   #3  0x0000aaaae380f9e8 in qio_channel_read (ioc=3D0xaaaae9e30a30, buf=
-=3D0xaaaaea204e9b "\026\003\001\001L\001", buflen=3D5, errp=3D0x0) at ../io=
-/channel.c:217
->   #4  0x0000aaaae380e7d4 in qio_channel_tls_read_handler (buf=3D0xaaaaea2=
-04e9b "\026\003\001\001L\001", len=3D5, opaque=3D0xfffd38001190) at ../io/c=
-hannel-tls.c:53
->   #5  0x0000aaaae3801114 in qcrypto_tls_session_pull (opaque=3D0xaaaae99d=
-5700, buf=3D0xaaaaea204e9b, len=3D5) at ../crypto/tlssession.c:89
->   #6  0x0000ffff8822ed30 in _gnutls_stream_read (ms=3D0xffffdb58eaac, pul=
-l_func=3D0xfffd38001870, size=3D5, bufel=3D<synthetic pointer>, session=3D0=
-xaaaae983cd60) at buffers.c:346
->   #7  _gnutls_read (ms=3D0xffffdb58eaac, pull_func=3D0xfffd38001870, size=
-=3D5, bufel=3D<synthetic pointer>, session=3D0xaaaae983cd60) at buffers.c:4=
-26
->   #8  _gnutls_io_read_buffered (session=3Dsession@entry=3D0xaaaae983cd60,=
- total=3D5, recv_type=3Drecv_type@entry=3D4294967295, ms=3D0xffffdb58eaac) =
-at buffers.c:581
->   #9  0x0000ffff88224954 in recv_headers (ms=3D<optimized out>, record=3D=
-0xffff883cd000 <gnutls_x509_ext_export_name_constraints@got.plt>, htype=3D6=
-5535, type=3D2284006288, record_params=3D0xaaaae9e22a60, session=3D0xaaaae9=
-83cd60) at record.c:1163
->   #10 _gnutls_recv_in_buffers (session=3Dsession@entry=3D0xaaaae983cd60, =
-type=3D2284006288, type@entry=3DGNUTLS_HANDSHAKE, htype=3D65535, htype@entr=
-y=3DGNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST, ms=3D<optimized out>, ms@entry=3D=
-0) at record.c:1302
->   #11 0x0000ffff88230568 in _gnutls_handshake_io_recv_int (session=3Dsess=
-ion@entry=3D0xaaaae983cd60, htype=3Dhtype@entry=3DGNUTLS_HANDSHAKE_HELLO_RE=
-TRY_REQUEST, hsk=3Dhsk@entry=3D0xffffdb58ec38, optional=3Doptional@entry=3D=
-1) at buffers.c:1445
->   #12 0x0000ffff88232b90 in _gnutls_recv_handshake (session=3Dsession@ent=
-ry=3D0xaaaae983cd60, type=3Dtype@entry=3DGNUTLS_HANDSHAKE_HELLO_RETRY_REQUE=
-ST, optional=3Doptional@entry=3D1, buf=3Dbuf@entry=3D0x0) at handshake.c:15=
-34
->   #13 0x0000ffff88235b40 in handshake_client (session=3Dsession@entry=3D0=
-xaaaae983cd60) at handshake.c:2925
->   #14 0x0000ffff88237824 in gnutls_handshake (session=3D0xaaaae983cd60) a=
-t handshake.c:2739
->   #15 0x0000aaaae380213c in qcrypto_tls_session_handshake (session=3D0xaa=
-aae99d5700, errp=3D0xffffdb58ee58) at ../crypto/tlssession.c:493
->   #16 0x0000aaaae380ea40 in qio_channel_tls_handshake_task (ioc=3D0xfffd3=
-8001190, task=3D0xaaaaea61d4e0, context=3D0x0) at ../io/channel-tls.c:161
->   #17 0x0000aaaae380ec60 in qio_channel_tls_handshake (ioc=3D0xfffd380011=
-90, func=3D0xaaaae3394d20 <multifd_tls_outgoing_handshake>, opaque=3D0xaaaa=
-ea189c30, destroy=3D0x0, context=3D0x0) at ../io/channel-tls.c:239
->   #18 0x0000aaaae3394e78 in multifd_tls_channel_connect (p=3D0xaaaaea189c=
-30, ioc=3D0xaaaae9e30a30, errp=3D0xffffdb58ef28) at ../migration/multifd.c:=
-782
->   #19 0x0000aaaae3394f30 in multifd_channel_connect (p=3D0xaaaaea189c30, =
-ioc=3D0xaaaae9e30a30, error=3D0x0) at ../migration/multifd.c:804
->   #20 0x0000aaaae33950b8 in multifd_new_send_channel_async (task=3D0xaaaa=
-ea6855a0, opaque=3D0xaaaaea189c30) at ../migration/multifd.c:858
->   #21 0x0000aaaae3810cf8 in qio_task_complete (task=3D0xaaaaea6855a0) at =
-../io/task.c:197
->   #22 0x0000aaaae381096c in qio_task_thread_result (opaque=3D0xaaaaea6855=
-a0) at ../io/task.c:112
->   #23 0x0000ffff88701df8 in ?? () from target:/usr/lib64/libglib-2.0.so.0
->   #24 0x0000ffff88705a7c in g_main_context_dispatch () from target:/usr/l=
-ib64/libglib-2.0.so.0
->   #25 0x0000aaaae3a5a29c in glib_pollfds_poll () at ../util/main-loop.c:2=
-21
->   #26 0x0000aaaae3a5a324 in os_host_main_loop_wait (timeout=3D0) at ../ut=
-il/main-loop.c:244
->   #27 0x0000aaaae3a5a444 in main_loop_wait (nonblocking=3D0) at ../util/m=
-ain-loop.c:520
->   #28 0x0000aaaae3696b20 in qemu_main_loop () at ../softmmu/vl.c:1677
->   #29 0x0000aaaae30949e4 in main (argc=3D81, argv=3D0xffffdb58f2c8, envp=
-=3D0xffffdb58f558) at ../softmmu/main.c:50
-> =
-
->   =3D=3D=3D=3D=3Dsrc live_migration stack=3D=3D=3D=3D=3D:
->   #0  0x0000ffff87d6a5d8 in pthread_cond_wait () from target:/usr/lib64/l=
-ibpthread.so.0
->   #1  0x0000aaaae3a5f3ec in qemu_sem_wait (sem=3D0xaaaaea189d40) at ../ut=
-il/qemu-thread-posix.c:328
->   #2  0x0000aaaae3394838 in multifd_send_sync_main (f=3D0xaaaae983f0e0) a=
-t ../migration/multifd.c:638
->   #3  0x0000aaaae37de310 in ram_save_setup (f=3D0xaaaae983f0e0, opaque=3D=
-0xaaaae4198708 <ram_state>) at ../migration/ram.c:2588
->   #4  0x0000aaaae31cf7ac in qemu_savevm_state_setup (f=3D0xaaaae983f0e0) =
-at ../migration/savevm.c:1176
->   #5  0x0000aaaae3248360 in migration_thread (opaque=3D0xaaaae9829f20) at=
- ../migration/migration.c:3521
->   #6  0x0000aaaae3a5f8fc in qemu_thread_start (args=3D0xaaaaea513ee0) at =
-../util/qemu-thread-posix.c:521
->   #7  0x0000ffff87d647ac in ?? () from target:/usr/lib64/libpthread.so.0
->   #8  0x0000ffff87cba6ec in ?? () from target:/usr/lib64/libc.so.6
-> =
-
->   =3D=3D=3D=3D=3Ddst qemu-system-aar stack=3D=3D=3D=3D=3D:
->   #0  0x0000ffff7f17d28c in recvmsg () from target:/usr/lib64/libpthread.=
-so.0
->   #1  0x0000aaaae263a424 in qio_channel_socket_readv (ioc=3D0xaaaaf998a80=
-0, iov=3D0xfffff5d22f78, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ..=
-/io/channel-socket.c:502
->   #2  0x0000aaaae2632468 in qio_channel_readv_full (ioc=3D0xaaaaf998a800,=
- iov=3D0xfffff5d22f78, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ../i=
-o/channel.c:66
->   #3  0x0000aaaae26329e8 in qio_channel_read (ioc=3D0xaaaaf998a800, buf=
-=3D0xaaaafa926dbb "q\024\335\365=C8=A3'\221,\\\357\246w\253\242=D1=A0=D8=B5=
-I\247(N(K=3D\256\316DH\227QNf\371\"\271\017\226^\223\026\373\245z\255\227\0=
-25R.\244\205\254\002\031T\033\312:h\226\a=DD=94\204=D4=AA\324\351K\341\365\=
-247\032\354+\277\005O'*l\301cXx\340~?\346\b\324k\225\223D\276\252\376\257_0=
-\036\223\022\006\212D|7h\257\226\300&n','\005zL\203M=CD=86\023\213\237(o\27=
-2\025_\305s\372\362\351\002\367Ph\016\347\371E\n\030Y\340\002\r\362^&`\021\=
-203}\353\324A\340=D2=B3(\207]\300l}h\026\037H\372\n=3D\"C\024\t\200\325\334=
-&=3D\333>\212=C6=8FE\214]_\372\264]"..., buflen=3D5, errp=3D0x0) at ../io/c=
-hannel.c:217
->   #4  0x0000aaaae26317d4 in qio_channel_tls_read_handler (buf=3D0xaaaafa9=
-26dbb "q\024\335\365=C8=A3'\221,\\\357\246w\253\242=D1=A0=D8=B5I\247(N(K=3D=
-\256\316DH\227QNf\371\"\271\017\226^\223\026\373\245z\255\227\025R.\244\205=
-\254\002\031T\033\312:h\226\a=DD=94\204=D4=AA\324\351K\341\365\247\032\354+=
-\277\005O'*l\301cXx\340~?\346\b\324k\225\223D\276\252\376\257_0\036\223\022=
-\006\212D|7h\257\226\300&n','\005zL\203M=CD=86\023\213\237(o\272\025_\305s\=
-372\362\351\002\367Ph\016\347\371E\n\030Y\340\002\r\362^&`\021\203}\353\324=
-A\340=D2=B3(\207]\300l}h\026\037H\372\n=3D\"C\024\t\200\325\334&=3D\333>\21=
-2=C6=8FE\214]_\372\264]"..., len=3D5, opaque=3D0xaaaaf9c4c400) at ../io/cha=
-nnel-tls.c:53
->   #5  0x0000aaaae2624114 in qcrypto_tls_session_pull (opaque=3D0xaaaafa4a=
-3d90, buf=3D0xaaaafa926dbb, len=3D5) at ../crypto/tlssession.c:89
->   #6  0x0000ffff7f63cd30 in _gnutls_stream_read (ms=3D0xfffff5d2317c, pul=
-l_func=3D0xaaaafa81a380, size=3D5, bufel=3D<synthetic pointer>, session=3D0=
-xaaaafa58b9d0) at buffers.c:346
->   #7  _gnutls_read (ms=3D0xfffff5d2317c, pull_func=3D0xaaaafa81a380, size=
-=3D5, bufel=3D<synthetic pointer>, session=3D0xaaaafa58b9d0) at buffers.c:4=
-26
->   #8  _gnutls_io_read_buffered (session=3Dsession@entry=3D0xaaaafa58b9d0,=
- total=3D5, recv_type=3Drecv_type@entry=3D4294967295, ms=3D0xfffff5d2317c) =
-at buffers.c:581
->   #9  0x0000ffff7f632954 in recv_headers (ms=3D<optimized out>, record=3D=
-0x1ee2a9fa78, htype=3D65535, type=3D2137262992, record_params=3D0xaaaafa4b7=
-1a0, session=3D0xaaaafa58b9d0) at record.c:1163
->   #10 _gnutls_recv_in_buffers (session=3Dsession@entry=3D0xaaaafa58b9d0, =
-type=3D2137262992, type@entry=3DGNUTLS_HANDSHAKE, htype=3D65535, htype@entr=
-y=3DGNUTLS_HANDSHAKE_CLIENT_HELLO, ms=3D<optimized out>, ms@entry=3D0) at r=
-ecord.c:1302
->   #11 0x0000ffff7f63e568 in _gnutls_handshake_io_recv_int (session=3Dsess=
-ion@entry=3D0xaaaafa58b9d0, htype=3Dhtype@entry=3DGNUTLS_HANDSHAKE_CLIENT_H=
-ELLO, hsk=3Dhsk@entry=3D0xfffff5d23308, optional=3Doptional@entry=3D0) at b=
-uffers.c:1445
->   #12 0x0000ffff7f640b90 in _gnutls_recv_handshake (session=3Dsession@ent=
-ry=3D0xaaaafa58b9d0, type=3Dtype@entry=3DGNUTLS_HANDSHAKE_CLIENT_HELLO, opt=
-ional=3Doptional@entry=3D0, buf=3Dbuf@entry=3D0x0) at handshake.c:1534
->   #13 0x0000ffff7f645f18 in handshake_server (session=3D<optimized out>) =
-at handshake.c:3351
->   #14 gnutls_handshake (session=3D0xaaaafa58b9d0) at handshake.c:2742
->   #15 0x0000aaaae262513c in qcrypto_tls_session_handshake (session=3D0xaa=
-aafa4a3d90, errp=3D0xfffff5d23478) at ../crypto/tlssession.c:493
->   #16 0x0000aaaae2631a40 in qio_channel_tls_handshake_task (ioc=3D0xaaaaf=
-9c4c400, task=3D0xaaaafa70e600, context=3D0x0) at ../io/channel-tls.c:161
->   #17 0x0000aaaae2631c60 in qio_channel_tls_handshake (ioc=3D0xaaaaf9c4c4=
-00, func=3D0xaaaae20d4b58 <migration_tls_incoming_handshake>, opaque=3D0x0,=
- destroy=3D0x0, context=3D0x0) at ../io/channel-tls.c:239
->   #18 0x0000aaaae20d4ca8 in migration_tls_channel_process_incoming (s=3D0=
-xaaaaf9b2ef20, ioc=3D0xaaaaf998a800, errp=3D0xfffff5d23548) at ../migration=
-/tls.c:103
->   #19 0x0000aaaae20f9f7c in migration_channel_process_incoming (ioc=3D0xa=
-aaaf998a800) at ../migration/channel.c:42
->   #20 0x0000aaaae1f484a8 in socket_accept_incoming_migration (listener=3D=
-0xffff64007a40, cioc=3D0xaaaaf998a800, opaque=3D0x0) at ../migration/socket=
-.c:130
->   #21 0x0000aaaae2638570 in qio_net_listener_channel_func (ioc=3D0xaaaafa=
-410600, condition=3DG_IO_IN, opaque=3D0xffff64007a40) at ../io/net-listener=
-.c:54
->   #22 0x0000aaaae263ac4c in qio_channel_fd_source_dispatch (source=3D0xaa=
-aafa81a380, callback=3D0xaaaae26384f8 <qio_net_listener_channel_func>, user=
-_data=3D0xffff64007a40) at ../io/channel-watch.c:84
->   #23 0x0000ffff7fb13a7c in g_main_context_dispatch () from target:/usr/l=
-ib64/libglib-2.0.so.0
->   #24 0x0000aaaae287d29c in glib_pollfds_poll () at ../util/main-loop.c:2=
-21
->   #25 0x0000aaaae287d324 in os_host_main_loop_wait (timeout=3D571000000) =
-at ../util/main-loop.c:244
->   #26 0x0000aaaae287d444 in main_loop_wait (nonblocking=3D0) at ../util/m=
-ain-loop.c:520
->   #27 0x0000aaaae24b9b20 in qemu_main_loop () at ../softmmu/vl.c:1677
->   #28 0x0000aaaae1eb79e4 in main (argc=3D83, argv=3D0xfffff5d238c8, envp=
-=3D0xfffff5d23b68) at ../softmmu/main.c:50
-> =
-
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1902470/+subscriptions
-> =
-
--- =
-
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1902470
-
-Title:
-  migration with TLS-MultiFD is stuck when the dst-libvirtd service
-  restarts
-
-Status in QEMU:
-  New
-
-Bug description:
-  hi,
-
-  I found that the multi-channel TLS-handshake will be stuck when the
-  dst-libvirtd restarts, both the src and dst sockets are blocked in
-  recvmsg. In the meantime, live_migration thread is blocked in
-  multifd_send_sync_main, so migration cannot be cancelled though src-
-  libvirt has delivered the QMP command.
-
-  Is there any way to exit migration when the multi-channel TLS-
-  handshake is stuck? Does setting TLS-handshake timeout function take
-  effect?
-
-  The stack trace are as follows:
-
-  =3D=3D=3D=3D=3Dsrc qemu-system-aar stack=3D=3D=3D=3D=3D:
-  #0  0x0000ffff87d6f28c in recvmsg () from target:/usr/lib64/libpthread.so=
-.0
-  #1  0x0000aaaae3817424 in qio_channel_socket_readv (ioc=3D0xaaaae9e30a30,=
- iov=3D0xffffdb58e8a8, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ../i=
-o/channel-socket.c:502
-  #2  0x0000aaaae380f468 in qio_channel_readv_full (ioc=3D0xaaaae9e30a30, i=
-ov=3D0xffffdb58e8a8, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ../io/=
-channel.c:66
-  #3  0x0000aaaae380f9e8 in qio_channel_read (ioc=3D0xaaaae9e30a30, buf=3D0=
-xaaaaea204e9b "\026\003\001\001L\001", buflen=3D5, errp=3D0x0) at ../io/cha=
-nnel.c:217
-  #4  0x0000aaaae380e7d4 in qio_channel_tls_read_handler (buf=3D0xaaaaea204=
-e9b "\026\003\001\001L\001", len=3D5, opaque=3D0xfffd38001190) at ../io/cha=
-nnel-tls.c:53
-  #5  0x0000aaaae3801114 in qcrypto_tls_session_pull (opaque=3D0xaaaae99d57=
-00, buf=3D0xaaaaea204e9b, len=3D5) at ../crypto/tlssession.c:89
-  #6  0x0000ffff8822ed30 in _gnutls_stream_read (ms=3D0xffffdb58eaac, pull_=
-func=3D0xfffd38001870, size=3D5, bufel=3D<synthetic pointer>, session=3D0xa=
-aaae983cd60) at buffers.c:346
-  #7  _gnutls_read (ms=3D0xffffdb58eaac, pull_func=3D0xfffd38001870, size=
-=3D5, bufel=3D<synthetic pointer>, session=3D0xaaaae983cd60) at buffers.c:4=
-26
-  #8  _gnutls_io_read_buffered (session=3Dsession@entry=3D0xaaaae983cd60, t=
-otal=3D5, recv_type=3Drecv_type@entry=3D4294967295, ms=3D0xffffdb58eaac) at=
- buffers.c:581
-  #9  0x0000ffff88224954 in recv_headers (ms=3D<optimized out>, record=3D0x=
-ffff883cd000 <gnutls_x509_ext_export_name_constraints@got.plt>, htype=3D655=
-35, type=3D2284006288, record_params=3D0xaaaae9e22a60, session=3D0xaaaae983=
-cd60) at record.c:1163
-  #10 _gnutls_recv_in_buffers (session=3Dsession@entry=3D0xaaaae983cd60, ty=
-pe=3D2284006288, type@entry=3DGNUTLS_HANDSHAKE, htype=3D65535, htype@entry=
-=3DGNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST, ms=3D<optimized out>, ms@entry=3D0=
-) at record.c:1302
-  #11 0x0000ffff88230568 in _gnutls_handshake_io_recv_int (session=3Dsessio=
-n@entry=3D0xaaaae983cd60, htype=3Dhtype@entry=3DGNUTLS_HANDSHAKE_HELLO_RETR=
-Y_REQUEST, hsk=3Dhsk@entry=3D0xffffdb58ec38, optional=3Doptional@entry=3D1)=
- at buffers.c:1445
-  #12 0x0000ffff88232b90 in _gnutls_recv_handshake (session=3Dsession@entry=
-=3D0xaaaae983cd60, type=3Dtype@entry=3DGNUTLS_HANDSHAKE_HELLO_RETRY_REQUEST=
-, optional=3Doptional@entry=3D1, buf=3Dbuf@entry=3D0x0) at handshake.c:1534
-  #13 0x0000ffff88235b40 in handshake_client (session=3Dsession@entry=3D0xa=
-aaae983cd60) at handshake.c:2925
-  #14 0x0000ffff88237824 in gnutls_handshake (session=3D0xaaaae983cd60) at =
-handshake.c:2739
-  #15 0x0000aaaae380213c in qcrypto_tls_session_handshake (session=3D0xaaaa=
-e99d5700, errp=3D0xffffdb58ee58) at ../crypto/tlssession.c:493
-  #16 0x0000aaaae380ea40 in qio_channel_tls_handshake_task (ioc=3D0xfffd380=
-01190, task=3D0xaaaaea61d4e0, context=3D0x0) at ../io/channel-tls.c:161
-  #17 0x0000aaaae380ec60 in qio_channel_tls_handshake (ioc=3D0xfffd38001190=
-, func=3D0xaaaae3394d20 <multifd_tls_outgoing_handshake>, opaque=3D0xaaaaea=
-189c30, destroy=3D0x0, context=3D0x0) at ../io/channel-tls.c:239
-  #18 0x0000aaaae3394e78 in multifd_tls_channel_connect (p=3D0xaaaaea189c30=
-, ioc=3D0xaaaae9e30a30, errp=3D0xffffdb58ef28) at ../migration/multifd.c:782
-  #19 0x0000aaaae3394f30 in multifd_channel_connect (p=3D0xaaaaea189c30, io=
-c=3D0xaaaae9e30a30, error=3D0x0) at ../migration/multifd.c:804
-  #20 0x0000aaaae33950b8 in multifd_new_send_channel_async (task=3D0xaaaaea=
-6855a0, opaque=3D0xaaaaea189c30) at ../migration/multifd.c:858
-  #21 0x0000aaaae3810cf8 in qio_task_complete (task=3D0xaaaaea6855a0) at ..=
-/io/task.c:197
-  #22 0x0000aaaae381096c in qio_task_thread_result (opaque=3D0xaaaaea6855a0=
-) at ../io/task.c:112
-  #23 0x0000ffff88701df8 in ?? () from target:/usr/lib64/libglib-2.0.so.0
-  #24 0x0000ffff88705a7c in g_main_context_dispatch () from target:/usr/lib=
-64/libglib-2.0.so.0
-  #25 0x0000aaaae3a5a29c in glib_pollfds_poll () at ../util/main-loop.c:221
-  #26 0x0000aaaae3a5a324 in os_host_main_loop_wait (timeout=3D0) at ../util=
-/main-loop.c:244
-  #27 0x0000aaaae3a5a444 in main_loop_wait (nonblocking=3D0) at ../util/mai=
-n-loop.c:520
-  #28 0x0000aaaae3696b20 in qemu_main_loop () at ../softmmu/vl.c:1677
-  #29 0x0000aaaae30949e4 in main (argc=3D81, argv=3D0xffffdb58f2c8, envp=3D=
-0xffffdb58f558) at ../softmmu/main.c:50
-
-  =3D=3D=3D=3D=3Dsrc live_migration stack=3D=3D=3D=3D=3D:
-  #0  0x0000ffff87d6a5d8 in pthread_cond_wait () from target:/usr/lib64/lib=
-pthread.so.0
-  #1  0x0000aaaae3a5f3ec in qemu_sem_wait (sem=3D0xaaaaea189d40) at ../util=
-/qemu-thread-posix.c:328
-  #2  0x0000aaaae3394838 in multifd_send_sync_main (f=3D0xaaaae983f0e0) at =
-../migration/multifd.c:638
-  #3  0x0000aaaae37de310 in ram_save_setup (f=3D0xaaaae983f0e0, opaque=3D0x=
-aaaae4198708 <ram_state>) at ../migration/ram.c:2588
-  #4  0x0000aaaae31cf7ac in qemu_savevm_state_setup (f=3D0xaaaae983f0e0) at=
- ../migration/savevm.c:1176
-  #5  0x0000aaaae3248360 in migration_thread (opaque=3D0xaaaae9829f20) at .=
-./migration/migration.c:3521
-  #6  0x0000aaaae3a5f8fc in qemu_thread_start (args=3D0xaaaaea513ee0) at ..=
-/util/qemu-thread-posix.c:521
-  #7  0x0000ffff87d647ac in ?? () from target:/usr/lib64/libpthread.so.0
-  #8  0x0000ffff87cba6ec in ?? () from target:/usr/lib64/libc.so.6
-
-  =3D=3D=3D=3D=3Ddst qemu-system-aar stack=3D=3D=3D=3D=3D:
-  #0  0x0000ffff7f17d28c in recvmsg () from target:/usr/lib64/libpthread.so=
-.0
-  #1  0x0000aaaae263a424 in qio_channel_socket_readv (ioc=3D0xaaaaf998a800,=
- iov=3D0xfffff5d22f78, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ../i=
-o/channel-socket.c:502
-  #2  0x0000aaaae2632468 in qio_channel_readv_full (ioc=3D0xaaaaf998a800, i=
-ov=3D0xfffff5d22f78, niov=3D1, fds=3D0x0, nfds=3D0x0, errp=3D0x0) at ../io/=
-channel.c:66
-  #3  0x0000aaaae26329e8 in qio_channel_read (ioc=3D0xaaaaf998a800, buf=3D0=
-xaaaafa926dbb "q\024\335\365=C8=A3'\221,\\\357\246w\253\242=D1=A0=D8=B5I\24=
-7(N(K=3D\256\316DH\227QNf\371\"\271\017\226^\223\026\373\245z\255\227\025R.=
-\244\205\254\002\031T\033\312:h\226\a=DD=94\204=D4=AA\324\351K\341\365\247\=
-032\354+\277\005O'*l\301cXx\340~?\346\b\324k\225\223D\276\252\376\257_0\036=
-\223\022\006\212D|7h\257\226\300&n','\005zL\203M=CD=86\023\213\237(o\272\02=
-5_\305s\372\362\351\002\367Ph\016\347\371E\n\030Y\340\002\r\362^&`\021\203}=
-\353\324A\340=D2=B3(\207]\300l}h\026\037H\372\n=3D\"C\024\t\200\325\334&=3D=
-\333>\212=C6=8FE\214]_\372\264]"..., buflen=3D5, errp=3D0x0) at ../io/chann=
-el.c:217
-  #4  0x0000aaaae26317d4 in qio_channel_tls_read_handler (buf=3D0xaaaafa926=
-dbb "q\024\335\365=C8=A3'\221,\\\357\246w\253\242=D1=A0=D8=B5I\247(N(K=3D\2=
-56\316DH\227QNf\371\"\271\017\226^\223\026\373\245z\255\227\025R.\244\205\2=
-54\002\031T\033\312:h\226\a=DD=94\204=D4=AA\324\351K\341\365\247\032\354+\2=
-77\005O'*l\301cXx\340~?\346\b\324k\225\223D\276\252\376\257_0\036\223\022\0=
-06\212D|7h\257\226\300&n','\005zL\203M=CD=86\023\213\237(o\272\025_\305s\37=
-2\362\351\002\367Ph\016\347\371E\n\030Y\340\002\r\362^&`\021\203}\353\324A\=
-340=D2=B3(\207]\300l}h\026\037H\372\n=3D\"C\024\t\200\325\334&=3D\333>\212=
-=C6=8FE\214]_\372\264]"..., len=3D5, opaque=3D0xaaaaf9c4c400) at ../io/chan=
-nel-tls.c:53
-  #5  0x0000aaaae2624114 in qcrypto_tls_session_pull (opaque=3D0xaaaafa4a3d=
-90, buf=3D0xaaaafa926dbb, len=3D5) at ../crypto/tlssession.c:89
-  #6  0x0000ffff7f63cd30 in _gnutls_stream_read (ms=3D0xfffff5d2317c, pull_=
-func=3D0xaaaafa81a380, size=3D5, bufel=3D<synthetic pointer>, session=3D0xa=
-aaafa58b9d0) at buffers.c:346
-  #7  _gnutls_read (ms=3D0xfffff5d2317c, pull_func=3D0xaaaafa81a380, size=
-=3D5, bufel=3D<synthetic pointer>, session=3D0xaaaafa58b9d0) at buffers.c:4=
-26
-  #8  _gnutls_io_read_buffered (session=3Dsession@entry=3D0xaaaafa58b9d0, t=
-otal=3D5, recv_type=3Drecv_type@entry=3D4294967295, ms=3D0xfffff5d2317c) at=
- buffers.c:581
-  #9  0x0000ffff7f632954 in recv_headers (ms=3D<optimized out>, record=3D0x=
-1ee2a9fa78, htype=3D65535, type=3D2137262992, record_params=3D0xaaaafa4b71a=
-0, session=3D0xaaaafa58b9d0) at record.c:1163
-  #10 _gnutls_recv_in_buffers (session=3Dsession@entry=3D0xaaaafa58b9d0, ty=
-pe=3D2137262992, type@entry=3DGNUTLS_HANDSHAKE, htype=3D65535, htype@entry=
-=3DGNUTLS_HANDSHAKE_CLIENT_HELLO, ms=3D<optimized out>, ms@entry=3D0) at re=
-cord.c:1302
-  #11 0x0000ffff7f63e568 in _gnutls_handshake_io_recv_int (session=3Dsessio=
-n@entry=3D0xaaaafa58b9d0, htype=3Dhtype@entry=3DGNUTLS_HANDSHAKE_CLIENT_HEL=
-LO, hsk=3Dhsk@entry=3D0xfffff5d23308, optional=3Doptional@entry=3D0) at buf=
-fers.c:1445
-  #12 0x0000ffff7f640b90 in _gnutls_recv_handshake (session=3Dsession@entry=
-=3D0xaaaafa58b9d0, type=3Dtype@entry=3DGNUTLS_HANDSHAKE_CLIENT_HELLO, optio=
-nal=3Doptional@entry=3D0, buf=3Dbuf@entry=3D0x0) at handshake.c:1534
-  #13 0x0000ffff7f645f18 in handshake_server (session=3D<optimized out>) at=
- handshake.c:3351
-  #14 gnutls_handshake (session=3D0xaaaafa58b9d0) at handshake.c:2742
-  #15 0x0000aaaae262513c in qcrypto_tls_session_handshake (session=3D0xaaaa=
-fa4a3d90, errp=3D0xfffff5d23478) at ../crypto/tlssession.c:493
-  #16 0x0000aaaae2631a40 in qio_channel_tls_handshake_task (ioc=3D0xaaaaf9c=
-4c400, task=3D0xaaaafa70e600, context=3D0x0) at ../io/channel-tls.c:161
-  #17 0x0000aaaae2631c60 in qio_channel_tls_handshake (ioc=3D0xaaaaf9c4c400=
-, func=3D0xaaaae20d4b58 <migration_tls_incoming_handshake>, opaque=3D0x0, d=
-estroy=3D0x0, context=3D0x0) at ../io/channel-tls.c:239
-  #18 0x0000aaaae20d4ca8 in migration_tls_channel_process_incoming (s=3D0xa=
-aaaf9b2ef20, ioc=3D0xaaaaf998a800, errp=3D0xfffff5d23548) at ../migration/t=
-ls.c:103
-  #19 0x0000aaaae20f9f7c in migration_channel_process_incoming (ioc=3D0xaaa=
-af998a800) at ../migration/channel.c:42
-  #20 0x0000aaaae1f484a8 in socket_accept_incoming_migration (listener=3D0x=
-ffff64007a40, cioc=3D0xaaaaf998a800, opaque=3D0x0) at ../migration/socket.c=
-:130
-  #21 0x0000aaaae2638570 in qio_net_listener_channel_func (ioc=3D0xaaaafa41=
-0600, condition=3DG_IO_IN, opaque=3D0xffff64007a40) at ../io/net-listener.c=
-:54
-  #22 0x0000aaaae263ac4c in qio_channel_fd_source_dispatch (source=3D0xaaaa=
-fa81a380, callback=3D0xaaaae26384f8 <qio_net_listener_channel_func>, user_d=
-ata=3D0xffff64007a40) at ../io/channel-watch.c:84
-  #23 0x0000ffff7fb13a7c in g_main_context_dispatch () from target:/usr/lib=
-64/libglib-2.0.so.0
-  #24 0x0000aaaae287d29c in glib_pollfds_poll () at ../util/main-loop.c:221
-  #25 0x0000aaaae287d324 in os_host_main_loop_wait (timeout=3D571000000) at=
- ../util/main-loop.c:244
-  #26 0x0000aaaae287d444 in main_loop_wait (nonblocking=3D0) at ../util/mai=
-n-loop.c:520
-  #27 0x0000aaaae24b9b20 in qemu_main_loop () at ../softmmu/vl.c:1677
-  #28 0x0000aaaae1eb79e4 in main (argc=3D83, argv=3D0xfffff5d238c8, envp=3D=
-0xfffff5d23b68) at ../softmmu/main.c:50
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1902470/+subscriptions
 
