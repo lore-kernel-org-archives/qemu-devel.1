@@ -2,85 +2,78 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDB5C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:31:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A50EC4742C
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:34:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64AFD21D91
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:31:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90C65208A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:34:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JrLqcbFG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64AFD21D91
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f5W9esqf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C65208A9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZdfz-0002LW-E6
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 12:31:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54120)
+	id 1kZdig-0004pQ-Qs
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 12:34:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZdM2-0001HH-Fo
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:50 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:39183)
+ id 1kZdgE-0002rD-64
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:31:42 -0500
+Received: from mail-ej1-x631.google.com ([2a00:1450:4864:20::631]:34925)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZdLz-0006dN-H1
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:50 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id 205so2472310wma.4
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 09:10:47 -0800 (PST)
+ id 1kZdgB-0000hB-LB
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:31:41 -0500
+Received: by mail-ej1-x631.google.com with SMTP id p5so20026398ejj.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 09:31:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=KnPXJ6NqptesuWN0QOJA3/7JLRDcQ5MPX9LbhM6n5G4=;
- b=JrLqcbFGMBk3yfGooxAODLMRIsLrQ2y2MW+X8r/4W5pIPI6dGQhVdVy/hFEwjKEuho
- tiSLZnw/5CFJAAjBgaPRiTChn/Bt6htSknaDCnww+0mo81aj2MMfgl5sIcZ9YgCj8+jw
- AQCB1CwaQP6k+e0a6bQD+HZ7VdlVtB0HshLH+x5GLI+BA8HGgYglw4veFYR7qxX5m2l9
- I88gkIxrPRCuchtRrXpKtQ7DyS3BLhsmBle6/mDPesa6v2rONlwTbXwE88yR58ZZRefQ
- dr8xXBhur/9f6bwVZhZ8b+19m3YyR7sOyH1UBjeQCeNW+Ch5gUvjl9bVYLKi69yrwQMJ
- viRA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=lrY8+fWQOho0yxiRfGKwjlRikfKieG6I4rjyCd+DF9U=;
+ b=f5W9esqfsLI82ZXpwXoLTIrYeeB48TJefrQ/mun00b2LAdjeK4MFKOPe8HlkHKlCvh
+ VrCZaNXF6y2b88mofb3SSHavj4qHXW+o6Maw6pkoIsQ5HJhw+Obu4Xw6UDxO9Unjm5kB
+ +GeYrE74Et41UwHS63NJrPbXIipIA6KuxZVCg9thd+x/YZp8sLXevSl8F5/kc5sU+J+0
+ m8fMMg6KZOdwDe6v0D4EbjyiRJIr6Sr/uDV+Iy0H3sje+RXUuOa5Ik/lvMJd8MbgIEIs
+ +mOTBqQebgYCNf1oFjNznS2ZawFUQuUDhaOG5UdSrMh3acYhQjFMSE6Z5VrcftSyeGlm
+ 5f5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=KnPXJ6NqptesuWN0QOJA3/7JLRDcQ5MPX9LbhM6n5G4=;
- b=MU9d0rxkAE+G/kKGzpzjfAS8HKe4R1UeZH+3XpZIwK23IlOAz7UQwYI1GuGDiEW1ts
- W74ZTlG0P75+u/pe9QxkJjHUa/mvxuP+Nw2fQqArwjEa4SlKQEyUp1UPv6EuZDUJaMuN
- UJRadTBnnx8OtYOZw3HtmP8uqDEi57N085kiyBtbeFxG81GVY/D/cHo2+s8nVWSTroaB
- 3FP2UI7XsD3s1ZpameiK1YA52M+tKlgS/UlxFqKKeCkQpTm1Xvyw6UJhcGXX5oTcR+m4
- qevXicJtnqZ4M4LpMFv3IWagkw6H/UZAW+0E++NK6/zeUrKAxMm3Avkhkombm+pYa8Xa
- LEyA==
-X-Gm-Message-State: AOAM532Mh4j11B75DJsuLdv/FFrene4+miCxAvOpHsjlv/McyU1znqqc
- JlSQugiFPIj/qsF22pNfB1nf1QcmNPJnmg==
-X-Google-Smtp-Source: ABdhPJzUlHkgxwrN3ysatg0fgf/GBQRFk8S0qZA+HCh9FPJjQVhw7OHuzn5dZTlhINSd7G0w4UdoGA==
-X-Received: by 2002:a1c:5946:: with SMTP id n67mr3550105wmb.162.1604337045863; 
- Mon, 02 Nov 2020 09:10:45 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c18sm22396540wrt.10.2020.11.02.09.10.44
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 09:10:45 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 24/26] scripts/kerneldoc: For Sphinx 3 use c:macro for macros
- with arguments
-Date: Mon,  2 Nov 2020 17:10:03 +0000
-Message-Id: <20201102171005.30690-25-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201102171005.30690-1-peter.maydell@linaro.org>
-References: <20201102171005.30690-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=lrY8+fWQOho0yxiRfGKwjlRikfKieG6I4rjyCd+DF9U=;
+ b=gIjJ+SGCwiA2++PV9aSTPxx7Fd+o0k4eQeBddkyldZIMiLia7Ey5ubQi9lvHxKkHen
+ qsyPnnreaGcYsbVrUOTw5bM7DKLP454HQ/45GefPsxG2TqPZWHTHN+JfLhXLDtqyJ5Qw
+ +xnBRMbYtxA6bbXLHNzfL7XM1BFgNOwZ0fPz1J7xXzz6OZRuUiN4JaGExRCYyVra3leL
+ 0DaXj9wPztU9rK28TAu7nSwWZ5qPPAbDb5wJm72LBVS1MncXUe64iEh9JgonSnp7HUcy
+ ElON28VMdNoDJX74jyQTCrCpv/xIfnY6wvGzjUndt+p3YgWcf6nkbIkoZg3O0ibJt4lk
+ Bt2Q==
+X-Gm-Message-State: AOAM532SCsDonh11fyRipz70egcQe1voBKlVtW935yAYqyFQ6S8UYVUj
+ eg6BtJR0tElpAzJCZgc0pxf4zDPzGMVFkmPcGJw5Kg==
+X-Google-Smtp-Source: ABdhPJypMh6aN3SICBhYBIyFTaf8ynSo51TiKvcsPcpQNxvcuQIBIPjHN+sbC9mWU8hgbadiv3FN+VAc1V9DkJoyjXg=
+X-Received: by 2002:a17:907:9e3:: with SMTP id
+ ce3mr16565584ejc.4.1604338297697; 
+ Mon, 02 Nov 2020 09:31:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32a.google.com
+References: <20201028154004.776760-1-philmd@redhat.com>
+In-Reply-To: <20201028154004.776760-1-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Nov 2020 17:31:26 +0000
+Message-ID: <CAFEAcA_URCc2LjdrR8GbK-uu+isTVPH39qSce4yWqNV39RkbWg@mail.gmail.com>
+Subject: Re: [PATCH-for-5.2] hw/virtio/vhost-vdpa: Fix Coverity CID 1432864
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::631;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x631.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,74 +95,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Cindy Lu <lulu@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The kerneldoc script currently emits Sphinx markup for a macro with
-arguments that uses the c:function directive. This is correct for
-Sphinx versions earlier than Sphinx 3, where c:macro doesn't allow
-documentation of macros with arguments and c:function is not picky
-about the syntax of what it is passed. However, in Sphinx 3 the
-c:macro directive was enhanced to support macros with arguments,
-and c:function was made more picky about what syntax it accepted.
+On Wed, 28 Oct 2020 at 15:45, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Fix uninitialized value issues reported by Coverity:
+>
+>   Field 'msg.reserved' is uninitialized when calling write().
+>
+> Fixes: a5bd05800f8 ("vhost-vdpa: batch updating IOTLB mappings")
+> Reported-by: Coverity (CID 1432864: UNINIT)
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-When kerneldoc is told that it needs to produce output for Sphinx
-3 or later, make it emit c:function only for functions and c:macro
-for macros with arguments. We assume that anything with a return
-type is a function and anything without is a macro.
+Hi Philippe; thanks for this patch. I don't suppose you
+could also write a patch that fixes the same problem in
+vhost_kernel_send_device_iotlb_msg() (CID 1432871) ?
 
-This fixes the Sphinx error:
-
-/home/petmay01/linaro/qemu-from-laptop/qemu/docs/../include/qom/object.h:155:Error in declarator
-If declarator-id with parameters (e.g., 'void f(int arg)'):
-  Invalid C declaration: Expected identifier in nested name. [error at 25]
-    DECLARE_INSTANCE_CHECKER ( InstanceType,  OBJ_NAME,  TYPENAME)
-    -------------------------^
-If parenthesis in noptr-declarator (e.g., 'void (*f(int arg))(double)'):
-  Error in declarator or parameters
-  Invalid C declaration: Expecting "(" in parameters. [error at 39]
-    DECLARE_INSTANCE_CHECKER ( InstanceType,  OBJ_NAME,  TYPENAME)
-    ---------------------------------------^
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20201030174700.7204-2-peter.maydell@linaro.org
----
- scripts/kernel-doc | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-index 0ff62bb6a2d..4fbaaa05e38 100755
---- a/scripts/kernel-doc
-+++ b/scripts/kernel-doc
-@@ -839,7 +839,23 @@ sub output_function_rst(%) {
- 	output_highlight_rst($args{'purpose'});
- 	$start = "\n\n**Syntax**\n\n  ``";
-     } else {
--	print ".. c:function:: ";
-+        if ((split(/\./, $sphinx_version))[0] >= 3) {
-+            # Sphinx 3 and later distinguish macros and functions and
-+            # complain if you use c:function with something that's not
-+            # syntactically valid as a function declaration.
-+            # We assume that anything with a return type is a function
-+            # and anything without is a macro.
-+            if ($args{'functiontype'} ne "") {
-+                print ".. c:function:: ";
-+            } else {
-+                print ".. c:macro:: ";
-+            }
-+        } else {
-+            # Older Sphinx don't support documenting macros that take
-+            # arguments with c:macro, and don't complain about the use
-+            # of c:function for this.
-+            print ".. c:function:: ";
-+        }
-     }
-     if ($args{'functiontype'} ne "") {
- 	$start .= $args{'functiontype'} . " " . $args{'function'} . " (";
--- 
-2.20.1
-
+thanks
+-- PMM
 
