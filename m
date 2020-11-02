@@ -2,85 +2,88 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4348EC00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30604C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:27:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F6D42222B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:27:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2A4922243
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:27:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aLhjZ74e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F6D42222B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NLpNCUgx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2A4922243
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZeXq-0002VR-Q3
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:27:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42274)
+	id 1kZeYR-00039z-Rb
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:27:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kZeX5-0001HK-QI
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:26:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46922)
+ id 1kZeVr-0008QU-1i
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:25:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41362)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kZeX4-0007eY-2N
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:26:19 -0500
+ id 1kZeVp-0007OM-6J
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:25:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604341577;
+ s=mimecast20190719; t=1604341500;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=yZ7ES9Yuix9uTvWG8uNiRAGWR8lvHDtOQ2repv1PLLc=;
- b=aLhjZ74e0EFLUb383NyD2e+jYT97YPOgwU48m9CHNn6GGPVA383qqWtSZPGGOXftOyLOK7
- 9onwBc7HE58dmXvZ5NqfLIINMyLj5u5balG9DBfWzm30pLgqUXKWlEgFb9G3OAzu/Pm5Ef
- tYttaxkz2uAbndsH+iadqTqx/n9nmO4=
+ bh=sz2tHExiCaTwr7JNj8W9VMc3FH9XKSMf0xQ8qFGNOu4=;
+ b=NLpNCUgxSwRF/Y3zrjT6zI+hwii8rxgFsS772TIj0rq8advUTz+Xk3K4d570fUaDI7tIk6
+ 8UkqMyBFHrzKh0uCRPQGLAsVmEcHOPvTlfEMcOhkx/E/mbqwlSQ83aiUikPfklHHLyyxsS
+ ++DhpKwMp5KprnAjExSMQeKglW8+J9s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-OWnkCUU0O7eonTKYqIQULw-1; Mon, 02 Nov 2020 13:26:15 -0500
-X-MC-Unique: OWnkCUU0O7eonTKYqIQULw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-574-y0XfeFFyN9O4O4M51VpHpA-1; Mon, 02 Nov 2020 13:24:56 -0500
+X-MC-Unique: y0XfeFFyN9O4O4M51VpHpA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17841805EE3;
- Mon,  2 Nov 2020 18:26:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4924C1006C8D;
+ Mon,  2 Nov 2020 18:24:55 +0000 (UTC)
 Received: from work-vm (ovpn-114-142.ams2.redhat.com [10.36.114.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 11F4D5B4DB;
- Mon,  2 Nov 2020 18:26:07 +0000 (UTC)
-Date: Mon, 2 Nov 2020 18:26:05 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4442C68431;
+ Mon,  2 Nov 2020 18:24:50 +0000 (UTC)
+Date: Mon, 2 Nov 2020 18:24:48 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH 0/2] migration: Two extra fixes
-Message-ID: <20201102182605.GM3673@work-vm>
+Subject: Re: [PATCH 2/2] migration: Postpone the kick of the fault thread
+ after recover
+Message-ID: <20201102182448.GL3673@work-vm>
 References: <20201102153010.11979-1-peterx@redhat.com>
+ <20201102153010.11979-3-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201102153010.11979-1-peterx@redhat.com>
+In-Reply-To: <20201102153010.11979-3-peterx@redhat.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 03:02:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,25 +104,61 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Peter Xu (peterx@redhat.com) wrote:
-> This should fix intermittent hang of migration-test due to the latest update to
-> postcopy recovery.
+> The new migrate_send_rp_req_pages_pending() call should greatly improve
+> destination responsiveness because it will resync faulted address after
+> postcopy recovery.  However it is also the 1st place to initiate the page
+> request from the main thread.
 > 
-> Thanks,
+> One thing is overlooked on that migrate_send_rp_message_req_pages() is not
+> designed to be thread-safe.  So if we wake the fault thread before syncing all
+> the faulted pages in the main thread, it means they can race.
+> 
+> Postpone the wake up operation after the sync of faulted addresses.
+> 
+> Fixes: 0c26781c09 ("migration: Sync requested pages after postcopy recovery")
+> Tested-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Queued
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
+> ---
+>  migration/savevm.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 > 
-> Peter Xu (2):
->   migration: Unify reset of last_rb on destination node when recover
->   migration: Postpone the kick of the fault thread after recover
-> 
->  migration/postcopy-ram.c |  2 --
->  migration/savevm.c       | 17 ++++++++++++++---
->  2 files changed, 14 insertions(+), 5 deletions(-)
-> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index e8834991ec..5f937a2762 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2069,12 +2069,9 @@ static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+>  
+>      /*
+>       * This means source VM is ready to resume the postcopy migration.
+> -     * It's time to switch state and release the fault thread to
+> -     * continue service page faults.
+>       */
+>      migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
+>                        MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> -    qemu_sem_post(&mis->postcopy_pause_sem_fault);
+>  
+>      trace_loadvm_postcopy_handle_resume();
+>  
+> @@ -2095,6 +2092,14 @@ static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+>       */
+>      migrate_send_rp_req_pages_pending(mis);
+>  
+> +    /*
+> +     * It's time to switch state and release the fault thread to continue
+> +     * service page faults.  Note that this should be explicitly after the
+> +     * above call to migrate_send_rp_req_pages_pending().  In short:
+> +     * migrate_send_rp_message_req_pages() is not thread safe, yet.
+> +     */
+> +    qemu_sem_post(&mis->postcopy_pause_sem_fault);
+> +
+>      return 0;
+>  }
+>  
 > -- 
 > 2.26.2
-> 
 > 
 -- 
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
