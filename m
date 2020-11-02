@@ -7,41 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D183C388F9
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 05:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A399C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 05:54:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96E1920870
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 05:53:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96E1920870
+	by mail.kernel.org (Postfix) with ESMTPS id 3E30D20870
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 05:54:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E30D20870
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZSmA-0005r2-Q7
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 00:53:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51210)
+	id 1kZSn6-0006wE-D9
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 00:54:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1kZSdN-0002VT-QZ; Mon, 02 Nov 2020 00:44:01 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2316)
+ id 1kZSdQ-0002We-3h; Mon, 02 Nov 2020 00:44:06 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2317)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1kZSdL-0001NU-T4; Mon, 02 Nov 2020 00:44:01 -0500
+ id 1kZSdM-0001NY-0z; Mon, 02 Nov 2020 00:44:03 -0500
 Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CPhfy2H0Mzkc74;
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CPhfy2TW4zkcJL;
  Mon,  2 Nov 2020 13:43:54 +0800 (CST)
 Received: from localhost.localdomain (10.175.124.27) by
  DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 2 Nov 2020 13:43:46 +0800
+ 14.3.487.0; Mon, 2 Nov 2020 13:43:48 +0800
 From: Peng Liang <liangpeng10@huawei.com>
 To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
-Subject: [RFC v3 08/10] target/arm: Introduce user_mask to indicate whether
- the feature is set explicitly
-Date: Mon, 2 Nov 2020 13:40:53 +0800
-Message-ID: <20201102054055.686143-9-liangpeng10@huawei.com>
+Subject: [RFC v3 09/10] target/arm: introduce CPU feature dependency mechanism
+Date: Mon, 2 Nov 2020 13:40:54 +0800
+Message-ID: <20201102054055.686143-10-liangpeng10@huawei.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201102054055.686143-1-liangpeng10@huawei.com>
 References: <20201102054055.686143-1-liangpeng10@huawei.com>
@@ -80,42 +79,187 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To add CPU feature dependencies, we need to known whether a CPU feature
-is set explicitly or automatically by dependencies mechanism.  Introduce
-user_mask to do that.
+Some CPU features are dependent on other CPU features.  For example,
+ID_AA64PFR0_EL1.FP field and ID_AA64PFR0_EL1.AdvSIMD must have the same
+value, which means FP and ADVSIMD are dependent on each other, FPHP and
+ADVSIMDHP are dependent on each other.
+
+This commit introduces a mechanism for CPU feature dependency in
+AArch64.  We build a directed graph from the CPU feature dependency
+relationship, each edge from->to means the `to` CPU feature is dependent
+on the `from` CPU feature.  And we will automatically enable/disable CPU
+feature according to the directed graph.
+
+For example, a and b CPU features are in relationship a->b, which means
+b is dependent on a.  If b is enabled by user, then a is enabled
+automatically.  And if a is disabled by user, then b is disabled
+automatically.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Peng Liang <liangpeng10@huawei.com>
 ---
- target/arm/cpu.c | 2 ++
- target/arm/cpu.h | 1 +
- 2 files changed, 3 insertions(+)
+ target/arm/cpu.c | 134 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 134 insertions(+)
 
 diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index c5530550ece0..8c84a16d92a8 100644
+index 8c84a16d92a8..9d5916719a24 100644
 --- a/target/arm/cpu.c
 +++ b/target/arm/cpu.c
-@@ -1306,6 +1306,8 @@ static void arm_cpu_set_feature_prop(Object *obj, Visitor *v, const char *name,
-         return;
-     }
+@@ -1266,6 +1266,107 @@ static struct CPUFeatureInfo cpu_features[] = {
+     },
+ };
  
-+    isar->user_mask[feat->reg] |= MAKE_64BIT_MASK(feat->shift, feat->length);
++typedef struct CPUFeatureDep {
++    CPUFeatureInfo from, to;
++} CPUFeatureDep;
 +
-     if (value) {
-         if (object_property_get_bool(obj, feat->name, &error_abort)) {
++static const CPUFeatureDep feature_dependencies[] = {
++    {
++        .from = FIELD_INFO("fp", ID_AA64PFR0, FP, true, 0, 0xf, false),
++        .to = FIELD_INFO("asimd", ID_AA64PFR0, ADVSIMD, true, 0, 0xf, false),
++    },
++    {
++        .from = FIELD_INFO("asimd", ID_AA64PFR0, ADVSIMD, true, 0, 0xf, false),
++        .to = FIELD_INFO("fp", ID_AA64PFR0, FP, true, 0, 0xf, false),
++    },
++    {
++        .from = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_FP_LENGTH,
++            .shift = R_ID_AA64PFR0_FP_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "fphp", .is_32bit = false,
++        },
++        .to = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_ADVSIMD_LENGTH,
++            .shift = R_ID_AA64PFR0_ADVSIMD_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "asimdhp", .is_32bit = false,
++        },
++    },
++    {
++        .from = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_ADVSIMD_LENGTH,
++            .shift = R_ID_AA64PFR0_ADVSIMD_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "asimdhp", .is_32bit = false,
++        },
++        .to = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_FP_LENGTH,
++            .shift = R_ID_AA64PFR0_FP_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "fphp", .is_32bit = false,
++        },
++    },
++    {
++
++        .from = FIELD_INFO("aes", ID_AA64ISAR0, AES, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_AES_LENGTH,
++            .shift = R_ID_AA64ISAR0_AES_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "pmull", .is_32bit = false,
++        },
++    },
++    {
++
++        .from = FIELD_INFO("sha2", ID_AA64ISAR0, SHA2, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_SHA2_LENGTH,
++            .shift = R_ID_AA64ISAR0_SHA2_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "sha512", .is_32bit = false,
++        },
++    },
++    {
++        .from = FIELD_INFO("lrcpc", ID_AA64ISAR1, LRCPC, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR1, .length = R_ID_AA64ISAR1_LRCPC_LENGTH,
++            .shift = R_ID_AA64ISAR1_LRCPC_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "ilrcpc", .is_32bit = false,
++        },
++    },
++    {
++        .from = FIELD_INFO("sm3", ID_AA64ISAR0, SM3, false, 1, 0, false),
++        .to = FIELD_INFO("sm4", ID_AA64ISAR0, SM4, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sm4", ID_AA64ISAR0, SM4, false, 1, 0, false),
++        .to = FIELD_INFO("sm3", ID_AA64ISAR0, SM3, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sha1", ID_AA64ISAR0, SHA1, false, 1, 0, false),
++        .to = FIELD_INFO("sha2", ID_AA64ISAR0, SHA2, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sha2", ID_AA64ISAR0, SHA2, false, 1, 0, false),
++        .to = FIELD_INFO("sha1", ID_AA64ISAR0, SHA1, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sha1", ID_AA64ISAR0, SHA1, false, 1, 0, false),
++        .to = FIELD_INFO("sha3", ID_AA64ISAR0, SHA3, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO("sha3", ID_AA64ISAR0, SHA3, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_SHA2_LENGTH,
++            .shift = R_ID_AA64ISAR0_SHA2_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "sha512", .is_32bit = false,
++        },
++    },
++    {
++        .from = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_SHA2_LENGTH,
++            .shift = R_ID_AA64ISAR0_SHA2_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "sha512", .is_32bit = false,
++        },
++        .to = FIELD_INFO("sha3", ID_AA64ISAR0, SHA3, false, 1, 0, false),
++    },
++};
++
+ static void arm_cpu_get_feature_prop(Object *obj, Visitor *v, const char *name,
+                                      void *opaque, Error **errp)
+ {
+@@ -1500,6 +1601,8 @@ static void arm_cpu_finalizefn(Object *obj)
+ 
+ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
+ {
++    int i;
++    ARMISARegisters *isar = &cpu->isar;
+     Error *local_err = NULL;
+ 
+     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+@@ -1517,6 +1620,37 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
              return;
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index c20f1ae20429..1ee653a712fd 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -932,6 +932,7 @@ struct ARMCPU {
-      */
-     struct ARMISARegisters {
-         uint64_t regs[ID_MAX];
-+        uint64_t user_mask[ID_MAX];
-     } isar;
-     uint64_t midr;
-     uint32_t revidr;
+         }
+     }
++
++    if (!kvm_enabled() || !kvm_arm_cpu_feature_supported()) {
++        return;
++    }
++
++    for (i = 0; i < ARRAY_SIZE(feature_dependencies); ++i) {
++        const CPUFeatureDep *d = &feature_dependencies[i];
++        bool from_explicit = !!(isar->user_mask[d->from.reg] &
++                                MAKE_64BIT_MASK(d->from.shift, d->from.length));
++        bool to_explicit = !!(isar->user_mask[d->to.reg] &
++                              MAKE_64BIT_MASK(d->to.shift, d->to.length));
++        bool from_enabled = object_property_get_bool(OBJECT(cpu), d->from.name,
++                                                     &error_abort);
++        bool to_enabled = object_property_get_bool(OBJECT(cpu), d->to.name,
++                                                   &error_abort);
++
++        if (!from_enabled && to_enabled) {
++            if (from_explicit && to_explicit) {
++                error_setg(errp, "The CPU feature '%s' dependes on CPU feature "
++                           "'%s' that is disabled explicitly",
++                           d->to.name, d->from.name);
++                return;
++            } else if (from_explicit) {
++                isar->regs[d->to.reg] = deposit64(isar->regs[d->to.reg],
++                        d->to.shift, d->to.length, d->to.ni_value);
++            } else if (to_explicit) {
++                isar->regs[d->from.reg] = deposit64(isar->regs[d->from.reg],
++                        d->from.shift, d->from.length, d->from.min_value);
++            }
++        }
++    }
+ }
+ 
+ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
 -- 
 2.26.2
 
