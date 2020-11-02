@@ -2,90 +2,88 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 616B3C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6E6C388F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:39:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2D0C22268
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:39:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC2FD22275
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:39:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aCAkNSZl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D0C22268
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RV30NQGr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC2FD22275
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZcra-000757-Nm
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 11:39:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44752)
+	id 1kZcre-0007Aj-2x
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 11:39:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1kZcmm-0003Dk-8r
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:34:24 -0500
-Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:34420)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1kZcmi-00013f-Bv
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:34:23 -0500
-Received: by mail-vs1-xe41.google.com with SMTP id b129so7800168vsb.1
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 08:34:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=YkCmdokUG70n/lP0Yg3aq5llbLTxN2eE6dBP9DGCPTI=;
- b=aCAkNSZlqaJlmomKa5MZoFM68wdB1hak7x5oXCTQOp67+tQlWuxKA2xvaCYue87T05
- vAehkUH89x8LWH9unqlSPyOOpLx9SVHMnjTycyL1zdClimGWw3fMnry3RL+PMMa1qr5R
- UZa9CirfaTcNO85foGXu1oK1T+ykA0bpjlBUDHRi5U2Kf0yGyi5JdQAil+r1VEv9+jD7
- v6ewmOx3sd6JiUn2tg+mort4075B3bN4etph+S7C5axa80rK3kFY0dMsbysXU/V/ovoM
- RKw8pMqkBtZY/8J1v0WJGlRXa6/FMFD66MJcyg7w44HP6WcmjYrs0v8Bqisb/wNW84fN
- NzqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=YkCmdokUG70n/lP0Yg3aq5llbLTxN2eE6dBP9DGCPTI=;
- b=fjpNcjPndWWej6UwF+hOWn0KXq0hoTffPripw+pP+I7g/2S4bg56FW1g7MO4FfEIYw
- WBDP+Zkh0hehD1IHpRL5wC/bG4AEwHZfNlOJTqHhvuuSjSzvPIUzEhY4Wg4yZRPddYBv
- xQzrRty16MR6KuMEmdlLosNuzqrY/pmKK0iU5Jqgm7/17So8YW+SZG7HbYf84fkjLRPb
- +VQ0DKdbFQBHa7Ta318RFEyA91TvmB9beNYZddSdEqzEDukDm17nvWP5CFldUSqKagbH
- yakMkCzHx6CrjK1W6Rb8rl+RvMG6fx9KYiTaaH4DT20iN38ApjoPiCu/4HnyAoyb87oF
- kirA==
-X-Gm-Message-State: AOAM533Pgh49UvczGI04bCiIHIbKEcajXgGGL4inb7LuqX0GfqSdZCZb
- ee2IuI01utun4yOzQPi0VSURW/GNzyMTqMoH4R6Ybw==
-X-Google-Smtp-Source: ABdhPJzIt2Nd2xiju/fdv2gWTSStWHpfzB5/Ss3Ge83HgiN0FvepFR+ePeFIBnIBprt/Zzon8AQYU4Bx8OwP2Scar8Y=
-X-Received: by 2002:a67:2545:: with SMTP id l66mr14572906vsl.1.1604334856444; 
- Mon, 02 Nov 2020 08:34:16 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kZcqj-0006IX-1O
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:38:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31677)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kZcqh-0001fH-E8
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:38:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604335106;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=HvRmTAmRBKOl/GkU0GI4vxD/wAYz2wz/v7JhVaVHHi8=;
+ b=RV30NQGrcgLZ58FCVwBHOD9R8ShinLXVqD2U3c6q3puJIbzn6OI7uo8YCaHJX1SQYd7DDH
+ GLXl+OwSVjerKNT9hmTbL8Wfx2CVeM45gTa7d4SMmfjaPAW+ba0gEopzs2rWwkFV/bql7p
+ YpDebT1meyS3Be05TnpI+c5mFpjpeVo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-73-IQdfjXPtMJuisQIq8ZHDZg-1; Mon, 02 Nov 2020 11:38:24 -0500
+X-MC-Unique: IQdfjXPtMJuisQIq8ZHDZg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA0B280364B
+ for <qemu-devel@nongnu.org>; Mon,  2 Nov 2020 16:38:23 +0000 (UTC)
+Received: from localhost (ovpn-114-65.ams2.redhat.com [10.36.114.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 454D568433;
+ Mon,  2 Nov 2020 16:38:20 +0000 (UTC)
+Date: Mon, 2 Nov 2020 16:38:18 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 1/2] MAINTAINERS: Add QAPI schema modules to their
+ subsystems
+Message-ID: <20201102163818.GA212231@stefanha-x1.localdomain>
+References: <20201102081550.171061-1-armbru@redhat.com>
+ <20201102081550.171061-2-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20201102152454.8287-1-peter.maydell@linaro.org>
-In-Reply-To: <20201102152454.8287-1-peter.maydell@linaro.org>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Mon, 2 Nov 2020 08:34:05 -0800
-Message-ID: <CAFQmdRbEJCD3t2=6omuq3PC5N6Rzvii5Tw+K3bme76jXGOkCdA@mail.gmail.com>
-Subject: Re: [PATCH] tests/qtest/npcm7xx_rng-test: Disable randomness tests
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, 
- Tyrone Ting <kfting@nuvoton.com>,
- "Daniel P. Berrange" <berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::e41;
- envelope-from=hskinnemoen@google.com; helo=mail-vs1-xe41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -175
-X-Spam_score: -17.6
-X-Spam_bar: -----------------
-X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
+In-Reply-To: <20201102081550.171061-2-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="rwEMma7ioTxnRzrJ"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,63 +96,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 2, 2020 at 7:24 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> The randomness tests in the NPCM7xx RNG test fail intermittently
-> but fairly frequently. On my machine running the test in a loop:
->  while QTEST_QEMU_BINARY=./qemu-system-aarch64 ./tests/qtest/npcm7xx_rng-test; do true; done
->
-> will fail in less than a minute with an error like:
-> ERROR:../../tests/qtest/npcm7xx_rng-test.c:256:test_first_byte_runs:
-> assertion failed (calc_runs_p(buf.l, sizeof(buf) * BITS_PER_BYTE) > 0.01): (0.00286205989 > 0.01)
->
-> (Failures have been observed on all 4 of the randomness tests,
-> not just first_byte_runs.)
->
-> It's not clear why these tests are failing like this, but intermittent
-> failures make CI and merge testing awkward, so disable running them
-> unless a developer specifically sets QEMU_TEST_FLAKY_RNG_TESTS when
-> running the test suite, until we work out the cause.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+--rwEMma7ioTxnRzrJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Nov 02, 2020 at 09:15:49AM +0100, Markus Armbruster wrote:
+> Add the relevant QAPI schema modules to section Audio, QMP, Tracing,
+> Cryptography.
+>=20
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  tests/qtest/npcm7xx_rng-test.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
->
-> diff --git a/tests/qtest/npcm7xx_rng-test.c b/tests/qtest/npcm7xx_rng-test.c
-> index da6e639bf6f..e7cde85fbbc 100644
-> --- a/tests/qtest/npcm7xx_rng-test.c
-> +++ b/tests/qtest/npcm7xx_rng-test.c
-> @@ -265,10 +265,16 @@ int main(int argc, char **argv)
->
->      qtest_add_func("npcm7xx_rng/enable_disable", test_enable_disable);
->      qtest_add_func("npcm7xx_rng/rosel", test_rosel);
-> -    qtest_add_func("npcm7xx_rng/continuous/monobit", test_continuous_monobit);
-> -    qtest_add_func("npcm7xx_rng/continuous/runs", test_continuous_runs);
-> -    qtest_add_func("npcm7xx_rng/first_byte/monobit", test_first_byte_monobit);
-> -    qtest_add_func("npcm7xx_rng/first_byte/runs", test_first_byte_runs);
-> +    /*
-> +     * These tests fail intermittently; only run them on explicit
-> +     * request until we figure out why.
-> +     */
-> +    if (getenv("QEMU_TEST_FLAKY_RNG_TESTS")) {
-> +        qtest_add_func("npcm7xx_rng/continuous/monobit", test_continuous_monobit);
-> +        qtest_add_func("npcm7xx_rng/continuous/runs", test_continuous_runs);
-> +        qtest_add_func("npcm7xx_rng/first_byte/monobit", test_first_byte_monobit);
-> +        qtest_add_func("npcm7xx_rng/first_byte/runs", test_first_byte_runs);
-> +    }
+>  MAINTAINERS | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-Reviewed-by: Havard Skinnemoen <hskinnemoen@google.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Thanks!
+--rwEMma7ioTxnRzrJ
+Content-Type: application/pgp-signature; name="signature.asc"
 
->      qtest_start("-machine npcm750-evb");
->      ret = g_test_run();
-> --
-> 2.20.1
->
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+gNfoACgkQnKSrs4Gr
+c8jsOQgArqg89TC1/4A4+KcY4aeRIYuH4Cl6b4taJlcpCMGXZT0qEqXbIBk63AmC
+3eGkqTHeOUyi4S1Dx6Cc5vMimIIwqZDM+gjsg7nBEfbZeIMCgS1yPd1JpfIsFNnp
+36EK2wcl+WOkC+fqX82Xp/ay2cTO/+ImbdGHfultsF/nAefouamG0dw66Jq33kAK
+AfTf/FLCymuhhk02v+j3Nz9SLzC5QvmMPZiae5F1PzmewWbiFxG2i2A2wTC+EIqv
+XgDpjT8BuGjBbu50AMEzHGSyFlD9mXQ7lsp9VDBP1OGlg+J9Qe5VOQbcxNYBpI9k
+PbM/mo7TgAObLjSU4tZ8AhoDZaJLRg==
+=kMY5
+-----END PGP SIGNATURE-----
+
+--rwEMma7ioTxnRzrJ--
+
 
