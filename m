@@ -2,70 +2,101 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 737A4C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 12:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 346CEC00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:06:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73E2122268
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 12:51:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73E2122268
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 75175223B0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:06:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UdvoL+Vw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75175223B0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZZJW-0000NN-05
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 07:51:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33928)
+	id 1kZZXY-0003k4-0E
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 08:06:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kZZIk-0008II-Hk; Mon, 02 Nov 2020 07:51:10 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:58610
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kZZIh-0005T3-3S; Mon, 02 Nov 2020 07:51:09 -0500
-Received: from host81-158-111-11.range81-158.btcentralplus.com
- ([81.158.111.11] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kZZIf-0006jT-QS; Mon, 02 Nov 2020 12:51:09 +0000
-To: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>,
- Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>,
- Stefan Weil <sw@weilnetz.de>
-References: <20201021064033.8600-1-vr_qemu@t-online.de>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <87eed2b3-d9a6-a1d1-e12a-e74bcbc9a702@ilande.co.uk>
-Date: Mon, 2 Nov 2020 12:50:50 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZZWt-0003LT-T3
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:05:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46088)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZZWr-00021w-Lf
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:05:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604322344;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=QWKUhCdaPrZlq8S524CZCYDlrDMIf0QXF7jDlI8f57Y=;
+ b=UdvoL+Vwiigdu7ni9k+hydkhYdwo0THFbgimHzBoSuG24aDxCeS4OUf1hrfA9TBJR80/Uq
+ OnrHhhqe2MMXwDZWRY2CBOVj+m71qC8TBNpBFhMQfSZBPU810SDJ96FTI1+rZgvHTFvKST
+ zuTxLjXZ7MbEp/mIGDQNMRgsV4X7dxQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-R7YAMDypP9GYOCfIHLYkWQ-1; Mon, 02 Nov 2020 08:05:42 -0500
+X-MC-Unique: R7YAMDypP9GYOCfIHLYkWQ-1
+Received: by mail-wr1-f72.google.com with SMTP id 2so6442313wrd.14
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 05:05:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=QWKUhCdaPrZlq8S524CZCYDlrDMIf0QXF7jDlI8f57Y=;
+ b=gxGMUxvCXVBIb36ADZIkIfLudtgkkHokMXpuZaLoMMaviCa2f8JAB24Vrmimzpc3f+
+ XrEEVNjhSIcNx5ZQGqJpumtOwX7CdWl11buwOJ/kDHT2e/CHUQvwDEEq33aXX7nUnPJM
+ lTU5IAmRrHuZseGDQnOvfegyvZXd9LdvvcdJAjX0siykMmeABWAcNzukn1sTqeNYLsIy
+ 43CyNfpc1TVp4dv6pIXCYi/B/7Oubb3CWT8fKLHkKje6F2NG/cnejgM96udz5lKnWQRo
+ 4okcQARLQuQ2jB8i8eOXO4URM+soI/bpqDwplJbDy8KNfs1EA4ZtIFYzxRKL+K4Uq5B4
+ P9WA==
+X-Gm-Message-State: AOAM530SfCBWYOJ1aO3C8qBoG91WVxJARELWRZLQhPei1UbvAdMob9AK
+ nU4t7VYVZ1V6GPFsqs8jXBC+D6sGXRCOIadnIKnBnWAWmLQ5axod4rRWo9P/4n/5X46O5DcTdYG
+ Bzi2q2CJ0lrwK8TM=
+X-Received: by 2002:a1c:cc01:: with SMTP id h1mr18425375wmb.114.1604320646982; 
+ Mon, 02 Nov 2020 04:37:26 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyww2BEfexRlcXZQ8n0Q0zJKbQWRcINwpw4IIUSLMPCaESI+JBO1eirQ00oE/LDs822fD3GoA==
+X-Received: by 2002:a1c:cc01:: with SMTP id h1mr18425357wmb.114.1604320646807; 
+ Mon, 02 Nov 2020 04:37:26 -0800 (PST)
+Received: from redhat.com (bzq-79-181-134-187.red.bezeqint.net.
+ [79.181.134.187])
+ by smtp.gmail.com with ESMTPSA id a17sm22483057wra.29.2020.11.02.04.37.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Nov 2020 04:37:25 -0800 (PST)
+Date: Mon, 2 Nov 2020 07:37:22 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v3 0/6] virtio-mem: block size and address-assignment
+ optimizations
+Message-ID: <20201102073715-mutt-send-email-mst@kernel.org>
+References: <20201008083029.9504-1-david@redhat.com>
+ <242d30e9-f22b-d570-0186-629792f5bdf1@redhat.com>
+ <58aa0883-ec4c-d118-4485-042a2482822b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201021064033.8600-1-vr_qemu@t-online.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 81.158.111.11
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH] qmp: fix aio_poll() assertion failure on Windows
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+In-Reply-To: <58aa0883-ec4c-d118-4485-042a2482822b@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,70 +110,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>,
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/10/2020 07:40, Volker Rümelin wrote:
-
-> Commit 9ce44e2ce2 "qmp: Move dispatcher to a coroutine" modified
-> aio_poll() in util/aio-posix.c to avoid an assertion failure. This
-> change is missing in util/aio-win32.c.
+On Mon, Nov 02, 2020 at 01:20:11PM +0100, David Hildenbrand wrote:
+> On 22.10.20 10:10, David Hildenbrand wrote:
+> > On 08.10.20 10:30, David Hildenbrand wrote:
+> > > 
+> > > 
+> > > Let's try to detect the actual THP size and use it as default block size
+> > > (unless the page size of the backend indicates that THP don't apply).
+> > > Always allow to set a block size of 1 MiB, but warn if the configured block
+> > > size is smaller than the default. Handle large block sizes better, avoiding
+> > > a virtio-spec violation and optimizing address auto-detection.
+> > > 
+> > > For existing setups (x86-64), the default block size won't change (was, and
+> > > will be 2 MiB on anonymous memory). For existing x86-64 setups, the address
+> > > auto-detection won't change in relevant setups (esp., anonymous memory
+> > > and hugetlbfs with 2 MiB pages and no manual configuration of the block
+> > > size). I don't see the need for compatibility handling (especially, as
+> > > virtio-mem is still not considered production-ready).
+> > > 
+> > > Most of this is a preparation for future architectures, using hugetlbfs
+> > > to full extend, and using manually configured, larger block sizes
+> > > (relevant for vfio in the future).
+> > 
+> > Ping.
+> > 
 > 
-> Apply the changes to util/aio-posix.c to util/aio-win32.c too.
-> This fixes an assertion failure on Windows whenever QEMU exits.
+> Ping, MST?
+
+Applied, thanks!
+
+> -- 
+> Thanks,
 > 
-> $ ./qemu-system-x86_64.exe -machine pc,accel=tcg -display gtk
-> **
-> ERROR:../qemu/util/aio-win32.c:337:aio_poll: assertion failed:
-> (in_aio_context_home_thread(ctx))
-> Bail out! ERROR:../qemu/util/aio-win32.c:337:aio_poll: assertion
-> failed: (in_aio_context_home_thread(ctx))
-> 
-> Fixes: 9ce44e2ce2 ("qmp: Move dispatcher to a coroutine")
-> Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
-> ---
->   util/aio-win32.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/util/aio-win32.c b/util/aio-win32.c
-> index e7b1d649e9..168717b51b 100644
-> --- a/util/aio-win32.c
-> +++ b/util/aio-win32.c
-> @@ -18,6 +18,7 @@
->   #include "qemu/osdep.h"
->   #include "qemu-common.h"
->   #include "block/block.h"
-> +#include "qemu/main-loop.h"
->   #include "qemu/queue.h"
->   #include "qemu/sockets.h"
->   #include "qapi/error.h"
-> @@ -333,8 +334,13 @@ bool aio_poll(AioContext *ctx, bool blocking)
->        * There cannot be two concurrent aio_poll calls for the same AioContext (or
->        * an aio_poll concurrent with a GSource prepare/check/dispatch callback).
->        * We rely on this below to avoid slow locked accesses to ctx->notify_me.
-> +     *
-> +     * aio_poll() may only be called in the AioContext's thread. iohandler_ctx
-> +     * is special in that it runs in the main thread, but that thread's context
-> +     * is qemu_aio_context.
->        */
-> -    assert(in_aio_context_home_thread(ctx));
-> +    assert(in_aio_context_home_thread(ctx == iohandler_get_aio_context() ?
-> +                                      qemu_get_aio_context() : ctx));
->       progress = false;
->   
->       /* aio_notify can avoid the expensive event_notifier_set if
+> David / dhildenb
 
-Sorry about the delay, however I've just tried this on top of git master and it fixes 
-the problem with the assert() when exiting QEMU on Win32 so:
-
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Is it possible to get this merged for 5.2?
-
-
-ATB,
-
-Mark.
 
