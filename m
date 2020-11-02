@@ -2,98 +2,79 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D476FC00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48936C388F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:13:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 164C5222B9
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:13:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ci0EE4q9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164C5222B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BF34A2225E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:13:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF34A2225E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZWqQ-0007gO-UK
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:13:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54332)
+	id 1kZWqS-0007jb-OK
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:13:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZWms-0004Dp-Pq
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:10:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30599)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZWmq-0005g4-SN
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:10:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604311803;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=XCI690buz+9wcPCmcDusTt+GnT6I/ArWLX5xgE3fK90=;
- b=ci0EE4q9JSUduyWGF+dUrouH/D+1CeFm1nyyF8DfxiyySxMQinK5SALNWa+v8+kPL0sT6T
- MbyL3ClwKZzWnlrPeaIHq4dHg9uW7TEnMeJYjdB1Q+h4fPlef7yVpC2riUt1uQfFxP22V2
- anDEovVm3dgANi8J+6Y/0rbzthJz6QI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-jnlLmeUSOf6t5BrHl2-2vg-1; Mon, 02 Nov 2020 05:09:59 -0500
-X-MC-Unique: jnlLmeUSOf6t5BrHl2-2vg-1
-Received: by mail-wm1-f72.google.com with SMTP id s85so1712236wme.3
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 02:09:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition;
- bh=XCI690buz+9wcPCmcDusTt+GnT6I/ArWLX5xgE3fK90=;
- b=fjS4VmsN5e8tV11rOjH8JttyyhYGQOjdYSInpu1FqIcW7MIgqhJ8Q5fNHUDZqlF0yz
- fw+o9C/fuM13gPCnUZvonxzGFdq2xqZQlKlNluwuJYTG+3H2G+Mkc5x2HINAv7t+Jsyh
- 1Wel+Vb6fMsHNBuSX8eItUiQ3IZ9ELyKo7sXC7Cz3l4CSsTZTE8iaVJPEO3UGoASIwpQ
- MQdZNgoECOkV+0RKXCzIYsZhpvzuADzyA7gp+ObCP8+xUcrCMD6k9D5X61bAbhwpFsO3
- KBa9KRpC7WEtapbjXC/HUBOO81qJBZ+OV4R0sTOmc/OdFO2UtM1yO2r0N4hD7UtA57qr
- uJ+w==
-X-Gm-Message-State: AOAM532kb/a0qVpKxjRETmNFp2f1MIwqCmFj89RNvrVyw1/10gGHasxb
- KiDUDX8VQOqYziTtHk/o3QoUOSX86eA7Gwjlv9q6FNJ8e1ExTwZscPepq+nDQtPJUl/QrPm732a
- g0RnwZnmSRnfyq88=
-X-Received: by 2002:adf:dc47:: with SMTP id m7mr19268899wrj.21.1604311797534; 
- Mon, 02 Nov 2020 02:09:57 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzWVvXPsMLHSqjz5L/2DDRmtHTC/2X2+4gNpVB8S3m/OCUXM5XlIuBCrpNN/qwsvsdFDtkRKA==
-X-Received: by 2002:adf:dc47:: with SMTP id m7mr19268881wrj.21.1604311797405; 
- Mon, 02 Nov 2020 02:09:57 -0800 (PST)
-Received: from redhat.com (bzq-79-182-97-190.red.bezeqint.net. [79.182.97.190])
- by smtp.gmail.com with ESMTPSA id x10sm20846341wrp.62.2020.11.02.02.09.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 02:09:56 -0800 (PST)
-Date: Mon, 2 Nov 2020 05:09:54 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] pc: comment stule fixup
-Message-ID: <20201102100948.1101121-1-mst@redhat.com>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kZWYw-0008AI-0z; Mon, 02 Nov 2020 04:55:42 -0500
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:41633)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kZWYp-0000cW-W9; Mon, 02 Nov 2020 04:55:37 -0500
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.111])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 71212705E333;
+ Mon,  2 Nov 2020 10:55:31 +0100 (CET)
+Received: from kaod.org (37.59.142.103) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 2 Nov 2020
+ 10:55:30 +0100
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-103G0057b6b8c91-57c0-4222-b306-c60c54a37036,
+ 8DD5A59BB4BDDF13F63AE8D0997EBD433013A0F2) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v6 0/7] hw/misc: Add LED device
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ <qemu-devel@nongnu.org>
+References: <20200912134041.946260-1-f4bug@amsat.org>
+ <3783cc00-8ec6-6174-dad6-331177b95724@amsat.org>
+ <22a8256e-3d1d-832e-b8ac-e05e9e91f07e@amsat.org>
+ <12b6cd76-d444-4ff5-1e7c-f11c8e54ffb9@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <4d921983-fc51-9e05-79aa-fb6baf5bafa4@kaod.org>
+Date: Mon, 2 Nov 2020 10:55:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 03:02:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <12b6cd76-d444-4ff5-1e7c-f11c8e54ffb9@amsat.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.103]
+X-ClientProxiedBy: DAG3EX2.mxp5.local (172.16.2.22) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 05c7f3e0-6da4-43b7-887e-4c9ae54bd3fb
+X-Ovh-Tracer-Id: 15533759540381191157
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedruddtuddguddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeekudeuudevleegudeugeekleffveeludejteffiedvledvgfekueefudehheefnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehfgegsuhhgsegrmhhsrghtrdhorhhg
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 04:55:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_BL_SPAMCOP_NET=1.347, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,37 +87,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix up checkpatch comment style warnings.
+On 10/26/20 11:00 PM, Philippe Mathieu-Daudé wrote:
+> On 10/16/20 5:29 PM, Philippe Mathieu-Daudé wrote:
+>> On 9/19/20 2:30 PM, Philippe Mathieu-Daudé wrote:
+>>> On 9/12/20 3:40 PM, Philippe Mathieu-Daudé wrote:
+>>>> Hello,
+>>>>
+>>>> These patches are part of the GSoC unselected 'QEMU visualizer'
+>>>> project.
+>>>>
+>>>> This series introduce a LED device that can be easily connected
+>>>> to a GPIO output.
+>>> [...]
+>>>> Philippe Mathieu-Daud=C3=A9 (7):
+>>>>    hw/misc/led: Add a LED device
+>>>>    hw/misc/led: Allow connecting from GPIO output
+>>>>    hw/misc/led: Emit a trace event when LED intensity has changed
+>>>>    hw/arm/aspeed: Add the 3 front LEDs drived by the PCA9552 #1
+>>>>    hw/misc/mps2-fpgaio: Use the LED device
+>>>>    hw/misc/mps2-scc: Use the LED device
+>>>>    hw/arm/tosa: Replace fprintf() calls by LED devices
+>>>
+>>> This series is now fully reviewed.
+> 
+> As soft-freeze is tomorrow, I'll go ahead and send a pull request.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/i386/pc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+You did well. I was out for a couple of weeks.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 416fb0e0f6..5872ae6095 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1150,9 +1150,9 @@ void pc_basic_device_init(struct PCMachineState *pcms,
-             exit(1);
-         }
-         /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
--            * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
--            * IRQ8 and IRQ2.
--            */
-+         * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
-+         * IRQ8 and IRQ2.
-+         */
-         uint8_t compat = object_property_get_uint(OBJECT(hpet),
-                 HPET_INTCAP, NULL);
-         if (!compat) {
--- 
-MST
+Thanks,
+
+C. 
 
 
