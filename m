@@ -2,85 +2,100 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5B8C388F2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 15:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 081D8C388F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 15:01:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4F43222EC
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 15:00:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DC672231B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 15:01:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ln5vIn4H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4F43222EC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V9Jswmln"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DC672231B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZbKK-0001eo-TC
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 10:00:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46324)
+	id 1kZbKe-00020F-I3
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 10:01:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kZbIw-0000L1-Ao
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZbIw-0000Kx-8k
  for qemu-devel@nongnu.org; Mon, 02 Nov 2020 09:59:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28451)
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34421)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kZbIl-0002VI-TT
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 09:59:28 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZbIl-0002VO-Ta
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 09:59:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604329156;
+ s=mimecast20190719; t=1604329158;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=llIO71ZCFVa0ng1Y5tokRvg93/ncIdaI9WlsB4WX9UQ=;
- b=Ln5vIn4HPBSmjLXHxURI3iuGF5S/+/ap5HTaSynnxmCbdPsbGlUC0dFc+naByMxuuWQ6ZF
- VMbbG4J5seaTszjipCEfvoXLYE+xBwVChnBB10vKGT6j50wzpuv2tzlpdrHcoFCerZ9Ano
- INDFHfFc3MWoTBLAfDEniF/qSsR/cm8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-F5FVvW4BPgeFMuCMcXoBfg-1; Mon, 02 Nov 2020 09:59:15 -0500
-X-MC-Unique: F5FVvW4BPgeFMuCMcXoBfg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79720CFF48;
- Mon,  2 Nov 2020 14:59:12 +0000 (UTC)
-Received: from localhost (ovpn-114-65.ams2.redhat.com [10.36.114.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 761A41002C18;
- Mon,  2 Nov 2020 14:59:11 +0000 (UTC)
-Date: Mon, 2 Nov 2020 14:59:10 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: Out-of-Process Device Emulation session at KVM Forum 2020
-Message-ID: <20201102145910.GB186617@stefanha-x1.localdomain>
-References: <b85405de-d525-bf59-826c-737fa7bbdfef@redhat.com>
- <20201029094603.15382476@w520.home>
- <d4f7df42-7b02-6505-c2c7-245bf813b513@redhat.com>
- <20201029210407.33d6f008@x1.home>
- <CAJSP0QVto+xFEnWv-aj=-0mZ72SzfeAvg4q0RCoLGK-N7C-WEw@mail.gmail.com>
- <04179584-3324-994e-d793-04be18d2dab2@redhat.com>
- <CAJSP0QXQmFgtSsJL1B3eMUr8teQc3cvvEFvr7LvnFkJPcE3ZpA@mail.gmail.com>
- <0cabda60-f10d-fb74-f3eb-d21be7db7334@redhat.com>
- <20201102102754.GB42093@stefanha-x1.localdomain>
- <20201102053142-mutt-send-email-mst@kernel.org>
+ bh=XdmDUDB2KsVatqCFQs3MMXSY2ZPPqVfNhlc61MSh75o=;
+ b=V9JswmlnGaigefWjuK3X2OxnPIPUR61N2uCDwfpOoCOrYgiFJe834BkAcrFQLI999FtddO
+ 9s0OszjZufATy/Sdykh0GxyZQKdIfH8fDigexS+cCMa+7R41Uu+1GQhjkvm5b6M6yY9FV4
+ 63ipSzbHcE0LGt6pbRNiY2EGyGYS32w=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-vOuRLHzMPF-UQTjRFZBqGw-1; Mon, 02 Nov 2020 09:59:16 -0500
+X-MC-Unique: vOuRLHzMPF-UQTjRFZBqGw-1
+Received: by mail-wm1-f72.google.com with SMTP id t201so3440339wmt.1
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 06:59:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XdmDUDB2KsVatqCFQs3MMXSY2ZPPqVfNhlc61MSh75o=;
+ b=aFned/tP/po0sIOflBX2R+9edpHuDDuZ2WAUUgZHEmkHXvpHZ6VvdfpdGyzikeUWjS
+ cOuTfxc+NYtuabK2hA1Wex3JV4dDxbDqrNTmgXVtcz9TIU2I0EgvbZ6SujA9TQM34FjB
+ tWBHQOSzqsilJW8bfQKCsSNSUycFr4p9TUFxY4xdYE3SVz5xAXAjb0eb5bWSep6PQU/P
+ Z6IJMxHut6dZzXrm3lqUneCXRcaVhDkXktZ42NNVtfvsDdXYl9wk+Jz2IbnTszIIKyRj
+ o3qjbzbqyv9+swYyj0ojUEmCemXDpXylQP5WThdwc0+zYjBK0hpCk07bHa97fBLut3Lf
+ Onxw==
+X-Gm-Message-State: AOAM532f7v9DrDSdj3YAKL2TbIOCMapN77omFKCKe2CLCq/jGg1sQq5S
+ fIeDg7hLbWj2Q7lZ4LZ8au9Rwd+N8Q4qO/7HDCDi97kaJwAdpurXTzNJHnsnyIq1njP6gphUccO
+ PiyINeAnnbuEVVKE=
+X-Received: by 2002:a5d:420d:: with SMTP id n13mr20677192wrq.196.1604329155275; 
+ Mon, 02 Nov 2020 06:59:15 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzCcJquammWW4mQX7RTv3/3JY41AfdqsYf4dXGPfDdVgAWd6QQO/B/rBfuUzyV7dQmW733y5Q==
+X-Received: by 2002:a5d:420d:: with SMTP id n13mr20677152wrq.196.1604329155073; 
+ Mon, 02 Nov 2020 06:59:15 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id v6sm22402553wrb.53.2020.11.02.06.59.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Nov 2020 06:59:14 -0800 (PST)
+Subject: Re: [RFC PATCH-for-5.2? 4/5] tests/acceptance: Only run tests tagged
+ 'gating-ci' on GitLab CI
+To: "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20201102144245.2134077-1-philmd@redhat.com>
+ <20201102144245.2134077-5-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f40e30a8-7be3-3f02-352a-9e5f60446d25@redhat.com>
+Date: Mon, 2 Nov 2020 15:59:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201102053142-mutt-send-email-mst@kernel.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20201102144245.2134077-5-philmd@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="lEGEL1/lMxI0MVQ2"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 03:02:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -89,8 +104,9 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,91 +119,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- Janosch Frank <frankja@linux.vnet.ibm.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Kirti Wankhede <kwankhede@nvidia.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Yan Vugenfirer <yan@daynix.com>,
- Jag Raman <jag.raman@oracle.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Anup Patel <anup@brainfault.org>,
- Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
- Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
- Roman Kagan <rkagan@virtuozzo.com>, Felipe Franciosi <felipe@nutanix.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Jens Freimann <jfreimann@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Kashyap Chamarthy <kchamart@redhat.com>,
- Darren Kenny <darren.kenny@oracle.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Liran Alon <liran.alon@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
- Halil Pasic <pasic@linux.vnet.ibm.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>, fam <fam@euphon.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Fabien Chouteau <chouteau@adacore.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+ Antony Pavlov <antonynpavlov@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---lEGEL1/lMxI0MVQ2
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 11/2/20 3:42 PM, Philippe Mathieu-Daudé wrote:
+> To avoid breaking our CI each time a test is added, switch from the
+> "run all but disable some" to "only run the tagged tests on CI".
+> This way we can add a test to the repository, and promote it to
+> 'gating-ci' once it is proven stable enough.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> 
+> TODO: where to add documentation?
+> 
+> - docs/devel/testing.rst (too big, split?)
+> - tests/acceptance/README.rst
+> 
+> ---
+>  tests/Makefile.include | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 3a0524ce740..f39ba760c17 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -126,7 +126,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
+>              $(TESTS_VENV_DIR)/bin/python -m avocado \
+>              --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
+>              --filter-by-tags-include-empty --filter-by-tags-include-empty-key \
+> -            $(AVOCADO_TAGS) \
+> +            $(AVOCADO_TAGS) -t gating-ci \
 
-On Mon, Nov 02, 2020 at 05:34:50AM -0500, Michael S. Tsirkin wrote:
-> On Mon, Nov 02, 2020 at 10:27:54AM +0000, Stefan Hajnoczi wrote:
-> > On Mon, Nov 02, 2020 at 11:00:12AM +0800, Jason Wang wrote:
-> > >=20
-> > > On 2020/10/30 =E4=B8=8B=E5=8D=887:13, Stefan Hajnoczi wrote:
-> > > > > I still don't get why it must be opaque.
-> > > > If the device state format needs to be in the VMM then each device
-> > > > needs explicit enablement in each VMM (QEMU, cloud-hypervisor, etc)=
-.
-> > > >=20
-> > > > Let's invert the question: why does the VMM need to understand the
-> > > > device state of a_passthrough_  device?
-> > >=20
-> > >=20
-> > > It's not a 100% passthrough device if you want to support live migrat=
-ion.
-> > > E.g the device state save and restore is not under the control of dri=
-vers in
-> > > the guest.
-> >=20
-> > VFIO devices are already not pure passthrough (even without mdev) since
-> > the PCI bus is emulated and device-specific quirks may be implemented.
->=20
-> So since it's not a pure passthrough anyway, let's try to
-> introduce some standards even if we can not always enforce
-> them.
+This doesn't work as expected, since we have:
 
-Yes, I agree. I've sent a document called "VFIO Migration" in a separate
-email thread that defines how to orchestrate migration with versioning.
-Maybe we can discuss the details there and figure out which guidelines
-and device state representations to standardize.
+AVOCADO_TAGS=$(patsubst %-softmmu,-t arch:%, $(filter
+%-softmmu,$(TARGET_DIRS)))
 
-Stefan
+And avocado '-t' works as logical OR, not logical AND.
 
---lEGEL1/lMxI0MVQ2
-Content-Type: application/pgp-signature; name="signature.asc"
+OTOH it seems this variable predate the auto-skip feature
+(when a binary is not present).
 
------BEGIN PGP SIGNATURE-----
+So I'll test this instead, which is simpler:
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+gHr4ACgkQnKSrs4Gr
-c8hAhQf/X2WbF3CZFPHsk3pdHqjJf9mBVikDW5lwZh3efNdqun5scNWsMx/RlL8c
-mZBRD0ZpWX/hUlbcy/HYEIyO76cUaylnkJ3g9QF63htXYb+EgWmPoDljZRDrYmWn
-0McjH43JfQIlsVC7aOXA89sOjGf8SHvZnRs3yYWwoxWsFFKuwWBjbOW3yArJ7K0+
-u6grng9RqLglYJTpvYrYbOSE5g/ojH0DY4VTQXCrS7GqXKm0DfFwYVeHCFczZwJY
-QPS7rgAvmPl2UDNQgfGm7wVb5Tqiu1xoMpcjl07piknD98dGMyV7PkTVnCqFQT86
-CrDonbuILqzosLYqJkI/K5YiNnX3kw==
-=6tB6
------END PGP SIGNATURE-----
+-- >8 --
+@@ -90,7 +90,7 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+ # Any number of command separated loggers are accepted.  For more
+ # information please refer to "avocado --help".
+ AVOCADO_SHOW=app
+-AVOCADO_TAGS=$(patsubst %-softmmu,-t arch:%, $(filter
+%-softmmu,$(TARGET_DIRS)))
++AVOCADO_TAGS=-t gating-ci
 
---lEGEL1/lMxI0MVQ2--
+ $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
+        $(call quiet-command, \
+---
 
 
