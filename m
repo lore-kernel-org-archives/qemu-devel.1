@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A0AFC00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A105CC00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:27:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0985B21D91
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:26:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DC3A20715
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:27:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TvTnE7Pw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0985B21D91
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cirx/Fu7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DC3A20715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZdbe-0005kS-KW
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 12:26:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54060)
+	id 1kZdc4-00064Y-42
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 12:27:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZdLy-00016b-3D
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:46 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56090)
+ id 1kZdM5-0001PL-Hi
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:53 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:50799)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZdLu-0006cN-Q3
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:45 -0500
-Received: by mail-wm1-x342.google.com with SMTP id c9so8605713wml.5
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 09:10:42 -0800 (PST)
+ id 1kZdM3-0006eX-QW
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:53 -0500
+Received: by mail-wm1-x331.google.com with SMTP id 13so10160900wmf.0
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 09:10:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=ed/BTbi7euqfL1hXrKVEmFWNJJJT/JBXDy33Yta9R7U=;
- b=TvTnE7PwnkqUuwn6H7RD13+NfZIpEdUkznHeUQeFVQXh39/CqsOxp2fhwC1SbNGTt1
- azfUfYe49rHZeaYdg2cA9XA2MyeaRN2Hfjg0bAYky7o1zlwT7kzHtf+uMEYssZQAD/jB
- D9hKTmHO8sv8ZSCnBqaKsum4fmhxUrnP3X+/ul0mBa6OVykRnRcQ7oT1q5GJ3lT8vgUZ
- 1rF0mCfsWpVwVJ5f/bDrYsV90h48ru4alLEOqnQ1wOIa4lSBiOq5yPDMWLU6vs8NmcSq
- 8hH7xb8zBjV/gQfuV+hIHLkidyTFEmTlH1w8jWijCXw1TecuraLh9UeqzCb53fTm592D
- O0Ww==
+ bh=UP1n0K2qtWKcroM5xmLdq4+koLBx0NwxnaUUM2A/CGU=;
+ b=Cirx/Fu7gnDaFZx1nWzqOvrdDwioh2/I5VuLofjwmlxUTV3bUfTl7OZpq/ShmO5mmq
+ ZrVyQ6qoBcRDhmKRbvmVXMrr7IP04VKrzcTq660QMTmKCOtocHy/Nfujw38neeYnsOF5
+ hUr5zstHTRgOLL3w+TwP2FjAnVCnkHPGwaDFIZpf15JBEo90l1Mc2UE4eS9sMA5esWlR
+ G5tlRCh1NqRflBGVsnaUIcbUK2KeI65fdLGi8dl9lG6Tp5+/OqeYE7UcJhhl/ANC6pxH
+ WyOZ2bHIrFciIcIzxvCePDGTwHm5Ck6ek6oCg98MEPEgmiesaZT3c7AN2O082zVQWGCR
+ q4wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ed/BTbi7euqfL1hXrKVEmFWNJJJT/JBXDy33Yta9R7U=;
- b=DcrhwdIBwiLreKbf6Pg0Uo9piqDoDVTmo6GWkZ3cXPFug25JE2aqi89DnCbMTWJt1W
- SzDAIZlCCvSy0Ie4c9zN/PDstF0KOcCVIgke4NmCA9MUIX+Fd1fSL+3z0IMPgNQwE/bJ
- LxPAMapd0gunk2fSnwsNUbLpxj3Of6PcpECfIQMsv8rv9ayTl89B2T3ZjZUQlPAEjLM9
- G0REoAQM3jqwNfpFoV8TvrhOHW7KEclORyT+3/dgvHRtTWZTldo8fu1gNlsRT4ZtI1Dc
- bsjmUlqz44u850AwioZEaUFO9WtXQa5stMsljLEmYCyIFO6oVQYL4vR11sInkDff6t7n
- S3Bw==
-X-Gm-Message-State: AOAM531wuBkxSr7OLmJ7Wmp+tsAlN12DBIQ6+tKHnGkVA8jb9sIdvzLM
- fmOqoEC+0L+m4bscGwmOIx1HHUmSY/ekKg==
-X-Google-Smtp-Source: ABdhPJxNAaM7Rer+oJ5v+BdkOK1sKxhQLHn/lQa9rsJmRbTvMzSg9xxRtCjS+PI2DzGhweo6IOeCkg==
-X-Received: by 2002:a1c:4d14:: with SMTP id o20mr18197607wmh.72.1604337041221; 
- Mon, 02 Nov 2020 09:10:41 -0800 (PST)
+ bh=UP1n0K2qtWKcroM5xmLdq4+koLBx0NwxnaUUM2A/CGU=;
+ b=UB9uRm81NPthFzaU20nK836WXfFzcMv8i/tOv1RB5+8+siK5uv7+15EG4Roob4a3vj
+ 28XYLbfcvZoV8H5xF21fVnPpWyNB9vq+InDWShUrl2M9r7PLNT0+cMPxzQmHQq4pFx3L
+ siDr7uaXZdKX3KyUvpVIFd/Esvsn90FrtmZuHMkq1UAEvkAQxNzxa7wGdFRIc1nkG+8u
+ fIRZgd4s9kR4rHKD2weQL+1dPzDP81me7JOShF/8x5Lzy7L/ZjYydX4ddPBMAU24/+Mn
+ W5mlnso+gJl0HtpoU7uZtbkG6etWkuYB792h/rLJfEjdPUgMWSoEl17oQb2aWaMKF0GS
+ xorA==
+X-Gm-Message-State: AOAM532ydsa2rwG7YhGTmP4sjU5XNMb0QNICerh6NgYVFekf/YF60YC/
+ ogBbzIfE8Hhu6VLH0IMh7T1zqcbfYXgMlA==
+X-Google-Smtp-Source: ABdhPJwm9xC3EAt0OHfEC1G8Xm0RCgBhEpyucX8BBn6b8hhwkI9VNO5UYzc5bvaN9CIirQIC5Okfrw==
+X-Received: by 2002:a1c:ac87:: with SMTP id
+ v129mr18630593wme.119.1604337047232; 
+ Mon, 02 Nov 2020 09:10:47 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c18sm22396540wrt.10.2020.11.02.09.10.40
+ by smtp.gmail.com with ESMTPSA id c18sm22396540wrt.10.2020.11.02.09.10.45
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 09:10:40 -0800 (PST)
+ Mon, 02 Nov 2020 09:10:46 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 20/26] hw/display/exynos4210_fimd: Fix potential NULL pointer
- dereference
-Date: Mon,  2 Nov 2020 17:09:59 +0000
-Message-Id: <20201102171005.30690-21-peter.maydell@linaro.org>
+Subject: [PULL 25/26] qemu-option-trace.rst.inc: Don't use option:: markup
+Date: Mon,  2 Nov 2020 17:10:04 +0000
+Message-Id: <20201102171005.30690-26-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201102171005.30690-1-peter.maydell@linaro.org>
 References: <20201102171005.30690-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::331;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x331.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,41 +106,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: AlexChen <alex.chen@huawei.com>
+Sphinx 3.2 is pickier than earlier versions about the option:: markup,
+and complains about our usage in qemu-option-trace.rst:
 
-In exynos4210_fimd_update(), the pointer s is dereferinced before
-being check if it is valid, which may lead to NULL pointer dereference.
-So move the assignment to global_width after checking that the s is valid.
+../../docs/qemu-option-trace.rst.inc:4:Malformed option description
+  '[enable=]PATTERN', should look like "opt", "-opt args", "--opt args",
+  "/opt args" or "+opt args"
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Alex Chen <alex.chen@huawei.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 5F9F8D88.9030102@huawei.com
+In this file, we're really trying to document the different parts of
+the top-level --trace option, which qemu-nbd.rst and qemu-img.rst
+have already introduced with an option:: markup.  So it's not right
+to use option:: here anyway.  Switch to a different markup
+(definition lists) which gives about the same formatted output.
+
+(Unlike option::, this markup doesn't produce index entries; but
+at the moment we don't do anything much with indexes anyway, and
+in any case I think it doesn't make much sense to have individual
+index entries for the sub-parts of the --trace option.)
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20201030174700.7204-3-peter.maydell@linaro.org
 ---
- hw/display/exynos4210_fimd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ docs/qemu-option-trace.rst.inc | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/display/exynos4210_fimd.c b/hw/display/exynos4210_fimd.c
-index 4c16e1f5a00..34a960a9765 100644
---- a/hw/display/exynos4210_fimd.c
-+++ b/hw/display/exynos4210_fimd.c
-@@ -1275,12 +1275,14 @@ static void exynos4210_fimd_update(void *opaque)
-     bool blend = false;
-     uint8_t *host_fb_addr;
-     bool is_dirty = false;
--    const int global_width = (s->vidtcon[2] & FIMD_VIDTCON2_SIZE_MASK) + 1;
-+    int global_width;
+diff --git a/docs/qemu-option-trace.rst.inc b/docs/qemu-option-trace.rst.inc
+index 7e09773a9c5..d7acbe67f73 100644
+--- a/docs/qemu-option-trace.rst.inc
++++ b/docs/qemu-option-trace.rst.inc
+@@ -1,7 +1,7 @@
  
-     if (!s || !s->console || !s->enabled ||
-         surface_bits_per_pixel(qemu_console_surface(s->console)) == 0) {
-         return;
-     }
-+
-+    global_width = (s->vidtcon[2] & FIMD_VIDTCON2_SIZE_MASK) + 1;
-     exynos4210_update_resolution(s);
-     surface = qemu_console_surface(s->console);
+ Specify tracing options.
  
+-.. option:: [enable=]PATTERN
++``[enable=]PATTERN``
+ 
+   Immediately enable events matching *PATTERN*
+   (either event name or a globbing pattern).  This option is only
+@@ -11,7 +11,7 @@ Specify tracing options.
+ 
+   Use :option:`-trace help` to print a list of names of trace points.
+ 
+-.. option:: events=FILE
++``events=FILE``
+ 
+   Immediately enable events listed in *FILE*.
+   The file must contain one event name (as listed in the ``trace-events-all``
+@@ -19,7 +19,7 @@ Specify tracing options.
+   available if QEMU has been compiled with the ``simple``, ``log`` or
+   ``ftrace`` tracing backend.
+ 
+-.. option:: file=FILE
++``file=FILE``
+ 
+   Log output traces to *FILE*.
+   This option is only available if QEMU has been compiled with
 -- 
 2.20.1
 
