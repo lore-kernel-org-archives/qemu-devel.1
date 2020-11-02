@@ -2,106 +2,56 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE78EC00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFA7C388F9
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:27:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F59F2223C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:27:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IjZFvGuM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F59F2223C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D4A0E2223C
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:27:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4A0E2223C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZW81-00044U-BY
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 04:27:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44684)
+	id 1kZW84-0004Cj-Jf
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 04:27:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kZW78-0003Jj-Af
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:26:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56245)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kZW76-00076A-NH
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:26:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604309215;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wvGhxUsJqo06ipVi86w+zJhdXv1eFtqbOarLy6QAmdY=;
- b=IjZFvGuM4SZIjBjzzpPrHFn84nrGYN5Rt5e9nZRLyA1PaAisP1c64JRnxaS075nR/DjBkE
- Ss/J9qdGJZyfa6Rce44I3t1wIdz8PYF2PWblQTQpEqa9bWW0pU2YUgJXB8ZzKV2rTxoKti
- R0vuwXNhNilmELe3A5uhbme9wpi7VxE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-m2e2FvQrMLqzBQYxHomplA-1; Mon, 02 Nov 2020 04:26:54 -0500
-X-MC-Unique: m2e2FvQrMLqzBQYxHomplA-1
-Received: by mail-wm1-f71.google.com with SMTP id z7so3113641wme.8
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 01:26:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=uR6TwZCpcZCZ+h7IM7HScu7o4n8bS7ER7TMaqeoMaI8=;
- b=FUaniDCai6OhfVEc5VpXMnjK5SMOwAGQ4pdBVhM9HkKKYnErILphzzX/7zclKNJgSE
- ta/cpdGkfcFJHz/6MAYwAQEFHs4HzfI5kg3P/FIVZklOXmIHAKASWv0kmur0uhlYn9N/
- z22JEILwLdX7TVtvw84nkWB7vqKrw1KLwCmaZVtmZ46dZDONMLZXA+6CmX8+gu7CozbP
- UFItVGyyVnak+kE2r6unmh4XEhkqYauFdEOEB8BWVlV2hkvcyUFHk+ko9dEk0iDRWTiJ
- w+vr6zWyJFglEeV0xj2xV72eCHsrxOZMwp5N7OBrhZPqzTp99EWQJPYxec7IunDvusHv
- n7bw==
-X-Gm-Message-State: AOAM532GslWOvX36GD/ma8crazc9ArSKNraHHMxRRFqvqhdGUJrRAuLT
- yboZ51HLeNnjd3rVFnUxkbC9E9WT9JIFbX0C2FUBsIM1/gNp8tTI1L+Yp/7RddSsxjjko4tjHkh
- 70W7KLMzrM1VsyGU=
-X-Received: by 2002:a1c:2441:: with SMTP id k62mr17365984wmk.10.1604309212538; 
- Mon, 02 Nov 2020 01:26:52 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzRe+IZVHLAqiWAsI4RD6usavgvek+w7lWv3Gk3n03ohF1RO5S4hcHH6Mbe3mIG8pi+4lcPxA==
-X-Received: by 2002:a1c:2441:: with SMTP id k62mr17365963wmk.10.1604309212293; 
- Mon, 02 Nov 2020 01:26:52 -0800 (PST)
-Received: from steredhat (host-79-22-200-33.retail.telecomitalia.it.
- [79.22.200.33])
- by smtp.gmail.com with ESMTPSA id e20sm14222599wme.35.2020.11.02.01.26.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 01:26:51 -0800 (PST)
-Date: Mon, 2 Nov 2020 10:26:49 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.2] hw/smbios: Fix leaked fd in save_opt_one() error
- path
-Message-ID: <20201102092649.ciwhp4mpcs4dc6ri@steredhat>
-References: <20201030152742.1553968-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kZW7D-0003OL-Gn
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:27:03 -0500
+Received: from mail.ispras.ru ([83.149.199.84]:56680)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kZW7B-00078r-AG
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:27:03 -0500
+Received: from [127.0.1.1] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 75F9740AAD9D;
+ Mon,  2 Nov 2020 09:26:59 +0000 (UTC)
+Subject: [PATCH v2] target/s390x: fix execution with icount
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+To: qemu-devel@nongnu.org
+Date: Mon, 02 Nov 2020 12:26:59 +0300
+Message-ID: <160430921917.21500.1486722139653938240.stgit@pasha-ThinkPad-X280>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-In-Reply-To: <20201030152742.1553968-1-philmd@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 03:02:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=83.149.199.84;
+ envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 04:25:18
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,60 +64,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
- Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+ pavel.dovgalyuk@ispras.ru, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 30, 2020 at 04:27:42PM +0100, Philippe Mathieu-Daudé wrote:
->Fix the following Coverity issue (RESOURCE_LEAK):
->
->  CID 1432879: Resource leak
->
->    Handle variable fd going out of scope leaks the handle.
->
->Replace a close() call by qemu_close() since the handle is
->opened with qemu_open().
->
->Fixes: bb99f4772f5 ("hw/smbios: support loading OEM strings values from a file")
->Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->---
-> hw/smbios/smbios.c | 4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
+This patch adds some gen_io_start() calls to allow execution
+of s390x targets in icount mode with -smp 1.
+It enables deterministic timers and record/replay features.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 
->
->diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
->index 8b30906e50a..6a3d39793bc 100644
->--- a/hw/smbios/smbios.c
->+++ b/hw/smbios/smbios.c
->@@ -988,16 +988,18 @@ static int save_opt_one(void *opaque,
->             if (ret < 0) {
->                 error_setg(errp, "Unable to read from %s: %s",
->                            value, strerror(errno));
->+                qemu_close(fd);
->                 return -1;
->             }
->             if (memchr(buf, '\0', ret)) {
->                 error_setg(errp, "NUL in OEM strings value in %s", value);
->+                qemu_close(fd);
->                 return -1;
->             }
->             g_byte_array_append(data, (guint8 *)buf, ret);
->         }
->
->-        close(fd);
->+        qemu_close(fd);
->
->         *opt->dest = g_renew(char *, *opt->dest, (*opt->ndest) + 1);
->         (*opt->dest)[*opt->ndest] = (char *)g_byte_array_free(data,  FALSE);
->-- 
->2.26.2
->
->
+---
+
+v2:
+ - added IF_IO flag to reuse icount code in translate_one()
+   (suggested by Richard Henderson)
+---
+ target/s390x/insn-data.def |   70 ++++++++++++++++++++++----------------------
+ target/s390x/translate.c   |   15 +++++++++
+ 2 files changed, 50 insertions(+), 35 deletions(-)
+
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index d3bcdfd67b..b95bc98d35 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -379,7 +379,7 @@
+ /* EXTRACT CPU ATTRIBUTE */
+     C(0xeb4c, ECAG,    RSY_a, GIE, 0, a2, r1, 0, ecag, 0)
+ /* EXTRACT CPU TIME */
+-    C(0xc801, ECTG,    SSF,   ECT, 0, 0, 0, 0, ectg, 0)
++    F(0xc801, ECTG,    SSF,   ECT, 0, 0, 0, 0, ectg, 0, IF_IO)
+ /* EXTRACT FPC */
+     F(0xb38c, EFPC,    RRE,   Z,   0, 0, new, r1_32, efpc, 0, IF_BFP)
+ /* EXTRACT PSW */
+@@ -855,10 +855,10 @@
+     C(0xe32f, STRVG,   RXY_a, Z,   la2, r1_o, new, m1_64, rev64, 0)
+ 
+ /* STORE CLOCK */
+-    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
+-    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
++    F(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0, IF_IO)
++    F(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0, IF_IO)
+ /* STORE CLOCK EXTENDED */
+-    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
++    F(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0, IF_IO)
+ 
+ /* STORE FACILITY LIST EXTENDED */
+     C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
+@@ -1269,7 +1269,7 @@
+     E(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL, IF_PRIV)
+     E(0xb98a, CSPG,    RRE, DAT_ENH, r1_o, ra2, r1_P, 0, csp, 0, MO_TEQ, IF_PRIV)
+ /* DIAGNOSE (KVM hypercall) */
+-    F(0x8300, DIAG,    RSI,   Z,   0, 0, 0, 0, diag, 0, IF_PRIV)
++    F(0x8300, DIAG,    RSI,   Z,   0, 0, 0, 0, diag, 0, IF_PRIV | IF_IO)
+ /* INSERT STORAGE KEY EXTENDED */
+     F(0xb229, ISKE,    RRE,   Z,   0, r2_o, new, r1_8, iske, 0, IF_PRIV)
+ /* INVALIDATE DAT TABLE ENTRY */
+@@ -1301,17 +1301,17 @@
+ /* RESET REFERENCE BIT EXTENDED */
+     F(0xb22a, RRBE,    RRE,   Z,   0, r2_o, 0, 0, rrbe, 0, IF_PRIV)
+ /* SERVICE CALL LOGICAL PROCESSOR (PV hypercall) */
+-    F(0xb220, SERVC,   RRE,   Z,   r1_o, r2_o, 0, 0, servc, 0, IF_PRIV)
++    F(0xb220, SERVC,   RRE,   Z,   r1_o, r2_o, 0, 0, servc, 0, IF_PRIV | IF_IO)
+ /* SET ADDRESS SPACE CONTROL FAST */
+     F(0xb279, SACF,    S,     Z,   0, a2, 0, 0, sacf, 0, IF_PRIV)
+ /* SET CLOCK */
+-    F(0xb204, SCK,     S,     Z,   la2, 0, 0, 0, sck, 0, IF_PRIV)
++    F(0xb204, SCK,     S,     Z,   la2, 0, 0, 0, sck, 0, IF_PRIV | IF_IO)
+ /* SET CLOCK COMPARATOR */
+-    F(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0, IF_PRIV)
++    F(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0, IF_PRIV | IF_IO)
+ /* SET CLOCK PROGRAMMABLE FIELD */
+     F(0x0107, SCKPF,   E,     Z,   0, 0, 0, 0, sckpf, 0, IF_PRIV)
+ /* SET CPU TIMER */
+-    F(0xb208, SPT,     S,     Z,   0, m2_64a, 0, 0, spt, 0, IF_PRIV)
++    F(0xb208, SPT,     S,     Z,   0, m2_64a, 0, 0, spt, 0, IF_PRIV | IF_IO)
+ /* SET PREFIX */
+     F(0xb210, SPX,     S,     Z,   0, m2_32ua, 0, 0, spx, 0, IF_PRIV)
+ /* SET PSW KEY FROM ADDRESS */
+@@ -1321,7 +1321,7 @@
+ /* SET SYSTEM MASK */
+     F(0x8000, SSM,     S,     Z,   0, m2_8u, 0, 0, ssm, 0, IF_PRIV)
+ /* SIGNAL PROCESSOR */
+-    F(0xae00, SIGP,    RS_a,  Z,   0, a2, 0, 0, sigp, 0, IF_PRIV)
++    F(0xae00, SIGP,    RS_a,  Z,   0, a2, 0, 0, sigp, 0, IF_PRIV | IF_IO)
+ /* STORE CLOCK COMPARATOR */
+     F(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0, IF_PRIV)
+ /* STORE CONTROL */
+@@ -1332,7 +1332,7 @@
+ /* STORE CPU ID */
+     F(0xb202, STIDP,   S,     Z,   la2, 0, new, m1_64a, stidp, 0, IF_PRIV)
+ /* STORE CPU TIMER */
+-    F(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64a, stpt, 0, IF_PRIV)
++    F(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64a, stpt, 0, IF_PRIV | IF_IO)
+ /* STORE FACILITY LIST */
+     F(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0, IF_PRIV)
+ /* STORE PREFIX */
+@@ -1352,35 +1352,35 @@
+     C(0xe501, TPROT,   SSE,   Z,   la1, a2, 0, 0, tprot, 0)
+ 
+ /* CCW I/O Instructions */
+-    F(0xb276, XSCH,    S,     Z,   0, 0, 0, 0, xsch, 0, IF_PRIV)
+-    F(0xb230, CSCH,    S,     Z,   0, 0, 0, 0, csch, 0, IF_PRIV)
+-    F(0xb231, HSCH,    S,     Z,   0, 0, 0, 0, hsch, 0, IF_PRIV)
+-    F(0xb232, MSCH,    S,     Z,   0, insn, 0, 0, msch, 0, IF_PRIV)
+-    F(0xb23b, RCHP,    S,     Z,   0, 0, 0, 0, rchp, 0, IF_PRIV)
+-    F(0xb238, RSCH,    S,     Z,   0, 0, 0, 0, rsch, 0, IF_PRIV)
+-    F(0xb237, SAL,     S,     Z,   0, 0, 0, 0, sal, 0, IF_PRIV)
+-    F(0xb23c, SCHM,    S,     Z,   0, insn, 0, 0, schm, 0, IF_PRIV)
+-    F(0xb274, SIGA,    S,     Z,   0, 0, 0, 0, siga, 0, IF_PRIV)
+-    F(0xb23a, STCPS,   S,     Z,   0, 0, 0, 0, stcps, 0, IF_PRIV)
+-    F(0xb233, SSCH,    S,     Z,   0, insn, 0, 0, ssch, 0, IF_PRIV)
+-    F(0xb239, STCRW,   S,     Z,   0, insn, 0, 0, stcrw, 0, IF_PRIV)
+-    F(0xb234, STSCH,   S,     Z,   0, insn, 0, 0, stsch, 0, IF_PRIV)
+-    F(0xb236, TPI ,    S,     Z,   la2, 0, 0, 0, tpi, 0, IF_PRIV)
+-    F(0xb235, TSCH,    S,     Z,   0, insn, 0, 0, tsch, 0, IF_PRIV)
++    F(0xb276, XSCH,    S,     Z,   0, 0, 0, 0, xsch, 0, IF_PRIV | IF_IO)
++    F(0xb230, CSCH,    S,     Z,   0, 0, 0, 0, csch, 0, IF_PRIV | IF_IO)
++    F(0xb231, HSCH,    S,     Z,   0, 0, 0, 0, hsch, 0, IF_PRIV | IF_IO)
++    F(0xb232, MSCH,    S,     Z,   0, insn, 0, 0, msch, 0, IF_PRIV | IF_IO)
++    F(0xb23b, RCHP,    S,     Z,   0, 0, 0, 0, rchp, 0, IF_PRIV | IF_IO)
++    F(0xb238, RSCH,    S,     Z,   0, 0, 0, 0, rsch, 0, IF_PRIV | IF_IO)
++    F(0xb237, SAL,     S,     Z,   0, 0, 0, 0, sal, 0, IF_PRIV | IF_IO)
++    F(0xb23c, SCHM,    S,     Z,   0, insn, 0, 0, schm, 0, IF_PRIV | IF_IO)
++    F(0xb274, SIGA,    S,     Z,   0, 0, 0, 0, siga, 0, IF_PRIV | IF_IO)
++    F(0xb23a, STCPS,   S,     Z,   0, 0, 0, 0, stcps, 0, IF_PRIV | IF_IO)
++    F(0xb233, SSCH,    S,     Z,   0, insn, 0, 0, ssch, 0, IF_PRIV | IF_IO)
++    F(0xb239, STCRW,   S,     Z,   0, insn, 0, 0, stcrw, 0, IF_PRIV | IF_IO)
++    F(0xb234, STSCH,   S,     Z,   0, insn, 0, 0, stsch, 0, IF_PRIV | IF_IO)
++    F(0xb236, TPI ,    S,     Z,   la2, 0, 0, 0, tpi, 0, IF_PRIV | IF_IO)
++    F(0xb235, TSCH,    S,     Z,   0, insn, 0, 0, tsch, 0, IF_PRIV | IF_IO)
+     /* ??? Not listed in PoO ninth edition, but there's a linux driver that
+        uses it: "A CHSC subchannel is usually present on LPAR only."  */
+-    F(0xb25f, CHSC,  RRE,     Z,   0, insn, 0, 0, chsc, 0, IF_PRIV)
++    F(0xb25f, CHSC,  RRE,     Z,   0, insn, 0, 0, chsc, 0, IF_PRIV | IF_IO)
+ 
+ /* zPCI Instructions */
+     /* None of these instructions are documented in the PoP, so this is all
+        based upon target/s390x/kvm.c and Linux code and likely incomplete */
+-    F(0xebd0, PCISTB, RSY_a, PCI, la2, 0, 0, 0, pcistb, 0, IF_PRIV)
+-    F(0xebd1, SIC, RSY_a, AIS, r1, r3, 0, 0, sic, 0, IF_PRIV)
+-    F(0xb9a0, CLP, RRF_c, PCI, 0, 0, 0, 0, clp, 0, IF_PRIV)
+-    F(0xb9d0, PCISTG, RRE, PCI, 0, 0, 0, 0, pcistg, 0, IF_PRIV)
+-    F(0xb9d2, PCILG, RRE, PCI, 0, 0, 0, 0, pcilg, 0, IF_PRIV)
+-    F(0xb9d3, RPCIT, RRE, PCI, 0, 0, 0, 0, rpcit, 0, IF_PRIV)
+-    F(0xe3d0, MPCIFC, RXY_a, PCI, la2, 0, 0, 0, mpcifc, 0, IF_PRIV)
+-    F(0xe3d4, STPCIFC, RXY_a, PCI, la2, 0, 0, 0, stpcifc, 0, IF_PRIV)
++    F(0xebd0, PCISTB, RSY_a, PCI, la2, 0, 0, 0, pcistb, 0, IF_PRIV | IF_IO)
++    F(0xebd1, SIC, RSY_a, AIS, r1, r3, 0, 0, sic, 0, IF_PRIV | IF_IO)
++    F(0xb9a0, CLP, RRF_c, PCI, 0, 0, 0, 0, clp, 0, IF_PRIV | IF_IO)
++    F(0xb9d0, PCISTG, RRE, PCI, 0, 0, 0, 0, pcistg, 0, IF_PRIV | IF_IO)
++    F(0xb9d2, PCILG, RRE, PCI, 0, 0, 0, 0, pcilg, 0, IF_PRIV | IF_IO)
++    F(0xb9d3, RPCIT, RRE, PCI, 0, 0, 0, 0, rpcit, 0, IF_PRIV | IF_IO)
++    F(0xe3d0, MPCIFC, RXY_a, PCI, la2, 0, 0, 0, mpcifc, 0, IF_PRIV | IF_IO)
++    F(0xe3d4, STPCIFC, RXY_a, PCI, la2, 0, 0, 0, stpcifc, 0, IF_PRIV | IF_IO)
+ 
+ #endif /* CONFIG_USER_ONLY */
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index ac10f42f10..7a8ff1f2de 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -1214,6 +1214,7 @@ typedef struct {
+ #define IF_DFP      0x0010      /* decimal floating point instruction */
+ #define IF_PRIV     0x0020      /* privileged instruction */
+ #define IF_VEC      0x0040      /* vector instruction */
++#define IF_IO       0x0080      /* input/output instruction */
+ 
+ struct DisasInsn {
+     unsigned opc:16;
+@@ -6369,6 +6370,7 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
+     const DisasInsn *insn;
+     DisasJumpType ret = DISAS_NEXT;
+     DisasOps o = {};
++    bool icount = false;
+ 
+     /* Search for the insn in the table.  */
+     insn = extract_insn(env, s);
+@@ -6435,6 +6437,14 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
+                 return DISAS_NORETURN;
+             }
+         }
++
++        /* input/output is the special case for icount mode */
++        if (insn->flags & IF_IO) {
++            icount = tb_cflags(s->base.tb) & CF_USE_ICOUNT;
++            if (icount) {
++                gen_io_start();
++            }
++        }
+     }
+ 
+     /* Check for insn specification exceptions.  */
+@@ -6488,6 +6498,11 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
+         tcg_temp_free_i64(o.addr1);
+     }
+ 
++    /* io should be the last instruction in tb when icount is enabled */
++    if (icount && ret == DISAS_NEXT) {
++        ret = DISAS_PC_STALE;
++    }
++
+ #ifndef CONFIG_USER_ONLY
+     if (s->base.tb->flags & FLAG_MASK_PER) {
+         /* An exception might be triggered, save PSW if not already done.  */
 
 
