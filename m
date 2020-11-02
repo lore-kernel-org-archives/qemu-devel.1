@@ -2,91 +2,95 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B66C4742C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 15:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 787C2C388F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 15:55:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42E1A206E5
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 15:51:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB37422258
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 15:55:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="idFcs2m9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E1A206E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YgGBzau+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB37422258
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZc7E-0006Sm-8Q
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 10:51:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60192)
+	id 1kZcAd-0000xA-UJ
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 10:54:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZc5U-00051A-NH
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 10:49:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48617)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZc5R-0003Ej-QS
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 10:49:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604332175;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vreaaMaZv5ISkFm0TlHo1DmFY5/2LPzpJZn1TAhdLtw=;
- b=idFcs2m9gOsGtZssQypKCSYhLHHhD4fPE7GKHUgkkQESXIa5zcR/nDm/RJOO6ATTEZJ6zJ
- 7BfurhPlDCmK1XAcMcY5h66hOLqxga+1ATZYGu4tBs23cV5VJLxWoPsJ+am9co+DLs/F3d
- A0Trwkj7+vugueXme/dRuvCMtpsF0J8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-owbAJjkwOTOb0VT0nzMfXg-1; Mon, 02 Nov 2020 10:49:33 -0500
-X-MC-Unique: owbAJjkwOTOb0VT0nzMfXg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 321271084C8A;
- Mon,  2 Nov 2020 15:49:32 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
- [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C480F7366E;
- Mon,  2 Nov 2020 15:49:28 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5635C1132BD6; Mon,  2 Nov 2020 16:49:27 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Michael Roth <michael.roth@amd.com>
-Subject: Re: [PULL 09/12] qga: add ssh-{add,remove}-authorized-keys
-References: <20201027055317.351868-1-michael.roth@amd.com>
- <20201027055317.351868-10-michael.roth@amd.com>
-Date: Mon, 02 Nov 2020 16:49:27 +0100
-In-Reply-To: <20201027055317.351868-10-michael.roth@amd.com> (Michael Roth's
- message of "Tue, 27 Oct 2020 00:53:14 -0500")
-Message-ID: <878sbju5bs.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kZc9x-00007j-1w
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 10:54:17 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:40307)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kZc9u-0003qQ-6O
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 10:54:16 -0500
+Received: by mail-pg1-x542.google.com with SMTP id x13so11116161pgp.7
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 07:54:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=kkKQH6mRfpBv2XRQzfJX+n4qLPHQiReKCiFv1dcikak=;
+ b=YgGBzau+w8m5FnlmcUWNUikbkVxFTUlufLtA1BdrFMn9Te0HGVkuanQPwJQvYD+P9N
+ hXTzvC1Yq452/BrssX5iIBdAWDoWKTwi9JqyHk1sOG21vG+qdCQXpznnspWkwUU2NWIX
+ 1BStYCjcWjhaUFglwYKtLPTjgdxMpqicKv1BWN/TajAq8Ui5BAWN3uiTlOSdpXBxQO//
+ oAeRqFno4m0hGOFZodDtvzBuQTPx+RD79oDeRBjSaDG0ymFKvhDnBS+LymzOowTrIbgj
+ P8+4ah1ibyfJqt8T5jW9Zv3N/wiuDoSd0ve5i/qSOqqt+HZJyMt0vswh3CGN2sW7UcOJ
+ /ykg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kkKQH6mRfpBv2XRQzfJX+n4qLPHQiReKCiFv1dcikak=;
+ b=tn5r4GAJPIrXBEhbx6xWT0VnYHBvu/w2HPbr8qEQbUbiOMBo1tdhbZ7/LIraA7ZtVc
+ 9JBOCfAH6oiVgSQo4u4yffB/LC2JU6JcqQ/fOPPqZ2S9+oebf5MOBxi1bY4DUIdw2Vg3
+ /Vz/sV7dPvqCtUkfA/BC3tm0lfASQcPigTqI+oT5CIIM3oprpyDTDwYApts4omFXcTuw
+ 43kaGCP1U8TVvyCnXIdTd+OWIlZO8vxt8jdQ2IhvkLVXpBWQ/tLYP2a5H7vfByfESrUu
+ aFzP0ZsU6B15eizRrOWJ7wA4fKFfIamAs6rvwXA5alWI2kfCYq3Gs5FsCa+nK5V8DVmt
+ vbZQ==
+X-Gm-Message-State: AOAM532Q+IbmDObVp/Z2MVPDb6hdHbIg/NhC0PZud6r1j11UDTDC7rdq
+ cDJNfbiOUoD1glGjeoA5QgRBOA==
+X-Google-Smtp-Source: ABdhPJwjm7Phz3RAg5xQRgc7s6b5/j1EsPLka1UIIcodXNubAs63p62wJsAglP2imqZZGyuHMVmycg==
+X-Received: by 2002:a63:2021:: with SMTP id g33mr14083396pgg.5.1604332452280; 
+ Mon, 02 Nov 2020 07:54:12 -0800 (PST)
+Received: from [192.168.101.174] ([75.147.178.105])
+ by smtp.gmail.com with ESMTPSA id s11sm4148582pfh.128.2020.11.02.07.54.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Nov 2020 07:54:11 -0800 (PST)
+Subject: Re: [PATCH v2] target/s390x: fix execution with icount
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>, qemu-devel@nongnu.org
+References: <160430921917.21500.1486722139653938240.stgit@pasha-ThinkPad-X280>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fc34885a-13e0-8299-c757-6c75486aa1f2@linaro.org>
+Date: Mon, 2 Nov 2020 07:54:09 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <160430921917.21500.1486722139653938240.stgit@pasha-ThinkPad-X280>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 03:02:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,94 +103,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michal Privoznik <mprivozn@redhat.com>,
- "Daniel P . =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- peter.maydell@linaro.org
+Cc: thuth@redhat.com, cohuck@redhat.com, rth@twiddle.net, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Michael Roth <michael.roth@amd.com> writes:
+On 11/2/20 1:26 AM, Pavel Dovgalyuk wrote:
+> This patch adds some gen_io_start() calls to allow execution
+> of s390x targets in icount mode with -smp 1.
+> It enables deterministic timers and record/replay features.
+> 
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> Add new commands to add and remove SSH public keys from
-> ~/.ssh/authorized_keys.
->
-> I took a different approach for testing, including the unit tests right
-> with the code. I wanted to overwrite the function to get the user
-> details, I couldn't easily do that over QMP. Furthermore, I prefer
-> having unit tests very close to the code, and unit files that are domain
-> specific (commands-posix is too crowded already). FWIW, that
-> coding/testing style is Rust-style (where tests can or should even be
-> part of the documentation!).
->
-> Fixes:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1885332
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> *squashed in fix-ups for setting file ownership and use of QAPI
->  conditionals for CONFIG_POSIX instead of stub definitions
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  qga/commands-posix-ssh.c | 407 +++++++++++++++++++++++++++++++++++++++
->  qga/meson.build          |  20 +-
->  qga/qapi-schema.json     |  35 ++++
->  3 files changed, 461 insertions(+), 1 deletion(-)
->  create mode 100644 qga/commands-posix-ssh.c
->
-> diff --git a/qga/commands-posix-ssh.c b/qga/commands-posix-ssh.c
-> new file mode 100644
-> index 0000000000..a7bc9a1c24
-> --- /dev/null
-> +++ b/qga/commands-posix-ssh.c
-> @@ -0,0 +1,407 @@
-> + /*
-> +  * This work is licensed under the terms of the GNU GPL, version 2 or l=
-ater.
-> +  * See the COPYING file in the top-level directory.
-> +  */
-> +#include "qemu/osdep.h"
-> +
-> +#include <glib-unix.h>
-> +#include <glib/gstdio.h>
-> +#include <locale.h>
-> +#include <pwd.h>
-> +
-> +#include "qapi/error.h"
-> +#include "qga-qapi-commands.h"
-> +
-> +#ifdef QGA_BUILD_UNIT_TEST
-> +static struct passwd *
-> +test_get_passwd_entry(const gchar *user_name, GError **error)
-> +{
-> +    struct passwd *p;
-> +    int ret;
-> +
-> +    if (!user_name || g_strcmp0(user_name, g_get_user_name())) {
-> +        g_set_error(error, G_UNIX_ERROR, 0, "Invalid user name");
-> +        return NULL;
-> +    }
-> +
-> +    p =3D g_new0(struct passwd, 1);
-> +    p->pw_dir =3D (char *)g_get_home_dir();
-> +    p->pw_uid =3D geteuid();
-> +    p->pw_gid =3D getegid();
-> +
-> +    ret =3D g_mkdir_with_parents(p->pw_dir, 0700);
-> +    g_assert_cmpint(ret, =3D=3D, 0);
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-checkpatch ERROR: Use g_assert or g_assert_not_reached
 
-See commit 6e9389563e "checkpatch: Disallow glib asserts in main code"
-for rationale.
-
-More below, and in PATCH 10+12.
-
-[...]
-
+r~
 
