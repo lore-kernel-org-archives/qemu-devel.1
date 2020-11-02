@@ -2,69 +2,101 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E08C388F9
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB35C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:11:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3961222E8
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:10:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 159B322275
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:11:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="Q0mBtHTS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3961222E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q72gpJk2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 159B322275
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZWnZ-0004lw-Q4
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:10:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49830)
+	id 1kZWoY-0005tp-2E
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:11:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <4d0746e2135f56c59c6e61ef42d700b7139065b4@lizzy.crudebyte.com>)
- id 1kZWVI-0004TQ-T3
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:51:58 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:41791)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <4d0746e2135f56c59c6e61ef42d700b7139065b4@lizzy.crudebyte.com>)
- id 1kZWVF-0007Lm-AG
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:51:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=YWmXVtZVZRtkS+BYg5kf2HB49/4Oet8HpRKUq5fnvUg=; b=Q0mBt
- HTSm7smeZAp+uIDUFjwM695GTXUfmAOOQ3qk5PMTmxriUfL5yDQWeVqWBZeIMZDPhal7MtJoqQEXM
- 6V7H1pu0hAlhStP6qJNGu80AzbxCPnSyrBbVcMS7CZBhx9um2jCnSlXyCISNKCV5U83hFDBefFBSM
- 2Ipg86IazFWIoKukrd3B4/WAdxIDlno5hjuLmxFNb2Wp4NBLgQpJvZEimH0mcmB9Gt4N3KeBqs0+X
- 7BtGAM/REvDOOv97VaGbGjnIdL+nM0YZpdQq9ZwxIUByJe4riATZ0m7qPMWBEz09JCSCp5DD7u/5M
- rUJH9goPuAzasew11HVQqIk4F8Z8Q==;
-Message-Id: <4d0746e2135f56c59c6e61ef42d700b7139065b4.1604309512.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1604309512.git.qemu_oss@crudebyte.com>
-References: <cover.1604309512.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Wed, 21 Oct 2020 14:55:46 +0200
-Subject: [PULL v3 17/17] tests/9pfs: add local Tunlinkat hard link test
-To: qemu-devel@nongnu.org,
-    Peter Maydell <peter.maydell@linaro.org>
-Cc: Greg Kurz <groug@kaod.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=4d0746e2135f56c59c6e61ef42d700b7139065b4@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 04:48:35
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZWly-0002eK-5a
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:09:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43419)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZWlv-0005Ki-FS
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:09:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604311744;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=tpfvga1D5sVj+WNXSSRop+Andp3BEC3tZxvRURQO4mU=;
+ b=Q72gpJk26tr5nrB72dKR6CPWNx6gDkhjZk+cCqO7QlS45rj0tcBNNpSXDfuxZPnGPcruVc
+ Ks+aLv3SoGY1tUKnxU4whFb9Ra+Skxuq9Fc1X/0gNIuLexJwtBAQH5rYkUg68Bypwudame
+ mqsxdWLK0EEnLcA9a8wUKYpYD0pyWX4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-50-OXirh0ztPrWm2C5dnsp55g-1; Mon, 02 Nov 2020 05:09:01 -0500
+X-MC-Unique: OXirh0ztPrWm2C5dnsp55g-1
+Received: by mail-wr1-f70.google.com with SMTP id w1so6230389wrr.5
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 02:09:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=tpfvga1D5sVj+WNXSSRop+Andp3BEC3tZxvRURQO4mU=;
+ b=K0sCLrlifTCNP2gJYV9UarYy4BlAg8M2c5tndXJextO3PamCRpljPfne4r5zUbX7MI
+ MXcSa2k8KTJJToMY7f0xmpSv/oiXvs6HyZuvtZ3VqEnEuVKUn6jySf2t1qT6kPbohYcq
+ WahZXq6r2NuFFZWRLC+uYglOXsK0C1FTcefD5Kb4Wik4ggS451sw33oVaks2qFm4YMiF
+ 1RLEKRb9km9h5sKD95K1dB1zlcX6bbgCP0YlJtBvkMIEXR/RYSl0SClusfhEAvdaEwSa
+ QGDSUKhPNXk7BvsEC19w9Vv1AvyuQKjr8LSGASdZGh4Nvv37bZfZIbh/GujKXXBjh6uv
+ iUfQ==
+X-Gm-Message-State: AOAM532Hi9G7a4P+QGkG5R5pSyf0ALiaB//1NEd7Z5OwweA3lyecrnvL
+ +nXLhLkr2j+yb4Bhx8Itc28W4Teibx1g/DDBYFxMDsjUxH44fJZK/K5gnVmehdgLHR5jizzT/Ro
+ +6lIlm+y3V/iyQaw=
+X-Received: by 2002:a5d:6652:: with SMTP id f18mr18331581wrw.186.1604311740590; 
+ Mon, 02 Nov 2020 02:09:00 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzmX3tvwWS9UX5PjFMVfx+vqQVboPvrpGs+gV+hACem3k9ADfZdZmAnXa2J8KLUlkp71+lMWw==
+X-Received: by 2002:a5d:6652:: with SMTP id f18mr18331563wrw.186.1604311740423; 
+ Mon, 02 Nov 2020 02:09:00 -0800 (PST)
+Received: from redhat.com (bzq-79-182-97-190.red.bezeqint.net. [79.182.97.190])
+ by smtp.gmail.com with ESMTPSA id r3sm21576928wrm.51.2020.11.02.02.08.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Nov 2020 02:08:59 -0800 (PST)
+Date: Mon, 2 Nov 2020 05:08:56 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 00/15] pc,pci,vhost,virtio: misc fixes
+Message-ID: <20201102050841-mutt-send-email-mst@kernel.org>
+References: <20201030141136.1013521-1-mst@redhat.com>
+ <160406842210.5222.16586020334648182159@66eaa9a8a123>
+ <CAFEAcA_vzpTivJSGmM2aR56-z5adXe0hn9A8K+2Hb0KdR6sXkA@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_vzpTivJSGmM2aR56-z5adXe0hn9A8K+2Hb0KdR6sXkA@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 03:02:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: 13
-X-Spam_score: 1.3
-X-Spam_bar: +
-X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_96_XX=3.405,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,70 +109,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test case uses a Tunlinkat request to remove a previously hard
-linked file by using the 9pfs 'local' fs driver.
+On Sun, Nov 01, 2020 at 02:03:56PM +0000, Peter Maydell wrote:
+> On Fri, 30 Oct 2020 at 14:33, <no-reply@patchew.org> wrote:
+> >
+> > Patchew URL: https://patchew.org/QEMU/20201030141136.1013521-1-mst@redhat.com/
+> 
+> I'll apply this pullreq (unless it has other more serious
+> issues), but could you look at the coding style warnings in
+> a followup patch, please?
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Message-Id: <9bec33a7d8f006ef8f80517985d0d6ac48650d53.1603285620.git.qemu_oss@crudebyte.com>
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- tests/qtest/virtio-9p-test.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
 
-diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index 35499e74ed..21e340fa5f 100644
---- a/tests/qtest/virtio-9p-test.c
-+++ b/tests/qtest/virtio-9p-test.c
-@@ -1391,6 +1391,34 @@ static void fs_hardlink_file(void *obj, void *data, QGuestAllocator *t_alloc)
-     g_free(real_file);
- }
- 
-+static void fs_unlinkat_hardlink(void *obj, void *data,
-+                                 QGuestAllocator *t_alloc)
-+{
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-+    struct stat st_real, st_link;
-+    char *real_file = virtio_9p_test_path("08/real_file");
-+    char *hardlink_file = virtio_9p_test_path("08/hardlink_file");
-+
-+    do_attach(v9p);
-+    do_mkdir(v9p, "/", "08");
-+    do_lcreate(v9p, "08", "real_file");
-+    g_assert(stat(real_file, &st_real) == 0);
-+    g_assert((st_real.st_mode & S_IFMT) == S_IFREG);
-+
-+    do_hardlink(v9p, "08", "hardlink_file", "08/real_file");
-+    g_assert(stat(hardlink_file, &st_link) == 0);
-+
-+    do_unlinkat(v9p, "08", "hardlink_file", 0);
-+    /* symlink should be gone now */
-+    g_assert(stat(hardlink_file, &st_link) != 0);
-+    /* and old file should still exist */
-+    g_assert(stat(real_file, &st_real) == 0);
-+
-+    g_free(hardlink_file);
-+    g_free(real_file);
-+}
-+
- static void *assign_9p_local_driver(GString *cmd_line, void *arg)
- {
-     virtio_9p_assign_local_driver(cmd_line, "security_model=mapped-xattr");
-@@ -1438,6 +1466,8 @@ static void register_virtio_9p_test(void)
-     qos_add_test("local/unlinkat_symlink", "virtio-9p", fs_unlinkat_symlink,
-                  &opts);
-     qos_add_test("local/hardlink_file", "virtio-9p", fs_hardlink_file, &opts);
-+    qos_add_test("local/unlinkat_hardlink", "virtio-9p", fs_unlinkat_hardlink,
-+                 &opts);
- }
- 
- libqos_init(register_virtio_9p_test);
--- 
-2.20.1
+Will do, thanks!
+
+> 
+> > 9/15 Checking commit 660b206b990b (pc: Implement -no-hpet as sugar for -machine hpet=on)
+> > WARNING: Block comments use a leading /* on a separate line
+> > #53: FILE: hw/i386/pc.c:1152:
+> > +        /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
+> >
+> > WARNING: Block comments should align the * on each line
+> > #54: FILE: hw/i386/pc.c:1153:
+> > +        /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
+> > +            * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
+> >
+> 
+> > 13/15 Checking commit e013e462e230 (vhost-blk: set features before setting inflight feature)
+> > ERROR: trailing whitespace
+> > #45: FILE: hw/virtio/vhost.c:1651:
+> > + $
+> >
+> > ERROR: trailing whitespace
+> > #50: FILE: hw/virtio/vhost.c:1656:
+> > + $
+> 
+> These all look like nits that should be fixed.
+> 
+> thanks
+> -- PMM
 
 
