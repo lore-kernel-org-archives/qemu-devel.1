@@ -2,86 +2,88 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7235C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:16:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF0B4C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:22:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D45922226
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:16:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30D382222B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:22:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="obFTcT/D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D45922226
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="bHXdgUlB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D382222B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZeNY-0008UQ-BB
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:16:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39870)
+	id 1kZeT7-0003Cb-2B
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:22:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZeMp-00084o-Qs
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:15:43 -0500
-Received: from mail-ej1-x62c.google.com ([2a00:1450:4864:20::62c]:43660)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeQw-0001WR-IQ
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:00 -0500
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:39295)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZeMo-0006GW-3D
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:15:43 -0500
-Received: by mail-ej1-x62c.google.com with SMTP id k3so20131060ejj.10
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 10:15:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=N0xVh9Zvb8JYT6y6gJRkCQwdcfDve831c0+w/y1/VxU=;
- b=obFTcT/DNiam2gDNeFSqUMP3gdaGI/zDItyggu3dJIx+WqoGj4lwIi6AZQ+bFlIAZj
- u2j4gYVDXoND4ltTWCvf4tDeN8WxvVkxPiHIDKI68FEQ8owFK71sRrc8LlhXO3Wczy1Q
- Vi+h0MIfQYRCHUkY28nqd/UVTjehHws81bM8U7/DYcm3r8ILfL8attDDOcV82JTlP2IS
- ATp7Nk++Cw2mAUCGBee/to04FAtKgbO6iRfyQSkfr/GgbEDu/+L/+bCJFGeMon6UIecX
- TkSaemnI0F49VhSk81QmFq0h6gwvGlm1A+LcIfzwwsRepeLYGkz+AYV1SJtOuvEHYP4O
- CceQ==
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeQq-0006hN-Uf
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:19:58 -0500
+Received: by mail-lf1-x143.google.com with SMTP id 184so18646639lfd.6
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 10:19:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ceOm0Xxf/LJg7f2HRgjqVHLIfEk3x6v7meMsg/XEr9M=;
+ b=bHXdgUlBKqDAeYVIYMTEuTUT1QPGBC5FoS4ISB+8MnnOliCOziWgpoNX5T4Q92pahM
+ UscpfvyEWJVvA5OByRFBQZ5u2TnuEu7cswnuOkA0iintkXmmxYoO4v8E9NhAPFyGoOh5
+ wxv514fxLlMLbdyZ122ca2R3WnP/MJAn4fHxLJpICFiyARkjk379q1XdLmeaKbacF7Vg
+ PxnRo7SwaOhyIFjIjEK9saipRGFYXW9b37aYsDn+g5izlkWUUV7wnEoZphEHiT0XPGnL
+ GgWkZfqIxpoOv9gG7oygB9bd318c5yBR1ITyy80XykA+wLcb50wqYATHVw4X8kNKVQHM
+ iXqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=N0xVh9Zvb8JYT6y6gJRkCQwdcfDve831c0+w/y1/VxU=;
- b=dHohMHIWW3D44XZrIfvy7vi8lvfwGlW4uTgxgbzgOgbAUlKXFRMItAlYAcCIEIoSPZ
- FEqAmlV4J6QAWyGY0UYJPkEdeKCorov+x3+To2NJvpN0lZRzzPzYDeM6R0ha3yQrnEYM
- i9GvpmD5QqLmwvWxSNulOUkV3ZqeDH0nOX8RirHeOOAoZ1GfkGQPauDsMtXvnsYiakQV
- epFjSz61IM6V1e+kVYLrhTIE9IEtW0pGaqxxSfFO3C53ELG6n/9fQ881O2t0peKFLDrT
- +9DHc1R0XzuaTEU+wmPn1gFbo+SL0MRWDFeESXdV/LXes37kElC0dN8NZbVRXiYA4C3C
- WH9g==
-X-Gm-Message-State: AOAM530s+KjL37qy5mKxl9e1G62XLC2kI9wWnjWXwM/Gr1rUdYFKt7Wz
- mbhMTwt+5o29hBtkn/m9X4Q+ttXwZpX5tWw/U7Z+gg==
-X-Google-Smtp-Source: ABdhPJzBGss4GSmUToSeE15f1IG3LSn+gBpcyDECU+1tdYRqzOnrm6VG7dBTBdxOMZEXIRBNA1es22eWSV+ovLNk/zw=
-X-Received: by 2002:a17:906:6949:: with SMTP id
- c9mr4378472ejs.482.1604340940381; 
- Mon, 02 Nov 2020 10:15:40 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ceOm0Xxf/LJg7f2HRgjqVHLIfEk3x6v7meMsg/XEr9M=;
+ b=XqD+H2K4qB2swsd2LkX5GMezYnAPIx7Hn3Mlre939oN7HMUWUmWVvnT6l483BPIESt
+ Tmnqtfui/iX372t/zWHKpraSC8OQkLL7a8c5Sh4QToTfR4PJ2S94FLDGP31/yEpcUEwQ
+ ltFPR22yIQJcWwl0LSywdkRKVt+Q/RaX88iGkVXe/vYfoh0nxJYWpncKy529UvUpZA9v
+ c4gJ/GVYdPx0ZiL/9n/xmq7fcDh82ewCKFysXyKdctUOktqq2TKXGFrZtHtih0AB773z
+ +leDJ9sTexayK/0qLmZ3HN8mQWuX3ndKfiTap/hSm78gielWRCr/gQnFx/WG3i5FrgCx
+ bEUg==
+X-Gm-Message-State: AOAM530zSO5aUGd2Dcy21Dtq7j8U1IqP7Oix/393k1sSbpWyrb4t1AX3
+ QlgCBBmQCZyj4/Ld3Zh0MRaztg==
+X-Google-Smtp-Source: ABdhPJwwz9DsqK2bITAqMEcHJMog+brLdpS9fvO3zYMJdqbwuxz9MlDwUmW16jTiBLL6Rc0nHR4BsQ==
+X-Received: by 2002:a05:6512:47c:: with SMTP id
+ x28mr3456181lfd.321.1604341190582; 
+ Mon, 02 Nov 2020 10:19:50 -0800 (PST)
+Received: from navi.cosmonova.net.ua ([95.67.24.131])
+ by smtp.gmail.com with ESMTPSA id c6sm2527007lfm.226.2020.11.02.10.19.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Nov 2020 10:19:49 -0800 (PST)
+From: Andrew Melnychenko <andrew@daynix.com>
+To: jasowang@redhat.com,
+	mst@redhat.com
+Subject: [RFC PATCH 0/6] eBPF RSS support for virtio-net
+Date: Mon,  2 Nov 2020 20:51:10 +0200
+Message-Id: <20201102185115.7425-1-andrew@daynix.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-References: <20200330102945.2388294-1-laurent@vivier.eu>
- <20200330102945.2388294-2-laurent@vivier.eu>
-In-Reply-To: <20200330102945.2388294-2-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Nov 2020 18:15:29 +0000
-Message-ID: <CAFEAcA97s+jiZxH+ObdFeFgs7-Wub6XjZvJFmL2s4voRrny38Q@mail.gmail.com>
-Subject: Re: [PULL 1/1] linux-user: Support futex_time64
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::62c;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62c.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=2a00:1450:4864:20::143;
+ envelope-from=andrew@daynix.com; helo=mail-lf1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,54 +96,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- Alistair Francis <alistair.francis@wdc.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: yan@daynix.com, yuri.benditovich@daynix.com,
+ Andrew Melnychenko <andrew@daynix.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 30 Mar 2020 at 11:31, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> From: Alistair Francis <alistair.francis@wdc.com>
->
-> Add support for host and target futex_time64. If futex_time64 exists on
-> the host we try that first before falling back to the standard futex
-> syscall.
+Basic idea is to use eBPF to calculate and steer packets in TAP.
+RSS(Receive Side Scaling) is used to distribute network packets to guest virtqueues
+by calculating packet hash.
+eBPF RSS allows us to use RSS with vhost TAP.
 
-Hi; I dunno why Coverity's only just noticed this, but in
-CID 1432339 it points out:
+This set of patches introduces the usage of eBPF for packet steering
+and RSS hash calculation:
+* RSS(Receive Side Scaling) is used to distribute network packets to
+guest virtqueues by calculating packet hash
+* eBPF RSS suppose to be faster than already existing 'software'
+implementation in QEMU
+* Additionally adding support for the usage of RSS with vhost
 
-> +#if defined(TARGET_NR_futex_time64)
-> +static int do_futex_time64(target_ulong uaddr, int op, int val, target_ulong timeout,
-> +                           target_ulong uaddr2, int val3)
-> +{
-> +    struct timespec ts, *pts;
-> +    int base_op;
-> +
-> +    /* ??? We assume FUTEX_* constants are the same on both host
-> +       and target.  */
-> +#ifdef FUTEX_CMD_MASK
-> +    base_op = op & FUTEX_CMD_MASK;
-> +#else
-> +    base_op = op;
-> +#endif
-> +    switch (base_op) {
-> +    case FUTEX_WAIT:
-> +    case FUTEX_WAIT_BITSET:
-> +        if (timeout) {
-> +            pts = &ts;
-> +            target_to_host_timespec64(pts, timeout);
+Supported kernels: 5.8+
 
-...that here we call target_to_host_timespec64(), which can
-fail with -TARGET_EFAULT, but (unlike all the other times we call
-the function) we aren't checking its return value.
-Is there missing error handling code here ?
+Implementation notes:
+Linux TAP TUNSETSTEERINGEBPF ioctl was used to set the eBPF program.
+Added eBPF support to qemu directly through a system call, see the
+bpf(2) for details.
+The eBPF program is part of the qemu and presented as an array of bpf
+instructions.
+The program can be recompiled by provided Makefile.ebpf(need to adjust
+'linuxhdrs'),
+although it's not required to build QEMU with eBPF support.
+Added changes to virtio-net and vhost, primary eBPF RSS is used.
+'Software' RSS used in the case of hash population and as a fallback option.
+For vhost, the hash population feature is not reported to the guest.
 
-> +        } else {
-> +            pts = NULL;
-> +        }
+Please also see the documentation in PATCH 6/6.
 
-thanks
--- PMM
+I am sending those patches as RFC to initiate the discussions and get
+feedback on the following points:
+* Fallback when eBPF is not supported by the kernel
+* Live migration to the kernel that doesn't have eBPF support
+* Integration with current QEMU build
+* Additional usage for eBPF for packet filtering
+
+Know issues:
+* hash population not supported by eBPF RSS: 'software' RSS used
+as a fallback, also, hash population feature is not reported to guests
+with vhost.
+* big-endian BPF support: for now, eBPF is disabled for big-endian systems.
+
+Andrew (6):
+  Added SetSteeringEBPF method for NetClientState.
+  ebpf: Added basic eBPF API.
+  ebpf: Added eBPF RSS program.
+  ebpf: Added eBPF RSS loader.
+  virtio-net: Added eBPF RSS to virtio-net.
+  docs: Added eBPF documentation.
+
+ MAINTAINERS                    |   6 +
+ configure                      |  36 +++
+ docs/ebpf.rst                  |  29 ++
+ docs/ebpf_rss.rst              | 129 ++++++++
+ ebpf/EbpfElf_to_C.py           |  67 ++++
+ ebpf/Makefile.ebpf             |  38 +++
+ ebpf/ebpf-stub.c               |  28 ++
+ ebpf/ebpf.c                    | 107 +++++++
+ ebpf/ebpf.h                    |  35 +++
+ ebpf/ebpf_rss.c                | 178 +++++++++++
+ ebpf/ebpf_rss.h                |  30 ++
+ ebpf/meson.build               |   1 +
+ ebpf/rss.bpf.c                 | 470 ++++++++++++++++++++++++++++
+ ebpf/trace-events              |   4 +
+ ebpf/trace.h                   |   2 +
+ ebpf/tun_rss_steering.h        | 556 +++++++++++++++++++++++++++++++++
+ hw/net/vhost_net.c             |   2 +
+ hw/net/virtio-net.c            | 120 ++++++-
+ include/hw/virtio/virtio-net.h |   4 +
+ include/net/net.h              |   2 +
+ meson.build                    |   3 +
+ net/tap-bsd.c                  |   5 +
+ net/tap-linux.c                |  19 ++
+ net/tap-solaris.c              |   5 +
+ net/tap-stub.c                 |   5 +
+ net/tap.c                      |   9 +
+ net/tap_int.h                  |   1 +
+ net/vhost-vdpa.c               |   2 +
+ 28 files changed, 1889 insertions(+), 4 deletions(-)
+ create mode 100644 docs/ebpf.rst
+ create mode 100644 docs/ebpf_rss.rst
+ create mode 100644 ebpf/EbpfElf_to_C.py
+ create mode 100755 ebpf/Makefile.ebpf
+ create mode 100644 ebpf/ebpf-stub.c
+ create mode 100644 ebpf/ebpf.c
+ create mode 100644 ebpf/ebpf.h
+ create mode 100644 ebpf/ebpf_rss.c
+ create mode 100644 ebpf/ebpf_rss.h
+ create mode 100644 ebpf/meson.build
+ create mode 100644 ebpf/rss.bpf.c
+ create mode 100644 ebpf/trace-events
+ create mode 100644 ebpf/trace.h
+ create mode 100644 ebpf/tun_rss_steering.h
+
+-- 
+2.28.0
+
 
