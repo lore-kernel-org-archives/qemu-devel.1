@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D88D1C388F9
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:24:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A579C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:24:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51CB62224E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:24:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 187762222B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:24:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="am3c7YU6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51CB62224E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="BjPycm7D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187762222B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZeV7-0006d1-9s
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:24:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40898)
+	id 1kZeVC-0006s8-UY
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:24:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeR3-0001YT-TF
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:05 -0500
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:37762)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeR6-0001dI-GK
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:08 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34289)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeQw-0006iJ-8j
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:05 -0500
-Received: by mail-lf1-x144.google.com with SMTP id j30so18671363lfp.4
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 10:19:57 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeQy-0006ix-9Z
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:08 -0500
+Received: by mail-lj1-x242.google.com with SMTP id y16so16117928ljk.1
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 10:19:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=daynix-com.20150623.gappssmtp.com; s=20150623;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=WUVUKv4PYWLLTid/U5M6cN4MwS3ke7uD6rvIMKkcOa8=;
- b=am3c7YU6Zc6q27BtqVlk9sOu7yFbX37F41tlp/oGYRUw1ULx/NXqDtrr+1NRdKK+Cp
- sPWS0rl/+TpycG/vbHKZjtQ7aYF5mscdWTDjl99m0V+EA0IhicM7EvDhEuQBEBQrLgtx
- ZdKlVp16NwVA/CvmInU5cAgvxq/XcBxSB+HxJbmoDrABderaSj1uqsDlVB0dXmS3Z92Z
- T6hup70vA60BXsJkB2T3a8+UEoDsXpCKk/yA24nA7BJys8PDoq23m55y5zKJ+uW/TNPM
- zgTvoO6BvkeSOpBA1VRTV5r0hymMiOsxKJi7BWUpH6bP3FL99d97K1ktBQVe8TXYmPec
- GdOA==
+ bh=G3YrJVgX998qKuhMvPXP2IEY2yBy5bIH1EzHgRLGBYE=;
+ b=BjPycm7D1uUxofL/ILn6p9n2tItlEAGmYonYawVDoe48j9DkDcEwxhPvTOkvsgXBSP
+ 1Nb68AJCiNObWQuDa5DO8MWJoyAZcu6bjKtshY6QooRg5CNFtoB0dyiXlEwjmv8jlWyE
+ vYLnCXdzjB7OUS4T+sAvQBS+uQPMuTxBbAGL4tLrscMFRdJA8hzBnmwu/yrXG45zT3ip
+ tnQacb7GNhCKhJk13gtDEpvAtT2i+S9/5GrzJU9Bd1tVsLRcmLJC1JN+75GsXWf9p8TM
+ yqNIzmHMBKuDVqO1g+vq78s7/NiyZhtm6BdiQFjmeE8/E3LggzEOolwP0sUFdoDHN0F2
+ Qn+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=WUVUKv4PYWLLTid/U5M6cN4MwS3ke7uD6rvIMKkcOa8=;
- b=iDh1FNxrGUFuWtKXUjLPQMmXj/g80QqhSbeOhXK7KgRknzEEPVwIlmICI4zqK28sCz
- hBIiTIf7n1JCOyRgqQLltAOccgn/jM+goV6Iih5BjwCx6zBU9QLsHFyhC9vf1EyX1D76
- hBG/yRHA0AEkEkhyM/Nplya7ZKm1k1xVtftB1cBbsFEB1PDbM9LyxE2gZQU/bsxK2C7b
- RYRJjlJMcg4DJxJtDKjY/KdyTdoChVKDhHAEXZfVN6kqF09RM/p8UHD+EHD2mti+VYgn
- tQAItg55Od3kw6g+QWqR0jxHTH4QPsqLPPgPh7zWg48C2mAgprg4ylHxQucpc/GpBjmR
- AbYQ==
-X-Gm-Message-State: AOAM530SXD9bpwAwi1O7YnXxFv074J+U2v9cYH2PppjojLbeIXjhgvmK
- f4vqT8xN54QAImEtdHuzJty3FA==
-X-Google-Smtp-Source: ABdhPJym5PpktOhe1HYFmkMhYeEYy6d77PYukIjPHukWIXViZyS/mlocpiy0CaNs5onurd+DNuzROA==
-X-Received: by 2002:a05:6512:210f:: with SMTP id
- q15mr5756726lfr.78.1604341195879; 
- Mon, 02 Nov 2020 10:19:55 -0800 (PST)
+ bh=G3YrJVgX998qKuhMvPXP2IEY2yBy5bIH1EzHgRLGBYE=;
+ b=V5aZlfbY47EYssMIDVieqaBvCB65cCk15QrqJpd3xbMCEU1EQB+TfAVPeRdArY+u2P
+ Z/mArKUeVVPkzeRFXjm3Jpw3c6UsAOrztIhxqdJABmh33BjwktNNVETra0dI69PvqLzp
+ zl1VykL+EvexYr45cUmrKgXHjMRVstNZVnqZ2AxyAXcWuUEPbtjAJCPjdhgGxHKK79kb
+ 1WyTypOIJXdRALnyamFLFUSbSrhnt7x7FW/kbCfBuZWUIMq7I/PMEiv3jvNHX77vxAf3
+ 1UpWEpsjFkzdhFT3JDCSjsz9q1PnXh1ddsQoy4MB2mCyXe2L00R7+ZUSSajHt2M/PdcH
+ tL+g==
+X-Gm-Message-State: AOAM533QTuXuHsGaFHfuc+sFc479V4nw3iiYxBo72M0DA75bpwxvuofd
+ mFD9nzdeRZXJzRL4CXgf/VV14Q==
+X-Google-Smtp-Source: ABdhPJxDljeBM6U+uC5luHm6WgUGUIDcqLOO7W2UTKJ3BylzInvH0piwBMoBjQeQ/SXxDj2AIf2p/g==
+X-Received: by 2002:a2e:7007:: with SMTP id l7mr7533678ljc.185.1604341198473; 
+ Mon, 02 Nov 2020 10:19:58 -0800 (PST)
 Received: from navi.cosmonova.net.ua ([95.67.24.131])
- by smtp.gmail.com with ESMTPSA id c6sm2527007lfm.226.2020.11.02.10.19.54
+ by smtp.gmail.com with ESMTPSA id c6sm2527007lfm.226.2020.11.02.10.19.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 10:19:55 -0800 (PST)
+ Mon, 02 Nov 2020 10:19:57 -0800 (PST)
 From: Andrew Melnychenko <andrew@daynix.com>
 To: jasowang@redhat.com,
 	mst@redhat.com
-Subject: [RFC PATCH 4/6] ebpf: Added eBPF RSS loader.
-Date: Mon,  2 Nov 2020 20:51:14 +0200
-Message-Id: <20201102185115.7425-5-andrew@daynix.com>
+Subject: [RFC PATCH 6/6] docs: Added eBPF documentation.
+Date: Mon,  2 Nov 2020 20:51:16 +0200
+Message-Id: <20201102185115.7425-7-andrew@daynix.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201102185115.7425-1-andrew@daynix.com>
 References: <20201102185115.7425-1-andrew@daynix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=2a00:1450:4864:20::144;
- envelope-from=andrew@daynix.com; helo=mail-lf1-x144.google.com
+Received-SPF: none client-ip=2a00:1450:4864:20::242;
+ envelope-from=andrew@daynix.com; helo=mail-lj1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -100,397 +99,212 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: yan@daynix.com, yuri.benditovich@daynix.com, Andrew <andrew@daynix.com>,
- Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Andrew <andrew@daynix.com>
 
-Added function that loads RSS eBPF program.
-Added stub functions for RSS eBPF.
-Added meson and configuration options.
+Also, added maintainers information.
 
-Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
 Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
 ---
- configure        |  36 ++++++++++
- ebpf/ebpf-stub.c |  28 ++++++++
- ebpf/ebpf_rss.c  | 178 +++++++++++++++++++++++++++++++++++++++++++++++
- ebpf/ebpf_rss.h  |  30 ++++++++
- ebpf/meson.build |   1 +
- meson.build      |   3 +
- 6 files changed, 276 insertions(+)
- create mode 100644 ebpf/ebpf-stub.c
- create mode 100644 ebpf/ebpf_rss.c
- create mode 100644 ebpf/ebpf_rss.h
- create mode 100644 ebpf/meson.build
+ MAINTAINERS       |   6 +++
+ docs/ebpf.rst     |  29 +++++++++++
+ docs/ebpf_rss.rst | 129 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 164 insertions(+)
+ create mode 100644 docs/ebpf.rst
+ create mode 100644 docs/ebpf_rss.rst
 
-diff --git a/configure b/configure
-index 6df4306c88..bae4ea54f8 100755
---- a/configure
-+++ b/configure
-@@ -330,6 +330,7 @@ vhost_scsi=""
- vhost_vsock=""
- vhost_user=""
- vhost_user_fs=""
-+bpf=""
- kvm="auto"
- hax="auto"
- hvf="auto"
-@@ -1210,6 +1211,10 @@ for opt do
-   ;;
-   --enable-membarrier) membarrier="yes"
-   ;;
-+  --disable-bpf) bpf="no"
-+  ;;
-+  --enable-bpf) bpf="yes"
-+  ;;
-   --disable-blobs) blobs="false"
-   ;;
-   --with-pkgversion=*) pkgversion="$optarg"
-@@ -1792,6 +1797,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   vhost-kernel    vhost kernel backend support
-   vhost-user      vhost-user backend support
-   vhost-vdpa      vhost-vdpa kernel backend support
-+  bpf             BPF kernel support
-   spice           spice
-   rbd             rados block device (rbd)
-   libiscsi        iscsi support
-@@ -5347,6 +5353,33 @@ else
-     membarrier=no
- fi
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2c22bbca5a..464b3f3c95 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3111,6 +3111,12 @@ S: Maintained
+ F: hw/semihosting/
+ F: include/hw/semihosting/
  
-+##########################################
-+# check for usable bpf system call
-+if test "$bpf" = ""; then
-+    have_bpf=no
-+    if test "$linux" = "yes" ; then
-+        cat > $TMPC << EOF
-+    #include <sys/syscall.h>
-+    #include <linux/bpf.h>
-+    #include <unistd.h>
-+    #include <stdlib.h>
-+    #include <string.h>
-+    int main(void) {
-+        union bpf_attr * attr = NULL;
-+        syscall(__NR_bpf, BPF_PROG_LOAD, attr, sizeof(attr));
-+        exit(0);
-+    }
-+EOF
-+        if compile_prog "" "" ; then
-+            have_bpf=yes
-+            bpf=yes
-+        fi
-+    fi
-+    if test "$have_bpf" = "no"; then
-+      feature_not_found "bpf" "the bpf system call is not available"
-+    fi
-+fi
++EBPF:
++M: Andrew Melnychenko <andrew@daynix.com>
++M: Yuri Benditovich <yuri.benditovich@daynix.com>
++S: Maintained
++F: ebpf/*
 +
- ##########################################
- # check if rtnetlink.h exists and is useful
- have_rtnetlink=no
-@@ -6279,6 +6312,9 @@ fi
- if test "$membarrier" = "yes" ; then
-   echo "CONFIG_MEMBARRIER=y" >> $config_host_mak
- fi
-+if test "$bpf" = "yes" -a "$bigendian" != "yes"; then
-+  echo "CONFIG_EBPF=y" >> $config_host_mak
-+fi
- if test "$signalfd" = "yes" ; then
-   echo "CONFIG_SIGNALFD=y" >> $config_host_mak
- fi
-diff --git a/ebpf/ebpf-stub.c b/ebpf/ebpf-stub.c
+ Build and test automation
+ -------------------------
+ Build and test automation
+diff --git a/docs/ebpf.rst b/docs/ebpf.rst
 new file mode 100644
-index 0000000000..281dc039d3
+index 0000000000..e45d085432
 --- /dev/null
-+++ b/ebpf/ebpf-stub.c
-@@ -0,0 +1,28 @@
-+#include "qemu/osdep.h"
-+#include "ebpf/ebpf_rss.h"
++++ b/docs/ebpf.rst
+@@ -0,0 +1,29 @@
++===========================
++eBPF qemu support
++===========================
 +
-+void ebpf_rss_init(struct EBPFRSSContext *ctx)
-+{
++eBPF support (CONFIG_EBPF) is enabled automatically by 'configure' script
++if 'bpf' system call is available.
++To disable eBPF support use './configure --disable-bpf'
 +
-+}
++Basic eBPF functionality is located in ebpf/ebpf.c and ebpf/ebpf.h.
++There are basic functions to load the eBPF program into the kernel.
++Mostly, functions name are self-explanatory:
 +
-+bool ebpf_rss_is_loaded(struct EBPFRSSContext *ctx)
-+{
-+    return false;
-+}
++- `bpf_create_map()`, `bpf_lookup_element()`, `bpf_update_element()`, `bpf_delete_element()` - manages eBPF maps. On error, a basic error message would be reported and returned -1. On success, 0 would be returned(`bpf_create_map()` returns map's file descriptor).
++- `bpf_prog_load()` - load the program. The program has to have proper map file descriptors if there are used. On error - the log eBPF would be reported. On success, the program file descriptor returned.
++- `bpf_fixup_mapfd()` - would place map file descriptor into the program according to 'relocate array' of 'struct fixup_mapfd_t'. The function would return how many instructions were 'fixed' aka how many relocations was occurred.
 +
-+bool ebpf_rss_load(struct EBPFRSSContext *ctx)
-+{
-+    return false;
-+}
++Simplified workflow would look like this:
 +
-+bool ebpf_rss_set_all(struct EBPFRSSContext *ctx, struct EBPFRSSConfig *config,
-+                      uint16_t *indirections_table, uint8_t *toeplitz_key)
-+{
-+    return false;
-+}
++.. code:: C
 +
-+void ebpf_rss_unload(struct EBPFRSSContext *ctx)
-+{
++    int map1 = bpf_create_map(...);
++    int map2 = bpf_create_map(...);
 +
-+}
-diff --git a/ebpf/ebpf_rss.c b/ebpf/ebpf_rss.c
++    bpf_fixup_mapfd(<fixup table>, ARRAY_SIZE(<fixup table>), <instructions pointer>, ARRAY_SIZE(<instructions pointer>), <map1 name>, map1);
++    bpf_fixup_mapfd(<fixup table>, ARRAY_SIZE(<fixup table>), <instructions pointer>, ARRAY_SIZE(<instructions pointer>), <map2 name>, map2);
++
++    int prog = bpf_prog_load(<program type>, <instructions pointer>, ARRAY_SIZE(<instructions pointer>), "GPL");
++
++See the bpf(2) for details.
+diff --git a/docs/ebpf_rss.rst b/docs/ebpf_rss.rst
 new file mode 100644
-index 0000000000..f3c948a7a0
+index 0000000000..96fee391b8
 --- /dev/null
-+++ b/ebpf/ebpf_rss.c
-@@ -0,0 +1,178 @@
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
++++ b/docs/ebpf_rss.rst
+@@ -0,0 +1,129 @@
++===========================
++eBPF RSS virtio-net support
++===========================
 +
-+#include "hw/virtio/virtio-net.h" /* VIRTIO_NET_RSS_MAX_TABLE_LEN */
++RSS(Receive Side Scaling) is used to distribute network packets to guest virtqueues
++by calculating packet hash. Usually every queue is processed then by a specific guest CPU core.
 +
-+#include "ebpf/ebpf_rss.h"
-+#include "ebpf/ebpf.h"
-+#include "ebpf/tun_rss_steering.h"
-+#include "trace.h"
++For now there are 2 RSS implementations in qemu:
++- 'software' RSS (functions if qemu receives network packets, i.e. vhost=off)
++- eBPF RSS (can function with also with vhost=on)
 +
-+void ebpf_rss_init(struct EBPFRSSContext *ctx)
-+{
-+    if (ctx != NULL) {
-+        ctx->program_fd = -1;
++If steering BPF is not set for kernel's TUN module, the TUN uses automatic selection
++of rx virtqueue based on lookup table built according to calculated symmetric hash
++of transmitted packets.
++If steering BPF is set for TUN the BPF code calculates the hash of packet header and
++returns the virtqueue number to place the packet to.
++
++Simplified decision formula:
++
++.. code:: C
++
++    queue_index = indirection_table[hash(<packet data>)%<indirection_table size>]
++
++
++Not for all packets, the hash can/should be calculated.
++
++Note: currently, eBPF RSS does not support hash reporting.
++
++eBPF RSS turned on by different combinations of vhost-net, vitrio-net and tap configurations:
++
++- eBPF is used:
++
++        tap,vhost=off & virtio-net-pci,rss=on,hash=off
++
++- eBPF is used:
++
++        tap,vhost=on & virtio-net-pci,rss=on,hash=off
++
++- 'software' RSS is used:
++
++        tap,vhost=off & virtio-net-pci,rss=on,hash=on
++
++- eBPF is used, hash population feature is not reported to the guest:
++
++        tap,vhost=on & virtio-net-pci,rss=on,hash=on
++
++If CONFIG_EBPF is not set then only 'software' RSS is supported.
++Also 'software' RSS, as a fallback, is used if the eBPF program failed to load or set to TUN.
++
++RSS eBPF program
++----------------
++
++RSS program located in ebpf/tun_rss_steering.h as an array of 'struct bpf_insn'.
++So the program is part of the qemu binary.
++Initially, the eBPF program was compiled by clang and source code located at ebpf/rss.bpf.c.
++Prerequisites to recompile the eBPF program (regenerate ebpf/tun_rss_steering.h):
++
++        llvm, clang, kernel source tree, python3 + (pip3 pyelftools)
++        Adjust 'linuxhdrs' in Makefile.ebpf to reflect the location of the kernel source tree
++
++        $ cd ebpf
++        $ make -f Makefile.ebpf
++
++Note the python script for convertation from eBPF ELF object to '.h' file - Ebpf_to_C.py:
++
++        $ python EbpfElf_to_C.py rss.bpf.o tun_rss_steering
++
++The first argument of the script is ELF object, second - section name where the eBPF program located.
++The script would generate <section name>.h file with eBPF instructions and 'relocate array'.
++'relocate array' is an array of 'struct fixup_mapfd_t' with the name of the eBPF map and instruction offset where the file descriptor of the map should be placed.
++
++Current eBPF RSS implementation uses 'bounded loops' with 'backward jump instructions' which present in the last kernels.
++Overall eBPF RSS works on kernels 5.8+.
++
++eBPF RSS implementation
++-----------------------
++
++eBPF RSS loading functionality located in ebpf/ebpf_rss.c and ebpf/ebpf_rss.h.
++
++The `struct EBPFRSSContext` structure that holds 4 file descriptors:
++
++- program_fd - file descriptor of the eBPF RSS program.
++- map_configuration - file descriptor of the 'configuration' map. This map contains one element of 'struct EBPFRSSConfig'. This configuration determines eBPF program behavior.
++- map_toeplitz_key - file descriptor of the 'Toeplitz key' map. One element of the 40byte key prepared for the hashing algorithm.
++- map_indirections_table - 128 elements of queue indexes.
++
++`struct EBPFRSSConfig` fields:
++
++- redirect - "boolean" value, should the hash be calculated, on false  - `default_queue` would be used as the final decision.
++- populate_hash - for now, not used. eBPF RSS doesn't support hash reporting.
++- hash_types - binary mask of different hash types. See `VIRTIO_NET_RSS_HASH_TYPE_*` defines. If for packet hash should not be calculated - `default_queue` would be used.
++- indirections_len - length of the indirections table, maximum 128.
++- default_queue - the queue index that used for packet that shouldn't be hashed. For some packets, the hash can't be calculated(g.e ARP).
++
++Functions:
++
++- `ebpf_rss_init()` - sets program_fd to -1, which indicates that EBPFRSSContext is not loaded.
++- `ebpf_rss_load()` - creates 3 maps and loads eBPF program from tun_rss_steering.h. Returns 'true' on success. After that, program_fd can be used to set steering for TAP.
++- `ebpf_rss_set_all()` - sets values for eBPF maps. `indirections_table` length is in EBPFRSSConfig. `toeplitz_key` is VIRTIO_NET_RSS_MAX_KEY_SIZE aka 40 bytes array.
++- `ebpf_rss_unload()` - close all file descriptors and set program_fd to -1.
++
++Simplified eBPF RSS workflow:
++
++.. code:: C
++
++    struct EBPFRSSConfig config;
++    config.redirect = 1;
++    config.hash_types = VIRTIO_NET_RSS_HASH_TYPE_UDPv4 | VIRTIO_NET_RSS_HASH_TYPE_TCPv4;
++    config.indirections_len = VIRTIO_NET_RSS_MAX_TABLE_LEN;
++    config.default_queue = 0;
++
++    uint16_t table[VIRTIO_NET_RSS_MAX_TABLE_LEN] = {...};
++    uint8_t key[VIRTIO_NET_RSS_MAX_KEY_SIZE] = {...};
++
++    struct EBPFRSSContext ctx;
++    ebpf_rss_init(&ctx);
++    ebpf_rss_load(&ctx);
++    ebpf_rss_set_all(&ctx, &config, table, key);
++    if (net_client->info->set_steering_ebpf != NULL) {
++        net_client->info->set_steering_ebpf(net_client, ctx->program_fd);
 +    }
-+}
++    ...
++    ebpf_unload(&ctx);
 +
-+bool ebpf_rss_is_loaded(struct EBPFRSSContext *ctx)
-+{
-+    return ctx != NULL && ctx->program_fd >= 0;
-+}
 +
-+bool ebpf_rss_load(struct EBPFRSSContext *ctx)
-+{
-+    if (ctx == NULL) {
-+        return false;
-+    }
++NetClientState SetSteeringEBPF()
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+    ctx->map_configuration =
-+            bpf_create_map(BPF_MAP_TYPE_ARRAY, sizeof(uint32_t),
-+                           sizeof(struct EBPFRSSConfig), 1);
-+    if (ctx->map_configuration < 0) {
-+        trace_ebpf_error("eBPF RSS", "can not create MAP for configurations");
-+        goto l_conf_create;
-+    }
-+    ctx->map_toeplitz_key =
-+            bpf_create_map(BPF_MAP_TYPE_ARRAY, sizeof(uint32_t),
-+                           VIRTIO_NET_RSS_MAX_KEY_SIZE, 1);
-+    if (ctx->map_toeplitz_key < 0) {
-+        trace_ebpf_error("eBPF RSS", "can not create MAP for toeplitz key");
-+        goto l_toe_create;
-+    }
-+
-+    ctx->map_indirections_table =
-+            bpf_create_map(BPF_MAP_TYPE_ARRAY, sizeof(uint32_t),
-+                           sizeof(uint16_t), VIRTIO_NET_RSS_MAX_TABLE_LEN);
-+    if (ctx->map_indirections_table < 0) {
-+        trace_ebpf_error("eBPF RSS", "can not create MAP for indirections table");
-+        goto l_table_create;
-+    }
-+
-+    bpf_fixup_mapfd(reltun_rss_steering,
-+            sizeof(reltun_rss_steering) / sizeof(struct fixup_mapfd_t),
-+            instun_rss_steering,
-+            sizeof(instun_rss_steering) / sizeof(struct bpf_insn),
-+            "tap_rss_map_configurations", ctx->map_configuration);
-+
-+    bpf_fixup_mapfd(reltun_rss_steering,
-+            sizeof(reltun_rss_steering) / sizeof(struct fixup_mapfd_t),
-+            instun_rss_steering,
-+            sizeof(instun_rss_steering) / sizeof(struct bpf_insn),
-+            "tap_rss_map_toeplitz_key", ctx->map_toeplitz_key);
-+
-+    bpf_fixup_mapfd(reltun_rss_steering,
-+            sizeof(reltun_rss_steering) / sizeof(struct fixup_mapfd_t),
-+            instun_rss_steering,
-+            sizeof(instun_rss_steering) / sizeof(struct bpf_insn),
-+            "tap_rss_map_indirection_table", ctx->map_indirections_table);
-+
-+    ctx->program_fd =
-+            bpf_prog_load(BPF_PROG_TYPE_SOCKET_FILTER, instun_rss_steering,
-+                         sizeof(instun_rss_steering) / sizeof(struct bpf_insn),
-+                         "GPL");
-+    if (ctx->program_fd < 0) {
-+        trace_ebpf_error("eBPF RSS", "can not load eBPF program");
-+        goto l_prog_load;
-+    }
-+
-+    return true;
-+l_prog_load:
-+    close(ctx->map_indirections_table);
-+l_table_create:
-+    close(ctx->map_toeplitz_key);
-+l_toe_create:
-+    close(ctx->map_configuration);
-+l_conf_create:
-+    return false;
-+}
-+
-+static bool ebpf_rss_set_config(struct EBPFRSSContext *ctx,
-+                                struct EBPFRSSConfig *config)
-+{
-+    if (!ebpf_rss_is_loaded(ctx)) {
-+        return false;
-+    }
-+    uint32_t map_key = 0;
-+    if (bpf_update_elem(ctx->map_configuration,
-+                            &map_key, config, BPF_ANY) < 0) {
-+        return false;
-+    }
-+    return true;
-+}
-+
-+static bool ebpf_rss_set_indirections_table(struct EBPFRSSContext *ctx,
-+                                            uint16_t *indirections_table,
-+                                            size_t len)
-+{
-+    if (!ebpf_rss_is_loaded(ctx) || indirections_table == NULL ||
-+       len > VIRTIO_NET_RSS_MAX_TABLE_LEN) {
-+        return false;
-+    }
-+    uint32_t i = 0;
-+
-+    for (; i < len; ++i) {
-+        if (bpf_update_elem(ctx->map_indirections_table, &i,
-+                                indirections_table + i, BPF_ANY) < 0) {
-+            return false;
-+        }
-+    }
-+    return true;
-+}
-+
-+static bool ebpf_rss_set_toepliz_key(struct EBPFRSSContext *ctx,
-+                                     uint8_t *toeplitz_key)
-+{
-+    if (!ebpf_rss_is_loaded(ctx) || toeplitz_key == NULL) {
-+        return false;
-+    }
-+    uint32_t map_key = 0;
-+
-+    /* prepare toeplitz key */
-+    uint8_t toe[VIRTIO_NET_RSS_MAX_KEY_SIZE] = {};
-+    memcpy(toe, toeplitz_key, VIRTIO_NET_RSS_MAX_KEY_SIZE);
-+    *(uint32_t *)toe = ntohl(*(uint32_t *)toe);
-+
-+    if (bpf_update_elem(ctx->map_toeplitz_key, &map_key, toe,
-+                            BPF_ANY) < 0) {
-+        return false;
-+    }
-+    return true;
-+}
-+
-+bool ebpf_rss_set_all(struct EBPFRSSContext *ctx, struct EBPFRSSConfig *config,
-+                      uint16_t *indirections_table, uint8_t *toeplitz_key)
-+{
-+    if (!ebpf_rss_is_loaded(ctx) || config == NULL ||
-+        indirections_table == NULL || toeplitz_key == NULL) {
-+        return false;
-+    }
-+
-+    if (!ebpf_rss_set_config(ctx, config)) {
-+        return false;
-+    }
-+
-+    if (!ebpf_rss_set_indirections_table(ctx, indirections_table,
-+                                      config->indirections_len)) {
-+        return false;
-+    }
-+
-+    if (!ebpf_rss_set_toepliz_key(ctx, toeplitz_key)) {
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
-+void ebpf_rss_unload(struct EBPFRSSContext *ctx)
-+{
-+    if (!ebpf_rss_is_loaded(ctx)) {
-+        return;
-+    }
-+
-+    close(ctx->program_fd);
-+    close(ctx->map_configuration);
-+    close(ctx->map_toeplitz_key);
-+    close(ctx->map_indirections_table);
-+    ctx->program_fd = -1;
-+}
-diff --git a/ebpf/ebpf_rss.h b/ebpf/ebpf_rss.h
-new file mode 100644
-index 0000000000..ffed7b571a
---- /dev/null
-+++ b/ebpf/ebpf_rss.h
-@@ -0,0 +1,30 @@
-+#ifndef QEMU_EBPF_RSS_H
-+#define QEMU_EBPF_RSS_H
-+
-+struct EBPFRSSContext {
-+    int program_fd;
-+    int map_configuration;
-+    int map_toeplitz_key;
-+    int map_indirections_table;
-+};
-+
-+struct EBPFRSSConfig {
-+    uint8_t redirect;
-+    uint8_t populate_hash;
-+    uint32_t hash_types;
-+    uint16_t indirections_len;
-+    uint16_t default_queue;
-+};
-+
-+void ebpf_rss_init(struct EBPFRSSContext *ctx);
-+
-+bool ebpf_rss_is_loaded(struct EBPFRSSContext *ctx);
-+
-+bool ebpf_rss_load(struct EBPFRSSContext *ctx);
-+
-+bool ebpf_rss_set_all(struct EBPFRSSContext *ctx, struct EBPFRSSConfig *config,
-+                      uint16_t *indirections_table, uint8_t *toeplitz_key);
-+
-+void ebpf_rss_unload(struct EBPFRSSContext *ctx);
-+
-+#endif /* QEMU_EBPF_RSS_H */
-diff --git a/ebpf/meson.build b/ebpf/meson.build
-new file mode 100644
-index 0000000000..10f4bc9ca8
---- /dev/null
-+++ b/ebpf/meson.build
-@@ -0,0 +1 @@
-+specific_ss.add(when: 'CONFIG_EBPF', if_true: files('ebpf_rss.c', 'ebpf.c'), if_false: files('ebpf-stub.c'))
-diff --git a/meson.build b/meson.build
-index 47e32e1fcb..d0ea1a0e9d 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1368,6 +1368,7 @@ if have_system
-     'backends',
-     'backends/tpm',
-     'chardev',
-+    'ebpf',
-     'hw/9pfs',
-     'hw/acpi',
-     'hw/alpha',
-@@ -1530,6 +1531,7 @@ subdir('accel')
- subdir('plugins')
- subdir('bsd-user')
- subdir('linux-user')
-+subdir('ebpf')
- 
- bsd_user_ss.add(files('gdbstub.c'))
- specific_ss.add_all(when: 'CONFIG_BSD_USER', if_true: bsd_user_ss)
-@@ -2093,6 +2095,7 @@ summary_info += {'vhost-vsock support': config_host.has_key('CONFIG_VHOST_VSOCK'
- summary_info += {'vhost-user support': config_host.has_key('CONFIG_VHOST_KERNEL')}
- summary_info += {'vhost-user-fs support': config_host.has_key('CONFIG_VHOST_USER_FS')}
- summary_info += {'vhost-vdpa support': config_host.has_key('CONFIG_VHOST_VDPA')}
-+summary_info += {'bpf support': config_host.has_key('CONFIG_EBPF')}
- summary_info += {'Trace backends':    config_host['TRACE_BACKENDS']}
- if config_host['TRACE_BACKENDS'].split().contains('simple')
-   summary_info += {'Trace output file': config_host['CONFIG_TRACE_FILE'] + '-<pid>'}
++For now, `set_steering_ebpf()` method supported by Linux TAP NetClientState. The method requires an eBPF program file descriptor as an argument.
 -- 
 2.28.0
 
