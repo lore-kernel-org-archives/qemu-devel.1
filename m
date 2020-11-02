@@ -2,69 +2,89 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A309DC00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D327C388F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:57:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C57E222B9
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:55:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8165820719
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 09:57:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="U3aZvfSD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C57E222B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4ajsf5u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8165820719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZWYb-0007LN-0Z
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 04:55:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49156)
+	id 1kZWaL-00015V-Di
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 04:57:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <8db193c4108e09996923a4d716b51fc98efb7f3a@lizzy.crudebyte.com>)
- id 1kZWTD-0001W4-2Q
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:49:47 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:60689)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <8db193c4108e09996923a4d716b51fc98efb7f3a@lizzy.crudebyte.com>)
- id 1kZWTB-0006Zo-FL
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:49:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=qnTnQy0Xa8xQsWTotjLWOzYssCe4FirszozZZ3yzRxU=; b=U3aZv
- fSDPmOLIhwk7P213qMHgGj2PFnwe21hxvBPwZ8lIEZBSfSCPbTyLPQp1CRkOsIPkcrOLP89D2pGRu
- vh+47QYITqQhZDxPmnGms+za6odk6lUVvcaxsycbB9ghe32MMBDB3UzDyr00ngAZ+rs4heSsH0/qs
- g8yMifPcQqXL9cP90jZlxfM6AJGXLf1HcYESelwKirsRkPpMlH+DDN//F+lbgtsf1rrpwwtG7Ukjb
- 54DJW3U6DvJvptBwQ14o9GUOd5ufHxlIjBOSEKd8xc8PlB9+t6qRMHpr4w/WAbxvpJMK7oo3SDd0W
- eqfQEM4Er0eE0YviiY9haxqRk8Dvg==;
-Message-Id: <8db193c4108e09996923a4d716b51fc98efb7f3a.1604309512.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1604309512.git.qemu_oss@crudebyte.com>
-References: <cover.1604309512.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Sun, 1 Nov 2020 15:25:14 +0100
-Subject: [PULL v3 01/17] tests/9pfs: make create/remove test dir public
-To: qemu-devel@nongnu.org,
-    Peter Maydell <peter.maydell@linaro.org>
-Cc: Greg Kurz <groug@kaod.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=8db193c4108e09996923a4d716b51fc98efb7f3a@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 04:48:35
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZWOM-0002gN-Dw
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:44:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35705)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZWOK-0005AW-Ph
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:44:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604310284;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MJ+bR0S9I3uUQF4x01Hu0P8NqIp3ZV6fCFjp0WaP0RU=;
+ b=D4ajsf5uY4qgT/t6dem8+oxxEdbc9F5WSN5HU8N2XfcxlAV8LS6zq8YT/PWzQdGpT7MtJs
+ Xo7SdT7QD4xe8bON5+KbystOZMQdlzBPvyvTKtbCb/7fyhBXmuxsOSKCIFVpCIk+SssveZ
+ yw4I9QDs0mS3S5Xmemb2c2eveTW44Uc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-xPbnmzOJOB6E17e7jHfNeg-1; Mon, 02 Nov 2020 04:44:40 -0500
+X-MC-Unique: xPbnmzOJOB6E17e7jHfNeg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21ADF809DC7;
+ Mon,  2 Nov 2020 09:44:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
+ [10.36.112.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DDB8F5C1BB;
+ Mon,  2 Nov 2020 09:44:32 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 047A110EE552; Mon,  2 Nov 2020 10:44:23 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 09/11] char-socket: Fix qemu_chr_socket_address() for
+ abstract sockets
+Date: Mon,  2 Nov 2020 10:44:20 +0100
+Message-Id: <20201102094422.173975-10-armbru@redhat.com>
+In-Reply-To: <20201102094422.173975-1-armbru@redhat.com>
+References: <20201102094422.173975-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_12_24=1.049,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,79 +97,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, berrange@redhat.com, zxq_yx_007@163.com,
+ kraxel@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make functions create_local_test_dir() and remove_local_test_dir()
-public. They're going to be used in the next patch.
+Commit 776b97d360 "qemu-sockets: add abstract UNIX domain socket
+support" neglected to update qemu_chr_socket_address().  It shows
+shows neither @abstract nor @tight.  Fix that.
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Message-Id: <ec90703cbc23d6b612b3672f946d7741f4a16080.1604243521.git.qemu_oss@crudebyte.com>
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/qtest/libqos/virtio-9p.c | 10 ++++------
- tests/qtest/libqos/virtio-9p.h | 10 ++++++++++
- 2 files changed, 14 insertions(+), 6 deletions(-)
+ chardev/char-socket.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
-index d43647b3b7..2736e9ae2a 100644
---- a/tests/qtest/libqos/virtio-9p.c
-+++ b/tests/qtest/libqos/virtio-9p.c
-@@ -39,8 +39,7 @@ static void init_local_test_path(void)
-     g_free(pwd);
- }
- 
--/* Creates the directory for the 9pfs 'local' filesystem driver to access. */
--static void create_local_test_dir(void)
-+void virtio_9p_create_local_test_dir(void)
- {
-     struct stat st;
- 
-@@ -53,8 +52,7 @@ static void create_local_test_dir(void)
-     g_assert((st.st_mode & S_IFMT) == S_IFDIR);
- }
- 
--/* Deletes directory previously created by create_local_test_dir(). */
--static void remove_local_test_dir(void)
-+void virtio_9p_remove_local_test_dir(void)
- {
-     g_assert(local_test_path != NULL);
-     char *cmd = g_strdup_printf("rm -r '%s'\n", local_test_path);
-@@ -248,8 +246,8 @@ static void virtio_9p_register_nodes(void)
- 
-     /* make sure test dir for the 'local' tests exists and is clean */
-     init_local_test_path();
--    remove_local_test_dir();
--    create_local_test_dir();
-+    virtio_9p_remove_local_test_dir();
-+    virtio_9p_create_local_test_dir();
- 
-     QPCIAddress addr = {
-         .devfn = QPCI_DEVFN(4, 0),
-diff --git a/tests/qtest/libqos/virtio-9p.h b/tests/qtest/libqos/virtio-9p.h
-index 19a4d97454..480727120e 100644
---- a/tests/qtest/libqos/virtio-9p.h
-+++ b/tests/qtest/libqos/virtio-9p.h
-@@ -44,6 +44,16 @@ struct QVirtio9PDevice {
-     QVirtio9P v9p;
- };
- 
-+/**
-+ * Creates the directory for the 9pfs 'local' filesystem driver to access.
-+ */
-+void virtio_9p_create_local_test_dir(void);
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 1ee5a8c295..dc1cf86ecf 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -443,10 +443,18 @@ static char *qemu_chr_socket_address(SocketChardev *s, const char *prefix)
+                                s->is_listen ? ",server" : "");
+         break;
+     case SOCKET_ADDRESS_TYPE_UNIX:
+-        return g_strdup_printf("%sunix:%s%s", prefix,
++    {
++        UnixSocketAddress *sa = &s->addr->u.q_unix;
 +
-+/**
-+ * Deletes directory previously created by virtio_9p_create_local_test_dir().
-+ */
-+void virtio_9p_remove_local_test_dir(void);
-+
- /**
-  * Prepares QEMU command line for 9pfs tests using the 'local' fs driver.
-  */
++        return g_strdup_printf("%sunix:%s%s%s%s", prefix,
+                                s->addr->u.q_unix.path,
++                               sa->has_abstract && sa->abstract
++                               ? ",abstract" : "",
++                               sa->has_tight && sa->tight
++                               ? ",tight" : "",
+                                s->is_listen ? ",server" : "");
+         break;
++    }
+     case SOCKET_ADDRESS_TYPE_FD:
+         return g_strdup_printf("%sfd:%s%s", prefix, s->addr->u.fd.str,
+                                s->is_listen ? ",server" : "");
 -- 
-2.20.1
+2.26.2
 
 
