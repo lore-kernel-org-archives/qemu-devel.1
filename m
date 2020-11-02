@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 547C1C388F2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4911AC4742C
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:25:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9296921D91
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:25:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C343122265
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:25:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I7+qtFh4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9296921D91
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E57Tchre"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C343122265
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZdZt-00031r-L7
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 12:25:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54036)
+	id 1kZda8-0003Ov-QV
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 12:25:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZdLx-00014B-8v
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:45 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35865)
+ id 1kZdLy-00018B-P1
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:46 -0500
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:40836)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZdLs-0006bw-VL
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:44 -0500
-Received: by mail-wm1-x341.google.com with SMTP id e2so10222737wme.1
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 09:10:40 -0800 (PST)
+ id 1kZdLw-0006cf-N2
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:46 -0500
+Received: by mail-wm1-x32a.google.com with SMTP id k18so10219272wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 09:10:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=rwxRQ2VGsaY/8EHSjzxMZ0dJGo8ROLSJrdHaZKDxSh4=;
- b=I7+qtFh4PXoSMdPKlefZ0gBI0QuK0+Yli7RHv1nbiPdtmvaF63ewIEDLE5DZ+wZb5p
- 7rzTSkbZ3QzHhb64ECIyDaN2wEOKMzs4vw5g8CAY8ifqvtkuwPlfvVj3Htzbx9dPgCDo
- Ckg8T0zpAe+8v09uEmE7MNXaK7FE2enihFxAyQ8/dVA6vNwIBQpZINxSjIQbZQxK6RUt
- EONRn/9RM/wSt/SeJdXlu6+gf+cSXR8rEiZu5t8JlL6wKhLvkKI5iZbjSH9rbABcwxOK
- 2LuddmtKUPinVIKT6aq9V0VdWw7tGNsUapZCSUnWhtK5qMG9BCIqQrOg7f8zKz9aJYAf
- XDWg==
+ bh=jMjtfOiFG10GNhNUO0WFVBSDgvdA1bWEPrli5zIV9Do=;
+ b=E57Tchret6x8g43AVWfwJNw6B8wgtPFmoT827ztHr+ZExQGGpFq4rDRoCwGzBqtvl8
+ mig708t098yaB9tJxgDgRBfZjfsj5TxZVfAf787KZpP15xGt7B5MJUXKOqi9n2XxXVWd
+ /Ihj1uYjWkHxek/Mr4UnQaNRJvo17lCDN5bfm/ECKTKvqqX7a5GG6ZyQqr2WmlgC/ga8
+ aMbShkIx9XwtKXD9nblZYhGGqqJiHeZP8qFQq4LKXWv5UzTi1zIPNVkSP4jtPiKFiLIr
+ KMkE/nr4UCIRhcVfJkVYT44je0hEdiswT+L2axzT7qu1l+X4/9MVS2AtwH2tD429EJbG
+ p3Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rwxRQ2VGsaY/8EHSjzxMZ0dJGo8ROLSJrdHaZKDxSh4=;
- b=oW/mwskpuD1wPKEMGJNALVfyrMaP3SNX2pdVid9DqQ0L5vF1447v6sMOtjxM+NTPDa
- +0b0mf8L/ZRk4mwR8ehiWd/tCiCdEkR9LRM7cQL40MU39ucTIuxhsrpJ1tG+fvMmBerR
- WRg+zFSYbntPVmCy7Ye0A+n/srmLkpvyePPQrLWdDYXeCQ7pM5/qHb8fTRUTD8BBAUV9
- xL7/Bb4JAlfQiDGLs+YgbG2jnVudVMYHJV5CJkcCcDwS/1NER8q4412EA1cLEj/IYaGd
- eJJp2z7pNaHhqNPThmHOlpaPGZYqRVGXA9piQsIqhj8J6zw82CZuzwu2K82vDfl+am9F
- 5Jiw==
-X-Gm-Message-State: AOAM532QwZCWkzLyAZmzQPEBH0YKAokroBp812cwnb/MnQqwNWCcI1Ow
- 3/UB4GS6AaB286A2Ms8LMhSRt6aaFZuBBA==
-X-Google-Smtp-Source: ABdhPJxpGYP9dRK2J8pZp7wI3fv+wcctz0bh2qCH9OJt6UgU/UjGT8wVN/FJknbHr+lKf5Bj8qB6AQ==
-X-Received: by 2002:a1c:ed0b:: with SMTP id l11mr18316543wmh.46.1604337038708; 
- Mon, 02 Nov 2020 09:10:38 -0800 (PST)
+ bh=jMjtfOiFG10GNhNUO0WFVBSDgvdA1bWEPrli5zIV9Do=;
+ b=m1eXC42jZm7C8DP4WxfDIq+EojePT73NQYgrrloYd+Z/uH+J3jwjDl7i1NzIsUz5hT
+ P2vXV4ul/hV3SVxPAHRFv4Qsy3Nt6SqO+QNcgd09DeDX2t7xV7OK/12xQAZKrSFHCeFg
+ R9QdiHXh6S6kH89WHBKPiqlCRVnhhd+7J0S0ACNhhMLdUi68gid0r78AtevN49RFfdbZ
+ LKS8HQs8yIj8LQYFVKpkiSh8rcuYis8Uuj83pbV9w2WLiD5AHDBF3p344AOQ8QmTw5Ma
+ 8oT3+UBpUmjwim7tdvOHc/MJ1cglN7OqnywLyu89qy6Wa18Nv+pe9so+j29qJQ5JTTAo
+ 4uQQ==
+X-Gm-Message-State: AOAM531P6kSNgW2XFcfMqhxTHo+ES9TQTbdnkwjmt572sDW0hROgJXYo
+ 5XdP4W70OAacRXp+nri36oFQ3Mr9rVvT0Q==
+X-Google-Smtp-Source: ABdhPJwJ8K8QXAsBK3OA2S61bd+4Pu71MnXooat+Wjn8JRecktN1Sy/jQoiMhsCGteqZzx5fa1F/xA==
+X-Received: by 2002:a1c:f311:: with SMTP id q17mr18234987wmq.28.1604337042332; 
+ Mon, 02 Nov 2020 09:10:42 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c18sm22396540wrt.10.2020.11.02.09.10.37
+ by smtp.gmail.com with ESMTPSA id c18sm22396540wrt.10.2020.11.02.09.10.41
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 09:10:37 -0800 (PST)
+ Mon, 02 Nov 2020 09:10:41 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/26] hw/arm/boot: fix SVE for EL3 direct kernel boot
-Date: Mon,  2 Nov 2020 17:09:57 +0000
-Message-Id: <20201102171005.30690-19-peter.maydell@linaro.org>
+Subject: [PULL 21/26] target/arm: Get correct MMU index for
+ other-security-state
+Date: Mon,  2 Nov 2020 17:10:00 +0000
+Message-Id: <20201102171005.30690-22-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201102171005.30690-1-peter.maydell@linaro.org>
 References: <20201102171005.30690-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,33 +105,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
+In arm_v7m_mmu_idx_for_secstate() we get the 'priv' level to pass to
+armv7m_mmu_idx_for_secstate_and_priv() by calling arm_current_el().
+This is incorrect when the security state being queried is not the
+current one, because arm_current_el() uses the current security state
+to determine which of the banked CONTROL.nPRIV bits to look at.
+The effect was that if (for instance) Secure state was in privileged
+mode but Non-Secure was not then we would return the wrong MMU index.
 
-When booting a CPU with EL3 using the -kernel flag, set up CPTR_EL3 so
-that SVE will not trap to EL3.
+The only places where we are using this function in a way that could
+trigger this bug are for the stack loads during a v8M function-return
+and for the instruction fetch of a v8M SG insn.
 
-Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20201030151541.11976-1-remi@remlab.net
+Fix the bug by expanding out the M-profile version of the
+arm_current_el() logic inline so it can use the passed in secstate
+rather than env->v7m.secure.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20201022164408.13214-1-peter.maydell@linaro.org
 ---
- hw/arm/boot.c | 3 +++
- 1 file changed, 3 insertions(+)
+ target/arm/m_helper.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 3e9816af803..cf97600a915 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -742,6 +742,9 @@ static void do_cpu_reset(void *opaque)
-                     if (cpu_isar_feature(aa64_mte, cpu)) {
-                         env->cp15.scr_el3 |= SCR_ATA;
-                     }
-+                    if (cpu_isar_feature(aa64_sve, cpu)) {
-+                        env->cp15.cptr_el[3] |= CPTR_EZ;
-+                    }
-                     /* AArch64 kernels never boot in secure mode */
-                     assert(!info->secure_boot);
-                     /* This hook is only supported for AArch32 currently:
+diff --git a/target/arm/m_helper.c b/target/arm/m_helper.c
+index 036454234c7..aad01ea0127 100644
+--- a/target/arm/m_helper.c
++++ b/target/arm/m_helper.c
+@@ -2719,7 +2719,8 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
+ /* Return the MMU index for a v7M CPU in the specified security state */
+ ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
+ {
+-    bool priv = arm_current_el(env) != 0;
++    bool priv = arm_v7m_is_handler_mode(env) ||
++        !(env->v7m.control[secstate] & 1);
+ 
+     return arm_v7m_mmu_idx_for_secstate_and_priv(env, secstate, priv);
+ }
 -- 
 2.20.1
 
