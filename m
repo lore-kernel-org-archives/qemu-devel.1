@@ -2,82 +2,83 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A579C00A89
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DAEC388F9
 	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:24:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 187762222B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:24:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 396F422243
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:24:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="BjPycm7D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187762222B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="pd/cuJS0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 396F422243
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZeVC-0006s8-UY
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:24:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40920)
+	id 1kZeVD-0006pH-8A
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:24:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeR6-0001dI-GK
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:08 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34289)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeR3-0001Y7-IA
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:05 -0500
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:45967)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeQy-0006ix-9Z
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:08 -0500
-Received: by mail-lj1-x242.google.com with SMTP id y16so16117928ljk.1
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 10:19:59 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeQw-0006iB-86
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:05 -0500
+Received: by mail-lf1-x143.google.com with SMTP id y184so16693727lfa.12
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 10:19:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=daynix-com.20150623.gappssmtp.com; s=20150623;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=G3YrJVgX998qKuhMvPXP2IEY2yBy5bIH1EzHgRLGBYE=;
- b=BjPycm7D1uUxofL/ILn6p9n2tItlEAGmYonYawVDoe48j9DkDcEwxhPvTOkvsgXBSP
- 1Nb68AJCiNObWQuDa5DO8MWJoyAZcu6bjKtshY6QooRg5CNFtoB0dyiXlEwjmv8jlWyE
- vYLnCXdzjB7OUS4T+sAvQBS+uQPMuTxBbAGL4tLrscMFRdJA8hzBnmwu/yrXG45zT3ip
- tnQacb7GNhCKhJk13gtDEpvAtT2i+S9/5GrzJU9Bd1tVsLRcmLJC1JN+75GsXWf9p8TM
- yqNIzmHMBKuDVqO1g+vq78s7/NiyZhtm6BdiQFjmeE8/E3LggzEOolwP0sUFdoDHN0F2
- Qn+g==
+ bh=Ww5EvrpJVdoc1slCZnMfPZ+2zfMTN1gD2SMi9IAZjPo=;
+ b=pd/cuJS0E9TxPyU8TR8aaPllaMv6j/nEPBo2wos6hfZRHeYVNjvO2b8AwSV0lw1yTz
+ wRXyZ9Eyn9btdmEBOl4+zVAVjNgFMs98mIMtdFPPzUvwgBcZ5QgQrw3seg+fGaGhCVuf
+ l1LiV/f1VLM3TTVg8gFkWi+9O0O7jpPlqg+jDdZZ7wFXlSc2Vix2HEHHWcjuipeny2cJ
+ xYdY8uJK1a9Yh1exeWJNTSHVYo+XZFpJhb8lmerbg9bQLQKjBUvsR5ad9MlMobyCrdCt
+ hAVLFDMX0bkMH5QQYsTdMWdzwSWX7iYscifnWo1HY2nlO+BkJx6qvg7STjdR+6XaAVPh
+ vGPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=G3YrJVgX998qKuhMvPXP2IEY2yBy5bIH1EzHgRLGBYE=;
- b=V5aZlfbY47EYssMIDVieqaBvCB65cCk15QrqJpd3xbMCEU1EQB+TfAVPeRdArY+u2P
- Z/mArKUeVVPkzeRFXjm3Jpw3c6UsAOrztIhxqdJABmh33BjwktNNVETra0dI69PvqLzp
- zl1VykL+EvexYr45cUmrKgXHjMRVstNZVnqZ2AxyAXcWuUEPbtjAJCPjdhgGxHKK79kb
- 1WyTypOIJXdRALnyamFLFUSbSrhnt7x7FW/kbCfBuZWUIMq7I/PMEiv3jvNHX77vxAf3
- 1UpWEpsjFkzdhFT3JDCSjsz9q1PnXh1ddsQoy4MB2mCyXe2L00R7+ZUSSajHt2M/PdcH
- tL+g==
-X-Gm-Message-State: AOAM533QTuXuHsGaFHfuc+sFc479V4nw3iiYxBo72M0DA75bpwxvuofd
- mFD9nzdeRZXJzRL4CXgf/VV14Q==
-X-Google-Smtp-Source: ABdhPJxDljeBM6U+uC5luHm6WgUGUIDcqLOO7W2UTKJ3BylzInvH0piwBMoBjQeQ/SXxDj2AIf2p/g==
-X-Received: by 2002:a2e:7007:: with SMTP id l7mr7533678ljc.185.1604341198473; 
- Mon, 02 Nov 2020 10:19:58 -0800 (PST)
+ bh=Ww5EvrpJVdoc1slCZnMfPZ+2zfMTN1gD2SMi9IAZjPo=;
+ b=JYYoGHpREmhpjO5ibgEzwMFx5U2skHlN31YV8YVCu1W6Ee7YIRrdsm62OqbgSXsSbZ
+ 8dJQEDjB5quaccg4e5Un1b2chD63TgKKXX2Ipvd6NoKDTWKbqCgaqhoyikaP03WOwp7T
+ Qz+OMP9PrJyvFDV6K2w2tOvdu190AkXbCrD2GNMBiK9qOMRT6NvAbtPH8jRawVRx1fyr
+ ZSVZxK19XZvAPLifIaW/IGlPVAgS/hWxwPYgPqsWTB6lAzDb9lOgT63+gxg4JHgwlZZl
+ ohD5y0WwZsNz4YlOs7McThG19EyUaDfjZ4XYa4D/MzT4bCGbEh41YwKyo1+RoN+RJ2lK
+ spzQ==
+X-Gm-Message-State: AOAM531ZwAJjlwln7mR6neqvjqqi1+BE/9h9pd3RwP2oh1F9Mweyh/k5
+ wPj4NmXFhCdNsPaSZSixpLdxdA==
+X-Google-Smtp-Source: ABdhPJwa4UlIiRK8ddEfDwebMrox6H3d/ykkO28Xw4xqDKaO3FfOhp6l1OES1SxqUnsLmkGyOzP4bw==
+X-Received: by 2002:a05:6512:3496:: with SMTP id
+ v22mr5725316lfr.230.1604341194619; 
+ Mon, 02 Nov 2020 10:19:54 -0800 (PST)
 Received: from navi.cosmonova.net.ua ([95.67.24.131])
- by smtp.gmail.com with ESMTPSA id c6sm2527007lfm.226.2020.11.02.10.19.57
+ by smtp.gmail.com with ESMTPSA id c6sm2527007lfm.226.2020.11.02.10.19.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 10:19:57 -0800 (PST)
+ Mon, 02 Nov 2020 10:19:53 -0800 (PST)
 From: Andrew Melnychenko <andrew@daynix.com>
 To: jasowang@redhat.com,
 	mst@redhat.com
-Subject: [RFC PATCH 6/6] docs: Added eBPF documentation.
-Date: Mon,  2 Nov 2020 20:51:16 +0200
-Message-Id: <20201102185115.7425-7-andrew@daynix.com>
+Subject: [RFC PATCH 3/6] ebpf: Added eBPF RSS program.
+Date: Mon,  2 Nov 2020 20:51:13 +0200
+Message-Id: <20201102185115.7425-4-andrew@daynix.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201102185115.7425-1-andrew@daynix.com>
 References: <20201102185115.7425-1-andrew@daynix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=2a00:1450:4864:20::242;
- envelope-from=andrew@daynix.com; helo=mail-lj1-x242.google.com
+Received-SPF: none client-ip=2a00:1450:4864:20::143;
+ envelope-from=andrew@daynix.com; helo=mail-lf1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -106,205 +107,1180 @@ Sender: "Qemu-devel"
 
 From: Andrew <andrew@daynix.com>
 
-Also, added maintainers information.
+RSS program and Makefile to build it.
+Also, added a python script that would generate '.h' file.
+The data in that file may be loaded by eBPF API.
+EBPF compilation is not required for building qemu.
+You can use Makefile if you need to regenerate tun_rss_steering.h.
 
 Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
 ---
- MAINTAINERS       |   6 +++
- docs/ebpf.rst     |  29 +++++++++++
- docs/ebpf_rss.rst | 129 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 164 insertions(+)
- create mode 100644 docs/ebpf.rst
- create mode 100644 docs/ebpf_rss.rst
+ ebpf/EbpfElf_to_C.py    |  67 +++++
+ ebpf/Makefile.ebpf      |  38 +++
+ ebpf/rss.bpf.c          | 470 +++++++++++++++++++++++++++++++++
+ ebpf/tun_rss_steering.h | 556 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 1131 insertions(+)
+ create mode 100644 ebpf/EbpfElf_to_C.py
+ create mode 100755 ebpf/Makefile.ebpf
+ create mode 100644 ebpf/rss.bpf.c
+ create mode 100644 ebpf/tun_rss_steering.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2c22bbca5a..464b3f3c95 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3111,6 +3111,12 @@ S: Maintained
- F: hw/semihosting/
- F: include/hw/semihosting/
- 
-+EBPF:
-+M: Andrew Melnychenko <andrew@daynix.com>
-+M: Yuri Benditovich <yuri.benditovich@daynix.com>
-+S: Maintained
-+F: ebpf/*
-+
- Build and test automation
- -------------------------
- Build and test automation
-diff --git a/docs/ebpf.rst b/docs/ebpf.rst
+diff --git a/ebpf/EbpfElf_to_C.py b/ebpf/EbpfElf_to_C.py
 new file mode 100644
-index 0000000000..e45d085432
+index 0000000000..a6e3476f2b
 --- /dev/null
-+++ b/docs/ebpf.rst
-@@ -0,0 +1,29 @@
-+===========================
-+eBPF qemu support
-+===========================
++++ b/ebpf/EbpfElf_to_C.py
+@@ -0,0 +1,67 @@
++#!/usr/bin/python3
++# pip install pyelftools
 +
-+eBPF support (CONFIG_EBPF) is enabled automatically by 'configure' script
-+if 'bpf' system call is available.
-+To disable eBPF support use './configure --disable-bpf'
++import sys
++import argparse
 +
-+Basic eBPF functionality is located in ebpf/ebpf.c and ebpf/ebpf.h.
-+There are basic functions to load the eBPF program into the kernel.
-+Mostly, functions name are self-explanatory:
++from elftools.elf.elffile import ELFFile
++from elftools.elf.relocation import RelocationSection
++from elftools.elf.sections import Section
++from elftools.elf.sections import SymbolTableSection
 +
-+- `bpf_create_map()`, `bpf_lookup_element()`, `bpf_update_element()`, `bpf_delete_element()` - manages eBPF maps. On error, a basic error message would be reported and returned -1. On success, 0 would be returned(`bpf_create_map()` returns map's file descriptor).
-+- `bpf_prog_load()` - load the program. The program has to have proper map file descriptors if there are used. On error - the log eBPF would be reported. On success, the program file descriptor returned.
-+- `bpf_fixup_mapfd()` - would place map file descriptor into the program according to 'relocate array' of 'struct fixup_mapfd_t'. The function would return how many instructions were 'fixed' aka how many relocations was occurred.
++def process_file(filename, prog_name):
++    print('Processing file:', filename)
++    with open(filename, 'rb') as f:
++        with open("%s.h" % prog_name, 'w') as w:
 +
-+Simplified workflow would look like this:
++            elffile = ELFFile(f)
 +
-+.. code:: C
++            symtab = elffile.get_section_by_name(".symtab")
++            if not isinstance(symtab, SymbolTableSection):
++                print('  The file has no %s section' % ".symtab")
++                return -1
 +
-+    int map1 = bpf_create_map(...);
-+    int map2 = bpf_create_map(...);
++            prog_sec = elffile.get_section_by_name(prog_name);
++            if not isinstance(prog_sec, Section):
++                print('  The file has no %s section' % prog_name)
++                return -1
 +
-+    bpf_fixup_mapfd(<fixup table>, ARRAY_SIZE(<fixup table>), <instructions pointer>, ARRAY_SIZE(<instructions pointer>), <map1 name>, map1);
-+    bpf_fixup_mapfd(<fixup table>, ARRAY_SIZE(<fixup table>), <instructions pointer>, ARRAY_SIZE(<instructions pointer>), <map2 name>, map2);
++            w.write('#ifndef %s\n' % prog_name.upper())
++            w.write('#define %s\n\n' % prog_name.upper())
 +
-+    int prog = bpf_prog_load(<program type>, <instructions pointer>, ARRAY_SIZE(<instructions pointer>), "GPL");
++            w.write("struct bpf_insn ins%s[] = {\n" % prog_name)
++            insns = [prog_sec.data()[i:i + 8] for i in range(0, prog_sec.data_size, 8)]
++            for x in insns:
++                w.write( \
++                    '    {0x%02x, 0x%02x, 0x%02x, 0x%02x%02x, 0x%02x%02x%02x%02x},\n' \
++                    % (x[0], x[1] & 0x0f, (x[1] >> 4) & 0x0f, \
++                       x[3], x[2], x[7], x[6], x[5], x[4]))
++            w.write('};\n\n')
 +
-+See the bpf(2) for details.
-diff --git a/docs/ebpf_rss.rst b/docs/ebpf_rss.rst
++            reladyn_name = '.rel' + prog_name
++            reladyn = elffile.get_section_by_name(reladyn_name)
++
++            if isinstance(reladyn, RelocationSection):
++                w.write('struct fixup_mapfd_t rel%s[] = {\n' % prog_name)
++                for reloc in reladyn.iter_relocations():
++                    w.write('    {"%s", %i},\n' \
++                        % (symtab.get_symbol(reloc['r_info_sym']).name, \
++                           (reloc['r_offset']/8)))
++                w.write('};\n\n')
++            else:
++               print('  The file has no %s section' % reladyn_name)
++
++            w.write('#endif /* %s */\n' % prog_name.upper())
++
++    return 0
++
++if __name__ == '__main__':
++    parser = argparse.ArgumentParser(
++        description='Convert eBPF ELF to C header. '
++                    'Section name will be used in C namings.')
++    parser.add_argument('--file', '-f', nargs=1, required=True,
++                        help='eBPF ELF file')
++    parser.add_argument('--section', '-s', nargs=1, required=True,
++                        help='section in ELF with eBPF program.')
++    args = parser.parse_args()
++    sys.exit(process_file(args.file[0], args.section[0]))
+diff --git a/ebpf/Makefile.ebpf b/ebpf/Makefile.ebpf
+new file mode 100755
+index 0000000000..f7008d7d32
+--- /dev/null
++++ b/ebpf/Makefile.ebpf
+@@ -0,0 +1,38 @@
++OBJS = rss.bpf.o
++
++LLC ?= llc
++CLANG ?= clang
++INC_FLAGS = -nostdinc -isystem `$(CLANG) -print-file-name=include`
++EXTRA_CFLAGS ?= -O2 -emit-llvm
++
++linuxhdrs = ~/src/kernel/master
++
++LINUXINCLUDE =  -I $(linuxhdrs)/arch/x86/include/uapi \
++                -I $(linuxhdrs)/arch/x86/include/generated/uapi \
++                -I $(linuxhdrs)/arch/x86/include/generated \
++                -I $(linuxhdrs)/include/generated/uapi \
++                -I $(linuxhdrs)/include/uapi \
++                -I $(linuxhdrs)/include \
++                -I $(linuxhdrs)/tools/lib
++
++all: $(OBJS)
++
++.PHONY: clean
++
++clean:
++	rm -f $(OBJS)
++
++INC_FLAGS = -nostdinc -isystem `$(CLANG) -print-file-name=include`
++
++$(OBJS):  %.o:%.c
++	$(CLANG) $(INC_FLAGS) \
++                -D__KERNEL__ -D__ASM_SYSREG_H \
++                -Wno-unused-value -Wno-pointer-sign \
++                -Wno-compare-distinct-pointer-types \
++                -Wno-gnu-variable-sized-type-not-at-end \
++                -Wno-address-of-packed-member -Wno-tautological-compare \
++                -Wno-unknown-warning-option \
++                -I../include $(LINUXINCLUDE) \
++                $(EXTRA_CFLAGS) -c $< -o -| $(LLC) -march=bpf -filetype=obj -o $@
++	python3 EbpfElf_to_C.py -f rss.bpf.o -s tun_rss_steering
++
+diff --git a/ebpf/rss.bpf.c b/ebpf/rss.bpf.c
 new file mode 100644
-index 0000000000..96fee391b8
+index 0000000000..084fc33f96
 --- /dev/null
-+++ b/docs/ebpf_rss.rst
-@@ -0,0 +1,129 @@
-+===========================
-+eBPF RSS virtio-net support
-+===========================
++++ b/ebpf/rss.bpf.c
+@@ -0,0 +1,470 @@
++#include <stddef.h>
++#include <stdbool.h>
++#include <linux/bpf.h>
 +
-+RSS(Receive Side Scaling) is used to distribute network packets to guest virtqueues
-+by calculating packet hash. Usually every queue is processed then by a specific guest CPU core.
++#include <linux/in.h>
++#include <linux/if_ether.h>
++#include <linux/ip.h>
++#include <linux/ipv6.h>
 +
-+For now there are 2 RSS implementations in qemu:
-+- 'software' RSS (functions if qemu receives network packets, i.e. vhost=off)
-+- eBPF RSS (can function with also with vhost=on)
++#include <linux/udp.h>
++#include <linux/tcp.h>
 +
-+If steering BPF is not set for kernel's TUN module, the TUN uses automatic selection
-+of rx virtqueue based on lookup table built according to calculated symmetric hash
-+of transmitted packets.
-+If steering BPF is set for TUN the BPF code calculates the hash of packet header and
-+returns the virtqueue number to place the packet to.
++#include <bpf/bpf_helpers.h>
++#include <linux/virtio_net.h>
 +
-+Simplified decision formula:
++/*
++ * Prepare:
++ * Requires llvm, clang, python3 with pyelftools, linux kernel tree
++ *
++ * Build tun_rss_steering.h:
++ * make -f Mefile.ebpf clean all
++ */
 +
-+.. code:: C
++#define INDIRECTION_TABLE_SIZE 128
++#define HASH_CALCULATION_BUFFER_SIZE 36
 +
-+    queue_index = indirection_table[hash(<packet data>)%<indirection_table size>]
++struct rss_config_t {
++    __u8 redirect;
++    __u8 populate_hash;
++    __u32 hash_types;
++    __u16 indirections_len;
++    __u16 default_queue;
++};
++
++struct toeplitz_key_data_t {
++    __u32 leftmost_32_bits;
++    __u8 next_byte[HASH_CALCULATION_BUFFER_SIZE];
++};
++
++struct packet_hash_info_t {
++    __u8 is_ipv4;
++    __u8 is_ipv6;
++    __u8 is_udp;
++    __u8 is_tcp;
++    __u8 is_ipv6_ext_src;
++    __u8 is_ipv6_ext_dst;
++
++    __u16 src_port;
++    __u16 dst_port;
++
++    union {
++        struct {
++            __be32 in_src;
++            __be32 in_dst;
++        };
++
++        struct {
++            struct in6_addr in6_src;
++            struct in6_addr in6_dst;
++            struct in6_addr in6_ext_src;
++            struct in6_addr in6_ext_dst;
++        };
++    };
++};
++
++struct {
++    __uint(type, BPF_MAP_TYPE_ARRAY);
++    __type(key, __u32);
++    __type(value, struct rss_config_t);
++    __uint(max_entries, 1);
++} tap_rss_map_configurations SEC(".maps");
++
++struct {
++    __uint(type, BPF_MAP_TYPE_ARRAY);
++    __type(key, __u32);
++    __type(value, struct toeplitz_key_data_t);
++    __uint(max_entries, 1);
++} tap_rss_map_toeplitz_key SEC(".maps");
++
++struct {
++    __uint(type, BPF_MAP_TYPE_ARRAY);
++    __type(key, __u32);
++    __type(value, __u16);
++    __uint(max_entries, INDIRECTION_TABLE_SIZE);
++} tap_rss_map_indirection_table SEC(".maps");
 +
 +
-+Not for all packets, the hash can/should be calculated.
++static inline void net_rx_rss_add_chunk(__u8 *rss_input, size_t *bytes_written,
++                                        const void *ptr, size_t size) {
++    __builtin_memcpy(&rss_input[*bytes_written], ptr, size);
++    *bytes_written += size;
++}
 +
-+Note: currently, eBPF RSS does not support hash reporting.
++static inline
++void net_toeplitz_add(__u32 *result,
++                      __u8 *input,
++                      __u32 len
++        , struct toeplitz_key_data_t *key) {
 +
-+eBPF RSS turned on by different combinations of vhost-net, vitrio-net and tap configurations:
++    __u32 accumulator = *result;
++    __u32 leftmost_32_bits = key->leftmost_32_bits;
++    __u32 byte;
 +
-+- eBPF is used:
++    for (byte = 0; byte < HASH_CALCULATION_BUFFER_SIZE; byte++) {
++        __u8 input_byte = input[byte];
++        __u8 key_byte = key->next_byte[byte];
++        __u8 bit;
 +
-+        tap,vhost=off & virtio-net-pci,rss=on,hash=off
++        for (bit = 0; bit < 8; bit++) {
++            if (input_byte & (1 << 7)) {
++                accumulator ^= leftmost_32_bits;
++            }
 +
-+- eBPF is used:
++            leftmost_32_bits =
++                    (leftmost_32_bits << 1) | ((key_byte & (1 << 7)) >> 7);
 +
-+        tap,vhost=on & virtio-net-pci,rss=on,hash=off
-+
-+- 'software' RSS is used:
-+
-+        tap,vhost=off & virtio-net-pci,rss=on,hash=on
-+
-+- eBPF is used, hash population feature is not reported to the guest:
-+
-+        tap,vhost=on & virtio-net-pci,rss=on,hash=on
-+
-+If CONFIG_EBPF is not set then only 'software' RSS is supported.
-+Also 'software' RSS, as a fallback, is used if the eBPF program failed to load or set to TUN.
-+
-+RSS eBPF program
-+----------------
-+
-+RSS program located in ebpf/tun_rss_steering.h as an array of 'struct bpf_insn'.
-+So the program is part of the qemu binary.
-+Initially, the eBPF program was compiled by clang and source code located at ebpf/rss.bpf.c.
-+Prerequisites to recompile the eBPF program (regenerate ebpf/tun_rss_steering.h):
-+
-+        llvm, clang, kernel source tree, python3 + (pip3 pyelftools)
-+        Adjust 'linuxhdrs' in Makefile.ebpf to reflect the location of the kernel source tree
-+
-+        $ cd ebpf
-+        $ make -f Makefile.ebpf
-+
-+Note the python script for convertation from eBPF ELF object to '.h' file - Ebpf_to_C.py:
-+
-+        $ python EbpfElf_to_C.py rss.bpf.o tun_rss_steering
-+
-+The first argument of the script is ELF object, second - section name where the eBPF program located.
-+The script would generate <section name>.h file with eBPF instructions and 'relocate array'.
-+'relocate array' is an array of 'struct fixup_mapfd_t' with the name of the eBPF map and instruction offset where the file descriptor of the map should be placed.
-+
-+Current eBPF RSS implementation uses 'bounded loops' with 'backward jump instructions' which present in the last kernels.
-+Overall eBPF RSS works on kernels 5.8+.
-+
-+eBPF RSS implementation
-+-----------------------
-+
-+eBPF RSS loading functionality located in ebpf/ebpf_rss.c and ebpf/ebpf_rss.h.
-+
-+The `struct EBPFRSSContext` structure that holds 4 file descriptors:
-+
-+- program_fd - file descriptor of the eBPF RSS program.
-+- map_configuration - file descriptor of the 'configuration' map. This map contains one element of 'struct EBPFRSSConfig'. This configuration determines eBPF program behavior.
-+- map_toeplitz_key - file descriptor of the 'Toeplitz key' map. One element of the 40byte key prepared for the hashing algorithm.
-+- map_indirections_table - 128 elements of queue indexes.
-+
-+`struct EBPFRSSConfig` fields:
-+
-+- redirect - "boolean" value, should the hash be calculated, on false  - `default_queue` would be used as the final decision.
-+- populate_hash - for now, not used. eBPF RSS doesn't support hash reporting.
-+- hash_types - binary mask of different hash types. See `VIRTIO_NET_RSS_HASH_TYPE_*` defines. If for packet hash should not be calculated - `default_queue` would be used.
-+- indirections_len - length of the indirections table, maximum 128.
-+- default_queue - the queue index that used for packet that shouldn't be hashed. For some packets, the hash can't be calculated(g.e ARP).
-+
-+Functions:
-+
-+- `ebpf_rss_init()` - sets program_fd to -1, which indicates that EBPFRSSContext is not loaded.
-+- `ebpf_rss_load()` - creates 3 maps and loads eBPF program from tun_rss_steering.h. Returns 'true' on success. After that, program_fd can be used to set steering for TAP.
-+- `ebpf_rss_set_all()` - sets values for eBPF maps. `indirections_table` length is in EBPFRSSConfig. `toeplitz_key` is VIRTIO_NET_RSS_MAX_KEY_SIZE aka 40 bytes array.
-+- `ebpf_rss_unload()` - close all file descriptors and set program_fd to -1.
-+
-+Simplified eBPF RSS workflow:
-+
-+.. code:: C
-+
-+    struct EBPFRSSConfig config;
-+    config.redirect = 1;
-+    config.hash_types = VIRTIO_NET_RSS_HASH_TYPE_UDPv4 | VIRTIO_NET_RSS_HASH_TYPE_TCPv4;
-+    config.indirections_len = VIRTIO_NET_RSS_MAX_TABLE_LEN;
-+    config.default_queue = 0;
-+
-+    uint16_t table[VIRTIO_NET_RSS_MAX_TABLE_LEN] = {...};
-+    uint8_t key[VIRTIO_NET_RSS_MAX_KEY_SIZE] = {...};
-+
-+    struct EBPFRSSContext ctx;
-+    ebpf_rss_init(&ctx);
-+    ebpf_rss_load(&ctx);
-+    ebpf_rss_set_all(&ctx, &config, table, key);
-+    if (net_client->info->set_steering_ebpf != NULL) {
-+        net_client->info->set_steering_ebpf(net_client, ctx->program_fd);
++            input_byte <<= 1;
++            key_byte <<= 1;
++        }
 +    }
-+    ...
-+    ebpf_unload(&ctx);
++
++    *result = accumulator;
++}
 +
 +
-+NetClientState SetSteeringEBPF()
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++static inline int ip6_extension_header_type(__u8 hdr_type)
++{
++    switch (hdr_type) {
++    case IPPROTO_HOPOPTS:
++    case IPPROTO_ROUTING:
++    case IPPROTO_FRAGMENT:
++    case IPPROTO_ICMPV6:
++    case IPPROTO_NONE:
++    case IPPROTO_DSTOPTS:
++    case IPPROTO_MH:
++        return 1;
++    default:
++        return 0;
++    }
++}
++/*
++ * According to https://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml
++ * we suspect that there are would be no more than 11 extensions in IPv6 header,
++ * also there is 27 TLV options for Destination and Hop-by-hop extensions.
++ * Need to choose reasonable amount of maximum extensions/options we may check to find
++ * ext src/dst.
++ */
++#define IP6_EXTENSIONS_COUNT 11
++#define IP6_OPTIONS_COUNT 30
 +
-+For now, `set_steering_ebpf()` method supported by Linux TAP NetClientState. The method requires an eBPF program file descriptor as an argument.
++static inline void parse_ipv6_ext(struct __sk_buff *skb,
++        struct packet_hash_info_t *info,
++        __u8 *l4_protocol, size_t *l4_offset)
++{
++    if (!ip6_extension_header_type(*l4_protocol)) {
++        return;
++    }
++
++    struct ipv6_opt_hdr ext_hdr = {};
++
++    for (unsigned int i = 0; i < IP6_EXTENSIONS_COUNT; ++i) {
++
++        bpf_skb_load_bytes_relative(skb, *l4_offset, &ext_hdr,
++                                    sizeof(ext_hdr), BPF_HDR_START_NET);
++
++        if (*l4_protocol == IPPROTO_ROUTING) {
++            struct ipv6_rt_hdr ext_rt = {};
++
++            bpf_skb_load_bytes_relative(skb, *l4_offset, &ext_rt,
++                                        sizeof(ext_rt), BPF_HDR_START_NET);
++
++            if ((ext_rt.type == IPV6_SRCRT_TYPE_2) &&
++                    (ext_rt.hdrlen == sizeof(struct in6_addr) / 8) &&
++                    (ext_rt.segments_left == 1)) {
++
++                bpf_skb_load_bytes_relative(skb,
++                    *l4_offset + offsetof(struct rt2_hdr, addr),
++                    &info->in6_ext_dst, sizeof(info->in6_ext_dst),
++                    BPF_HDR_START_NET);
++
++                info->is_ipv6_ext_dst = 1;
++            }
++
++        } else if (*l4_protocol == IPPROTO_DSTOPTS) {
++            struct ipv6_opt_t {
++                __u8 type;
++                __u8 length;
++            } __attribute__((packed)) opt = {};
++
++            size_t opt_offset = sizeof(ext_hdr);
++
++            for (unsigned int j = 0; j < IP6_OPTIONS_COUNT; ++j) {
++                bpf_skb_load_bytes_relative(skb, *l4_offset + opt_offset,
++                                        &opt, sizeof(opt), BPF_HDR_START_NET);
++
++                opt_offset += (opt.type == IPV6_TLV_PAD1) ?
++                        1 : opt.length + sizeof(opt);
++
++                if (opt_offset + 1 >= ext_hdr.hdrlen * 8) {
++                    break;
++                }
++
++                if (opt.type == IPV6_TLV_HAO) {
++                    bpf_skb_load_bytes_relative(skb,
++                        *l4_offset + opt_offset + offsetof(struct ipv6_destopt_hao, addr),
++                        &info->is_ipv6_ext_src, sizeof(info->is_ipv6_ext_src),
++                        BPF_HDR_START_NET);
++
++                    info->is_ipv6_ext_src = 1;
++                    break;
++                }
++            }
++        }
++
++        *l4_protocol = ext_hdr.nexthdr;
++        *l4_offset += (ext_hdr.hdrlen + 1) * 8;
++
++        if (!ip6_extension_header_type(ext_hdr.nexthdr)) {
++            return;
++        }
++    }
++}
++
++static inline void parse_packet(struct __sk_buff *skb,
++        struct packet_hash_info_t *info)
++{
++    if (!info || !skb) {
++        return;
++    }
++
++    size_t l4_offset = 0;
++    __u8 l4_protocol = 0;
++    __u16 l3_protocol = __be16_to_cpu(skb->protocol);
++
++    if (l3_protocol == ETH_P_IP) {
++        info->is_ipv4 = 1;
++
++        struct iphdr ip = {};
++        bpf_skb_load_bytes_relative(skb, 0, &ip, sizeof(ip),
++                                    BPF_HDR_START_NET);
++
++        info->in_src = ip.saddr;
++        info->in_dst = ip.daddr;
++
++        l4_protocol = ip.protocol;
++        l4_offset = ip.ihl * 4;
++    } else if (l3_protocol == ETH_P_IPV6) {
++        info->is_ipv6 = 1;
++
++        struct ipv6hdr ip6 = {};
++        bpf_skb_load_bytes_relative(skb, 0, &ip6, sizeof(ip6),
++                                    BPF_HDR_START_NET);
++
++        info->in6_src = ip6.saddr;
++        info->in6_dst = ip6.daddr;
++
++        l4_protocol = ip6.nexthdr;
++        l4_offset = sizeof(ip6);
++
++        parse_ipv6_ext(skb, info, &l4_protocol, &l4_offset);
++    }
++
++    if (l4_protocol != 0) {
++        if (l4_protocol == IPPROTO_TCP) {
++            info->is_tcp = 1;
++
++            struct tcphdr tcp = {};
++            bpf_skb_load_bytes_relative(skb, l4_offset, &tcp, sizeof(tcp),
++                                        BPF_HDR_START_NET);
++
++            info->src_port = tcp.source;
++            info->dst_port = tcp.dest;
++        } else if (l4_protocol == IPPROTO_UDP) { /* TODO: add udplite? */
++            info->is_udp = 1;
++
++            struct udphdr udp = {};
++            bpf_skb_load_bytes_relative(skb, l4_offset, &udp, sizeof(udp),
++                                        BPF_HDR_START_NET);
++
++            info->src_port = udp.source;
++            info->dst_port = udp.dest;
++        }
++    }
++}
++
++static inline __u32 calculate_rss_hash(struct __sk_buff *skb,
++        struct rss_config_t *config, struct toeplitz_key_data_t *toe)
++{
++    __u8 rss_input[HASH_CALCULATION_BUFFER_SIZE] = {};
++    size_t bytes_written = 0;
++    __u32 result = 0;
++    struct packet_hash_info_t packet_info = {};
++
++    parse_packet(skb, &packet_info);
++
++    if (packet_info.is_ipv4) {
++        if (packet_info.is_tcp &&
++            config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4) {
++
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.in_src,
++                                 sizeof(packet_info.in_src));
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.in_dst,
++                                 sizeof(packet_info.in_dst));
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.src_port,
++                                 sizeof(packet_info.src_port));
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.dst_port,
++                                 sizeof(packet_info.dst_port));
++        } else if (packet_info.is_udp &&
++                   config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4) {
++
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.in_src,
++                                 sizeof(packet_info.in_src));
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.in_dst,
++                                 sizeof(packet_info.in_dst));
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.src_port,
++                                 sizeof(packet_info.src_port));
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.dst_port,
++                                 sizeof(packet_info.dst_port));
++        } else if (config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_IPv4) {
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.in_src,
++                                 sizeof(packet_info.in_src));
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.in_dst,
++                                 sizeof(packet_info.in_dst));
++        }
++    } else if (packet_info.is_ipv6) {
++        if (packet_info.is_tcp &&
++            config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_TCPv6) {
++
++            if (packet_info.is_ipv6_ext_src &&
++                config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_TCP_EX) {
++
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_ext_src,
++                                     sizeof(packet_info.in6_ext_src));
++            } else {
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_src,
++                                     sizeof(packet_info.in6_src));
++            }
++            if (packet_info.is_ipv6_ext_dst &&
++                config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_TCP_EX) {
++
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_ext_dst,
++                                     sizeof(packet_info.in6_ext_dst));
++            } else {
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_dst,
++                                     sizeof(packet_info.in6_dst));
++            }
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.src_port,
++                                 sizeof(packet_info.src_port));
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.dst_port,
++                                 sizeof(packet_info.dst_port));
++        } else if (packet_info.is_udp &&
++                   config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_UDPv6) {
++
++            if (packet_info.is_ipv6_ext_src &&
++               config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_UDP_EX) {
++
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_ext_src,
++                                     sizeof(packet_info.in6_ext_src));
++            } else {
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_src,
++                                     sizeof(packet_info.in6_src));
++            }
++            if (packet_info.is_ipv6_ext_dst &&
++               config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_UDP_EX) {
++
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_ext_dst,
++                                     sizeof(packet_info.in6_ext_dst));
++            } else {
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_dst,
++                                     sizeof(packet_info.in6_dst));
++            }
++
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.src_port,
++                                 sizeof(packet_info.src_port));
++            net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                 &packet_info.dst_port,
++                                 sizeof(packet_info.dst_port));
++
++        } else if (config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_IPv6) {
++            if (packet_info.is_ipv6_ext_src &&
++               config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_IP_EX) {
++
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_ext_src,
++                                     sizeof(packet_info.in6_ext_src));
++            } else {
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_src,
++                                     sizeof(packet_info.in6_src));
++            }
++            if (packet_info.is_ipv6_ext_dst &&
++                config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_IP_EX) {
++
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_ext_dst,
++                                     sizeof(packet_info.in6_ext_dst));
++            } else {
++                net_rx_rss_add_chunk(rss_input, &bytes_written,
++                                     &packet_info.in6_dst,
++                                     sizeof(packet_info.in6_dst));
++            }
++        }
++    }
++
++    if (bytes_written) {
++        net_toeplitz_add(&result, rss_input, bytes_written, toe);
++    }
++
++    return result;
++}
++
++SEC("tun_rss_steering")
++int tun_rss_steering_prog(struct __sk_buff *skb)
++{
++
++    struct rss_config_t *config = 0;
++    struct toeplitz_key_data_t *toe = 0;
++
++    __u32 key = 0;
++    __u32 hash = 0;
++
++    config = bpf_map_lookup_elem(&tap_rss_map_configurations, &key);
++    toe = bpf_map_lookup_elem(&tap_rss_map_toeplitz_key, &key);
++
++    if (config && toe) {
++        if (!config->redirect) {
++            return config->default_queue;
++        }
++
++        hash = calculate_rss_hash(skb, config, toe);
++        if (hash) {
++            __u32 table_idx = hash % config->indirections_len;
++            __u16 *queue = 0;
++
++            queue = bpf_map_lookup_elem(&tap_rss_map_indirection_table,
++                                        &table_idx);
++
++            if (queue) {
++                return *queue;
++            }
++        }
++
++        return config->default_queue;
++    }
++
++    return -1;
++}
++
++char _license[] SEC("license") = "GPL";
+diff --git a/ebpf/tun_rss_steering.h b/ebpf/tun_rss_steering.h
+new file mode 100644
+index 0000000000..bbf63a109a
+--- /dev/null
++++ b/ebpf/tun_rss_steering.h
+@@ -0,0 +1,556 @@
++#ifndef TUN_RSS_STEERING
++#define TUN_RSS_STEERING
++
++struct bpf_insn instun_rss_steering[] = {
++    {0xbf, 0x09, 0x01, 0x0000, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xff4c, 0x00000000},
++    {0xbf, 0x06, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x06, 0x00, 0x0000, 0xffffff4c},
++    {0x18, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x00, 0x00, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x02, 0x06, 0x0000, 0x00000000},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000001},
++    {0xbf, 0x07, 0x00, 0x0000, 0x00000000},
++    {0x18, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x00, 0x00, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x02, 0x06, 0x0000, 0x00000000},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000001},
++    {0xbf, 0x08, 0x00, 0x0000, 0x00000000},
++    {0x18, 0x00, 0x00, 0x0000, 0xffffffff},
++    {0x00, 0x00, 0x00, 0x0000, 0x00000000},
++    {0x15, 0x07, 0x00, 0x016e, 0x00000000},
++    {0xbf, 0x05, 0x08, 0x0000, 0x00000000},
++    {0x15, 0x05, 0x00, 0x016c, 0x00000000},
++    {0x71, 0x01, 0x07, 0x0000, 0x00000000},
++    {0x55, 0x01, 0x00, 0x0001, 0x00000000},
++    {0x05, 0x00, 0x00, 0x0168, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xffc0, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffb8, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffb0, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffa8, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffa0, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xff98, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff90, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff88, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff80, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff78, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff70, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff68, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff60, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff58, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff50, 0x00000000},
++    {0x15, 0x09, 0x00, 0x007e, 0x00000000},
++    {0x61, 0x01, 0x09, 0x0010, 0x00000000},
++    {0xdc, 0x01, 0x00, 0x0000, 0x00000010},
++    {0x15, 0x01, 0x00, 0x0030, 0x000086dd},
++    {0x55, 0x01, 0x00, 0x007a, 0x00000800},
++    {0x7b, 0x0a, 0x05, 0xff28, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
++    {0x73, 0x0a, 0x01, 0xff50, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xffe0, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffd8, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffd0, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xffffffd0},
++    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
++    {0xb7, 0x02, 0x00, 0x0000, 0x00000000},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000014},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
++    {0x61, 0x01, 0x0a, 0xffdc, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xff5c, 0x00000000},
++    {0x61, 0x01, 0x0a, 0xffe0, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xff60, 0x00000000},
++    {0x71, 0x06, 0x0a, 0xffd9, 0x00000000},
++    {0x71, 0x01, 0x0a, 0xffd0, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000002},
++    {0x57, 0x01, 0x00, 0x0000, 0x0000003c},
++    {0x7b, 0x0a, 0x01, 0xff40, 0x00000000},
++    {0x57, 0x06, 0x00, 0x0000, 0x000000ff},
++    {0x15, 0x06, 0x00, 0x0051, 0x00000011},
++    {0x79, 0x05, 0x0a, 0xff28, 0x00000000},
++    {0x55, 0x06, 0x00, 0x005f, 0x00000006},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
++    {0x73, 0x0a, 0x01, 0xff53, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xffe0, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffd8, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffd0, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xffffffd0},
++    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
++    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000014},
++    {0xbf, 0x06, 0x05, 0x0000, 0x00000000},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
++    {0xbf, 0x05, 0x06, 0x0000, 0x00000000},
++    {0x69, 0x01, 0x0a, 0xffd0, 0x00000000},
++    {0x6b, 0x0a, 0x01, 0xff56, 0x00000000},
++    {0x69, 0x01, 0x0a, 0xffd2, 0x00000000},
++    {0x6b, 0x0a, 0x01, 0xff58, 0x00000000},
++    {0x05, 0x00, 0x00, 0x004b, 0x00000000},
++    {0x7b, 0x0a, 0x05, 0xff28, 0x00000000},
++    {0x7b, 0x0a, 0x07, 0xff10, 0x00000000},
++    {0xb7, 0x07, 0x00, 0x0000, 0x00000001},
++    {0x73, 0x0a, 0x07, 0xff51, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xfff0, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffe8, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffe0, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffd8, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffd0, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xffffffd0},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000028},
++    {0x7b, 0x0a, 0x01, 0xff40, 0x00000000},
++    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
++    {0xb7, 0x02, 0x00, 0x0000, 0x00000000},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000028},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
++    {0x79, 0x01, 0x0a, 0xffd8, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xff5c, 0x00000000},
++    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x63, 0x0a, 0x01, 0xff60, 0x00000000},
++    {0x79, 0x01, 0x0a, 0xffe0, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xff64, 0x00000000},
++    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x63, 0x0a, 0x01, 0xff68, 0x00000000},
++    {0x79, 0x01, 0x0a, 0xffe8, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xff6c, 0x00000000},
++    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x63, 0x0a, 0x01, 0xff70, 0x00000000},
++    {0x79, 0x01, 0x0a, 0xfff0, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xff74, 0x00000000},
++    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x63, 0x0a, 0x01, 0xff78, 0x00000000},
++    {0x71, 0x06, 0x0a, 0xffd6, 0x00000000},
++    {0x25, 0x06, 0x00, 0x0126, 0x0000003c},
++    {0x6f, 0x07, 0x06, 0x0000, 0x00000000},
++    {0x18, 0x01, 0x00, 0x0000, 0x00000001},
++    {0x00, 0x00, 0x00, 0x0000, 0x1c001800},
++    {0x5f, 0x07, 0x01, 0x0000, 0x00000000},
++    {0x55, 0x07, 0x00, 0x0001, 0x00000000},
++    {0x05, 0x00, 0x00, 0x0120, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x6b, 0x0a, 0x01, 0xfffe, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000028},
++    {0x7b, 0x0a, 0x01, 0xff40, 0x00000000},
++    {0xbf, 0x01, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x01, 0x00, 0x0000, 0xffffff8c},
++    {0x7b, 0x0a, 0x01, 0xff20, 0x00000000},
++    {0xbf, 0x01, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x01, 0x00, 0x0000, 0xffffff54},
++    {0x7b, 0x0a, 0x01, 0xff18, 0x00000000},
++    {0x18, 0x07, 0x00, 0x0000, 0x00000001},
++    {0x00, 0x00, 0x00, 0x0000, 0x1c001800},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xff38, 0x00000000},
++    {0x7b, 0x0a, 0x08, 0xff30, 0x00000000},
++    {0x05, 0x00, 0x00, 0x0153, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
++    {0x73, 0x0a, 0x01, 0xff52, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffd0, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xffffffd0},
++    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
++    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000008},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
++    {0x69, 0x01, 0x0a, 0xffd0, 0x00000000},
++    {0x6b, 0x0a, 0x01, 0xff56, 0x00000000},
++    {0x69, 0x01, 0x0a, 0xffd2, 0x00000000},
++    {0x6b, 0x0a, 0x01, 0xff58, 0x00000000},
++    {0x79, 0x05, 0x0a, 0xff28, 0x00000000},
++    {0x71, 0x01, 0x0a, 0xff50, 0x00000000},
++    {0x15, 0x01, 0x00, 0x000f, 0x00000000},
++    {0x61, 0x01, 0x07, 0x0004, 0x00000000},
++    {0x71, 0x02, 0x0a, 0xff53, 0x00000000},
++    {0x15, 0x02, 0x00, 0x002b, 0x00000000},
++    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x57, 0x02, 0x00, 0x0000, 0x00000002},
++    {0x15, 0x02, 0x00, 0x0028, 0x00000000},
++    {0x61, 0x01, 0x0a, 0xff5c, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xffa0, 0x00000000},
++    {0x61, 0x01, 0x0a, 0xff60, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xffa4, 0x00000000},
++    {0x69, 0x01, 0x0a, 0xff56, 0x00000000},
++    {0x6b, 0x0a, 0x01, 0xffa8, 0x00000000},
++    {0x69, 0x01, 0x0a, 0xff58, 0x00000000},
++    {0x6b, 0x0a, 0x01, 0xffaa, 0x00000000},
++    {0x05, 0x00, 0x00, 0x005e, 0x00000000},
++    {0x71, 0x01, 0x0a, 0xff51, 0x00000000},
++    {0x15, 0x01, 0x00, 0x00c6, 0x00000000},
++    {0x61, 0x01, 0x07, 0x0004, 0x00000000},
++    {0x71, 0x02, 0x0a, 0xff53, 0x00000000},
++    {0x15, 0x02, 0x00, 0x0027, 0x00000000},
++    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x57, 0x02, 0x00, 0x0000, 0x00000010},
++    {0x15, 0x02, 0x00, 0x0024, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xffffff5c},
++    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x02, 0x00, 0x0000, 0xffffff7c},
++    {0x71, 0x04, 0x0a, 0xff54, 0x00000000},
++    {0x55, 0x04, 0x00, 0x0001, 0x00000000},
++    {0xbf, 0x02, 0x03, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000038},
++    {0xc7, 0x01, 0x00, 0x0000, 0x00000038},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000000},
++    {0x6d, 0x04, 0x01, 0x0001, 0x00000000},
++    {0xbf, 0x02, 0x03, 0x0000, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xffffff6c},
++    {0xbf, 0x05, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x05, 0x00, 0x0000, 0xffffff8c},
++    {0x6d, 0x04, 0x01, 0x0001, 0x00000000},
++    {0xbf, 0x05, 0x03, 0x0000, 0x00000000},
++    {0x71, 0x01, 0x0a, 0xff55, 0x00000000},
++    {0x15, 0x01, 0x00, 0x0028, 0x00000000},
++    {0xbf, 0x03, 0x05, 0x0000, 0x00000000},
++    {0x05, 0x00, 0x00, 0x0026, 0x00000000},
++    {0x71, 0x02, 0x0a, 0xff52, 0x00000000},
++    {0x15, 0x02, 0x00, 0x0004, 0x00000000},
++    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x57, 0x02, 0x00, 0x0000, 0x00000004},
++    {0x15, 0x02, 0x00, 0x0001, 0x00000000},
++    {0x05, 0x00, 0x00, 0xffd2, 0x00000000},
++    {0x57, 0x01, 0x00, 0x0000, 0x00000001},
++    {0x15, 0x01, 0x00, 0x00a1, 0x00000000},
++    {0x61, 0x01, 0x0a, 0xff5c, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xffa0, 0x00000000},
++    {0x61, 0x01, 0x0a, 0xff60, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xffa4, 0x00000000},
++    {0x05, 0x00, 0x00, 0x0032, 0x00000000},
++    {0x71, 0x02, 0x0a, 0xff52, 0x00000000},
++    {0x15, 0x02, 0x00, 0x009e, 0x00000000},
++    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x57, 0x02, 0x00, 0x0000, 0x00000020},
++    {0x15, 0x02, 0x00, 0x009b, 0x00000000},
++    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x02, 0x00, 0x0000, 0xffffff5c},
++    {0x71, 0x04, 0x0a, 0xff54, 0x00000000},
++    {0xbf, 0x03, 0x02, 0x0000, 0x00000000},
++    {0x15, 0x04, 0x00, 0x0002, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xffffff7c},
++    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
++    {0x57, 0x01, 0x00, 0x0000, 0x00000100},
++    {0x15, 0x01, 0x00, 0x0001, 0x00000000},
++    {0xbf, 0x02, 0x03, 0x0000, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xffffff6c},
++    {0x71, 0x05, 0x0a, 0xff55, 0x00000000},
++    {0xbf, 0x04, 0x03, 0x0000, 0x00000000},
++    {0x15, 0x05, 0x00, 0x0002, 0x00000000},
++    {0xbf, 0x04, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x04, 0x00, 0x0000, 0xffffff8c},
++    {0x15, 0x01, 0x00, 0x0001, 0x00000000},
++    {0xbf, 0x03, 0x04, 0x0000, 0x00000000},
++    {0x61, 0x01, 0x02, 0x0004, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x61, 0x04, 0x02, 0x0000, 0x00000000},
++    {0x4f, 0x01, 0x04, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffa0, 0x00000000},
++    {0x61, 0x01, 0x02, 0x0008, 0x00000000},
++    {0x61, 0x02, 0x02, 0x000c, 0x00000000},
++    {0x67, 0x02, 0x00, 0x0000, 0x00000020},
++    {0x4f, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x02, 0xffa8, 0x00000000},
++    {0x61, 0x01, 0x03, 0x0000, 0x00000000},
++    {0x61, 0x02, 0x03, 0x0004, 0x00000000},
++    {0x61, 0x04, 0x03, 0x0008, 0x00000000},
++    {0x61, 0x03, 0x03, 0x000c, 0x00000000},
++    {0x69, 0x05, 0x0a, 0xff58, 0x00000000},
++    {0x6b, 0x0a, 0x05, 0xffc2, 0x00000000},
++    {0x69, 0x05, 0x0a, 0xff56, 0x00000000},
++    {0x6b, 0x0a, 0x05, 0xffc0, 0x00000000},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000020},
++    {0x4f, 0x03, 0x04, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x03, 0xffb8, 0x00000000},
++    {0x67, 0x02, 0x00, 0x0000, 0x00000020},
++    {0x4f, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x02, 0xffb0, 0x00000000},
++    {0xbf, 0x05, 0x00, 0x0000, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x07, 0x08, 0x00, 0x0000, 0x00000004},
++    {0x61, 0x03, 0x05, 0x0000, 0x00000000},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x02, 0x00, 0x0000, 0xffffffa0},
++    {0x0f, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x71, 0x04, 0x02, 0x0000, 0x00000000},
++    {0xbf, 0x02, 0x04, 0x0000, 0x00000000},
++    {0x67, 0x02, 0x00, 0x0000, 0x00000038},
++    {0xc7, 0x02, 0x00, 0x0000, 0x0000003f},
++    {0x5f, 0x02, 0x03, 0x0000, 0x00000000},
++    {0xaf, 0x02, 0x05, 0x0000, 0x00000000},
++    {0xbf, 0x05, 0x08, 0x0000, 0x00000000},
++    {0x0f, 0x05, 0x01, 0x0000, 0x00000000},
++    {0x71, 0x05, 0x05, 0x0000, 0x00000000},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
++    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
++    {0x77, 0x00, 0x00, 0x0000, 0x00000007},
++    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
++    {0x67, 0x00, 0x00, 0x0000, 0x00000039},
++    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
++    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
++    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
++    {0x77, 0x00, 0x00, 0x0000, 0x00000006},
++    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
++    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
++    {0x67, 0x00, 0x00, 0x0000, 0x0000003a},
++    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
++    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
++    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
++    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
++    {0x77, 0x00, 0x00, 0x0000, 0x00000005},
++    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
++    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
++    {0x67, 0x00, 0x00, 0x0000, 0x0000003b},
++    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
++    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
++    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
++    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
++    {0x77, 0x00, 0x00, 0x0000, 0x00000004},
++    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
++    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
++    {0x67, 0x00, 0x00, 0x0000, 0x0000003c},
++    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
++    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
++    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
++    {0x77, 0x00, 0x00, 0x0000, 0x00000003},
++    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
++    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
++    {0x67, 0x00, 0x00, 0x0000, 0x0000003d},
++    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
++    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
++    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
++    {0x77, 0x00, 0x00, 0x0000, 0x00000002},
++    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
++    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
++    {0x67, 0x00, 0x00, 0x0000, 0x0000003e},
++    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
++    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
++    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
++    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
++    {0x77, 0x00, 0x00, 0x0000, 0x00000001},
++    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
++    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
++    {0x57, 0x04, 0x00, 0x0000, 0x00000001},
++    {0x87, 0x04, 0x00, 0x0000, 0x00000000},
++    {0x5f, 0x04, 0x03, 0x0000, 0x00000000},
++    {0xaf, 0x02, 0x04, 0x0000, 0x00000000},
++    {0x57, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
++    {0x4f, 0x03, 0x05, 0x0000, 0x00000000},
++    {0x07, 0x01, 0x00, 0x0000, 0x00000001},
++    {0xbf, 0x05, 0x02, 0x0000, 0x00000000},
++    {0x15, 0x01, 0x00, 0x0001, 0x00000024},
++    {0x05, 0x00, 0x00, 0xffa9, 0x00000000},
++    {0xbf, 0x01, 0x02, 0x0000, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x15, 0x01, 0x00, 0x000b, 0x00000000},
++    {0x69, 0x03, 0x07, 0x0008, 0x00000000},
++    {0x3f, 0x01, 0x03, 0x0000, 0x00000000},
++    {0x2f, 0x01, 0x03, 0x0000, 0x00000000},
++    {0x1f, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x63, 0x0a, 0x02, 0xff50, 0x00000000},
++    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x02, 0x00, 0x0000, 0xffffff50},
++    {0x18, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x00, 0x00, 0x00, 0x0000, 0x00000000},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000001},
++    {0x55, 0x00, 0x00, 0x0002, 0x00000000},
++    {0x69, 0x00, 0x07, 0x000a, 0x00000000},
++    {0x95, 0x00, 0x00, 0x0000, 0x00000000},
++    {0x69, 0x00, 0x00, 0x0000, 0x00000000},
++    {0x05, 0x00, 0x00, 0xfffd, 0x00000000},
++    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x57, 0x02, 0x00, 0x0000, 0x00000008},
++    {0x15, 0x02, 0x00, 0xfff9, 0x00000000},
++    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x02, 0x00, 0x0000, 0xffffff5c},
++    {0x71, 0x04, 0x0a, 0xff54, 0x00000000},
++    {0xbf, 0x03, 0x02, 0x0000, 0x00000000},
++    {0x15, 0x04, 0x00, 0x0002, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xffffff7c},
++    {0x57, 0x01, 0x00, 0x0000, 0x00000040},
++    {0x15, 0x01, 0x00, 0x0001, 0x00000000},
++    {0xbf, 0x02, 0x03, 0x0000, 0x00000000},
++    {0x61, 0x03, 0x02, 0x0004, 0x00000000},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000020},
++    {0x61, 0x04, 0x02, 0x0000, 0x00000000},
++    {0x4f, 0x03, 0x04, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x03, 0xffa0, 0x00000000},
++    {0x61, 0x03, 0x02, 0x0008, 0x00000000},
++    {0x61, 0x02, 0x02, 0x000c, 0x00000000},
++    {0x67, 0x02, 0x00, 0x0000, 0x00000020},
++    {0x4f, 0x02, 0x03, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x02, 0xffa8, 0x00000000},
++    {0x15, 0x01, 0x00, 0x0079, 0x00000000},
++    {0x71, 0x01, 0x0a, 0xff55, 0x00000000},
++    {0x15, 0x01, 0x00, 0x0077, 0x00000000},
++    {0x61, 0x01, 0x0a, 0xff98, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x61, 0x02, 0x0a, 0xff94, 0x00000000},
++    {0x4f, 0x01, 0x02, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffb8, 0x00000000},
++    {0x61, 0x01, 0x0a, 0xff90, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x61, 0x02, 0x0a, 0xff8c, 0x00000000},
++    {0x05, 0x00, 0x00, 0x0076, 0x00000000},
++    {0x15, 0x06, 0x00, 0xfedf, 0x00000087},
++    {0x05, 0x00, 0x00, 0x003f, 0x00000000},
++    {0x0f, 0x06, 0x09, 0x0000, 0x00000000},
++    {0xbf, 0x02, 0x06, 0x0000, 0x00000000},
++    {0x07, 0x02, 0x00, 0x0000, 0x00000001},
++    {0x71, 0x03, 0x0a, 0xffff, 0x00000000},
++    {0x67, 0x03, 0x00, 0x0000, 0x00000003},
++    {0x3d, 0x02, 0x03, 0x0022, 0x00000000},
++    {0x55, 0x01, 0x00, 0x000c, 0x000000c9},
++    {0x79, 0x01, 0x0a, 0xff40, 0x00000000},
++    {0x0f, 0x06, 0x01, 0x0000, 0x00000000},
++    {0x07, 0x06, 0x00, 0x0000, 0x00000002},
++    {0xbf, 0x01, 0x07, 0x0000, 0x00000000},
++    {0xbf, 0x02, 0x06, 0x0000, 0x00000000},
++    {0x79, 0x03, 0x0a, 0xff18, 0x00000000},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000001},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
++    {0x73, 0x0a, 0x01, 0xff54, 0x00000000},
++    {0x05, 0x00, 0x00, 0x0015, 0x00000000},
++    {0x07, 0x08, 0x00, 0x0000, 0xffffffff},
++    {0xbf, 0x01, 0x08, 0x0000, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
++    {0xbf, 0x09, 0x06, 0x0000, 0x00000000},
++    {0x15, 0x01, 0x00, 0x000f, 0x00000000},
++    {0xbf, 0x02, 0x09, 0x0000, 0x00000000},
++    {0x79, 0x01, 0x0a, 0xff40, 0x00000000},
++    {0x0f, 0x02, 0x01, 0x0000, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xfffffff8},
++    {0xb7, 0x06, 0x00, 0x0000, 0x00000001},
++    {0xbf, 0x01, 0x07, 0x0000, 0x00000000},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000002},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
++    {0x71, 0x01, 0x0a, 0xfff8, 0x00000000},
++    {0x15, 0x01, 0x00, 0xffdb, 0x00000000},
++    {0x71, 0x06, 0x0a, 0xfff9, 0x00000000},
++    {0x07, 0x06, 0x00, 0x0000, 0x00000002},
++    {0x05, 0x00, 0x00, 0xffd8, 0x00000000},
++    {0x79, 0x08, 0x0a, 0xff30, 0x00000000},
++    {0xbf, 0x09, 0x07, 0x0000, 0x00000000},
++    {0x18, 0x07, 0x00, 0x0000, 0x00000001},
++    {0x00, 0x00, 0x00, 0x0000, 0x1c001800},
++    {0x71, 0x01, 0x0a, 0xffff, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000003},
++    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
++    {0x0f, 0x02, 0x01, 0x0000, 0x00000000},
++    {0x07, 0x02, 0x00, 0x0000, 0x00000008},
++    {0x7b, 0x0a, 0x02, 0xff40, 0x00000000},
++    {0x71, 0x06, 0x0a, 0xfffe, 0x00000000},
++    {0x25, 0x06, 0x00, 0x0036, 0x0000003c},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
++    {0x6f, 0x01, 0x06, 0x0000, 0x00000000},
++    {0x5f, 0x01, 0x07, 0x0000, 0x00000000},
++    {0x55, 0x01, 0x00, 0x0001, 0x00000000},
++    {0x05, 0x00, 0x00, 0x0031, 0x00000000},
++    {0x79, 0x01, 0x0a, 0xff38, 0x00000000},
++    {0x07, 0x01, 0x00, 0x0000, 0x00000001},
++    {0x7b, 0x0a, 0x01, 0xff38, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x55, 0x01, 0x00, 0x0002, 0x0000000b},
++    {0x79, 0x07, 0x0a, 0xff10, 0x00000000},
++    {0x05, 0x00, 0x00, 0xfe5a, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xfffffffe},
++    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
++    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000002},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
++    {0xbf, 0x01, 0x06, 0x0000, 0x00000000},
++    {0x15, 0x01, 0x00, 0x001a, 0x0000003c},
++    {0x55, 0x01, 0x00, 0xffe1, 0x0000002b},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x63, 0x0a, 0x01, 0xfff8, 0x00000000},
++    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
++    {0x07, 0x03, 0x00, 0x0000, 0xfffffff8},
++    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
++    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000004},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
++    {0x71, 0x01, 0x0a, 0xfffa, 0x00000000},
++    {0x55, 0x01, 0x00, 0xffd6, 0x00000002},
++    {0x71, 0x01, 0x0a, 0xfff9, 0x00000000},
++    {0x55, 0x01, 0x00, 0xffd4, 0x00000002},
++    {0x71, 0x01, 0x0a, 0xfffb, 0x00000000},
++    {0x55, 0x01, 0x00, 0xffd2, 0x00000001},
++    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
++    {0x07, 0x02, 0x00, 0x0000, 0x00000008},
++    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
++    {0x79, 0x03, 0x0a, 0xff20, 0x00000000},
++    {0xb7, 0x04, 0x00, 0x0000, 0x00000010},
++    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
++    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
++    {0x73, 0x0a, 0x01, 0xff55, 0x00000000},
++    {0x05, 0x00, 0x00, 0xffc8, 0x00000000},
++    {0xbf, 0x07, 0x09, 0x0000, 0x00000000},
++    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
++    {0x6b, 0x0a, 0x01, 0xfff8, 0x00000000},
++    {0xb7, 0x09, 0x00, 0x0000, 0x00000002},
++    {0xb7, 0x08, 0x00, 0x0000, 0x0000001e},
++    {0x05, 0x00, 0x00, 0xffaf, 0x00000000},
++    {0x15, 0x06, 0x00, 0xffce, 0x00000087},
++    {0x05, 0x00, 0x00, 0xffd3, 0x00000000},
++    {0x61, 0x01, 0x0a, 0xff78, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x61, 0x02, 0x0a, 0xff74, 0x00000000},
++    {0x4f, 0x01, 0x02, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffb8, 0x00000000},
++    {0x61, 0x01, 0x0a, 0xff70, 0x00000000},
++    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
++    {0x61, 0x02, 0x0a, 0xff6c, 0x00000000},
++    {0x4f, 0x01, 0x02, 0x0000, 0x00000000},
++    {0x7b, 0x0a, 0x01, 0xffb0, 0x00000000},
++    {0x05, 0x00, 0x00, 0xfef6, 0x00000000},
++};
++
++struct fixup_mapfd_t reltun_rss_steering[] = {
++    {"tap_rss_map_configurations", 5},
++    {"tap_rss_map_toeplitz_key", 10},
++    {"tap_rss_map_indirection_table", 379},
++};
++
++#endif /* TUN_RSS_STEERING */
 -- 
 2.28.0
 
