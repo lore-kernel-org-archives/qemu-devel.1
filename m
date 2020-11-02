@@ -2,65 +2,105 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 470B0C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0070C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:26:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B65912225E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:20:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B65912225E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id CBFEE2071E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:26:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6mNDcxM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBFEE2071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZWwt-0006OP-Pj
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:20:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55416)
+	id 1kZX33-0008ER-Hb
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:26:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kZWqB-0007hB-0Z; Mon, 02 Nov 2020 05:13:31 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:2067)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kZWq9-00077m-2i; Mon, 02 Nov 2020 05:13:30 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CPpdy3gVHzhfYX;
- Mon,  2 Nov 2020 18:13:26 +0800 (CST)
-Received: from [10.174.187.138] (10.174.187.138) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 2 Nov 2020 18:13:17 +0800
-Message-ID: <5F9FDBBD.4020607@huawei.com>
-Date: Mon, 2 Nov 2020 18:13:17 +0800
-From: AlexChen <alex.chen@huawei.com>
-User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
- rv:17.0) Gecko/20130509 Thunderbird/17.0.6
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZX2E-0007o1-Ju
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:25:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40029)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZX2C-0003Im-BX
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:25:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604312753;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0i+r8zkLfSvZzA+y2wQ1NWMeSkorqmC4wRhVw95IzNw=;
+ b=e6mNDcxMMqoFWkh/XmZn8TgQtQtZinHrcuamrO8w7ZEukSDoXRu66QJcSk1s6SYhBUJv9z
+ tGQ2R5nGtSM7LmeOV3Kzqwk/jTCW0ypY05+fBZmhmfMMnQtoR6qGGtX+qIxQKC2OealuQr
+ 0hVuz2Wr42N6tIGxe6s0Osq/hYeNNm0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-93-ogE8aPUkOrGg1SpTvPcyEA-1; Mon, 02 Nov 2020 05:25:51 -0500
+X-MC-Unique: ogE8aPUkOrGg1SpTvPcyEA-1
+Received: by mail-wm1-f70.google.com with SMTP id e15so1722834wme.4
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 02:25:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=0i+r8zkLfSvZzA+y2wQ1NWMeSkorqmC4wRhVw95IzNw=;
+ b=MPcmk0cjPO4i4OPzgKgAC0i7ABZQOs18KjyEDvCp8wMYrIFA3KxvOKdQl8YqYYZcp7
+ b/Si2welOI67cFG+rsEMdoDkeGPXMI3Dp15UBdkeTtfbfkulzz9pRxnmw+1etLZtJ9o4
+ JcN9fvToEsZ5p/UiUJo0+793V401DoXj2wMJaA8659gYX0Czs1bRW4j68KP5lNPK83SI
+ JVORyUrtqHNLH3M+ikiokOohC9ZnH9Izsgz0SRAvdlBVX/W9COxunL8ERm0FUhv+GDNG
+ 1btlrJ2aZU8YqZkypcI6+rFHTuwn6vaM6r+5guRkLPi4piEsW7xekcJOEffVWwledI2q
+ vlag==
+X-Gm-Message-State: AOAM5322eJAjlAiu6XatcAOJZyidl3qQ45+9RcetvDRjAWPYxKjNtLWb
+ 9Ta8i6sDZF4vElYAwM49dcBPTr0Rp929dfmGK64oFi35lmnZSzkIrYUGDK14bl1Mut8znISGAS2
+ 0R+nf6zxG1h//M7I=
+X-Received: by 2002:a7b:c11a:: with SMTP id w26mr17631290wmi.78.1604312750739; 
+ Mon, 02 Nov 2020 02:25:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwqdIrTYMHZpJpBEEXgRyuUY24Hsv9x8i58FP+Vu6e3gCJHk3wiDXtrox067dcoXRV869bxlg==
+X-Received: by 2002:a7b:c11a:: with SMTP id w26mr17631270wmi.78.1604312750564; 
+ Mon, 02 Nov 2020 02:25:50 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id l3sm17345839wmg.32.2020.11.02.02.25.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Nov 2020 02:25:49 -0800 (PST)
+Subject: Re: [PATCH] pc: comment stule fixup
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+References: <20201102100948.1101121-1-mst@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <10d203e1-33d9-22f4-2395-d83561922b8c@redhat.com>
+Date: Mon, 2 Nov 2020 11:25:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-To: =?UTF-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: [PATCH V3] hw/display/exynos4210_fimd: Fix potential NULL pointer
- dereference
-References: <5F9F8D88.9030102@huawei.com>
- <b2945df0-186e-e670-bdfc-34104d8ddf2c@redhat.com>
-In-Reply-To: <b2945df0-186e-e670-bdfc-34104d8ddf2c@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.187.138]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=alex.chen@huawei.com;
- helo=szxga06-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 05:10:42
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+In-Reply-To: <20201102100948.1101121-1-mst@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -74,44 +114,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU <qemu-devel@nongnu.org>, zhang.zhanghailiang@huawei.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In exynos4210_fimd_update(), the pointer 's' is dereferenced before
-checking it is valid, which may lead to NULL pointer dereference.
-So move the assignment to global_width after checking 's' is valid.
+On 11/2/20 11:09 AM, Michael S. Tsirkin wrote:
+> Fix up checkpatch comment style warnings.
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Alex Chen <alex.chen@huawei.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/display/exynos4210_fimd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Typo stule -> style in subject ;)
 
-diff --git a/hw/display/exynos4210_fimd.c b/hw/display/exynos4210_fimd.c
-index 4c16e1f5a0..34a960a976 100644
---- a/hw/display/exynos4210_fimd.c
-+++ b/hw/display/exynos4210_fimd.c
-@@ -1275,12 +1275,14 @@ static void exynos4210_fimd_update(void *opaque)
-     bool blend = false;
-     uint8_t *host_fb_addr;
-     bool is_dirty = false;
--    const int global_width = (s->vidtcon[2] & FIMD_VIDTCON2_SIZE_MASK) + 1;
-+    int global_width;
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  hw/i386/pc.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 416fb0e0f6..5872ae6095 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1150,9 +1150,9 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+>              exit(1);
+>          }
+>          /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
 
-     if (!s || !s->console || !s->enabled ||
-         surface_bits_per_pixel(qemu_console_surface(s->console)) == 0) {
-         return;
-     }
-+
-+    global_width = (s->vidtcon[2] & FIMD_VIDTCON2_SIZE_MASK) + 1;
-     exynos4210_update_resolution(s);
-     surface = qemu_console_surface(s->console);
+Since it needs a respin, maybe convert the 1st line too?
 
--- 
-2.19.1
+> -            * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
+> -            * IRQ8 and IRQ2.
+> -            */
+> +         * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
+> +         * IRQ8 and IRQ2.
+> +         */
+>          uint8_t compat = object_property_get_uint(OBJECT(hpet),
+>                  HPET_INTCAP, NULL);
+>          if (!compat) {
+> 
+
 
