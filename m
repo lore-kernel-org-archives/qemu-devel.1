@@ -2,44 +2,43 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E65C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 11:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE81EC00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 11:07:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1881720719
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 11:07:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1881720719
+	by mail.kernel.org (Postfix) with ESMTPS id 51FCE20719
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 11:07:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51FCE20719
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZXgC-0002zX-Uq
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 06:07:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38304)
+	id 1kZXgW-0003S5-7W
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 06:07:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38330)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <remi@remlab.net>)
- id 1kZXXl-0008QO-FJ; Mon, 02 Nov 2020 05:58:33 -0500
-Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:39566
+ id 1kZXXm-0008U2-OB; Mon, 02 Nov 2020 05:58:34 -0500
+Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:39574
  helo=ns207790.ip-94-23-215.eu)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <remi@remlab.net>)
- id 1kZXXj-0006mt-NI; Mon, 02 Nov 2020 05:58:33 -0500
+ id 1kZXXk-0006nD-4S; Mon, 02 Nov 2020 05:58:34 -0500
 Received: from basile.remlab.net (ip6-localhost [IPv6:::1])
- by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id B88756038D;
- Mon,  2 Nov 2020 11:58:04 +0100 (CET)
+ by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id BDAA5605D7;
+ Mon,  2 Nov 2020 11:58:05 +0100 (CET)
 From: remi.denis.courmont@huawei.com
 To: qemu-arm@nongnu.org
-Subject: [PATCH 10/14] target/arm: do S1_ptw_translate() before address space
- lookup
-Date: Mon,  2 Nov 2020 12:57:58 +0200
-Message-Id: <20201102105802.39332-10-remi.denis.courmont@huawei.com>
+Subject: [PATCH 14/14] target/arm: enable Secure EL2 in max CPU
+Date: Mon,  2 Nov 2020 12:58:02 +0200
+Message-Id: <20201102105802.39332-14-remi.denis.courmont@huawei.com>
 X-Mailer: git-send-email 2.29.1
 In-Reply-To: <2172054.ElGaqSPkdT@basile.remlab.net>
 References: <2172054.ElGaqSPkdT@basile.remlab.net>
@@ -75,60 +74,23 @@ Sender: "Qemu-devel"
 
 From: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
 
-In the secure stage 2 translation regime, the VSTCR.SW and VTCR.NSW
-bits can invert the secure flag for pagetable walks. This patchset
-allows S1_ptw_translate() to change the non-secure bit.
-
 Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
 ---
- target/arm/helper.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ target/arm/cpu64.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 4c86e4f57c..7c70460e65 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10403,7 +10403,7 @@ static bool get_level1_table_address(CPUARMState *env, ARMMMUIdx mmu_idx,
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 649213082f..8c3749268e 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -641,6 +641,7 @@ static void aarch64_max_initfn(Object *obj)
+         t = FIELD_DP64(t, ID_AA64PFR0, SVE, 1);
+         t = FIELD_DP64(t, ID_AA64PFR0, FP, 1);
+         t = FIELD_DP64(t, ID_AA64PFR0, ADVSIMD, 1);
++        t = FIELD_DP64(t, ID_AA64PFR0, SEL2, 1);
+         cpu->isar.id_aa64pfr0 = t;
  
- /* Translate a S1 pagetable walk through S2 if needed.  */
- static hwaddr S1_ptw_translate(CPUARMState *env, ARMMMUIdx mmu_idx,
--                               hwaddr addr, MemTxAttrs txattrs,
-+                               hwaddr addr, bool *is_secure,
-                                ARMMMUFaultInfo *fi)
- {
-     ARMMMUIdx s2_mmu_idx;
-@@ -10415,6 +10415,9 @@ static hwaddr S1_ptw_translate(CPUARMState *env, ARMMMUIdx mmu_idx,
-         int s2prot;
-         int ret;
-         ARMCacheAttrs cacheattrs = {};
-+        MemTxAttrs txattrs = {};
-+
-+        assert(!*is_secure); /* TODO: S-EL2 */
- 
-         ret = get_phys_addr_lpae(env, addr, MMU_DATA_LOAD, s2_mmu_idx, false,
-                                  &s2pa, &txattrs, &s2prot, &s2size, fi,
-@@ -10453,9 +10456,9 @@ static uint32_t arm_ldl_ptw(CPUState *cs, hwaddr addr, bool is_secure,
-     AddressSpace *as;
-     uint32_t data;
- 
-+    addr = S1_ptw_translate(env, mmu_idx, addr, &is_secure, fi);
-     attrs.secure = is_secure;
-     as = arm_addressspace(cs, attrs);
--    addr = S1_ptw_translate(env, mmu_idx, addr, attrs, fi);
-     if (fi->s1ptw) {
-         return 0;
-     }
-@@ -10482,9 +10485,9 @@ static uint64_t arm_ldq_ptw(CPUState *cs, hwaddr addr, bool is_secure,
-     AddressSpace *as;
-     uint64_t data;
- 
-+    addr = S1_ptw_translate(env, mmu_idx, addr, &is_secure, fi);
-     attrs.secure = is_secure;
-     as = arm_addressspace(cs, attrs);
--    addr = S1_ptw_translate(env, mmu_idx, addr, attrs, fi);
-     if (fi->s1ptw) {
-         return 0;
-     }
+         t = cpu->isar.id_aa64pfr1;
 -- 
 2.29.1
 
