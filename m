@@ -2,96 +2,106 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62DA8C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6ED3C388F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:17:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB0C720706
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:17:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4074820706
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:17:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aAafESDm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB0C720706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJcyFPuF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4074820706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZWtm-0003GF-Mp
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:17:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55458)
+	id 1kZWtr-0003Ne-7M
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:17:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kZWqK-0007wy-PQ
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:13:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50727)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kZWqI-0007Bg-J6
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:13:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604312017;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=SI3A595rFtt89mmUBUWjdERuYDfJ0azevqLTwoMfPBA=;
- b=aAafESDmNpHgxOhe9VV1/fqXt5j/txwRS8jCRqGf5/nSpo7C6NQ6siubn3BQXivKvkxi+4
- 4lpwfqxit/mjKPE6vyTSMtm1fIJ8TThfe+TlnGITKGb1U7UkcFMuAyCIgLvIcB9Cx+jPb5
- BakZcc2oA7zSeRVQROdHDFnvM5e0kgo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-bA1IXi64MqGKduthheXzAg-1; Mon, 02 Nov 2020 05:13:34 -0500
-X-MC-Unique: bA1IXi64MqGKduthheXzAg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE0CE6415C;
- Mon,  2 Nov 2020 10:13:31 +0000 (UTC)
-Received: from localhost (ovpn-114-205.ams2.redhat.com [10.36.114.205])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0CE0D6EF40;
- Mon,  2 Nov 2020 10:13:09 +0000 (UTC)
-Date: Mon, 2 Nov 2020 10:13:08 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: Out-of-Process Device Emulation session at KVM Forum 2020
-Message-ID: <20201102101308.GA42093@stefanha-x1.localdomain>
-References: <b85405de-d525-bf59-826c-737fa7bbdfef@redhat.com>
- <20201029094603.15382476@w520.home>
- <d4f7df42-7b02-6505-c2c7-245bf813b513@redhat.com>
- <20201029210407.33d6f008@x1.home>
- <CAJSP0QVto+xFEnWv-aj=-0mZ72SzfeAvg4q0RCoLGK-N7C-WEw@mail.gmail.com>
- <04179584-3324-994e-d793-04be18d2dab2@redhat.com>
- <CAJSP0QXQmFgtSsJL1B3eMUr8teQc3cvvEFvr7LvnFkJPcE3ZpA@mail.gmail.com>
- <95432b0c-919f-3868-b3f5-fc45a1eef721@redhat.com>
- <CAJSP0QX_=dbDB2k7H-6D19ns1_HuM2P5ZMtUrFN9H7WU8aDXCg@mail.gmail.com>
- <1cf6b664-63cc-7b57-0a2c-4d4f979d4950@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kZWdO-0007nL-Uw
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:00:19 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43171)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kZWdK-0002C8-Qj
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 05:00:16 -0500
+Received: by mail-wr1-x441.google.com with SMTP id g12so13788687wrp.10
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 02:00:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=VXcdbHryCKfOmvF7bPo+U2fnt8UIY92DQGOuPw5QX3E=;
+ b=NJcyFPuF1K8skzHuVL3dPxPgSkaDZk+Jw/IrqEwJeY6aVU2lO6Y8/tP8XEishTM8m3
+ QqXY45LRVVc4N/J7gsfCY8Kmp9Zi0JJaevnNAA4cDncD+YOW1Z1klPbmyQ8kxogAxtPj
+ kzJRGqc6e1ogPcpitD4G8RQ+3u7A3Vl5Ogpy/KsEV9Wk/XWXbG04I7GFnq5gbeEYwbAG
+ Cvk1sUfutULb1StUApqUVgkjSzWASPpqhgsi7MaZIjbvUJLQfBFbTLFyf/QQpgPBf9q0
+ GLvydCjlZ5g4dgjgjE9xcsCWxpMHFe1NDD8I4S9beci50yLsFpTtAIb9SLRrdR9nLx/5
+ ARHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:from:to:cc:references:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=VXcdbHryCKfOmvF7bPo+U2fnt8UIY92DQGOuPw5QX3E=;
+ b=UU2Rh6pJurLkfkTywb/paE/9nVHtAXEH+gRTw6TSUkGJLMUN1KU7Zvcxozlt41nBjX
+ ioa5AunGJf22AawVdveMGw3r/BGZvLB4gnFyRQNq9vXFwXJ2EoKKhJfbwJBOn/ASj9z1
+ OVWqPaHSsIDIT79kY+Fi+JRnEAzoIWC4xx1bRjX9nrUFRk3CfN9ySLxvW/LdnVXmhPJX
+ WCKKWhf2Pz63Pb3VOA0Cnccn3NBbzdHDUwBgiLiEprRsEF4i2Wm0bwtDtxU4HuYEDdEQ
+ XWkqoVEER9sYDlUlWkZeHByU3JwSczHBUIDBOy30XuGr5r2lRKPOmsDlORdhOGe2NoxQ
+ nR+g==
+X-Gm-Message-State: AOAM533NOQp8YD93Ttw9VE3NKnYMqGbjnjGlF89Q0xP75mNGsM95WuY2
+ Tvw12oUl9SaiHvHfiC2EREw=
+X-Google-Smtp-Source: ABdhPJwmxNQ1136QYkc9PA3muYgnR4p2qL5tLzKXL3lm576ULSXTsbWX7IBpIKH9M8f/1LW+Ilc4Kg==
+X-Received: by 2002:adf:ec50:: with SMTP id w16mr19023608wrn.265.1604311211088; 
+ Mon, 02 Nov 2020 02:00:11 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id b63sm15649221wme.9.2020.11.02.02.00.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Nov 2020 02:00:10 -0800 (PST)
+Subject: target/mips: Deprecate nanoMIPS ISA?
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Matthew Fortune <matthew.fortune@mips.com>,
+ Paul Burton <paulburton@kernel.org>,
+ Stefan Markovic <Stefan.Markovic@mips.com>,
+ Robert Suchanek <Robert.Suchanek@mips.com>
+References: <CA+Lzsy=o9yshAAAacuTwcs3Hfr4MfWiX-SiUf5A2Fds3vGOrAQ@mail.gmail.com>
+ <CAFEAcA9ap=c=1XZ6wpphiE=FYtCU+vdNCX8THW-m-hUp_XyGmg@mail.gmail.com>
+ <b384912c-0e62-604d-df0b-b5181c2e7f3d@linaro.org>
+ <05afa227-3db0-4b11-d541-7fce7139729d@amsat.org>
+Message-ID: <38441531-1509-724f-4643-2ff2db253e3f@amsat.org>
+Date: Mon, 2 Nov 2020 11:00:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <1cf6b664-63cc-7b57-0a2c-4d4f979d4950@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="FL5UXtIhxfXey3p5"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <05afa227-3db0-4b11-d541-7fce7139729d@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,226 +114,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- "mst@redhat.com" <mtsirkin@redhat.com>,
- Janosch Frank <frankja@linux.vnet.ibm.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Kirti Wankhede <kwankhede@nvidia.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Yan Vugenfirer <yan@daynix.com>, Jag Raman <jag.raman@oracle.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Anup Patel <anup@brainfault.org>,
- Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
- Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
- Roman Kagan <rkagan@virtuozzo.com>, Felipe Franciosi <felipe@nutanix.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Jens Freimann <jfreimann@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Kashyap Chamarthy <kchamart@redhat.com>,
- Darren Kenny <darren.kenny@oracle.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Liran Alon <liran.alon@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
- Halil Pasic <pasic@linux.vnet.ibm.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>, fam <fam@euphon.net>
+Cc: James Hogan <jhogan@kernel.org>,
+ Marcin Nowakowski <marcin.nowakowski@fungible.com>,
+ zou xu <iwatchnima@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---FL5UXtIhxfXey3p5
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Richard,
 
-On Mon, Nov 02, 2020 at 10:51:18AM +0800, Jason Wang wrote:
->=20
-> On 2020/10/30 =E4=B8=8B=E5=8D=889:15, Stefan Hajnoczi wrote:
-> > On Fri, Oct 30, 2020 at 12:08 PM Jason Wang <jasowang@redhat.com> wrote=
-:
-> > > On 2020/10/30 =E4=B8=8B=E5=8D=887:13, Stefan Hajnoczi wrote:
-> > > > On Fri, Oct 30, 2020 at 9:46 AM Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > > > On 2020/10/30 =E4=B8=8B=E5=8D=882:21, Stefan Hajnoczi wrote:
-> > > > > > On Fri, Oct 30, 2020 at 3:04 AM Alex Williamson
-> > > > > > <alex.williamson@redhat.com> wrote:
-> > > > > > > It's great to revisit ideas, but proclaiming a uAPI is bad so=
-lely
-> > > > > > > because the data transfer is opaque, without defining why tha=
-t's bad,
-> > > > > > > evaluating the feasibility and implementation of defining a w=
-ell
-> > > > > > > specified data format rather than protocol, including cross-v=
-endor
-> > > > > > > support, or proposing any sort of alternative is not so helpf=
-ul imo.
-> > > > > > The migration approaches in VFIO and vDPA/vhost were designed f=
-or
-> > > > > > different requirements and I think this is why there are differ=
-ent
-> > > > > > perspectives on this. Here is a comparison and how VFIO could b=
-e
-> > > > > > extended in the future. I see 3 levels of device state compatib=
-ility:
-> > > > > >=20
-> > > > > > 1. The device cannot save/load state blobs, instead userspace f=
-etches
-> > > > > > and restores specific values of the device's runtime state (e.g=
-. last
-> > > > > > processed ring index). This is the vhost approach.
-> > > > > >=20
-> > > > > > 2. The device can save/load state in a standard format. This is
-> > > > > > similar to #1 except that there is a single read/write blob int=
-erface
-> > > > > > instead of fine-grained get_FOO()/set_FOO() interfaces. This ap=
-proach
-> > > > > > pushes the migration state parsing into the device so that user=
-space
-> > > > > > doesn't need knowledge of every device type. With this approach=
- it is
-> > > > > > possible for a device from vendor A to migrate to a device from=
- vendor
-> > > > > > B, as long as they both implement the same standard migration f=
-ormat.
-> > > > > > The limitation of this approach is that vendor-specific state c=
-annot
-> > > > > > be transferred.
-> > > > > >=20
-> > > > > > 3. The device can save/load opaque blobs. This is the initial V=
-FIO
-> > > > > > approach.
-> > > > > I still don't get why it must be opaque.
-> > > > If the device state format needs to be in the VMM then each device
-> > > > needs explicit enablement in each VMM (QEMU, cloud-hypervisor, etc)=
-.
-> > > >=20
-> > > > Let's invert the question: why does the VMM need to understand the
-> > > > device state of a _passthrough_ device?
-> > >=20
-> > > For better manageability, compatibility and debug-ability. If we depe=
-nds
-> > > on a opaque structure, do we encourage device to implement its own
-> > > migration protocol? It would be very challenge.
-> > >=20
-> > > For VFIO in the kernel, I suspect a uAPI that may result a opaque dat=
-a
-> > > to be read or wrote from guest violates the Linux uAPI principle. It
-> > > will be very hard to maintain uABI or even impossible. It looks to me
-> > > VFIO is the first subsystem that is trying to do this.
-> > I think our concepts of uAPI are different. The uAPI of read(2) and
-> > write(2) does not define the structure of the data buffers. VFIO
-> > device regions are exactly the same, the structure of the data is not
-> > defined by the kernel uAPI.
->=20
->=20
-> I think we're talking about different things. It's not about the data
-> structure, it's about whether to data that reads from kernel can be
-> understood by userspace.
->=20
->=20
-> >=20
-> > Maybe microcode and firmware loading is an example we agree on?
->=20
->=20
-> I think not. They are bytecodes that have
->=20
-> 1) strict ABI definitions
-> 2) understood by userspace
+Cc'ing developers who introduced nanoMIPS.
 
-No, they can be proprietary formats that neither the Linux kernel nor
-userspace can parse. For example, look at linux-firmware
-(https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.gi=
-t/about/)
-it's just a collection of binary blobs. The format is not necessarily
-public. The only restriction on that repo is that the binary blob must
-be redistributable and users must be allowed to run them (i.e.
-proprietary licenses can be used).
+On 9/11/20 7:23 PM, Philippe Mathieu-Daudé wrote:
+> On 9/11/20 6:55 PM, Richard Henderson wrote:
+>> On 9/11/20 3:41 AM, Peter Maydell wrote:
+>>>> +    /* Detect store by reading the instruction at the program counter. */
+>>>> +    uint32_t insn = *(uint32_t *)pc;
+>>>> +    switch(insn>>29) {
+>>>> +    case 0x5:
+>>>> +        switch((insn>>26) & 0x7) {
+>>>
+>>> Here we mask to get a 3-bit field...
+>>>
+>>>> +        case 0x0: /* SB */
+>>>> +        case 0x1: /* SH */
+>>>> +        case 0x2: /* SWL */
+>>>> +        case 0x3: /* SW */
+>>>> +        case 0x4: /* SDL */
+>>>> +        case 0x5: /* SDR */
+>>>> +        case 0x6: /* SWR */
+>>>> +        case 0x7: /* CACHE */
+>>>> +            is_write = 1;
+>>>
+>>> ...but here all 8 cases are handled identically.
+>>> Is there a typo/logic error here, or should this
+>>> really just be
+>>>
+>>>     case 0x5:
+>>>         /* SB, SH, SWL, SW, SDL, SDR, SWR, CACHE */
+>>>         is_write = 1;
+>>>
+>>> ?
+>>>
+>>> Is CACHE really a write insn ?
+>>
+>> Indeed not.  However, it's also illegal for user-mode, so we cannot arrive here
+>> with SIGSEGV by executing it.  So we could ignore that case and not decode this
+>> field.
+>>
+>>>> +    case 0x7:
+>>>> +        switch((insn>>26) & 0x7) {
+>>>> +        case 0x0: /* SC */
+>>>> +        case 0x1: /* SWC1 */
+>>>> +        case 0x2: /* SWC2 */
+>>>> +        case 0x4: /* SCD */
+>>>> +        case 0x5: /* SDC1 */
+>>>> +        case 0x6: /* SDC2 */
+>>>> +        case 0x7: /* SD */
+>>>> +            is_write = 1;
+>>
+>> Well, the unconditional check of SWC2/SDC2 is not quite right. MIPS64R6 removes
+>> them and replaces them with some compact branches.  That's easy enough to
+>> include here, using
+>>
+>> #if !defined(__mips_isa_rev) || __mips_isa_rev < 6
+>>     case 2: /* SWC2 */
+>>     case 6: /* SDC2 */
+>> #endif
+>>
+>> We should also add
+>>
+>> #if defined(__mips16) || defined(__mips_micromips)
+>> # error "Unsupported encoding"
+>> #endif
+>>
+>> I see no upstream compiler support for nanomips at all, so there's no point in
+>> checking for that encoding.  (Indeed, I wonder at the code in target/mips...
+>> how could it be tested?)
+> 
+> I took the information from commit f7d257cb4a1
+> ("qemu-doc: Add nanoMIPS ISA information") to add
+> the tests in  f375ad6a0d6 ("BootLinuxConsoleTest:
+> Test nanoMIPS kernels on the I7200 CPU"), but I
+> haven't tried to recompile these files myself.
 
-Or look at other passthrough device interfaces like /dev/i2c or libusb.
-They expose data to userspace without requiring a defined format. It's
-the same as VFIO.
+I checked the various nanoMIPS announcements:
+GCC:   https://gcc.gnu.org/legacy-ml/gcc/2018-05/msg00012.html
+Linux: https://lwn.net/Articles/753605/
+QEMU:  https://www.mail-archive.com/qemu-devel@nongnu.org/msg530721.html
 
-In addition, look at kernel uAPIs where userspace acts simply as a data
-transport for opaque data (e.g. where a userspace helper facilitates
-communication but has no visibility of the data). I imagine that memory
-encryption relies on this because the host kernel and userspace do not
-have access to encrypted memory or associated state - but they need to
-help migrate them to other hosts.
+Unfortunately www.mips.com doesn't work anymore.
 
-I hope these examples show that such APIs don't pose a problem for the
-Linux uAPI and are already in use. VFIO device state isn't doing
-anything new here.
+From this Wayback machine link:
+https://web.archive.org/web/20180904044530/https://www.mips.com/develop/tools/compilers/
 
-> > > > > >     A device from vendor A cannot migrate to a device from
-> > > > > > vendor B because the format is incompatible. This approach work=
-s well
-> > > > > > when devices have unique guest-visible hardware interfaces so t=
-he
-> > > > > > guest wouldn't be able to handle migrating a device from vendor=
- A to a
-> > > > > > device from vendor B anyway.
-> > > > > For VFIO I guess cross vendor live migration can't succeed unless=
- we do
-> > > > > some cheats in device/vendor id.
-> > > > Yes. I haven't looked into the details of PCI (Sub-)Device/Vendor I=
-Ds
-> > > > and how to best enable migration but I hope that can be solved. The
-> > > > simplest approach is to override the IDs and make them part of the
-> > > > guest configuration.
-> > >=20
-> > > That would be very tricky (or requires whitelist). E.g the opaque of =
-the
-> > > src may match the opaque of the dst by chance.
-> > Luckily identifying things based on magic constants has been solved
-> > many times in the past.
-> >=20
-> > A central identifier registry prevents all collisions but is a pain to
-> > manage. Or use a 128-bit UUID and self-allocate the identifier with an
-> > extremely low chance of collision:
-> > https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions
->=20
->=20
-> I may miss something. I think we're talking about cross vendor live
-> migration.
->=20
-> Would you want src and dest have same UUID or not?
->=20
-> If they have different UUIDs, how could we know we can live migrate betwe=
-en
-> them.
->=20
-> If they have the same UUID, what's the rule of forcing the the vendors to
-> choose same UUID (a spec)?
+I found this working web (the toolchain is a later release than the
+one referenced in the announcement mails):
+http://codescape.mips.com/components/toolchain/nanomips/2018.04-02/downloads.html
 
-I will send a separate email that describes how VFIO live migration can
-work in more detail. I think it's possible to do it with existing ioctl
-interface that Kirti has proposed and still prevent the risk of
-incorrectly interpreting data that you have pointed out.
+The toolchain page mention LLVM but simply links http://llvm.org/
+where I couldn't find any reference on nanoMIPS.
 
-The document that I'm sending will allow us to discuss in more detail
-and make the approach clearer.
+The only reference in the GCC mailing list, is the nanoMIPS
+announcement: https://gcc.gnu.org/pipermail/gcc/2018-May.txt
 
-Stefan
 
---FL5UXtIhxfXey3p5
-Content-Type: application/pgp-signature; name="signature.asc"
+It looks safe for QEMU to declare nanoMIPS deprecated (it has no
+maintainer), to give time to interested parties to finish upstreaming
+process and step in to maintain it.
+Thoughts?
 
------BEGIN PGP SIGNATURE-----
+Regards,
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+f27QACgkQnKSrs4Gr
-c8jjfgf/UohNZPHFNkmhUJsfWnrrnVf5pm9zmQRYiZomUyzT7Tn0GoFMjzu8Y7Gy
-EEbrvg6alOmdPbR1u7ktcu4+cwnPB+bN97Gi49VSgOeIJSRyORFVtyxb+C0Y0Jm1
-5BgrAnDiL7nFgv6WtYecQnI583VzZq2K1MbGJ9kKWiXpczW8xnf8fJuPUO8qWJip
-yKkjQH6T3YIlD18y8mzGiBLr79fV8iQYu9hIqiU4h4nmSmAcddgVin2yQS7kUVnj
-jAo6l3d59mErHcpT16uZK0y+p5DL176eQp/OhAbWOnuzlvpqhPYaASHQlfZExMyN
-boTAyMCsWSvve6J+glhUxxH7bi2oFw==
-=PbvA
------END PGP SIGNATURE-----
-
---FL5UXtIhxfXey3p5--
-
+Phil.
 
