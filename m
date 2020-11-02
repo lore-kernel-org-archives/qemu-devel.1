@@ -2,82 +2,68 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA040C4742C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 14:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E652C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 14:21:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 393652222B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 14:18:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6572720679
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 14:21:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="KFWc1GOb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 393652222B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="Qv3ZoYfl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6572720679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZaf7-0008Lv-3R
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 09:18:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36392)
+	id 1kZahw-0001qz-83
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 09:21:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kZaeH-0007iJ-0B; Mon, 02 Nov 2020 09:17:29 -0500
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:59700)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kZagf-0000tw-Fi
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 09:19:57 -0500
+Received: from lizzy.crudebyte.com ([91.194.90.13]:38927)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>)
- id 1kZaeE-00049R-7A; Mon, 02 Nov 2020 09:17:28 -0500
-Received: from localhost (sekoia-pc.home.lmichel.fr [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPSA id DBD91C60011;
- Mon,  2 Nov 2020 14:17:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
- t=1604326642;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qp0haXp9skMBrDWMipkfGnc7ZWhDc+b1zvHHdD+csw8=;
- b=KFWc1GObrJSp9skTMAmV4nZRO88+hgm6JtDJy3haaCR/ChlOT/lT8Qb/3aad7W1edJnfw2
- jtL8++jmqRBecpWfYqEG5aMPG3DlzhFo4F9r1fDVwaC20ECb/tdS3GU8CSiTQnJKaR8hTa
- WdjhHoL69dA66MsyzofvH/Fp9ZDLBj2RWGZoR8rwC0QQmG/PGa5sstRcb5/nQwmZpq4phN
- 9ff41TlQdrCG3FocUCvkfJ0DA8O91BAgzZRlZ6bF6igytcpKEHE0afJcdZBYw6fxcQUHyc
- coUt/IdwlURl2mPS0vkrYIRZalCaJe9wJwXakEli1vv/Fojx8uUkMwQJZ5k3KA==
-Date: Mon, 2 Nov 2020 15:18:36 +0100
-From: Luc Michel <luc@lmichel.fr>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] hw/intc/arm_gicv3_cpuif: Make GIC maintenance interrupts
- work
-Message-ID: <20201102141836.6qla5tcp5afqb63e@sekoia-pc.home.lmichel.fr>
-References: <20201009153904.28529-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kZagd-0004xE-CR
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 09:19:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=srEyC4MpaEK2CCCVGOHDkm7Nnb7hoa0VBuufFMu9xpE=; b=Qv3ZoYflj8G6ip2dc+SplsBuUL
+ q0Ffpz1yn7cNYq1Pu8/ELk1OfW3Rm2bx+6QyZmZacqcSJYIDWaNTYUu04Y1L2/pwLG5R2fCYWlevs
+ BGI6kcaP9hl6Mi1n4cmXmatYMrnDl7Kb3iRdzGPLyuW8pY4Hhj7fjRqNmttUFjZ/G9cnvqHuK5EHr
+ Q43YICLJUHkMXg70DKVTlmNHWGSgI49iSdYz27JU8ZEeLuyWVJ1ASBj+C4D9J5mTjN2bTWfv3XGxf
+ gA5wgbhEhMqZjMXR1StVGk17R+9iKrDXF73GJ3P14Kuv23W66cxsNYzm96ndmhQMaYtt+tt2r7jtx
+ VVUNxf4Q==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <philmd@redhat.com>,
+ Peter Xu <peterx@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
+Subject: Re: recent flakiness (intermittent hangs) of migration-test
+Date: Mon, 02 Nov 2020 15:19:50 +0100
+Message-ID: <2235778.NHLJzTTKgb@silver>
+In-Reply-To: <f3a379ca-5c7b-0c19-b0ea-6354c460eff3@redhat.com>
+References: <CAFEAcA-EsEZWDbUSy6_AXym5e-wP_B4buZYG0swF946ue41WKg@mail.gmail.com>
+ <20201030135350.GA588069@xz-x1>
+ <f3a379ca-5c7b-0c19-b0ea-6354c460eff3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201009153904.28529-1-peter.maydell@linaro.org>
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
- s=pharaoh; t=1604326643;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qp0haXp9skMBrDWMipkfGnc7ZWhDc+b1zvHHdD+csw8=;
- b=bJnVuMT30izud7rIqG3qoY+C16RkPq0VhdzafPIFw0oajghMxQVAeSvG7RzeR2BhHHfLQV
- JGZf1QnCjcE6j3vBYZJLJrsbF//7C+bRzLznK9eHjtGuMWGmjmiU4ffEzyP3ooHFWXWT7b
- gtlz5QgBja+vb3sx7ebx7QUkLX+JQqddS1Sba9bBqe7EXWbeQaANGZBn0liqOiyXDFpeWy
- DnFMHgQh0skbwJ66g44AQexczyKA+nBws7no+8jzd9deog0RPEw82fxaLvtmfsXR5mJ6W+
- KWO7IcMnHv6re2vrfvfSoy5OmNtbrKDE9K8/VNDDAt2XJoZ33Ce42ugL1hek7A==
-ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1604326643; a=rsa-sha256; cv=none;
- b=ViaW+96wZWcFJYbSiWYXaHaiJJpaJS0jYV0U5vSaJ9Opehl4/lx8jLYB4F2x34dxf/MncrAKRpF5ygsVOBTQTsclo1DMXm9BuOsO2v4IEJn0RnbNVCRtVmqeYCEBp9CTj0lFvqKZggeZWotitq7zpJRYVMA4IU6dBXRHc5tkJY8Rh50P+gkz750z9/ydKLdg8UxjH/NhBRA2xmkMTOQahtUdTuNB2eQ7LTzRfbW09Xh7qZAG9gNdkWyA44RnGrOdUakXQnEKcio9bE1Ax/8CJcXLAX+RywhnDRDzzRnzHaU6Q5Vy7GkcqdWgti4Llrwo+XbB0c3MLmuNIBzTBlufcA==
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=sekoia smtp.mailfrom=luc@lmichel.fr
-Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
- helo=pharaoh.lmichel.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 08:49:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 09:19:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -96,95 +82,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jose Martins <josemartins90@gmail.com>, Marc Zyngier <maz@kernel.org>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16:39 Fri 09 Oct     , Peter Maydell wrote:
-> In gicv3_init_cpuif() we copy the ARMCPU gicv3_maintenance_interrupt
-> into the GICv3CPUState struct's maintenance_irq field.  This will
-> only work if the board happens to have already wired up the CPU
-> maintenance IRQ before the GIC was realized.  Unfortunately this is
-> not the case for the 'virt' board, and so the value that gets copied
-> is NULL (since a qemu_irq is really a pointer to an IRQState struct
-> under the hood).  The effect is that the CPU interface code never
-> actually raises the maintenance interrupt line.
-> 
-> Instead, since the GICv3CPUState has a pointer to the CPUState, make
-> the dereference at the point where we want to raise the interrupt, to
-> avoid an implicit requirement on board code to wire things up in a
-> particular order.
-> 
-> Reported-by: Jose Martins <josemartins90@gmail.com>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Montag, 2. November 2020 14:55:04 CET Philippe Mathieu-Daud=E9 wrote:
+> On 10/30/20 2:53 PM, Peter Xu wrote:
+> > On Fri, Oct 30, 2020 at 11:48:28AM +0000, Peter Maydell wrote:
+> >>> Peter, is it possible that you enable QTEST_LOG=3D1 in your future
+> >>> migration-test testcase and try to capture the stderr?  With the help
+> >>> of commit a47295014d ("migration-test: Only hide error if !QTEST_LOG",
+> >>> 2020-10-26), the test should be able to dump quite some helpful
+> >>> information to further identify the issue.>>=20
+> >> Here's the result of running just the migration test with
+> >> QTEST_LOG=3D1:
+> >> https://people.linaro.org/~peter.maydell/migration.log
+> >> It's 300MB because when the test hangs one of the processes
+> >> is apparently in a polling state and continues to send status
+> >> queries.
+> >>=20
+> >> My impression is that the test is OK on an unloaded machine but
+> >> more likely to fail if the box is doing other things at the
+> >> same time. Alternatively it might be a 'parallel make check' bug.
+> >=20
+> > Thanks for collecting that, Peter.
+> >=20
+> > I'm copy-pasting the important information out here (with some moves and
+> > indents to make things even clearer):
+> >=20
+> > ...
+> > {"execute": "migrate-recover", "arguments": {"uri":
+> > "unix:/tmp/migration-test-nGzu4q/migsocket-recover"}, "id":
+> > "recover-cmd"} {"timestamp": {"seconds": 1604056292, "microseconds":
+> > 177955}, "event": "MIGRATION", "data": {"status": "setup"}} {"return":
+> > {}, "id": "recover-cmd"}
+> > {"execute": "query-migrate"}
+> > ...
+> > {"execute": "migrate", "arguments": {"resume": true, "uri":
+> > "unix:/tmp/migration-test-nGzu4q/migsocket-recover"}} qemu-system-x86_6=
+4:
+> > ram_save_queue_pages no previous block
+> > qemu-system-x86_64: Detected IO failure for postcopy. Migration paused.
+> > {"return": {}}
+> > {"execute": "migrate-set-parameters", "arguments":
+> > {"max-postcopy-bandwidth": 0}} ...
+> >=20
+> > The problem is probably an misuse on last_rb on destination node.  When
+> > looking at it, I also found a race.  So I guess I should fix both...
+> >=20
+> > Peter, would it be easy to try apply the two patches I attached to see
+> > whether the test hang would be resolved?  Dave, feel free to give early
+> > comments too on the two fixes before I post them on the list.
+>=20
+> Per this comment:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg756235.html
+> You could add:
+> Tested-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 
-Reviewed-by: Luc Michel <luc@lmichel.fr>
+Yes, you can do that.
 
-> ---
-> 
-> QEMU's implementation here is a bit odd because we've put all the
-> logic into the "GIC" device where in real hardware it's split between
-> a GIC device and the CPU interface part in the CPU.  If we had
-> arranged it in that way then we wouldn't have this odd bit of code
-> where the GIC device needs to raise an IRQ line that belongs to the
-> CPU.
-> 
-> Not sure why we've never noticed this bug previously with KVM as a
-> guest, you'd think we'd have spotted "maintenance interrupts just
-> don't work"...
-> ---
->  include/hw/intc/arm_gicv3_common.h | 1 -
->  hw/intc/arm_gicv3_cpuif.c          | 5 ++---
->  2 files changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-> index 0331b0ffdb8..91491a2f664 100644
-> --- a/include/hw/intc/arm_gicv3_common.h
-> +++ b/include/hw/intc/arm_gicv3_common.h
-> @@ -153,7 +153,6 @@ struct GICv3CPUState {
->      qemu_irq parent_fiq;
->      qemu_irq parent_virq;
->      qemu_irq parent_vfiq;
-> -    qemu_irq maintenance_irq;
->  
->      /* Redistributor */
->      uint32_t level;                  /* Current IRQ level */
-> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-> index 08e000e33c6..43ef1d7a840 100644
-> --- a/hw/intc/arm_gicv3_cpuif.c
-> +++ b/hw/intc/arm_gicv3_cpuif.c
-> @@ -399,6 +399,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
->      int irqlevel = 0;
->      int fiqlevel = 0;
->      int maintlevel = 0;
-> +    ARMCPU *cpu = ARM_CPU(cs->cpu);
->  
->      idx = hppvi_index(cs);
->      trace_gicv3_cpuif_virt_update(gicv3_redist_affid(cs), idx);
-> @@ -424,7 +425,7 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
->  
->      qemu_set_irq(cs->parent_vfiq, fiqlevel);
->      qemu_set_irq(cs->parent_virq, irqlevel);
-> -    qemu_set_irq(cs->maintenance_irq, maintlevel);
-> +    qemu_set_irq(cpu->gicv3_maintenance_interrupt, maintlevel);
->  }
->  
->  static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
-> @@ -2624,8 +2625,6 @@ void gicv3_init_cpuif(GICv3State *s)
->              && cpu->gic_num_lrs) {
->              int j;
->  
-> -            cs->maintenance_irq = cpu->gicv3_maintenance_interrupt;
-> -
->              cs->num_list_regs = cpu->gic_num_lrs;
->              cs->vpribits = cpu->gic_vpribits;
->              cs->vprebits = cpu->gic_vprebits;
-> -- 
-> 2.20.1
-> 
-> 
+We've extensively tested with Peter Xu's patches in the last couple days on=
+=20
+various systems and haven't encountered any further lockup since then.
 
--- 
+Best regards,
+Christian Schoenebeck
+
+
 
