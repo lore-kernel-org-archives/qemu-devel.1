@@ -2,68 +2,71 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF22C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 08:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B96C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 08:18:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21D2822272
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 08:18:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85AF3206B7
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 08:18:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KtHbpi/a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21D2822272
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hns2Anl0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85AF3206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZV2R-0007h5-31
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 03:18:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54646)
+	id 1kZV2V-0007qK-Co
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 03:18:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54676)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZV0S-0006P2-Hp
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 03:16:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26291)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZV0V-0006V1-PJ
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 03:16:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44310)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZV0P-0005fq-Ny
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 03:15:59 -0500
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZV0U-0005kR-1X
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 03:16:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604304955;
+ s=mimecast20190719; t=1604304960;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=EWmP5QDJjU4mKSiEC7MKhzhtOiXsXErvoKKBzEessRU=;
- b=KtHbpi/a6T92SuDmqvDX8HCj+tupf3FQDDbWL+kML5QPZOcdJdaRQiljoMmt3f+VM42LBA
- TvHLM3GBKbIgb4kbJgM4IheC+ZCScV5WU7zTCpqwIrSWpzdVnVCwf7O0C3MC4AIs59l40e
- rwbKPyF8SNekH7s+BVOGQ+ATFNWkQ0U=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rpMyzUcOPK6RVXohSIf6XEJEbeNM2FEsvATa+Qe26/o=;
+ b=hns2Anl0SSxViCg1kb5a7tcTqoUtwrTUP3+DKVN0LpS52wBJQZyjca98Rb/VIcsY8fjjYW
+ IrYOkHI9+Gk97itmupbbxqnhp5BSIn67GapTsqjP+ea5ArSgsvQHI6C/1mooqqIMOIoQtz
+ SjUkIsNUk6CMcjk1YY9n4IjUWfnIQcI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-zJZS1_FEMg-gqlmyF1gozQ-1; Mon, 02 Nov 2020 03:15:53 -0500
-X-MC-Unique: zJZS1_FEMg-gqlmyF1gozQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-354-0S-Z74O_Nam8cYI3g5R5hg-1; Mon, 02 Nov 2020 03:15:59 -0500
+X-MC-Unique: 0S-Z74O_Nam8cYI3g5R5hg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D20A1868401
- for <qemu-devel@nongnu.org>; Mon,  2 Nov 2020 08:15:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36A951018F81
+ for <qemu-devel@nongnu.org>; Mon,  2 Nov 2020 08:15:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
  [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7007C5DA60
- for <qemu-devel@nongnu.org>; Mon,  2 Nov 2020 08:15:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 73C57109F1AF;
+ Mon,  2 Nov 2020 08:15:52 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id DFE641132BD6; Mon,  2 Nov 2020 09:15:50 +0100 (CET)
+ id E1E7911329AB; Mon,  2 Nov 2020 09:15:50 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/2] qapi: Doc & MAINTAINERS tweaks
-Date: Mon,  2 Nov 2020 09:15:48 +0100
-Message-Id: <20201102081550.171061-1-armbru@redhat.com>
+Subject: [PATCH 1/2] MAINTAINERS: Add QAPI schema modules to their subsystems
+Date: Mon,  2 Nov 2020 09:15:49 +0100
+Message-Id: <20201102081550.171061-2-armbru@redhat.com>
+In-Reply-To: <20201102081550.171061-1-armbru@redhat.com>
+References: <20201102081550.171061-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -93,19 +96,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster (2):
-  MAINTAINERS: Add QAPI schema modules to their subsystems
-  qapi: Fix missing headers in QMP Reference Manual
+Add the relevant QAPI schema modules to section Audio, QMP, Tracing,
+Cryptography.
 
- qapi/audio.json | 4 ++++
- qapi/authz.json | 6 ++++--
- MAINTAINERS     | 6 ++++++
- 3 files changed, 14 insertions(+), 2 deletions(-)
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8c744a9bdf..b4b6b36542 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1907,6 +1907,7 @@ Rocker
+ M: Jiri Pirko <jiri@resnulli.us>
+ S: Maintained
+ F: hw/net/rocker/
++F: qapi/rocker.json
+ F: tests/rocker/
+ F: docs/specs/rocker.txt
+ 
+@@ -2109,6 +2110,7 @@ S: Maintained
+ F: audio/
+ F: hw/audio/
+ F: include/hw/audio/
++F: qapi/audio.json
+ F: tests/qtest/ac97-test.c
+ F: tests/qtest/es1370-test.c
+ F: tests/qtest/intel-hda-test.c
+@@ -2488,7 +2490,9 @@ F: monitor/monitor-internal.h
+ F: monitor/qmp*
+ F: monitor/misc.c
+ F: monitor/monitor.c
++F: qapi/control.json
+ F: qapi/error.json
++F: qapi/introspect.json
+ F: docs/devel/*qmp-*
+ F: docs/interop/*qmp-*
+ F: scripts/qmp/
+@@ -2549,6 +2553,7 @@ S: Maintained
+ F: trace/
+ F: trace-events
+ F: docs/qemu-option-trace.rst.inc
++F: qapi/trace.json
+ F: scripts/tracetool.py
+ F: scripts/tracetool/
+ F: scripts/qemu-trace-stap*
+@@ -2608,6 +2613,7 @@ M: Daniel P. Berrange <berrange@redhat.com>
+ S: Maintained
+ F: crypto/
+ F: include/crypto/
++F: qapi/crypto.json
+ F: tests/test-crypto-*
+ F: tests/benchmark-crypto-*
+ F: tests/crypto-tls-*
 -- 
 2.26.2
 
