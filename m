@@ -7,81 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5530BC00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1789CC388F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:26:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB1B2208B6
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B077B208B6
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:26:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fbs6Fscn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB1B2208B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hB+7cjHr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B077B208B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZcdR-0004hB-LJ
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 11:24:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41138)
+	id 1kZcf4-0005wx-MI
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 11:26:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kZcYo-0007c9-AU
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:19:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34857)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kZcYq-0007ev-Cn
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:20:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56273)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kZcYm-0007Yt-JV
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:19:57 -0500
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kZcYn-0007ZI-N0
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:20:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604333995;
+ s=mimecast20190719; t=1604333997;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/aWKbAAhu9frPZQrNWey5VyZKlxANhwMMHb0/A+kqlg=;
- b=Fbs6FscnQkMhG1qoJXZkL635se7BG3sOhW7oVq+vxvxMD1yOU/mQt9Ly39vpHCzdU7ICWK
- ZNrIuGqFSMQLVQBM28bZhnVhldILl9WAUVCbj7TUzOsNDf0tp/P8ekoon1l39LY0bSnBVr
- +WXnmXWBd998ieCbVu2c4eS6J542Pqk=
+ bh=np1wcj3Xrtf2RFaeSPyrqu5vbK7YYOVbRAU+EJELevE=;
+ b=hB+7cjHrN18eQGkdtm4egpN8isPqG2yX86EiN13QgmdAV6Dvmfta+vs27OQtgdkToS1vDC
+ gsMZGlmbRYFAcmh08zHg0C7+f8gvZ70/KGJWYo9LV5E3pYMfWKwR1hfiO5zEEFRUfebLxN
+ MFPje9sSHpGDyCSLt9Im4PvkuE9NGSY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-19WoXifrPwizNbeucR3UwQ-1; Mon, 02 Nov 2020 11:19:53 -0500
-X-MC-Unique: 19WoXifrPwizNbeucR3UwQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-321-mT3p98M8OEi-mp5nmZDtbA-1; Mon, 02 Nov 2020 11:19:52 -0500
+X-MC-Unique: mT3p98M8OEi-mp5nmZDtbA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2030880403C
- for <qemu-devel@nongnu.org>; Mon,  2 Nov 2020 16:19:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8A968030CE
+ for <qemu-devel@nongnu.org>; Mon,  2 Nov 2020 16:19:44 +0000 (UTC)
 Received: from localhost (unknown [10.40.194.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A29915C3E0;
- Mon,  2 Nov 2020 16:19:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1EEE55D9D2;
+ Mon,  2 Nov 2020 16:19:43 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 6/7] tests/acceptance/boot_linux: Accept SSH pubkey
-Date: Mon,  2 Nov 2020 17:18:58 +0100
-Message-Id: <20201102161859.156603-7-mreitz@redhat.com>
+Subject: [PATCH v3 4/7] virtiofsd: Add mount ID to the lo_inode key
+Date: Mon,  2 Nov 2020 17:18:56 +0100
+Message-Id: <20201102161859.156603-5-mreitz@redhat.com>
 In-Reply-To: <20201102161859.156603-1-mreitz@redhat.com>
 References: <20201102161859.156603-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 03:02:24
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- T_FILL_THIS_FORM_SHORT=0.01 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,64 +100,256 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let download_cloudinit() take an optional pubkey, which subclasses of
-BootLinux can pass through setUp().
+Using st_dev is not sufficient to uniquely identify a mount: You can
+mount the same device twice, but those are still separate trees, and
+e.g. by mounting something else inside one of them, they may differ.
 
+Using statx(), we can get a mount ID that uniquely identifies a mount.
+If that is available, add it to the lo_inode key.
+
+Most of this patch is taken from Miklos's mail here:
+https://marc.info/?l=fuse-devel&m=160062521827983
+(virtiofsd-use-mount-id.patch attachment)
+
+Suggested-by: Miklos Szeredi <mszeredi@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Willian Rampazzo <willianr@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/acceptance/boot_linux.py | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ tools/virtiofsd/passthrough_ll.c      | 95 ++++++++++++++++++++++++---
+ tools/virtiofsd/passthrough_seccomp.c |  1 +
+ 2 files changed, 86 insertions(+), 10 deletions(-)
 
-diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.py
-index c743e231f4..1da4a53d6a 100644
---- a/tests/acceptance/boot_linux.py
-+++ b/tests/acceptance/boot_linux.py
-@@ -57,7 +57,7 @@ class BootLinuxBase(Test):
-             self.cancel('Failed to download/prepare boot image')
-         return boot.path
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index a0beb986f3..34d107975f 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -94,6 +94,7 @@ struct lo_map {
+ struct lo_key {
+     ino_t ino;
+     dev_t dev;
++    uint64_t mnt_id;
+ };
  
--    def download_cloudinit(self):
-+    def download_cloudinit(self, ssh_pubkey=None):
-         self.log.info('Preparing cloudinit image')
-         try:
-             cloudinit_iso = os.path.join(self.workdir, 'cloudinit.iso')
-@@ -67,7 +67,8 @@ class BootLinuxBase(Test):
-                           password='password',
-                           # QEMU's hard coded usermode router address
-                           phone_home_host='10.0.2.2',
--                          phone_home_port=self.phone_home_port)
-+                          phone_home_port=self.phone_home_port,
-+                          authorized_key=ssh_pubkey)
-         except Exception:
-             self.cancel('Failed to prepared cloudinit image')
-         return cloudinit_iso
-@@ -80,19 +81,19 @@ class BootLinux(BootLinuxBase):
-     timeout = 900
-     chksum = None
+ struct lo_inode {
+@@ -166,6 +167,7 @@ struct lo_data {
+     int readdirplus_set;
+     int readdirplus_clear;
+     int allow_direct_io;
++    bool use_statx;
+     struct lo_inode root;
+     GHashTable *inodes; /* protected by lo->mutex */
+     struct lo_map ino_map; /* protected by lo->mutex */
+@@ -219,7 +221,8 @@ static struct {
+ /* That we loaded cap-ng in the current thread from the saved */
+ static __thread bool cap_loaded = 0;
  
--    def setUp(self):
-+    def setUp(self, ssh_pubkey=None):
-         super(BootLinux, self).setUp()
-         self.vm.add_args('-smp', '2')
-         self.vm.add_args('-m', '1024')
-         self.prepare_boot()
--        self.prepare_cloudinit()
-+        self.prepare_cloudinit(ssh_pubkey)
+-static struct lo_inode *lo_find(struct lo_data *lo, struct stat *st);
++static struct lo_inode *lo_find(struct lo_data *lo, struct stat *st,
++                                uint64_t mnt_id);
  
-     def prepare_boot(self):
-         path = self.download_boot()
-         self.vm.add_args('-drive', 'file=%s' % path)
+ static int is_dot_or_dotdot(const char *name)
+ {
+@@ -741,12 +744,14 @@ out_err:
+     fuse_reply_err(req, saverr);
+ }
  
--    def prepare_cloudinit(self):
--        cloudinit_iso = self.download_cloudinit()
-+    def prepare_cloudinit(self, ssh_pubkey=None):
-+        cloudinit_iso = self.download_cloudinit(ssh_pubkey)
-         self.vm.add_args('-drive', 'file=%s,format=raw' % cloudinit_iso)
+-static struct lo_inode *lo_find(struct lo_data *lo, struct stat *st)
++static struct lo_inode *lo_find(struct lo_data *lo, struct stat *st,
++                                uint64_t mnt_id)
+ {
+     struct lo_inode *p;
+     struct lo_key key = {
+         .ino = st->st_ino,
+         .dev = st->st_dev,
++        .mnt_id = mnt_id,
+     };
  
-     def launch_and_wait(self):
+     pthread_mutex_lock(&lo->mutex);
+@@ -774,6 +779,60 @@ static void posix_locks_value_destroy(gpointer data)
+     free(plock);
+ }
+ 
++static int do_statx(struct lo_data *lo, int dirfd, const char *pathname,
++                    struct stat *statbuf, int flags, uint64_t *mnt_id)
++{
++    int res;
++
++#if defined(CONFIG_STATX) && defined(STATX_MNT_ID)
++    if (lo->use_statx) {
++        struct statx statxbuf;
++
++        res = statx(dirfd, pathname, flags, STATX_BASIC_STATS | STATX_MNT_ID,
++                    &statxbuf);
++        if (!res) {
++            memset(statbuf, 0, sizeof(*statbuf));
++            statbuf->st_dev = makedev(statxbuf.stx_dev_major,
++                                      statxbuf.stx_dev_minor);
++            statbuf->st_ino = statxbuf.stx_ino;
++            statbuf->st_mode = statxbuf.stx_mode;
++            statbuf->st_nlink = statxbuf.stx_nlink;
++            statbuf->st_uid = statxbuf.stx_uid;
++            statbuf->st_gid = statxbuf.stx_gid;
++            statbuf->st_rdev = makedev(statxbuf.stx_rdev_major,
++                                       statxbuf.stx_rdev_minor);
++            statbuf->st_size = statxbuf.stx_size;
++            statbuf->st_blksize = statxbuf.stx_blksize;
++            statbuf->st_blocks = statxbuf.stx_blocks;
++            statbuf->st_atim.tv_sec = statxbuf.stx_atime.tv_sec;
++            statbuf->st_atim.tv_nsec = statxbuf.stx_atime.tv_nsec;
++            statbuf->st_mtim.tv_sec = statxbuf.stx_mtime.tv_sec;
++            statbuf->st_mtim.tv_nsec = statxbuf.stx_mtime.tv_nsec;
++            statbuf->st_ctim.tv_sec = statxbuf.stx_ctime.tv_sec;
++            statbuf->st_ctim.tv_nsec = statxbuf.stx_ctime.tv_nsec;
++
++            if (statxbuf.stx_mask & STATX_MNT_ID) {
++                *mnt_id = statxbuf.stx_mnt_id;
++            } else {
++                *mnt_id = 0;
++            }
++            return 0;
++        } else if (errno != ENOSYS) {
++            return -1;
++        }
++        lo->use_statx = false;
++        /* fallback */
++    }
++#endif
++    res = fstatat(dirfd, pathname, statbuf, flags);
++    if (res == -1) {
++        return -1;
++    }
++    *mnt_id = 0;
++
++    return 0;
++}
++
+ /*
+  * Increments nlookup and caller must release refcount using
+  * lo_inode_put(&parent).
+@@ -784,6 +843,7 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *name,
+     int newfd;
+     int res;
+     int saverr;
++    uint64_t mnt_id;
+     struct lo_data *lo = lo_data(req);
+     struct lo_inode *inode = NULL;
+     struct lo_inode *dir = lo_inode(req, parent);
+@@ -811,12 +871,13 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *name,
+         goto out_err;
+     }
+ 
+-    res = fstatat(newfd, "", &e->attr, AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW);
++    res = do_statx(lo, newfd, "", &e->attr, AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW,
++                   &mnt_id);
+     if (res == -1) {
+         goto out_err;
+     }
+ 
+-    inode = lo_find(lo, &e->attr);
++    inode = lo_find(lo, &e->attr, mnt_id);
+     if (inode) {
+         close(newfd);
+     } else {
+@@ -838,6 +899,7 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *name,
+         inode->fd = newfd;
+         inode->key.ino = e->attr.st_ino;
+         inode->key.dev = e->attr.st_dev;
++        inode->key.mnt_id = mnt_id;
+         pthread_mutex_init(&inode->plock_mutex, NULL);
+         inode->posix_locks = g_hash_table_new_full(
+             g_direct_hash, g_direct_equal, NULL, posix_locks_value_destroy);
+@@ -1090,15 +1152,23 @@ static struct lo_inode *lookup_name(fuse_req_t req, fuse_ino_t parent,
+                                     const char *name)
+ {
+     int res;
++    uint64_t mnt_id;
+     struct stat attr;
++    struct lo_data *lo = lo_data(req);
++    struct lo_inode *dir = lo_inode(req, parent);
+ 
+-    res = fstatat(lo_fd(req, parent), name, &attr,
+-                  AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW);
++    if (!dir) {
++        return NULL;
++    }
++
++    res = do_statx(lo, dir->fd, name, &attr,
++                   AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW, &mnt_id);
++    lo_inode_put(lo, &dir);
+     if (res == -1) {
+         return NULL;
+     }
+ 
+-    return lo_find(lo_data(req), &attr);
++    return lo_find(lo, &attr, mnt_id);
+ }
+ 
+ static void lo_rmdir(fuse_req_t req, fuse_ino_t parent, const char *name)
+@@ -3266,6 +3336,7 @@ static void setup_root(struct lo_data *lo, struct lo_inode *root)
+ {
+     int fd, res;
+     struct stat stat;
++    uint64_t mnt_id;
+ 
+     fd = open("/", O_PATH);
+     if (fd == -1) {
+@@ -3273,7 +3344,8 @@ static void setup_root(struct lo_data *lo, struct lo_inode *root)
+         exit(1);
+     }
+ 
+-    res = fstatat(fd, "", &stat, AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW);
++    res = do_statx(lo, fd, "", &stat, AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW,
++                   &mnt_id);
+     if (res == -1) {
+         fuse_log(FUSE_LOG_ERR, "fstatat(%s): %m\n", lo->source);
+         exit(1);
+@@ -3283,6 +3355,7 @@ static void setup_root(struct lo_data *lo, struct lo_inode *root)
+     root->fd = fd;
+     root->key.ino = stat.st_ino;
+     root->key.dev = stat.st_dev;
++    root->key.mnt_id = mnt_id;
+     root->nlookup = 2;
+     g_atomic_int_set(&root->refcount, 2);
+ }
+@@ -3291,7 +3364,7 @@ static guint lo_key_hash(gconstpointer key)
+ {
+     const struct lo_key *lkey = key;
+ 
+-    return (guint)lkey->ino + (guint)lkey->dev;
++    return (guint)lkey->ino + (guint)lkey->dev + (guint)lkey->mnt_id;
+ }
+ 
+ static gboolean lo_key_equal(gconstpointer a, gconstpointer b)
+@@ -3299,7 +3372,7 @@ static gboolean lo_key_equal(gconstpointer a, gconstpointer b)
+     const struct lo_key *la = a;
+     const struct lo_key *lb = b;
+ 
+-    return la->ino == lb->ino && la->dev == lb->dev;
++    return la->ino == lb->ino && la->dev == lb->dev && la->mnt_id == lb->mnt_id;
+ }
+ 
+ static void fuse_lo_data_cleanup(struct lo_data *lo)
+@@ -3445,6 +3518,8 @@ int main(int argc, char *argv[])
+         exit(1);
+     }
+ 
++    lo.use_statx = true;
++
+     se = fuse_session_new(&args, &lo_oper, sizeof(lo_oper), &lo);
+     if (se == NULL) {
+         goto err_out1;
+diff --git a/tools/virtiofsd/passthrough_seccomp.c b/tools/virtiofsd/passthrough_seccomp.c
+index eb9af8265f..751e15fa39 100644
+--- a/tools/virtiofsd/passthrough_seccomp.c
++++ b/tools/virtiofsd/passthrough_seccomp.c
+@@ -76,6 +76,7 @@ static const int syscall_whitelist[] = {
+     SCMP_SYS(mremap),
+     SCMP_SYS(munmap),
+     SCMP_SYS(newfstatat),
++    SCMP_SYS(statx),
+     SCMP_SYS(open),
+     SCMP_SYS(openat),
+     SCMP_SYS(ppoll),
 -- 
 2.26.2
 
