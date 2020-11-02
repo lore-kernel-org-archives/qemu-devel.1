@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC6A2C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45822C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 522632225E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:59:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 522632225E
+	by mail.kernel.org (Postfix) with ESMTPS id C87432225E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:59:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C87432225E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZXYm-0001YA-2m
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:59:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38140)
+	id 1kZXYn-0001dK-Lc
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:59:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <remi@remlab.net>)
- id 1kZXXO-0007Re-VV; Mon, 02 Nov 2020 05:58:10 -0500
-Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:39538
+ id 1kZXXQ-0007UX-A7; Mon, 02 Nov 2020 05:58:12 -0500
+Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:39564
  helo=ns207790.ip-94-23-215.eu)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <remi@remlab.net>)
- id 1kZXXL-0006io-Vh; Mon, 02 Nov 2020 05:58:10 -0500
+ id 1kZXXO-0006lm-KZ; Mon, 02 Nov 2020 05:58:11 -0500
 Received: from basile.remlab.net (ip6-localhost [IPv6:::1])
- by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id 5C0EA5FBC5;
- Mon,  2 Nov 2020 11:58:02 +0100 (CET)
+ by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id 7F51560362;
+ Mon,  2 Nov 2020 11:58:04 +0100 (CET)
 From: remi.denis.courmont@huawei.com
 To: qemu-arm@nongnu.org
-Subject: [PATCH 01/14] target/arm: add arm_is_el2_enabled() helper
-Date: Mon,  2 Nov 2020 12:57:49 +0200
-Message-Id: <20201102105802.39332-1-remi.denis.courmont@huawei.com>
+Subject: [PATCH 09/14] target/arm: add ARMv8.4-SEL2 system registers
+Date: Mon,  2 Nov 2020 12:57:57 +0200
+Message-Id: <20201102105802.39332-9-remi.denis.courmont@huawei.com>
 X-Mailer: git-send-email 2.29.1
 In-Reply-To: <2172054.ElGaqSPkdT@basile.remlab.net>
 References: <2172054.ElGaqSPkdT@basile.remlab.net>
@@ -74,46 +74,70 @@ Sender: "Qemu-devel"
 
 From: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
 
-This checks if EL2 is enabled (meaning EL2 registers take effects) in
-the current security context.
-
 Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
 ---
- target/arm/cpu.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ target/arm/cpu.h    |  2 ++
+ target/arm/helper.c | 24 ++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index c18a916766..aaf3671806 100644
+index 3fbb70e273..c047b17a81 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -2040,6 +2040,15 @@ static inline bool arm_is_secure(CPUARMState *env)
-     return arm_is_secure_below_el3(env);
- }
+@@ -323,9 +323,11 @@ typedef struct CPUARMState {
+             uint64_t ttbr1_el[4];
+         };
+         uint64_t vttbr_el2; /* Virtualization Translation Table Base.  */
++        uint64_t vsttbr_el2; /* Secure Virtualization Translation Table. */
+         /* MMU translation table base control. */
+         TCR tcr_el[4];
+         TCR vtcr_el2; /* Virtualization Translation Control.  */
++        TCR vstcr_el2; /* Secure Virtualization Translation Control. */
+         uint32_t c2_data; /* MPU data cacheable bits.  */
+         uint32_t c2_insn; /* MPU instruction cacheable bits.  */
+         union { /* MMU domain access control register
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index eeae3ecff2..4c86e4f57c 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5724,6 +5724,27 @@ static const ARMCPRegInfo el2_v8_cp_reginfo[] = {
+     REGINFO_SENTINEL
+ };
  
-+/* Return true if the current security state has AArch64 EL2 or AArch32 Hyp */
-+static inline bool arm_is_el2_enabled(CPUARMState *env)
++static CPAccessResult sel2_access(CPUARMState *env, const ARMCPRegInfo *ri,
++                                  bool isread)
 +{
-+    if (arm_feature(env, ARM_FEATURE_EL2)) {
-+        return !arm_is_secure_below_el3(env);
++    if (arm_current_el(env) == 3 || arm_is_secure_below_el3(env)) {
++        return CP_ACCESS_OK;
 +    }
-+    return false;
++    return CP_ACCESS_TRAP_UNCATEGORIZED;
 +}
 +
- #else
- static inline bool arm_is_secure_below_el3(CPUARMState *env)
- {
-@@ -2050,6 +2059,11 @@ static inline bool arm_is_secure(CPUARMState *env)
- {
-     return false;
- }
++static const ARMCPRegInfo el2_sec_cp_reginfo[] = {
++    { .name = "VSTTBR_EL2", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 6, .opc2 = 0,
++      .access = PL2_RW, .accessfn = sel2_access,
++      .fieldoffset = offsetof(CPUARMState, cp15.vsttbr_el2) },
++    { .name = "VSTCR_EL2", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 6, .opc2 = 2,
++      .access = PL2_RW, .accessfn = sel2_access,
++      .fieldoffset = offsetof(CPUARMState, cp15.vstcr_el2) },
++    REGINFO_SENTINEL
++};
 +
-+static inline bool arm_is_el2_enabled(CPUARMState *env)
-+{
-+    return false;
-+}
- #endif
- 
- /**
+ static CPAccessResult nsacr_access(CPUARMState *env, const ARMCPRegInfo *ri,
+                                    bool isread)
+ {
+@@ -7745,6 +7766,9 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         if (arm_feature(env, ARM_FEATURE_V8)) {
+             define_arm_cp_regs(cpu, el2_v8_cp_reginfo);
+         }
++        if (cpu_isar_feature(aa64_sel2, cpu)) {
++            define_arm_cp_regs(cpu, el2_sec_cp_reginfo);
++        }
+         /* RVBAR_EL2 is only implemented if EL2 is the highest EL */
+         if (!arm_feature(env, ARM_FEATURE_EL3)) {
+             ARMCPRegInfo rvbar = {
 -- 
 2.29.1
 
