@@ -2,92 +2,137 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A43C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 20:15:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D82C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 20:16:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BD3021534
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 20:15:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F70621534
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 20:16:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hSuRzfGY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BD3021534
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mLedTD8z";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="iB8cSx50"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F70621534
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZgEb-0004qD-3v
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 15:15:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39978)
+	id 1kZgFq-0005Ht-Rr
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 15:16:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kZgCc-0003bb-Ie
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 15:13:18 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:35721)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kZgCZ-0004NQ-W7
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 15:13:18 -0500
-Received: by mail-wr1-x434.google.com with SMTP id n15so16107656wrq.2
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 12:13:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=zJvN3LgH+5e54B3iKgw/oQMGpwPMQdEXv28RMQDjV8E=;
- b=hSuRzfGYfjYvvLUCh0B0BFkF7OsnQ50w7NrQj7PfF1+ubryOFlIRNJnZVWO2xGDewg
- 3ko6jUvqHoVLJrYUs68MBSyoSVPmlQIxK8/hCdgMhbuNB+iPG7B7GdeuIIjh33oVBTTF
- QpqsewnFY3XhIdng05TA/Brj3LL8FNP7vhcJ0noqyCJ+vOZno5nKaSXtI7A+N8sLCXdR
- qAwrkjT4hbqANZaZT1YO/AZ4Scxt9qtR6ZQubADSirL4S7NpCBwEeeL78ZdH7l6r0zw2
- k9KbGwHgotjZ9YJRHpgUhV/H/AOvzRAH001qAega91shS/wS5SXUXLGLXlwGyAV7/pbp
- oepA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=zJvN3LgH+5e54B3iKgw/oQMGpwPMQdEXv28RMQDjV8E=;
- b=jJ5B2zStXkyu2fqvMWw0yxq6SIUyn8CToIMaJh8q214MCDnwKJgZ+9R7uePj4l4IBL
- 5OGQ0rC+d1hO+yDzv1AV6nYFOvfCtd49tp7IdTsg9xlt8Q5rYfu7/Coz5HiywR9yOf2h
- ODvzrCwHWZycW3wPoUCCFcQe/1+zjm/Njk8o57CtgqebTS/Vfx1Gei5IDRE2Gtb6pcsR
- 5uNjyiqQRcWkn+pRDBTV/bLaTvBy7wW8HLwf3DjTYLIIuO1XAxuyZVb3dBMvLKrSNDp2
- jmsU1M8A5N5o6Dy/k4v2RNwEksM2P6YmXT5XbeFhzVJgOJJsa+Tyr2csQWdKZ2iFhxgZ
- bLBQ==
-X-Gm-Message-State: AOAM533hRiDhPpgbvt9kpWYt0H0Y/8ZCRAkN4eyVqBPp5jaOMrCo/2Mb
- m08EIRwQyCcngdONAx9ulkQg1sh36NU=
-X-Google-Smtp-Source: ABdhPJwjvPId/u3QSNvVoj/ZU1oBW6fGAAt/TJrgRnLlrOdWCV21wDbO52fJSOIX8i5W000MXOvyGQ==
-X-Received: by 2002:adf:fec8:: with SMTP id q8mr23087464wrs.64.1604347993867; 
- Mon, 02 Nov 2020 12:13:13 -0800 (PST)
-Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id 30sm23372680wrs.84.2020.11.02.12.13.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 12:13:13 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 v3] hw/mips: Remove the 'r4k' machine
-Date: Mon,  2 Nov 2020 21:13:11 +0100
-Message-Id: <20201102201311.2220005-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1kZg48-0004YK-DV
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 15:04:33 -0500
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:43571)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1kZg45-000353-WB
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 15:04:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1604347469; x=1635883469;
+ h=from:to:cc:subject:date:message-id:
+ content-transfer-encoding:mime-version;
+ bh=0mnp43mgPhbKhzcPkj/kW4Ce1lJLDiymgzSAFodhEs0=;
+ b=mLedTD8zsT9YAPW41tLKBGyb1zQVr1qcb0G2o7XvLOVUhwWWXytC7G5P
+ Tku+RFJv3XZIyggUqXoqEKmbmPfQUSA3eC3x4ro8m/l15zimCM9p9W5ti
+ xVP7uU2EOg0YipL35Zziv1agUgdkZG+SEqYL3COiGGD/zZGfQFmmX9cHk k=;
+Received: from unknown (HELO ironmsg04-sd.qualcomm.com) ([10.53.140.144])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 02 Nov 2020 12:04:27 -0800
+X-QCInternal: smtphost
+Received: from nasanexm03c.na.qualcomm.com ([10.85.0.106])
+ by ironmsg04-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 02 Nov 2020 12:04:27 -0800
+Received: from nasanexm03c.na.qualcomm.com (10.85.0.106) by
+ nasanexm03c.na.qualcomm.com (10.85.0.106) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Mon, 2 Nov 2020 12:04:27 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03c.na.qualcomm.com (10.85.0.106) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Mon, 2 Nov 2020 12:04:27 -0800
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com (10.167.173.24) by
+ MW4PR02MB7265.namprd02.prod.outlook.com (20.182.11.203) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3499.19; Mon, 2 Nov 2020 20:04:26 +0000
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::dda2:8e04:fb37:ea4c]) by MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::dda2:8e04:fb37:ea4c%7]) with mapi id 15.20.3477.035; Mon, 2 Nov 2020
+ 20:04:26 +0000
+From: Stephen Long <steplong@quicinc.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philippe.mathieu.daude@gmail.com>
+Subject: Re: linux-user/elfload.c: Seeing a segfault in qemu with a binary
+ with no data section
+Thread-Topic: Re: linux-user/elfload.c: Seeing a segfault in qemu with a
+ binary with no data section
+Thread-Index: AdaxUyv7uCuOMu4XSoKbndddapgs5w==
+Date: Mon, 2 Nov 2020 20:04:25 +0000
+Message-ID: <MWHPR0201MB354799A3C98A1B3AE7741DB2C7100@MWHPR0201MB3547.namprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
+x-originating-ip: [2606:6000:cfc0:2f:41ec:6160:7613:734c]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 696cddf2-28f5-4a32-9ae2-08d87f6a7fde
+x-ms-traffictypediagnostic: MW4PR02MB7265:
+x-microsoft-antispam-prvs: <MW4PR02MB7265B8D0CB3EA6619D8466B0C7100@MW4PR02MB7265.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: O0qYDA5I3CFWQXLl8oD5VUbsdcggN0c2yAvmeG71iUgfRE3aZdwhN3gsI1WwK/e61+F1nheRFpJE6dZO8ysHbooOn4QQvlVeSMofYEVlhIJ4h7ivcX2ZEmnVcrK459ixbZoJTlc9IYIZqhx+xy41b7/I6f3Gi4ZIn/h/vKeOOwFdxP8cIhGQnl2hYVe6HfsAGMX48siFMF3S7THTRsB6eKIddXsBFlc3Aal1rP34l87m9OgTSW7UDL/+Vk5rqhV9L0Aieqn+UfFp1BpYIuUiSECxCKfKGIieOdNFkPJZfty6q75azLYE/F9kBT3412xdjnDLJvR9p9kJViUcVioS0A==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(376002)(346002)(366004)(39860400002)(396003)(136003)(52536014)(66446008)(2906002)(110136005)(7696005)(5660300002)(6506007)(9686003)(66946007)(64756008)(66476007)(66556008)(76116006)(54906003)(8676002)(316002)(478600001)(558084003)(55016002)(186003)(71200400001)(86362001)(4326008)(33656002)(8936002);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: FC0uo7HflSQo8Nce/hrFGVi0YWNL3oXHGnxk8Rdjn+Hy0b8gS2TZ7gTMZUOBF2IR31TRR/7HMdk3g4lawb7ez1IQ10tA4FUHN7Sj9xOTjhLlkyEnKgZ5aIJDvoH6DqcGIaGjy52GdlkBLDJk6B7vAIO+Tza1Q6nLA2FvxropI3YBOPNp58aJ180T0DAtVqdtCJmvt0KcOibgqf/BqF5/1Y/pM7lYV4Hx9OGwqiMKt9LWexOOxkGp55T69LJtJT2TNf7EjPy72sRSHNwm7sHPWNh8zdFfIdawehhQKt2uvYUEIFdKfghDMBXFp+5IoxRAgBwuxenRkARUhlvKHDTwqmuzcjOWHJFU1JMDmbUg3MrFY5f76i66SGzPRY0OnL+wUA/419wD78kQBXrBmJKuCxxrUbfoVMtJy6AZ67fb70pHiZ5xiDc9/X0TWgpzZ9Y3fxuKxvLotekZHOjMJX4EBvjV41ICommQymrz1dyVZeJ/CxegMptZyuJV3bppdZes53ee2QqWsJrczj1NjutqvZV1A2UQZEfTfcUEwjI/Zx3cUmr9QseZpQUsvqVsd5ubaAgoqb1nYmWDowyqKyYNq9YVCPgCst6cIWFcCwaBu6U/sHJ/ocvgIdL25NbYALGwxAPF7IisdBoPz79O0Qd7T7GnHzfvEwPG8Yx8kd+oZWSD96+BXfFlFXCRev8bMg0QVrx/i0WZMMqe/EBot4LF/A==
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=awrsYA++QJEiW9NULfkU10/RVSx9zDZIRiFob4YZAvRFi6ZYijTRCBTHPXcDUBFqexEayhQDhoP4ivrP+VuLedSNnbOXQ2l6k6CleGNwyb1Tdo2DGwIVrw/iSsV4XhyIXLbOPxs9nWKS2oAaAQWi6iF7wJhrXslXQymJ9V798HA4lhrAKU3ZAsKyvqxwZEDEoRkZP/k0AXUCvJMrj56X0PWlAxkkVdzYCYwiKdbQbpa62zOp7GE/5SK1V67aWvPSpqnhjkrg71BtafGNAa5ggcxNE/anBC9tBWtxS67Rmj5VpUlzGQmZ7lnGQqoXdcerVIcPzc4GPfjxSvOFI5HRGw==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=USKCG5ut7NkUhbjcF8SglNyEyEIY5r6YCIbOdPZE+Z0=;
+ b=VIPwh1qb5zbLywFa/62O+55ba+77iy3uzirJZlfJNy9YuodiFFDrRc/8SAkjrVGScHotFt8pbFfbYdQ+qDB9iswfUM2QScDI4uHQOYXwB0tXbGCer3RveG434yrVC2hWV382Ev7uGHllEJbw6FfzdKxORkVHJ7FQwEpKcfJepxU8xwibO0nGhbw/k1UkPTyVx0ISjPw8MaJOu4RuarkXVMS1VEzlZNTtzpWj3L+/TuHcwSNr+xE+cArKZyUGRykEJ54x/gPwkO9V8MWSY04ebzIHRkhWqk0buzr0s8C4kXRAx61SspZnHbKvgjbY2L7V1sSSYe/nhZDEQwc9HDyFoA==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=USKCG5ut7NkUhbjcF8SglNyEyEIY5r6YCIbOdPZE+Z0=;
+ b=iB8cSx50E8AZK3VbSgHxj3FcrhHLRe8fWbr3q8uIrncnRAqBidDhtk8vREmcN4G5V/SXWD9gGxZDjWNPsLzLr7S2nuYzS6VkDGQgthHQn/oTgMKHfwph7x8pxbndMe4iYppHW14MUtyLTY6Vvpxhrqpk1KRWK1vJO6LJQxGxUvM=
+x-ms-exchange-crosstenant-authas: Internal
+x-ms-exchange-crosstenant-authsource: MWHPR0201MB3547.namprd02.prod.outlook.com
+x-ms-exchange-crosstenant-network-message-id: 696cddf2-28f5-4a32-9ae2-08d87f6a7fde
+x-ms-exchange-crosstenant-originalarrivaltime: 02 Nov 2020 20:04:26.1081 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: wrpYZ3ENWen1EwU54ynYChjlaQyJ4spfMn7GLPnRBmVw2VRK8AUJ9NNqmrUQjFwKkAqBAASRg0BSne71QhVI+g==
+x-ms-exchange-transport-crosstenantheadersstamped: MW4PR02MB7265
+x-originatororg: quicinc.com
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x434.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=199.106.114.38; envelope-from=steplong@quicinc.com;
+ helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 13:30:16
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,456 +145,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, libvir-list@redhat.com,
+Cc: Michael Tokarev <mjt@tls.msk.ru>,
  Richard Henderson <richard.henderson@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+ "laurent@vivier.eu" <laurent@vivier.eu>, Ben Hutchings <ben@decadent.org.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We deprecated the support for the 'r4k' machine for the 5.0 release
-(commit d32dc61421), which means that our deprecation policy allows
-us to drop it in release 5.2. Remove the code.
+Ahh whoops, I see the actual intended change was to replace "eppnt->p_files=
+z !=3D 0" with "vaddr_len !=3D 0", which isn't on master.
 
-To repeat the rationale from the deprecation note:
-- this virtual machine has no specification
-- the Linux kernel dropped support for it 10 years ago
-
-Users are recommended to use the Malta board instead.
-
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-v3: Move to "Recently removed features" section
----
- docs/system/deprecated.rst                    |  12 +-
- .../devices/mips-softmmu-common.mak           |   1 -
- hw/mips/r4k.c                                 | 318 ------------------
- MAINTAINERS                                   |   6 -
- hw/mips/Kconfig                               |  13 -
- hw/mips/meson.build                           |   1 -
- 6 files changed, 6 insertions(+), 345 deletions(-)
- delete mode 100644 hw/mips/r4k.c
-
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index 0ebce37a191..e5b7cf274d3 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -327,12 +327,6 @@ The 'scsi-disk' device is deprecated. Users should use 'scsi-hd' or
- System emulator machines
- ------------------------
- 
--mips ``r4k`` platform (since 5.0)
--'''''''''''''''''''''''''''''''''
--
--This machine type is very old and unmaintained. Users should use the ``malta``
--machine type instead.
--
- mips ``fulong2e`` machine (since 5.1)
- '''''''''''''''''''''''''''''''''''''
- 
-@@ -575,6 +569,12 @@ The version specific Spike machines have been removed in favour of the
- generic ``spike`` machine. If you need to specify an older version of the RISC-V
- spec you can use the ``-cpu rv64gcsu,priv_spec=v1.10.0`` command line argument.
- 
-+mips ``r4k`` platform (removed in 5.2)
-+''''''''''''''''''''''''''''''''''''''
-+
-+This machine type is very old and unmaintained. Users should use the ``malta``
-+machine type instead.
-+
- Related binaries
- ----------------
- 
-diff --git a/default-configs/devices/mips-softmmu-common.mak b/default-configs/devices/mips-softmmu-common.mak
-index da29c6c0b24..ea78fe72759 100644
---- a/default-configs/devices/mips-softmmu-common.mak
-+++ b/default-configs/devices/mips-softmmu-common.mak
-@@ -33,7 +33,6 @@ CONFIG_MC146818RTC=y
- CONFIG_EMPTY_SLOT=y
- CONFIG_MIPS_CPS=y
- CONFIG_MIPS_ITU=y
--CONFIG_R4K=y
- CONFIG_MALTA=y
- CONFIG_PCNET_PCI=y
- CONFIG_MIPSSIM=y
-diff --git a/hw/mips/r4k.c b/hw/mips/r4k.c
-deleted file mode 100644
-index 38308543421..00000000000
---- a/hw/mips/r4k.c
-+++ /dev/null
-@@ -1,318 +0,0 @@
--/*
-- * QEMU/MIPS pseudo-board
-- *
-- * emulates a simple machine with ISA-like bus.
-- * ISA IO space mapped to the 0x14000000 (PHYS) and
-- * ISA memory at the 0x10000000 (PHYS, 16Mb in size).
-- * All peripherial devices are attached to this "bus" with
-- * the standard PC ISA addresses.
-- */
--
--#include "qemu/osdep.h"
--#include "qemu/units.h"
--#include "qapi/error.h"
--#include "qemu-common.h"
--#include "cpu.h"
--#include "hw/clock.h"
--#include "hw/mips/mips.h"
--#include "hw/mips/cpudevs.h"
--#include "hw/intc/i8259.h"
--#include "hw/char/serial.h"
--#include "hw/isa/isa.h"
--#include "net/net.h"
--#include "hw/net/ne2000-isa.h"
--#include "sysemu/sysemu.h"
--#include "hw/boards.h"
--#include "hw/block/flash.h"
--#include "qemu/log.h"
--#include "hw/mips/bios.h"
--#include "hw/ide.h"
--#include "hw/ide/internal.h"
--#include "hw/loader.h"
--#include "elf.h"
--#include "hw/rtc/mc146818rtc.h"
--#include "hw/input/i8042.h"
--#include "hw/timer/i8254.h"
--#include "exec/address-spaces.h"
--#include "sysemu/qtest.h"
--#include "sysemu/reset.h"
--#include "sysemu/runstate.h"
--#include "qemu/error-report.h"
--
--#define MAX_IDE_BUS 2
--
--static const int ide_iobase[2] = { 0x1f0, 0x170 };
--static const int ide_iobase2[2] = { 0x3f6, 0x376 };
--static const int ide_irq[2] = { 14, 15 };
--
--static ISADevice *pit; /* PIT i8254 */
--
--/* i8254 PIT is attached to the IRQ0 at PIC i8259 */
--
--static struct _loaderparams {
--    int ram_size;
--    const char *kernel_filename;
--    const char *kernel_cmdline;
--    const char *initrd_filename;
--} loaderparams;
--
--static void mips_qemu_write(void *opaque, hwaddr addr,
--                            uint64_t val, unsigned size)
--{
--    if ((addr & 0xffff) == 0 && val == 42) {
--        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
--    } else if ((addr & 0xffff) == 4 && val == 42) {
--        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
--    }
--}
--
--static uint64_t mips_qemu_read(void *opaque, hwaddr addr,
--                               unsigned size)
--{
--    return 0;
--}
--
--static const MemoryRegionOps mips_qemu_ops = {
--    .read = mips_qemu_read,
--    .write = mips_qemu_write,
--    .endianness = DEVICE_NATIVE_ENDIAN,
--};
--
--typedef struct ResetData {
--    MIPSCPU *cpu;
--    uint64_t vector;
--} ResetData;
--
--static int64_t load_kernel(void)
--{
--    const size_t params_size = 264;
--    int64_t entry, kernel_high, initrd_size;
--    long kernel_size;
--    ram_addr_t initrd_offset;
--    uint32_t *params_buf;
--    int big_endian;
--
--#ifdef TARGET_WORDS_BIGENDIAN
--    big_endian = 1;
--#else
--    big_endian = 0;
--#endif
--    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
--                           cpu_mips_kseg0_to_phys, NULL,
--                           (uint64_t *)&entry, NULL,
--                           (uint64_t *)&kernel_high, NULL, big_endian,
--                           EM_MIPS, 1, 0);
--    if (kernel_size < 0) {
--        error_report("could not load kernel '%s': %s",
--                     loaderparams.kernel_filename,
--                     load_elf_strerror(kernel_size));
--        exit(1);
--    }
--
--    /* load initrd */
--    initrd_size = 0;
--    initrd_offset = 0;
--    if (loaderparams.initrd_filename) {
--        initrd_size = get_image_size(loaderparams.initrd_filename);
--        if (initrd_size > 0) {
--            initrd_offset = ROUND_UP(kernel_high, INITRD_PAGE_SIZE);
--            if (initrd_offset + initrd_size > ram_size) {
--                error_report("memory too small for initial ram disk '%s'",
--                             loaderparams.initrd_filename);
--                exit(1);
--            }
--            initrd_size = load_image_targphys(loaderparams.initrd_filename,
--                                              initrd_offset,
--                                              ram_size - initrd_offset);
--        }
--        if (initrd_size == (target_ulong) -1) {
--            error_report("could not load initial ram disk '%s'",
--                         loaderparams.initrd_filename);
--            exit(1);
--        }
--    }
--
--    /* Store command line.  */
--    params_buf = g_malloc(params_size);
--
--    params_buf[0] = tswap32(ram_size);
--    params_buf[1] = tswap32(0x12345678);
--
--    if (initrd_size > 0) {
--        snprintf((char *)params_buf + 8, 256,
--                 "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
--                 cpu_mips_phys_to_kseg0(NULL, initrd_offset),
--                 initrd_size, loaderparams.kernel_cmdline);
--    } else {
--        snprintf((char *)params_buf + 8, 256,
--        "%s", loaderparams.kernel_cmdline);
--    }
--
--    rom_add_blob_fixed("params", params_buf, params_size,
--                       16 * MiB - params_size);
--
--    g_free(params_buf);
--    return entry;
--}
--
--static void main_cpu_reset(void *opaque)
--{
--    ResetData *s = (ResetData *)opaque;
--    CPUMIPSState *env = &s->cpu->env;
--
--    cpu_reset(CPU(s->cpu));
--    env->active_tc.PC = s->vector;
--}
--
--static const int sector_len = 32 * KiB;
--static
--void mips_r4k_init(MachineState *machine)
--{
--    const char *kernel_filename = machine->kernel_filename;
--    const char *kernel_cmdline = machine->kernel_cmdline;
--    const char *initrd_filename = machine->initrd_filename;
--    char *filename;
--    MemoryRegion *address_space_mem = get_system_memory();
--    MemoryRegion *bios;
--    MemoryRegion *iomem = g_new(MemoryRegion, 1);
--    MemoryRegion *isa_io = g_new(MemoryRegion, 1);
--    MemoryRegion *isa_mem = g_new(MemoryRegion, 1);
--    int bios_size;
--    Clock *cpuclk;
--    MIPSCPU *cpu;
--    CPUMIPSState *env;
--    ResetData *reset_info;
--    int i;
--    qemu_irq *i8259;
--    ISABus *isa_bus;
--    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
--    DriveInfo *dinfo;
--    int be;
--
--    cpuclk = clock_new(OBJECT(machine), "cpu-refclk");
--    clock_set_hz(cpuclk, 200000000); /* 200 MHz */
--
--    /* init CPUs */
--    cpu = mips_cpu_create_with_clock(machine->cpu_type, cpuclk);
--    env = &cpu->env;
--
--    reset_info = g_malloc0(sizeof(ResetData));
--    reset_info->cpu = cpu;
--    reset_info->vector = env->active_tc.PC;
--    qemu_register_reset(main_cpu_reset, reset_info);
--
--    /* allocate RAM */
--    if (machine->ram_size > 256 * MiB) {
--        error_report("Too much memory for this machine: %" PRId64 "MB,"
--                     " maximum 256MB", ram_size / MiB);
--        exit(1);
--    }
--    memory_region_add_subregion(address_space_mem, 0, machine->ram);
--
--    memory_region_init_io(iomem, NULL, &mips_qemu_ops,
--                          NULL, "mips-qemu", 0x10000);
--
--    memory_region_add_subregion(address_space_mem, 0x1fbf0000, iomem);
--
--    /*
--     * Try to load a BIOS image. If this fails, we continue regardless,
--     * but initialize the hardware ourselves. When a kernel gets
--     * preloaded we also initialize the hardware, since the BIOS wasn't
--     * run.
--     */
--
--    if (bios_name == NULL) {
--        bios_name = BIOS_FILENAME;
--    }
--    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
--    if (filename) {
--        bios_size = get_image_size(filename);
--    } else {
--        bios_size = -1;
--    }
--#ifdef TARGET_WORDS_BIGENDIAN
--    be = 1;
--#else
--    be = 0;
--#endif
--    dinfo = drive_get(IF_PFLASH, 0, 0);
--    if ((bios_size > 0) && (bios_size <= BIOS_SIZE)) {
--        bios = g_new(MemoryRegion, 1);
--        memory_region_init_rom(bios, NULL, "mips_r4k.bios", BIOS_SIZE,
--                               &error_fatal);
--        memory_region_add_subregion(get_system_memory(), 0x1fc00000, bios);
--
--        load_image_targphys(filename, 0x1fc00000, BIOS_SIZE);
--    } else if (dinfo != NULL) {
--        uint32_t mips_rom = 0x00400000;
--        if (!pflash_cfi01_register(0x1fc00000, "mips_r4k.bios", mips_rom,
--                                   blk_by_legacy_dinfo(dinfo),
--                                   sector_len, 4, 0, 0, 0, 0, be)) {
--            fprintf(stderr, "qemu: Error registering flash memory.\n");
--        }
--    } else if (!qtest_enabled()) {
--        /* not fatal */
--        warn_report("could not load MIPS bios '%s'", bios_name);
--    }
--    g_free(filename);
--
--    if (kernel_filename) {
--        loaderparams.ram_size = machine->ram_size;
--        loaderparams.kernel_filename = kernel_filename;
--        loaderparams.kernel_cmdline = kernel_cmdline;
--        loaderparams.initrd_filename = initrd_filename;
--        reset_info->vector = load_kernel();
--    }
--
--    /* Init CPU internal devices */
--    cpu_mips_irq_init_cpu(cpu);
--    cpu_mips_clock_init(cpu);
--
--    /* ISA bus: IO space at 0x14000000, mem space at 0x10000000 */
--    memory_region_init_alias(isa_io, NULL, "isa-io",
--                             get_system_io(), 0, 0x00010000);
--    memory_region_init(isa_mem, NULL, "isa-mem", 0x01000000);
--    memory_region_add_subregion(get_system_memory(), 0x14000000, isa_io);
--    memory_region_add_subregion(get_system_memory(), 0x10000000, isa_mem);
--    isa_bus = isa_bus_new(NULL, isa_mem, get_system_io(), &error_abort);
--
--    /* The PIC is attached to the MIPS CPU INT0 pin */
--    i8259 = i8259_init(isa_bus, env->irq[2]);
--    isa_bus_irqs(isa_bus, i8259);
--
--    mc146818_rtc_init(isa_bus, 2000, NULL);
--
--    pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
--
--    serial_hds_isa_init(isa_bus, 0, MAX_ISA_SERIAL_PORTS);
--
--    isa_vga_init(isa_bus);
--
--    if (nd_table[0].used) {
--        isa_ne2000_init(isa_bus, 0x300, 9, &nd_table[0]);
--    }
--
--    ide_drive_get(hd, ARRAY_SIZE(hd));
--    for (i = 0; i < MAX_IDE_BUS; i++)
--        isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[i], ide_irq[i],
--                     hd[MAX_IDE_DEVS * i],
--                     hd[MAX_IDE_DEVS * i + 1]);
--
--    isa_create_simple(isa_bus, TYPE_I8042);
--}
--
--static void mips_machine_init(MachineClass *mc)
--{
--    mc->deprecation_reason = "use malta machine type instead";
--    mc->desc = "mips r4k platform";
--    mc->init = mips_r4k_init;
--    mc->block_default_type = IF_IDE;
--#ifdef TARGET_MIPS64
--    mc->default_cpu_type = MIPS_CPU_TYPE_NAME("R4000");
--#else
--    mc->default_cpu_type = MIPS_CPU_TYPE_NAME("24Kf");
--#endif
--    mc->default_ram_id = "mips_r4k.ram";
--}
--
--DEFINE_MACHINE("mips", mips_machine_init)
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8c744a9bdf4..77a67becc1f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1138,12 +1138,6 @@ S: Orphaned
- F: hw/mips/mipssim.c
- F: hw/net/mipsnet.c
- 
--R4000
--R: Aurelien Jarno <aurelien@aurel32.net>
--R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
--S: Obsolete
--F: hw/mips/r4k.c
--
- Fuloong 2E
- M: Huacai Chen <chenhc@lemote.com>
- M: Philippe Mathieu-Daudé <f4bug@amsat.org>
-diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
-index 67d39c56a4e..8be70122f4c 100644
---- a/hw/mips/Kconfig
-+++ b/hw/mips/Kconfig
-@@ -1,16 +1,3 @@
--config R4K
--    bool
--    select ISA_BUS
--    select SERIAL_ISA
--    select I8259
--    select I8254
--    select MC146818RTC
--    imply VGA_ISA
--    imply NE2000_ISA
--    select IDE_ISA
--    select PCKBD
--    select PFLASH_CFI01
--
- config MALTA
-     bool
-     select ISA_SUPERIO
-diff --git a/hw/mips/meson.build b/hw/mips/meson.build
-index 46294b7382f..bcdf96be69f 100644
---- a/hw/mips/meson.build
-+++ b/hw/mips/meson.build
-@@ -6,6 +6,5 @@
- mips_ss.add(when: 'CONFIG_MIPSSIM', if_true: files('mipssim.c'))
- mips_ss.add(when: 'CONFIG_MIPS_BOSTON', if_true: [files('boston.c'), fdt])
- mips_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('cps.c'))
--mips_ss.add(when: 'CONFIG_R4K', if_true: files('r4k.c'))
- 
- hw_arch += {'mips': mips_ss}
--- 
-2.26.2
-
+Thanks,
+Stephen
 
