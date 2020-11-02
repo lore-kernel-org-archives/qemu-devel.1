@@ -2,89 +2,90 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69FF5C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:26:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2803AC00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:26:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04A8B2222B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:26:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AA8B2222B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:26:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPMXWvQ3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04A8B2222B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="NSz4/piZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AA8B2222B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZeWq-0000ph-4z
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:26:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41788)
+	id 1kZeXE-0001Dg-Ks
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:26:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kZeUl-0006HE-Ta
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:23:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60813)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kZeUj-0007HU-RB
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:23:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604341432;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ftHdmlbo3Beonif/lBCxuo10ZO9J1OjYSksFW/oikAE=;
- b=CPMXWvQ3jpCpWPRIjVvV50CLfIzz04TLwf5sC9LDyqOAa88CJqfaV9oK1ZkCzUoShU82K7
- rHwT1DGiyJLz6E+dzW6ZdTJB/ddxCuNUkkAq1WOXE2j70oPY+bPDioQTM693bu+zVZDOUT
- Scmf7+Afn3lblpHZ7kWLVK3b+f++UIo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-BcKO-S--OHSSG3w6F-ag9Q-1; Mon, 02 Nov 2020 13:23:47 -0500
-X-MC-Unique: BcKO-S--OHSSG3w6F-ag9Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6B111006C98;
- Mon,  2 Nov 2020 18:23:46 +0000 (UTC)
-Received: from work-vm (ovpn-114-142.ams2.redhat.com [10.36.114.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BD91F5C5DE;
- Mon,  2 Nov 2020 18:23:42 +0000 (UTC)
-Date: Mon, 2 Nov 2020 18:23:39 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH 1/2] migration: Unify reset of last_rb on destination
- node when recover
-Message-ID: <20201102182339.GK3673@work-vm>
-References: <20201102153010.11979-1-peterx@redhat.com>
- <20201102153010.11979-2-peterx@redhat.com>
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeR7-0001fn-JC
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:09 -0500
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:42017)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeQu-0006hs-8u
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:09 -0500
+Received: by mail-lf1-x141.google.com with SMTP id a7so18628526lfk.9
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 10:19:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=3+YyHTEOmoDlnxZwQCww4YXw4Lozy8Eon7UHJCT2EzM=;
+ b=NSz4/piZs7R5rtGK6iEwyUNc2Se7teWjllHhJvvkPZoOcbmA1wXHbX8aN2cxtWUqcT
+ qSzXv0aH4cnfCjNf/JI74QcPE1eFrgi/B2KnjYvYMrnQh0Ybe0wj/BafbVvFvVxfR7YT
+ 5ISxA4W/SeGiTYUwgv5EVCT4SsV6oon0IY1KQV39VHEaJt1/441oXOHu8bNmY3WO0twS
+ 19GJx/VLt8aQWbaY0DbBw/KbICx04T0cozFXck2ddd3zaW0cpsVxvGB5A2p+nsdajEuE
+ i3/nh3qVB0waw+tbWMcP455OjYidGMJzflvTzM9u5aQUuUuuILPGjBA5wuKZ7x5yvkOs
+ /zxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=3+YyHTEOmoDlnxZwQCww4YXw4Lozy8Eon7UHJCT2EzM=;
+ b=YeWMDN9ZYukJ/WsAO8ur6KQTa+1ostZ9p8H1AMxdSXdQtRqplANLhYawcVUDgGpvsf
+ MwERQXlu4HEfLOKyiwjOpgm1UZDrpAQJ6ypIhLGOHY1QS2bOMojfC7BSDCgMo4UkpuDn
+ 0OzT7HU0rr0umplxJL4u3kwZtALzwg6njKDL9zNG32PORLcaxo0qAtfLIQkc7wKtDrJq
+ mRz5bLQeJJysB1Iox+qrKHsUgjtE93rJdO03utcMoW337AEZkkublykyxtfuhVUBZKkw
+ 7/MTlhSJz512h3FJjFiMeOr+ojBXewaLVkpjELF1dUIvezGCxYLA53tLZFJbX7hOk+1r
+ Ap3g==
+X-Gm-Message-State: AOAM531xhdUsbI0tk0TFfJqY0OvivrLKjJaSyE7ZM8xUmCqoLtEp0csU
+ Sa54/6+HIPnpiKelvabNfxna7w==
+X-Google-Smtp-Source: ABdhPJyRiaXqfwvJsq1jD9Ly3RknIiCLSt5abf9+ZSuAhO20/Ls5tn9ghUt3xXlBm+Il3nKjaUMYOw==
+X-Received: by 2002:ac2:47fc:: with SMTP id b28mr5969722lfp.454.1604341193176; 
+ Mon, 02 Nov 2020 10:19:53 -0800 (PST)
+Received: from navi.cosmonova.net.ua ([95.67.24.131])
+ by smtp.gmail.com with ESMTPSA id c6sm2527007lfm.226.2020.11.02.10.19.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Nov 2020 10:19:52 -0800 (PST)
+From: Andrew Melnychenko <andrew@daynix.com>
+To: jasowang@redhat.com,
+	mst@redhat.com
+Subject: [RFC PATCH 2/6] ebpf: Added basic eBPF API.
+Date: Mon,  2 Nov 2020 20:51:12 +0200
+Message-Id: <20201102185115.7425-3-andrew@daynix.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201102185115.7425-1-andrew@daynix.com>
+References: <20201102185115.7425-1-andrew@daynix.com>
 MIME-Version: 1.0
-In-Reply-To: <20201102153010.11979-2-peterx@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=2a00:1450:4864:20::141;
+ envelope-from=andrew@daynix.com; helo=mail-lf1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,82 +98,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
+Cc: yan@daynix.com, yuri.benditovich@daynix.com, Andrew <andrew@daynix.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> When postcopy recover happens, we need to reset last_rb after each return of
-> postcopy_pause_fault_thread() because that means we just got the postcopy
-> migration continued.
-> 
-> Unify this reset to the place right before we want to kick the fault thread
-> again, when we get the command MIG_CMD_POSTCOPY_RESUME from source.
-> 
-> This is actually more than that - because the main thread on destination will
-> now be able to call migrate_send_rp_req_pages_pending() too, so the fault
-> thread is not the only user of last_rb now.  Move the reset earlier will allow
-> the first call to migrate_send_rp_req_pages_pending() to use the reset value
-> even if called from the main thread.
-> 
-> (NOTE: this is not a real fix to 0c26781c09 mentioned below, however it is just
->  a mark that when picking up 0c26781c09 we'd better have this one too; the real
->  fix will come later)
-> 
-> Fixes: 0c26781c09 ("migration: Sync requested pages after postcopy recovery")
-> Tested-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+From: Andrew <andrew@daynix.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Added basic functions for creating eBPF maps and loading programs.
+Also added helper function to 'fix' eBPF map descriptors in programs.
+During runtime, different values of eBPF map file descriptors created,
+and it required to place them into eBPF instructions for proper work.
+It's similar to ELF's relocation table section routine.
 
-> ---
->  migration/postcopy-ram.c | 2 --
->  migration/savevm.c       | 6 ++++++
->  2 files changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index d3bb3a744b..d99842eb1b 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -903,7 +903,6 @@ static void *postcopy_ram_fault_thread(void *opaque)
->               * the channel is rebuilt.
->               */
->              if (postcopy_pause_fault_thread(mis)) {
-> -                mis->last_rb = NULL;
->                  /* Continue to read the userfaultfd */
->              } else {
->                  error_report("%s: paused but don't allow to continue",
-> @@ -985,7 +984,6 @@ retry:
->                  /* May be network failure, try to wait for recovery */
->                  if (ret == -EIO && postcopy_pause_fault_thread(mis)) {
->                      /* We got reconnected somehow, try to continue */
-> -                    mis->last_rb = NULL;
->                      goto retry;
->                  } else {
->                      /* This is a unavoidable fault */
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 21ccba9fb3..e8834991ec 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2061,6 +2061,12 @@ static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
->          return 0;
->      }
->  
-> +    /*
-> +     * Reset the last_rb before we resend any page req to source again, since
-> +     * the source should have it reset already.
-> +     */
-> +    mis->last_rb = NULL;
-> +
->      /*
->       * This means source VM is ready to resume the postcopy migration.
->       * It's time to switch state and release the fault thread to
-> -- 
-> 2.26.2
-> 
+Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+---
+ ebpf/ebpf.c       | 107 ++++++++++++++++++++++++++++++++++++++++++++++
+ ebpf/ebpf.h       |  35 +++++++++++++++
+ ebpf/trace-events |   4 ++
+ ebpf/trace.h      |   2 +
+ 4 files changed, 148 insertions(+)
+ create mode 100644 ebpf/ebpf.c
+ create mode 100644 ebpf/ebpf.h
+ create mode 100644 ebpf/trace-events
+ create mode 100644 ebpf/trace.h
+
+diff --git a/ebpf/ebpf.c b/ebpf/ebpf.c
+new file mode 100644
+index 0000000000..cec35a484c
+--- /dev/null
++++ b/ebpf/ebpf.c
+@@ -0,0 +1,107 @@
++#include "ebpf/ebpf.h"
++#include <sys/syscall.h>
++#include "trace.h"
++
++#define ptr_to_u64(x) ((uint64_t)(uintptr_t)x)
++
++static inline int ebpf(enum bpf_cmd cmd, union bpf_attr *attr,
++        unsigned int size)
++{
++    int ret = syscall(__NR_bpf, cmd, attr, size);
++    if (ret < 0) {
++        trace_ebpf_error("eBPF syscall error", strerror(errno));
++    }
++
++    return ret;
++}
++
++int bpf_create_map(enum bpf_map_type map_type,
++                   unsigned int key_size,
++                   unsigned int value_size,
++                   unsigned int max_entries)
++{
++    union bpf_attr attr = {
++            .map_type    = map_type,
++            .key_size    = key_size,
++            .value_size  = value_size,
++            .max_entries = max_entries
++    };
++
++    return ebpf(BPF_MAP_CREATE, &attr, sizeof(attr));
++}
++
++int bpf_lookup_elem(int fd, const void *key, void *value)
++{
++    union bpf_attr attr = {
++            .map_fd = (uint32_t)fd,
++            .key    = ptr_to_u64(key),
++            .value  = ptr_to_u64(value),
++    };
++
++    return ebpf(BPF_MAP_LOOKUP_ELEM, &attr, sizeof(attr));
++}
++
++int bpf_update_elem(int fd, const void *key, const void *value,
++                    uint64_t flags)
++{
++    union bpf_attr attr = {
++            .map_fd = (uint32_t)fd,
++            .key    = ptr_to_u64(key),
++            .value  = ptr_to_u64(value),
++            .flags  = flags,
++    };
++
++    return ebpf(BPF_MAP_UPDATE_ELEM, &attr, sizeof(attr));
++}
++
++int bpf_delete_elem(int fd, const void *key)
++{
++    union bpf_attr attr = {
++            .map_fd = (uint32_t)fd,
++            .key    = ptr_to_u64(key),
++    };
++
++    return ebpf(BPF_MAP_DELETE_ELEM, &attr, sizeof(attr));
++}
++
++#define BPF_LOG_BUF_SIZE (UINT32_MAX >> 8)
++static char bpf_log_buf[BPF_LOG_BUF_SIZE] = {};
++
++int bpf_prog_load(enum bpf_prog_type type,
++                  const struct bpf_insn *insns, int insn_cnt,
++                  const char *license)
++{
++    int ret = 0;
++    union bpf_attr attr = {};
++    attr.prog_type = type;
++    attr.insns     = ptr_to_u64(insns);
++    attr.insn_cnt  = (uint32_t)insn_cnt;
++    attr.license   = ptr_to_u64(license);
++    attr.log_buf   = ptr_to_u64(bpf_log_buf);
++    attr.log_size  = BPF_LOG_BUF_SIZE;
++    attr.log_level = 1;
++
++    ret = ebpf(BPF_PROG_LOAD, &attr, sizeof(attr));
++    if (ret < 0) {
++        trace_ebpf_error("eBPF program load error:", bpf_log_buf);
++    }
++
++    return ret;
++}
++
++unsigned int bpf_fixup_mapfd(struct fixup_mapfd_t *table,
++                             size_t table_size, struct bpf_insn *insn,
++                             size_t insn_len, const char *map_name, int fd) {
++    unsigned int ret = 0;
++    int i = 0;
++
++    for (; i < table_size; ++i) {
++        if (strcmp(table[i].map_name, map_name) == 0) {
++            insn[table[i].instruction_num].src_reg = 1;
++            insn[table[i].instruction_num].imm = fd;
++            ++ret;
++        }
++    }
++
++    return ret;
++}
+diff --git a/ebpf/ebpf.h b/ebpf/ebpf.h
+new file mode 100644
+index 0000000000..511ad0a06f
+--- /dev/null
++++ b/ebpf/ebpf.h
+@@ -0,0 +1,35 @@
++#ifndef QEMU_EBPF_H
++#define QEMU_EBPF_H
++
++#include "qemu/osdep.h"
++
++#ifdef CONFIG_EBPF
++#include <linux/bpf.h>
++
++int bpf_create_map(enum bpf_map_type map_type,
++                   unsigned int key_size,
++                   unsigned int value_size,
++                   unsigned int max_entries);
++
++int bpf_lookup_elem(int fd, const void *key, void *value);
++
++int bpf_update_elem(int fd, const void *key, const void *value,
++                    uint64_t flags);
++
++int bpf_delete_elem(int fd, const void *key);
++
++int bpf_prog_load(enum bpf_prog_type type,
++                  const struct bpf_insn *insns, int insn_cnt,
++                  const char *license);
++
++struct fixup_mapfd_t {
++    const char *map_name;
++    size_t instruction_num;
++};
++
++unsigned int bpf_fixup_mapfd(struct fixup_mapfd_t *table,
++                             size_t table_size, struct bpf_insn *insn,
++                             size_t insn_len, const char *map_name, int fd);
++
++#endif /* CONFIG_EBPF */
++#endif /* QEMU_EBPF_H */
+diff --git a/ebpf/trace-events b/ebpf/trace-events
+new file mode 100644
+index 0000000000..3c189516e3
+--- /dev/null
++++ b/ebpf/trace-events
+@@ -0,0 +1,4 @@
++# See docs/devel/tracing.txt for syntax documentation.
++
++# ebpf.c
++ebpf_error(const char *s1, const char *s2) "error in %s: %s"
+diff --git a/ebpf/trace.h b/ebpf/trace.h
+new file mode 100644
+index 0000000000..ad570e6691
+--- /dev/null
++++ b/ebpf/trace.h
+@@ -0,0 +1,2 @@
++#include "trace/trace-ebpf.h"
++
 -- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+2.28.0
 
 
