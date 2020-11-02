@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DECCDC388F2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED42FC00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:19:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A0F121D91
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:18:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E73920691
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 17:19:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w6AK/ZU8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A0F121D91
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UTqJjLn4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E73920691
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZdTA-0002ct-Fq
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 12:18:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53970)
+	id 1kZdTv-0004HX-An
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 12:19:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZdLu-0000yB-6g
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:42 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40587)
+ id 1kZdLn-0000sl-Sa
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:35 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:33118)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZdLr-0006at-JG
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:41 -0500
-Received: by mail-wr1-x443.google.com with SMTP id 33so4707934wrl.7
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 09:10:36 -0800 (PST)
+ id 1kZdLj-0006ZX-QQ
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 12:10:35 -0500
+Received: by mail-wr1-x434.google.com with SMTP id b8so15525449wrn.0
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 09:10:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=oS0wIyEvl6kAmgjQUcastyFGaftesb6oVP+8lJQGRmA=;
- b=w6AK/ZU8E7lFeVE63BSJIzdZKFOLZf2Ex4ohEHQW3gUvWDN8Jvzh+EPSfjf9cBpLz7
- KpNXTunV+/oY/ijxmkdP94ApH1c3tJxv7OX9y2lo6mI6Q5LTKuAWRxitVZtt35BlHp2L
- LPMiIUmVctrRK7UO/r+mWZ5RwnLgpC09dHMkPxd7K+SSGEFtV63iHFmkHk30dL0SYQRB
- Jd0oFNdY3FM+/oMlzSLnCu4bMjYZlQpMKlZ3hK6uE0gtirSOJUZHMZpUfx9HVXzulTjW
- 9Y+fSpe8Dib/mfMlL+Wcnd+yna5n5HqO6cTUK8cYP1oKP9AInJuVdKoPgTYndsUin0oD
- YwuA==
+ bh=ddc3YHEWydM8IrInAbVJszIYA0TZHXyS/v+Zbs+mUmc=;
+ b=UTqJjLn4noqjXwzjUQY2mEvUC8aasVxYugDeo8R1WlJjxCC436FloXRYOvWDZLlrOK
+ ai+yzCti+2Iri1te6jpDicU0LNtFTmnFHRM1xlxOZtZ6lkq4oF+xwUJJkuMjsTLN1ygT
+ tdDjtdXKli9QsJ0O9N5JkbrVtqElch/zr/VjevVZ1jv82Ej/+03JEKYq4NZ5jFj5YHK8
+ J95EeDdBiQi5N2e3ekQBBkxECmlIOZVntU+VW/opnE7gkDzxYb7tDymTNsCpRANipUzk
+ d5TM2FS3BYFACZoGpSIUAZ6G1Lnw0Hr/6pv2wKnbhTwKHuHIwDVefiozt56tJowJpcA0
+ 5T/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=oS0wIyEvl6kAmgjQUcastyFGaftesb6oVP+8lJQGRmA=;
- b=s8iYz+9ku2DyjGtr5p3ExAq/EMVHl48habJ5ea6yjqE3mBj5dRz6eF6RGJfqY6Oz6v
- Y5qfMgcyhc8m6LpVMH/x4wfNfi8/e/2FlO8m3jhSR/tc3Hx0YyisPJjzB1khR3yZUkrO
- /oDySyEM0BO8pRvMsqEGUmKKvKblsg2q7ZpzXfHrPt0tQnPbkYhcG63HiAn9g6TxW18k
- Et92Z4WX/WQc+Jor8IXPWWzgNXZOtujyypLQNGdzAltK5j/VP7HloKjKBGIEmUs5HM7D
- IdVC/ZIiIviXZXNUYnEJGVuzUCGx3Fdoyp4KwjDzr3DUdub3T/4ZdFoJF+xCjGApXn8k
- Wlbg==
-X-Gm-Message-State: AOAM533gFkBS15AlyJcxSsKnejb/YdBeZq651Q8QVSK+F4qtzKhiPDq9
- iJyi7wATrBRInE8bZWliFhhY4/9pjE+Ssg==
-X-Google-Smtp-Source: ABdhPJygreadJKuXOtZlJ9IkLEy6vxp5T8fWRWMRk4Sox4ohPl2vJZrjN+Klwr5VDEyID+poTYfwfA==
-X-Received: by 2002:adf:ba4f:: with SMTP id t15mr20633953wrg.335.1604337035495; 
- Mon, 02 Nov 2020 09:10:35 -0800 (PST)
+ bh=ddc3YHEWydM8IrInAbVJszIYA0TZHXyS/v+Zbs+mUmc=;
+ b=mO+uW+SPF8cv/+jl517o4wjjnDBOn+qYqf42UQWuhMRdv8RP8DxEHTgjsxwooyrAc6
+ XBG0Yc7wGqS1KD0zdzNFmQfUDvqG5Ii2cEsC4tu16f68NGNE04Qu8XRXLQn9mAj7pKnT
+ i5v8bfKEqFFZd6eUJbtSGHmDcGV/Mxi0iUc5YWdpxOD3lVrKQfzt7OM6OrapmdGXsMN7
+ 889M7UCUuPmNPCQPEr3Z1f5s/sLjW791tgwU+vYr0IFwc6+Z139C0G8TyhZm/vCtk85u
+ ZKj+PZ4kLOlnf583E09Fr+vK2SXDueoRCHjGS6GmuDL8bzPv52K5wYsrA7IkeQ7a77w+
+ 8LZQ==
+X-Gm-Message-State: AOAM530IfGUN2FPLkyozusbPPJCyPxm4E1NuHhxcbVVGwmJDlQPLSFDn
+ KH89PZ5/oQyZd+0MOO3VnNOEDRCVUcC+IA==
+X-Google-Smtp-Source: ABdhPJws6CUIea6XKfrECu/IcOgh3WXIH2KQJzOzMbjMmEQKsWQDzny1/oOr0vvIJ65K/J/uFSxQLQ==
+X-Received: by 2002:a5d:534d:: with SMTP id t13mr20582512wrv.69.1604337029421; 
+ Mon, 02 Nov 2020 09:10:29 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c18sm22396540wrt.10.2020.11.02.09.10.34
+ by smtp.gmail.com with ESMTPSA id c18sm22396540wrt.10.2020.11.02.09.10.28
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 09:10:34 -0800 (PST)
+ Mon, 02 Nov 2020 09:10:28 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/26] target/arm: fix LORID_EL1 access check
-Date: Mon,  2 Nov 2020 17:09:54 +0000
-Message-Id: <20201102171005.30690-16-peter.maydell@linaro.org>
+Subject: [PULL 10/26] target/arm: Simplify do_long_3d and do_2scalar_long
+Date: Mon,  2 Nov 2020 17:09:49 +0000
+Message-Id: <20201102171005.30690-11-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201102171005.30690-1-peter.maydell@linaro.org>
 References: <20201102171005.30690-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::434;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x434.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,70 +104,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Secure mode is not exempted from checking SCR_EL3.TLOR, and in the
-future HCR_EL2.TLOR when S-EL2 is enabled.
+In both cases, we can sink the write-back and perform
+the accumulate into the normal destination temps.
 
-Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20201030022618.785675-11-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
+ target/arm/translate-neon.c.inc | 23 +++++++++--------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index dc51175bf05..68545919865 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6679,9 +6679,10 @@ static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
- #endif
- 
- /* Shared logic between LORID and the rest of the LOR* registers.
-- * Secure state has already been delt with.
-+ * Secure state exclusion has already been dealt with.
-  */
--static CPAccessResult access_lor_ns(CPUARMState *env)
-+static CPAccessResult access_lor_ns(CPUARMState *env,
-+                                    const ARMCPRegInfo *ri, bool isread)
- {
-     int el = arm_current_el(env);
- 
-@@ -6694,16 +6695,6 @@ static CPAccessResult access_lor_ns(CPUARMState *env)
-     return CP_ACCESS_OK;
- }
- 
--static CPAccessResult access_lorid(CPUARMState *env, const ARMCPRegInfo *ri,
--                                   bool isread)
--{
--    if (arm_is_secure_below_el3(env)) {
--        /* Access ok in secure mode.  */
--        return CP_ACCESS_OK;
--    }
--    return access_lor_ns(env);
--}
--
- static CPAccessResult access_lor_other(CPUARMState *env,
-                                        const ARMCPRegInfo *ri, bool isread)
- {
-@@ -6711,7 +6702,7 @@ static CPAccessResult access_lor_other(CPUARMState *env,
-         /* Access denied in secure mode.  */
-         return CP_ACCESS_TRAP;
+diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
+index c2d67160f9e..1c16c56e7ec 100644
+--- a/target/arm/translate-neon.c.inc
++++ b/target/arm/translate-neon.c.inc
+@@ -2037,17 +2037,14 @@ static bool do_long_3d(DisasContext *s, arg_3diff *a,
+     if (accfn) {
+         tmp = tcg_temp_new_i64();
+         read_neon_element64(tmp, a->vd, 0, MO_64);
+-        accfn(tmp, tmp, rd0);
+-        write_neon_element64(tmp, a->vd, 0, MO_64);
++        accfn(rd0, tmp, rd0);
+         read_neon_element64(tmp, a->vd, 1, MO_64);
+-        accfn(tmp, tmp, rd1);
+-        write_neon_element64(tmp, a->vd, 1, MO_64);
++        accfn(rd1, tmp, rd1);
+         tcg_temp_free_i64(tmp);
+-    } else {
+-        write_neon_element64(rd0, a->vd, 0, MO_64);
+-        write_neon_element64(rd1, a->vd, 1, MO_64);
      }
--    return access_lor_ns(env);
-+    return access_lor_ns(env, ri, isread);
- }
  
- /*
-@@ -6738,7 +6729,7 @@ static const ARMCPRegInfo lor_reginfo[] = {
-       .type = ARM_CP_CONST, .resetvalue = 0 },
-     { .name = "LORID_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 7,
--      .access = PL1_R, .accessfn = access_lorid,
-+      .access = PL1_R, .accessfn = access_lor_ns,
-       .type = ARM_CP_CONST, .resetvalue = 0 },
-     REGINFO_SENTINEL
- };
++    write_neon_element64(rd0, a->vd, 0, MO_64);
++    write_neon_element64(rd1, a->vd, 1, MO_64);
+     tcg_temp_free_i64(rd0);
+     tcg_temp_free_i64(rd1);
+ 
+@@ -2670,16 +2667,14 @@ static bool do_2scalar_long(DisasContext *s, arg_2scalar *a,
+     if (accfn) {
+         TCGv_i64 t64 = tcg_temp_new_i64();
+         read_neon_element64(t64, a->vd, 0, MO_64);
+-        accfn(t64, t64, rn0_64);
+-        write_neon_element64(t64, a->vd, 0, MO_64);
++        accfn(rn0_64, t64, rn0_64);
+         read_neon_element64(t64, a->vd, 1, MO_64);
+-        accfn(t64, t64, rn1_64);
+-        write_neon_element64(t64, a->vd, 1, MO_64);
++        accfn(rn1_64, t64, rn1_64);
+         tcg_temp_free_i64(t64);
+-    } else {
+-        write_neon_element64(rn0_64, a->vd, 0, MO_64);
+-        write_neon_element64(rn1_64, a->vd, 1, MO_64);
+     }
++
++    write_neon_element64(rn0_64, a->vd, 0, MO_64);
++    write_neon_element64(rn1_64, a->vd, 1, MO_64);
+     tcg_temp_free_i64(rn0_64);
+     tcg_temp_free_i64(rn1_64);
+     return true;
 -- 
 2.20.1
 
