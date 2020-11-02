@@ -2,86 +2,86 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A82C4C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B02CC00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:58:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 266A3206F9
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 789D020706
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 16:58:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fkBFSeg8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 266A3206F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fPp9irZ5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 789D020706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZd63-0005jx-4u
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 11:54:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49162)
+	id 1kZdAN-0008Nd-Ij
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 11:58:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kZd54-0004Fv-1d; Mon, 02 Nov 2020 11:53:18 -0500
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:33149)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kZd51-0003jM-OS; Mon, 02 Nov 2020 11:53:17 -0500
-Received: by mail-io1-xd42.google.com with SMTP id j12so961660iow.0;
- Mon, 02 Nov 2020 08:53:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tS8v4nzlJZu7d6GXguhBK1/ScAKpUC99fTeoGWL9UbI=;
- b=fkBFSeg8j4fZ3mhXBRHEKwFpBjg+nMEvixDEGXD/AL8bIirPoHlf26P3JgEMf+Bt67
- Ap6urpBfwtt6yVBj0tslWrAycu/0y6jNOh6+ZHCGRKzyIv2/WMe90Oh8yhWFNo/qWkB0
- L75Aly5NhANd5xyRJ/2fjcZYkeXC5qdd+UYBFaB31JSJlxTobuMgL/ATJDig7IFsEtAt
- OJha2LNO/JsG/GPIwhKBMgGWC3fS47Tg3njXCF4yyWY1EJRlYoOpCzAXX3eV8nZADnUF
- dR1l6aaQVsewEPhjkyZoiidWg/V8kVLmDrMORmUtLnuB4gJUzKdLqs7f2CdKPqnkD/pB
- 1T/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tS8v4nzlJZu7d6GXguhBK1/ScAKpUC99fTeoGWL9UbI=;
- b=CvqT7m5/BWdWEaHGYLO5i+jtASD+TfmKYJFF0h1rjk0eok+yQtwj2n4z8vHF9+EdUe
- 4gFilABYAcXa0fB9B7h5GWsYpkpnVhLhwdFbTaPoX06aOPtq4X0NiKep/LhNn0MpIBwk
- efWxG79Nxt+F8n0danrDgNy3pv5nxNwQaTddRHRQckvelU+FUqGGJLkSKjCpCVgft/bO
- /F/nCMxC6QST16ik0FKomWZsedUl+o1zL1/8kWCQ8FyWNEM0OH25bFxTKeJrwBUHKrlR
- GE+JjuIayj+7DkfPGP9BY+xwMC5N0TaM40bPKfN+1E3me1h01snc5cAztxeWWUkVSD6h
- TAIw==
-X-Gm-Message-State: AOAM532+icj15y4RlwVqubFpXx5/1KxHYddo8hGKbTugspAFgVB92TbE
- 0GLMgyv0V3rrZZo4MhmM8NqzsDrsfHewPMy7VyI=
-X-Google-Smtp-Source: ABdhPJxz0bjwomIQGa6s98p8OZH+Cw8svwcc0245tLDKUCauRYfEZXP+irYeiib1RRXIQcdUxX/ec4/TCbCDtWTiAL4=
-X-Received: by 2002:a05:6638:451:: with SMTP id
- r17mr12741147jap.8.1604335993824; 
- Mon, 02 Nov 2020 08:53:13 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kZd9O-0007gw-GL
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:57:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35170)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kZd9L-0004ZO-UR
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 11:57:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604336261;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=NHphSXYVwPdSG864F+F8ulYN+k1TQTXyLvb8Pe0RQAg=;
+ b=fPp9irZ5aveBGAgHabemVVXLE3j84cMVcLwaqPXv3CO7QHLNs/VIdUl/U9lqTTLziyFpdw
+ bZjhfw5JETAmKQMg2VqaowFRfs4LbvMdwWbTOTmUaxZP8MMrxkjAxG/6MvEAGsGsc+aIip
+ AarohLKbJzZ4OuUAkcQ9LmYCyV7qYyY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-FMShhmYQPlqiMOaHp0q_zA-1; Mon, 02 Nov 2020 11:57:38 -0500
+X-MC-Unique: FMShhmYQPlqiMOaHp0q_zA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 253B581F03A;
+ Mon,  2 Nov 2020 16:57:29 +0000 (UTC)
+Received: from localhost (ovpn-114-65.ams2.redhat.com [10.36.114.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C6CAF81F58;
+ Mon,  2 Nov 2020 16:57:10 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] Revert "vhost-blk: set features before setting inflight
+ feature"
+Date: Mon,  2 Nov 2020 16:57:09 +0000
+Message-Id: <20201102165709.232180-1-stefanha@redhat.com>
 MIME-Version: 1.0
-References: <20201101170538.3732-1-bmeng.cn@gmail.com>
-In-Reply-To: <20201101170538.3732-1-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 2 Nov 2020 08:41:17 -0800
-Message-ID: <CAKmqyKMsFZEBvNs9M3tBZi25eFVPKj9VDu60neZcf-W3bFUgEg@mail.gmail.com>
-Subject: Re: [PATCH v4] hw/riscv: microchip_pfsoc: Correct DDR memory map
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 03:02:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -3
+X-Spam_score: -0.4
+X-Spam_bar: /
+X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,155 +94,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Bin Meng <bin.meng@windriver.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jin Yu <jin.yu@intel.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Nov 1, 2020 at 9:06 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> From: Bin Meng <bin.meng@windriver.com>
->
-> When system memory is larger than 1 GiB (high memory), PolarFire SoC
-> maps it at address 0x10_0000_0000. Address 0xC000_0000 and above is
-> aliased to the same 1 GiB low memory with different cache attributes.
->
-> At present QEMU maps the system memory contiguously from 0x8000_0000.
-> This corrects the wrong QEMU logic. Note address 0x14_0000_0000 is
-> the alias to the high memory, and even physical memory is only 1 GiB,
-> the HSS codes still tries to probe the high memory alias address.
-> It seems there is no issue on the real hardware, so we will have to
-> take that into the consideration in our emulation. Due to this, we
-> we increase the default system memory size to 1537 MiB (the minimum
-> required high memory size by HSS) so that user gets notified an error
-> when less than 1537 MiB is specified.
->
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+VGhpcyByZXZlcnRzIGNvbW1pdCBhZGIyOWMwMjczNDFiYTA5NWEzZWY0YmVlZjZhYWVmODZkM2E1
+MjBlLgoKVGhlIGNvbW1pdCBicm9rZSAtZGV2aWNlIHZob3N0LXVzZXItYmxrLXBjaSBiZWNhdXNl
+IHRoZQp2aG9zdF9kZXZfcHJlcGFyZV9pbmZsaWdodCgpIGZ1bmN0aW9uIGl0IGludHJvZHVjZWQg
+c2VnZmF1bHRzIGluCnZob3N0X2Rldl9zZXRfZmVhdHVyZXMoKSB3aGVuIGF0dGVtcHRpbmcgdG8g
+YWNjZXNzIHN0cnVjdCB2aG9zdF9kZXYncwp2ZGV2IHBvaW50ZXIgYmVmb3JlIGl0IGhhcyBiZWVu
+IGFzc2lnbmVkLgoKVG8gcmVwcm9kdWNlIHRoZSBzZWdmYXVsdCBzaW1wbHkgbGF1bmNoIGEgdmhv
+c3QtdXNlci1ibGsgZGV2aWNlIHdpdGggdGhlCmNvbnRyaWIgdmhvc3QtdXNlci1ibGsgZGV2aWNl
+IGJhY2tlbmQ6CgogICQgYnVpbGQvY29udHJpYi92aG9zdC11c2VyLWJsay92aG9zdC11c2VyLWJs
+ayAtcyAvdG1wL3Zob3N0LXVzZXItYmxrLnNvY2sgLXIgLWIgL3Zhci90bXAvZm9vLmltZwogICQg
+YnVpbGQvcWVtdS1zeXN0ZW0teDg2XzY0IFwKICAgICAgICAtZGV2aWNlIHZob3N0LXVzZXItYmxr
+LXBjaSxpZD1kcnYwLGNoYXJkZXY9Y2hhcjEsYWRkcj00LjAgXAogICAgICAgIC1vYmplY3QgbWVt
+b3J5LWJhY2tlbmQtbWVtZmQsaWQ9bWVtLHNpemU9MUcsc2hhcmU9b24gXAogICAgICAgIC1NIG1l
+bW9yeS1iYWNrZW5kPW1lbSxhY2NlbD1rdm0gXAogICAgICAgIC1jaGFyZGV2IHNvY2tldCxpZD1j
+aGFyMSxwYXRoPS90bXAvdmhvc3QtdXNlci1ibGsuc29jawogIFNlZ21lbnRhdGlvbiBmYXVsdCAo
+Y29yZSBkdW1wZWQpCgpDYzogSmluIFl1IDxqaW4ueXVAaW50ZWwuY29tPgpDYzogUmFwaGFlbCBO
+b3J3aXR6IDxyYXBoYWVsLm5vcndpdHpAbnV0YW5peC5jb20+CkNjOiBNaWNoYWVsIFMuIFRzaXJr
+aW4gPG1zdEByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZh
+bmhhQHJlZGhhdC5jb20+Ci0tLQogaW5jbHVkZS9ody92aXJ0aW8vdmhvc3QuaCB8ICAxIC0KIGh3
+L2Jsb2NrL3Zob3N0LXVzZXItYmxrLmMgfCAgNiAtLS0tLS0KIGh3L3ZpcnRpby92aG9zdC5jICAg
+ICAgICAgfCAxOCAtLS0tLS0tLS0tLS0tLS0tLS0KIDMgZmlsZXMgY2hhbmdlZCwgMjUgZGVsZXRp
+b25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ody92aXJ0aW8vdmhvc3QuaCBiL2luY2x1ZGUv
+aHcvdmlydGlvL3Zob3N0LmgKaW5kZXggODM5YmZiMTUzYy4uOTQ1ODUwNjdmNyAxMDA2NDQKLS0t
+IGEvaW5jbHVkZS9ody92aXJ0aW8vdmhvc3QuaAorKysgYi9pbmNsdWRlL2h3L3ZpcnRpby92aG9z
+dC5oCkBAIC0xNDEsNyArMTQxLDYgQEAgdm9pZCB2aG9zdF9kZXZfcmVzZXRfaW5mbGlnaHQoc3Ry
+dWN0IHZob3N0X2luZmxpZ2h0ICppbmZsaWdodCk7CiB2b2lkIHZob3N0X2Rldl9mcmVlX2luZmxp
+Z2h0KHN0cnVjdCB2aG9zdF9pbmZsaWdodCAqaW5mbGlnaHQpOwogdm9pZCB2aG9zdF9kZXZfc2F2
+ZV9pbmZsaWdodChzdHJ1Y3Qgdmhvc3RfaW5mbGlnaHQgKmluZmxpZ2h0LCBRRU1VRmlsZSAqZik7
+CiBpbnQgdmhvc3RfZGV2X2xvYWRfaW5mbGlnaHQoc3RydWN0IHZob3N0X2luZmxpZ2h0ICppbmZs
+aWdodCwgUUVNVUZpbGUgKmYpOwotaW50IHZob3N0X2Rldl9wcmVwYXJlX2luZmxpZ2h0KHN0cnVj
+dCB2aG9zdF9kZXYgKmhkZXYpOwogaW50IHZob3N0X2Rldl9zZXRfaW5mbGlnaHQoc3RydWN0IHZo
+b3N0X2RldiAqZGV2LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IHZob3N0X2lu
+ZmxpZ2h0ICppbmZsaWdodCk7CiBpbnQgdmhvc3RfZGV2X2dldF9pbmZsaWdodChzdHJ1Y3Qgdmhv
+c3RfZGV2ICpkZXYsIHVpbnQxNl90IHF1ZXVlX3NpemUsCmRpZmYgLS1naXQgYS9ody9ibG9jay92
+aG9zdC11c2VyLWJsay5jIGIvaHcvYmxvY2svdmhvc3QtdXNlci1ibGsuYwppbmRleCBmNjdiMjli
+YmYzLi5hMDc2YjFlNTRkIDEwMDY0NAotLS0gYS9ody9ibG9jay92aG9zdC11c2VyLWJsay5jCisr
+KyBiL2h3L2Jsb2NrL3Zob3N0LXVzZXItYmxrLmMKQEAgLTEzMSwxMiArMTMxLDYgQEAgc3RhdGlj
+IGludCB2aG9zdF91c2VyX2Jsa19zdGFydChWaXJ0SU9EZXZpY2UgKnZkZXYpCiAKICAgICBzLT5k
+ZXYuYWNrZWRfZmVhdHVyZXMgPSB2ZGV2LT5ndWVzdF9mZWF0dXJlczsKIAotICAgIHJldCA9IHZo
+b3N0X2Rldl9wcmVwYXJlX2luZmxpZ2h0KCZzLT5kZXYpOwotICAgIGlmIChyZXQgPCAwKSB7Ci0g
+ICAgICAgIGVycm9yX3JlcG9ydCgiRXJyb3Igc2V0IGluZmxpZ2h0IGZvcm1hdDogJWQiLCAtcmV0
+KTsKLSAgICAgICAgZ290byBlcnJfZ3Vlc3Rfbm90aWZpZXJzOwotICAgIH0KLQogICAgIGlmICgh
+cy0+aW5mbGlnaHQtPmFkZHIpIHsKICAgICAgICAgcmV0ID0gdmhvc3RfZGV2X2dldF9pbmZsaWdo
+dCgmcy0+ZGV2LCBzLT5xdWV1ZV9zaXplLCBzLT5pbmZsaWdodCk7CiAgICAgICAgIGlmIChyZXQg
+PCAwKSB7CmRpZmYgLS1naXQgYS9ody92aXJ0aW8vdmhvc3QuYyBiL2h3L3ZpcnRpby92aG9zdC5j
+CmluZGV4IGYyNDgyMzc4YzYuLjc5YjJiZTIwZGYgMTAwNjQ0Ci0tLSBhL2h3L3ZpcnRpby92aG9z
+dC5jCisrKyBiL2h3L3ZpcnRpby92aG9zdC5jCkBAIC0xNjQ1LDI0ICsxNjQ1LDYgQEAgaW50IHZo
+b3N0X2Rldl9sb2FkX2luZmxpZ2h0KHN0cnVjdCB2aG9zdF9pbmZsaWdodCAqaW5mbGlnaHQsIFFF
+TVVGaWxlICpmKQogICAgIHJldHVybiAwOwogfQogCi1pbnQgdmhvc3RfZGV2X3ByZXBhcmVfaW5m
+bGlnaHQoc3RydWN0IHZob3N0X2RldiAqaGRldikKLXsKLSAgICBpbnQgcjsKLSAKLSAgICBpZiAo
+aGRldi0+dmhvc3Rfb3BzLT52aG9zdF9nZXRfaW5mbGlnaHRfZmQgPT0gTlVMTCB8fAotICAgICAg
+ICBoZGV2LT52aG9zdF9vcHMtPnZob3N0X3NldF9pbmZsaWdodF9mZCA9PSBOVUxMKSB7Ci0gICAg
+ICAgIHJldHVybiAwOwotICAgIH0KLSAKLSAgICByID0gdmhvc3RfZGV2X3NldF9mZWF0dXJlcyho
+ZGV2LCBoZGV2LT5sb2dfZW5hYmxlZCk7Ci0gICAgaWYgKHIgPCAwKSB7Ci0gICAgICAgIFZIT1NU
+X09QU19ERUJVRygidmhvc3RfZGV2X3ByZXBhcmVfaW5mbGlnaHQgZmFpbGVkIik7Ci0gICAgICAg
+IHJldHVybiByOwotICAgIH0KLQotICAgIHJldHVybiAwOwotfQotCiBpbnQgdmhvc3RfZGV2X3Nl
+dF9pbmZsaWdodChzdHJ1Y3Qgdmhvc3RfZGV2ICpkZXYsCiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBzdHJ1Y3Qgdmhvc3RfaW5mbGlnaHQgKmluZmxpZ2h0KQogewotLSAKMi4yOC4wCgo=
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
->
-> ---
-> This patch should replace the following commit in Alistair's
-> riscv-to-apply.next tree:
-> https://github.com/alistair23/qemu/commit/8c47c1e9df850a928b4b230240a950feabe6152f
->
-> Changes in v4:
-> - Change default ram size to 1537 MiB which is the minimum required
->   high memory size to satisfy HSS
->
-> Changes in v3:
-> - Change default ram size to 2047 MiB for 32-bit host
->
->  hw/riscv/microchip_pfsoc.c         | 50 ++++++++++++++++++++++++++----
->  include/hw/riscv/microchip_pfsoc.h |  5 ++-
->  2 files changed, 48 insertions(+), 7 deletions(-)
->
-> diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-> index 44a84732ac..96cb8b983a 100644
-> --- a/hw/riscv/microchip_pfsoc.c
-> +++ b/hw/riscv/microchip_pfsoc.c
-> @@ -121,7 +121,10 @@ static const struct MemmapEntry {
->      [MICROCHIP_PFSOC_ENVM_CFG] =        { 0x20200000,     0x1000 },
->      [MICROCHIP_PFSOC_ENVM_DATA] =       { 0x20220000,    0x20000 },
->      [MICROCHIP_PFSOC_IOSCB] =           { 0x30000000, 0x10000000 },
-> -    [MICROCHIP_PFSOC_DRAM] =            { 0x80000000,        0x0 },
-> +    [MICROCHIP_PFSOC_DRAM_LO] =         { 0x80000000, 0x40000000 },
-> +    [MICROCHIP_PFSOC_DRAM_LO_ALIAS] =   { 0xc0000000, 0x40000000 },
-> +    [MICROCHIP_PFSOC_DRAM_HI] =       { 0x1000000000,        0x0 },
-> +    [MICROCHIP_PFSOC_DRAM_HI_ALIAS] = { 0x1400000000,        0x0 },
->  };
->
->  static void microchip_pfsoc_soc_instance_init(Object *obj)
-> @@ -424,7 +427,11 @@ static void microchip_icicle_kit_machine_init(MachineState *machine)
->      const struct MemmapEntry *memmap = microchip_pfsoc_memmap;
->      MicrochipIcicleKitState *s = MICROCHIP_ICICLE_KIT_MACHINE(machine);
->      MemoryRegion *system_memory = get_system_memory();
-> -    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> +    MemoryRegion *mem_low = g_new(MemoryRegion, 1);
-> +    MemoryRegion *mem_low_alias = g_new(MemoryRegion, 1);
-> +    MemoryRegion *mem_high = g_new(MemoryRegion, 1);
-> +    MemoryRegion *mem_high_alias = g_new(MemoryRegion, 1);
-> +    uint64_t mem_high_size;
->      DriveInfo *dinfo = drive_get_next(IF_SD);
->
->      /* Sanity check on RAM size */
-> @@ -441,10 +448,33 @@ static void microchip_icicle_kit_machine_init(MachineState *machine)
->      qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
->
->      /* Register RAM */
-> -    memory_region_init_ram(main_mem, NULL, "microchip.icicle.kit.ram",
-> -                           machine->ram_size, &error_fatal);
-> +    memory_region_init_ram(mem_low, NULL, "microchip.icicle.kit.ram_low",
-> +                           memmap[MICROCHIP_PFSOC_DRAM_LO].size,
-> +                           &error_fatal);
-> +    memory_region_init_alias(mem_low_alias, NULL,
-> +                             "microchip.icicle.kit.ram_low.alias",
-> +                             mem_low, 0,
-> +                             memmap[MICROCHIP_PFSOC_DRAM_LO_ALIAS].size);
-> +    memory_region_add_subregion(system_memory,
-> +                                memmap[MICROCHIP_PFSOC_DRAM_LO].base,
-> +                                mem_low);
->      memory_region_add_subregion(system_memory,
-> -                                memmap[MICROCHIP_PFSOC_DRAM].base, main_mem);
-> +                                memmap[MICROCHIP_PFSOC_DRAM_LO_ALIAS].base,
-> +                                mem_low_alias);
-> +
-> +    mem_high_size = machine->ram_size - 1 * GiB;
-> +
-> +    memory_region_init_ram(mem_high, NULL, "microchip.icicle.kit.ram_high",
-> +                           mem_high_size, &error_fatal);
-> +    memory_region_init_alias(mem_high_alias, NULL,
-> +                             "microchip.icicle.kit.ram_high.alias",
-> +                             mem_high, 0, mem_high_size);
-> +    memory_region_add_subregion(system_memory,
-> +                                memmap[MICROCHIP_PFSOC_DRAM_HI].base,
-> +                                mem_high);
-> +    memory_region_add_subregion(system_memory,
-> +                                memmap[MICROCHIP_PFSOC_DRAM_HI_ALIAS].base,
-> +                                mem_high_alias);
->
->      /* Load the firmware */
->      riscv_find_and_load_firmware(machine, BIOS_FILENAME, RESET_VECTOR, NULL);
-> @@ -470,7 +500,15 @@ static void microchip_icicle_kit_machine_class_init(ObjectClass *oc, void *data)
->                     MICROCHIP_PFSOC_COMPUTE_CPU_COUNT;
->      mc->min_cpus = MICROCHIP_PFSOC_MANAGEMENT_CPU_COUNT + 1;
->      mc->default_cpus = mc->min_cpus;
-> -    mc->default_ram_size = 1 * GiB;
-> +
-> +    /*
-> +     * Map 513 MiB high memory, the mimimum required high memory size, because
-> +     * HSS will do memory test against the high memory address range regardless
-> +     * of physical memory installed.
-> +     *
-> +     * See memory_tests() in mss_ddr.c in the HSS source code.
-> +     */
-> +    mc->default_ram_size = 1537 * MiB;
->  }
->
->  static const TypeInfo microchip_icicle_kit_machine_typeinfo = {
-> diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-> index f34a6b3fd7..db77e9c84a 100644
-> --- a/include/hw/riscv/microchip_pfsoc.h
-> +++ b/include/hw/riscv/microchip_pfsoc.h
-> @@ -105,7 +105,10 @@ enum {
->      MICROCHIP_PFSOC_ENVM_CFG,
->      MICROCHIP_PFSOC_ENVM_DATA,
->      MICROCHIP_PFSOC_IOSCB,
-> -    MICROCHIP_PFSOC_DRAM,
-> +    MICROCHIP_PFSOC_DRAM_LO,
-> +    MICROCHIP_PFSOC_DRAM_LO_ALIAS,
-> +    MICROCHIP_PFSOC_DRAM_HI,
-> +    MICROCHIP_PFSOC_DRAM_HI_ALIAS
->  };
->
->  enum {
-> --
-> 2.25.1
->
->
 
