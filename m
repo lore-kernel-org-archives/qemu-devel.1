@@ -2,107 +2,90 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91EC2C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51BE1C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:52:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DDB22231B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:51:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00C0122275
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 13:52:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PWpl8Pbl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DDB22231B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="QahjWA5p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00C0122275
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZaFP-0008C3-UT
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 08:51:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56434)
+	id 1kZaFs-0000K3-WC
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 08:52:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZaE8-0007FL-1n
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:50:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35400)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZaE6-0002UT-Dw
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:50:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604325025;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>) id 1kZaDI-0006Xv-F3
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:49:36 -0500
+Received: from pharaoh.lmichel.fr ([149.202.28.74]:58734)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <luc@lmichel.fr>) id 1kZaDF-00028r-EG
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 08:49:35 -0500
+Received: from localhost (sekoia-pc.home.lmichel.fr [192.168.61.100])
+ by pharaoh.lmichel.fr (Postfix) with ESMTPSA id 8B642C60010;
+ Mon,  2 Nov 2020 13:49:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
+ t=1604324969;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Jw0+CBPAnUFXUtR/+eyBdRbfmPn9YExYA6RAcEY9adg=;
- b=PWpl8PblxG9Y1rBkWTbpnIDNpIILiNscreEwPLmq3WGOt/e5GBvcULnqx9j+mfpdR0ZD92
- LWyV/MpdKi1uDXyy6Oy6U+8nDrJATlZm6miq6NVkhy2VkfYwG/5qUQXmCf+8yhLxljARUE
- q1y6cj99+rMVeWSR0j9SCaEGDK6Cpew=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-2SIJOeICMFeikXCYluv1RA-1; Mon, 02 Nov 2020 08:50:22 -0500
-X-MC-Unique: 2SIJOeICMFeikXCYluv1RA-1
-Received: by mail-wr1-f69.google.com with SMTP id j13so6502840wrn.4
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 05:50:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Jw0+CBPAnUFXUtR/+eyBdRbfmPn9YExYA6RAcEY9adg=;
- b=FiTmcFwNIY29l8pE/1CaX5ccZuISgEv7ZnWyP0R7Swrxi7nxhyvTTK5kWvdozHkxia
- vGKeIJKmecTg/gJTwjBJipR3VpdkonSxEYBRxCN6bYr5DSdQ+vCOQ7A6Q9gWXMhIXHVq
- TOXLVCynnPb+YJ4d7l6zh4yyBydYOOCr9YG8qtI+72068QwMtNtrQMwXk/QjJYHjfehy
- sKQfi06rS/UWD927WBFFtemEMp0Ne5UC1+VDycj4EGpPEpTONCZgaGft5NQ/dBaJ2bqy
- YhlJNyZCxTjiEzw4ZDRAE879vSTrExUVtsiN9idiUwJDqpgoXM/t8dzBuK9hdt9KXg92
- feMA==
-X-Gm-Message-State: AOAM531YxN3RPoWjwUEPxZMLkcU3+f2ma6jZFHnxRHwzD7B9dPECB1XW
- t0FCi/1uB7bQSu58Wt91q/jV2ISewGYCfheir716PxEefsC7YX2ovzs3d8O3A5Te+LZw+OWfPtf
- RlYJ+C6/MWghHTvo=
-X-Received: by 2002:adf:f10e:: with SMTP id r14mr19514573wro.337.1604325021359; 
- Mon, 02 Nov 2020 05:50:21 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJydrm4UUGARKO42ulBUC96W6nfbS10vliU08yxOirwMIGJaWkwnpyGwceaRLFzeWbkZyV6GoA==
-X-Received: by 2002:adf:f10e:: with SMTP id r14mr19514560wro.337.1604325021203; 
- Mon, 02 Nov 2020 05:50:21 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id f2sm21853063wre.63.2020.11.02.05.50.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Nov 2020 05:50:20 -0800 (PST)
-Subject: Re: [PATCH 1/4] gitlab: publish the docs built during CI
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-References: <20201102130926.161183-1-berrange@redhat.com>
- <20201102130926.161183-2-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e496d701-c943-6bac-073b-97a9bb7567f0@redhat.com>
-Date: Mon, 2 Nov 2020 14:50:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ bh=KngahSW9XKPcsD9lJYIFsTzeKTBH7gdtMLueEsN6e1o=;
+ b=QahjWA5pgJX2qUPfp9MogxZMBaAlrcNDgZPdmAIMNOSVKXy/QkGOKldLiBbOCaD9Ficb7D
+ uPqCMVfkVAP22zbzs/nd6TyX1TO9xP7ss9XunkanqDARbbhcjucEyavh55igazivyHoRpo
+ qVAJdbzcyEscobud5kUxWUsd6MGkHbrG7TzTsX2iGpTZ0W7H7g8DJCvWMqFA1R+QSnGthS
+ VGiTCjaeu7AlEGC81aTo0Lqh4MaUvuLgJxMz6g5qCCrUf8Id2ZA48xJgyl0r92zSsZfrMT
+ wvDQ8DL94A5u4wPvIBTMDmLM8XLZeCdWQwKfhwMJYyreOBzK+Wm0EeSPREV+PA==
+Date: Mon, 2 Nov 2020 14:50:42 +0100
+From: Luc Michel <luc@lmichel.fr>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH-for-5.2 v3] util/cutils: Fix Coverity array overrun in
+ freq_to_str()
+Message-ID: <20201102135042.gc35bz364m3esz62@sekoia-pc.home.lmichel.fr>
+References: <20201101215755.2021421-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20201102130926.161183-2-berrange@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+In-Reply-To: <20201101215755.2021421-1-f4bug@amsat.org>
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
+ s=pharaoh; t=1604324969;
+ h=from:from:sender:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KngahSW9XKPcsD9lJYIFsTzeKTBH7gdtMLueEsN6e1o=;
+ b=JhnfQLVnqXiWUnvCOvOioE1DjBJBoPq/X2bPeWrjmlnM5XHP5iYwqemkLTmFM3/E4vZunS
+ L+aOhUb3PeSYr0r+baYQk5zpp88UGvHdPwfDedqLkhQyjTpXzTrMEFF4m5xZVFrMky7lb7
+ mTlcwn1eh9sz1dX9pMfgSx6gNjACc25qRQOWRCOy5tvK9LdeBEqzM/gVVqsx8/Sd191/zK
+ X+h6lV1jYbcaw1qLedmvgQRbbd/rLzGrp2FicaJ6TFHNwJ6wsc6N8YUGw+Bi5Kmafzjv1y
+ BZBAE6LJW1SqlQoA0Npljr0yiZbON7lOre6REgYYiMz78cklkTU+mz9afu6low==
+ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1604324969; a=rsa-sha256; cv=none;
+ b=HxFZTZlQpk7rgQ2PBiX22Dw3HWgNbFRkQZSsefoSNjg225KLMJoWWHatVNwPfM0jGmnFRcW/UFp1mw3ggfmJj1/ignefoshz5UVTT2TlMevOnwOadyS2IXdpISsy+L7WwCGIimZYXXJQ4mDUZEklaiGqR4bddfCzS7bKJ/Tz4052dzEK+r+bDPDL/CvgMmI7lri2OZ8Cqq7w2i0oM4jJto/okgRMAzqpDwOUPz46ZlV5We+JZK27kOvceSf4etIhMVsL7ewBSFxlnDxXnqmfStUoId/tz1pIQGcrwXgLJCnPNRXfue2NPTcHg65JsmgXs/jlcqJLLFmR3u/UyLXyDw==
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=sekoia smtp.mailfrom=luc@lmichel.fr
+Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
+ helo=pharaoh.lmichel.fr
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 08:49:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,61 +99,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/2/20 2:09 PM, Daniel P. Berrangé wrote:
-> Most of the build jobs will create the sphinx documentation. If we
-> expose this as an artifact of a "pages" job in a "public" directory, it
-> will get published using GitLab Pages. This means a user can push a
-> branch with docs changes to GitLab and view the results at
+On 22:57 Sun 01 Nov     , Philippe Mathieu-Daudé wrote:
+> Fix Coverity CID 1435957:  Memory - illegal accesses (OVERRUN):
 > 
->   https://yourusername.gitlab.io/qemu/
-
-Do we want that only for forks or also for the main repo?
-
-For the main repo we need to keep older releases archived
-but accessible.
-
+> >>> Overrunning array "suffixes" of 7 8-byte elements at element
+>     index 7 (byte offset 63) using index "idx" (which evaluates to 7).
 > 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> Note, the biggest input value freq_to_str() can accept is UINT64_MAX,
+> which is ~18.446 EHz, less than 1000 EHz.
+> 
+> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Reviewed-by: Luc Michel <luc@lmichel.fr>
+
 > ---
->  .gitlab-ci.yml | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+> v3: Follow Peter's suggestion
+> ---
+>  util/cutils.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index 3b15ae5c30..a41725d6f7 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -423,3 +423,17 @@ check-dco:
->        - $CI_PROJECT_NAMESPACE == 'qemu-project' && $CI_COMMIT_BRANCH == 'master'
->    variables:
->      GIT_DEPTH: 1000
-> +
-> +pages:
-> +  image: $CI_REGISTRY_IMAGE/qemu/ubuntu2004:latest
-> +  stage: test
-> +  needs:
-> +    - job: build-system-ubuntu
-> +      artifacts: true
-> +  script:
-> +    - mkdir public
-
-I'd rather use public/$CI_COMMIT_BRANCH, that way we can
-diff between 2 versions.
-
-What about adding a manual job to clean public/$CI_COMMIT_BRANCH?
-(depending on push-pages success).
-
-> +    - mv build/docs/index.html public/
-> +    - for i in devel interop specs system tools user ; do mv build/docs/$i public/ ; done
-> +  artifacts:
-> +    paths:
-> +      - public
+> diff --git a/util/cutils.c b/util/cutils.c
+> index c395974fab4..2f869a843a5 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> @@ -891,10 +891,11 @@ char *freq_to_str(uint64_t freq_hz)
+>      double freq = freq_hz;
+>      size_t idx = 0;
+>  
+> -    while (freq >= 1000.0 && idx < ARRAY_SIZE(suffixes)) {
+> +    while (freq >= 1000.0) {
+>          freq /= 1000.0;
+>          idx++;
+>      }
+> +    assert(idx < ARRAY_SIZE(suffixes));
+>  
+>      return g_strdup_printf("%0.3g %sHz", freq, suffixes[idx]);
+>  }
+> -- 
+> 2.26.2
 > 
 
+-- 
 
