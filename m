@@ -7,68 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F492C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 06:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 229E2C00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 06:35:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D63C020874
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 06:33:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AED320874
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 06:35:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e5cyCnws"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D63C020874
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WCXmF6dp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AED320874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZTPe-0004Yp-Me
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 01:33:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58324)
+	id 1kZTR0-0005Xs-Lr
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 01:35:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZTOu-00042s-QP
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 01:33:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60495)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZTPl-0004oq-Rn
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 01:34:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48573)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZTOr-0001kf-Kk
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 01:33:07 -0500
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZTPk-00021s-9b
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 01:34:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604298783;
+ s=mimecast20190719; t=1604298839;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=FvO7SWeRvtMsAen7yl3skEAdrRW+yndcHhOHx/L/lzc=;
- b=e5cyCnwsA+Atr3qEDMV4R+f+tTpOx14chTAmiGXiD/I0fEh0m8OfiZSHJ/Pp/F8IGuqWVX
- 2syDFP1PcOka8o7Ksoh3hj8e3vFLF9zFrCa2j9JVdwg4ICuw+r7tOj8DcbP9pvfXEvj1cd
- GLlsB3TcleW3yyyvm61jEtVRZRDTks4=
+ bh=lme2fBuAaYU3LnfN8aCXvRWc2xvArjV9tMzvBphxAOc=;
+ b=WCXmF6dpzCcWBeJtxGj0F1LfAxdOTn7ydkjhHCgN/2DJrgnB7Rgvq45t7TK7Km9IkW16iL
+ XaIH71zA2xnl1F6HyNzKXS6JR69JPomfFizW/7rDXuxCJab/qugbtfJl/ZbB7V9yi0JrQX
+ h4VbgcJI6PGIWullAtxoTokqnLefy44=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-4jM5X1GpNGGVDubPe02A2g-1; Mon, 02 Nov 2020 01:33:01 -0500
-X-MC-Unique: 4jM5X1GpNGGVDubPe02A2g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-465-LicyAaXjNMu8NFE2O5iUTg-1; Mon, 02 Nov 2020 01:33:57 -0500
+X-MC-Unique: LicyAaXjNMu8NFE2O5iUTg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 641F0107ACF8;
- Mon,  2 Nov 2020 06:33:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBAE01084C86;
+ Mon,  2 Nov 2020 06:33:55 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
  [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5029860C13;
- Mon,  2 Nov 2020 06:32:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B141C5C1C2;
+ Mon,  2 Nov 2020 06:33:55 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id ADC0F1132BD6; Mon,  2 Nov 2020 07:32:55 +0100 (CET)
+ id 5FBCE1132BD6; Mon,  2 Nov 2020 07:33:54 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH v10 1/8] Introduce yank feature
+Subject: Re: [PATCH v10 7/8] MAINTAINERS: Add myself as maintainer for yank
+ feature
 References: <cover.1604075469.git.lukasstraub2@web.de>
- <20201030174108.1c88195b@luklap>
-Date: Mon, 02 Nov 2020 07:32:55 +0100
-In-Reply-To: <20201030174108.1c88195b@luklap> (Lukas Straub's message of "Fri, 
- 30 Oct 2020 17:41:08 +0100")
-Message-ID: <87y2jkp8tk.fsf@dusky.pond.sub.org>
+ <20201030174138.071af6a3@luklap>
+Date: Mon, 02 Nov 2020 07:33:54 +0100
+In-Reply-To: <20201030174138.071af6a3@luklap> (Lukas Straub's message of "Fri, 
+ 30 Oct 2020 17:41:38 +0100")
+Message-ID: <87r1pcp8rx.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -100,68 +101,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Kevin Wolf <kwolf@redhat.com>,
  =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- "Dr. David
- Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
  =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Lukas Straub <lukasstraub2@web.de> writes:
 
-> The yank feature allows to recover from hanging qemu by "yanking"
-> at various parts. Other qemu systems can register themselves and
-> multiple yank functions. Then all yank functions for selected
-> instances can be called by the 'yank' out-of-band qmp command.
-> Available instances can be queried by a 'query-yank' oob command.
+> I'll maintain this for now as the colo usecase is the first user
+> of this functionality.
 >
 > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 > Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-[...]
->  qapi_storage_daemon_modules = [
-> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-> index 0b444b76d2..79c1705ed7 100644
-> --- a/qapi/qapi-schema.json
-> +++ b/qapi/qapi-schema.json
-> @@ -91,3 +91,4 @@
->  { 'include': 'audio.json' }
->  { 'include': 'acpi.json' }
->  { 'include': 'pci.json' }
-> +{ 'include': 'yank.json' }
-
-This adds the documentation at the very end of the reference manual.  Is
-this where you want it to go?  Check generated
-docs/interop/qemu-qmp-ref.html.
-
-> diff --git a/qapi/yank.json b/qapi/yank.json
-> new file mode 100644
-> index 0000000000..1964a2202e
-> --- /dev/null
-> +++ b/qapi/yank.json
-> @@ -0,0 +1,115 @@
-> +# -*- Mode: Python -*-
-> +# vim: filetype=python
-> +#
+> ---
+>  MAINTAINERS | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8c744a9bdf..81288fd219 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2676,6 +2676,13 @@ F: util/uuid.c
+>  F: include/qemu/uuid.h
+>  F: tests/test-uuid.c
+>
+> +Yank feature
+> +M: Lukas Straub <lukasstraub2@web.de>
+> +S: Odd fixes
+> +F: util/yank.c
+> +F: include/qemu/yank.h
+> +F: qapi/yank.json
 > +
+>  COLO Framework
+>  M: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>  S: Maintained
 
-Please add a suitable heading here.  Headings look like this:
+I'd squash this into PATCH 1 to mollify checkpatch.pl.
 
-   ##
-   # Text of heading goes here
-   ##
-
-Without it, the yank stuff gets squashed into the previous section
-(happens to be PCI).
-
-If you want to add an introduction or overview, it goes right below the
-heading.  I'm not asking you to do that, I'm only telling you what's
-possible.
-
-[...]
-
-Solid work, pleasant to review, thanks!
-
+Regardless,
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
