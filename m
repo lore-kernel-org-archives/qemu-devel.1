@@ -2,91 +2,89 @@ Return-Path: <SRS0=N3Ri=EI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DAEC388F9
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69FF5C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:26:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 396F422243
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:24:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04A8B2222B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 18:26:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="pd/cuJS0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 396F422243
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPMXWvQ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04A8B2222B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZeVD-0006pH-8A
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:24:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40892)
+	id 1kZeWq-0000ph-4z
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 13:26:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeR3-0001Y7-IA
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:05 -0500
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:45967)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1kZeQw-0006iB-86
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:20:05 -0500
-Received: by mail-lf1-x143.google.com with SMTP id y184so16693727lfa.12
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 10:19:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Ww5EvrpJVdoc1slCZnMfPZ+2zfMTN1gD2SMi9IAZjPo=;
- b=pd/cuJS0E9TxPyU8TR8aaPllaMv6j/nEPBo2wos6hfZRHeYVNjvO2b8AwSV0lw1yTz
- wRXyZ9Eyn9btdmEBOl4+zVAVjNgFMs98mIMtdFPPzUvwgBcZ5QgQrw3seg+fGaGhCVuf
- l1LiV/f1VLM3TTVg8gFkWi+9O0O7jpPlqg+jDdZZ7wFXlSc2Vix2HEHHWcjuipeny2cJ
- xYdY8uJK1a9Yh1exeWJNTSHVYo+XZFpJhb8lmerbg9bQLQKjBUvsR5ad9MlMobyCrdCt
- hAVLFDMX0bkMH5QQYsTdMWdzwSWX7iYscifnWo1HY2nlO+BkJx6qvg7STjdR+6XaAVPh
- vGPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Ww5EvrpJVdoc1slCZnMfPZ+2zfMTN1gD2SMi9IAZjPo=;
- b=JYYoGHpREmhpjO5ibgEzwMFx5U2skHlN31YV8YVCu1W6Ee7YIRrdsm62OqbgSXsSbZ
- 8dJQEDjB5quaccg4e5Un1b2chD63TgKKXX2Ipvd6NoKDTWKbqCgaqhoyikaP03WOwp7T
- Qz+OMP9PrJyvFDV6K2w2tOvdu190AkXbCrD2GNMBiK9qOMRT6NvAbtPH8jRawVRx1fyr
- ZSVZxK19XZvAPLifIaW/IGlPVAgS/hWxwPYgPqsWTB6lAzDb9lOgT63+gxg4JHgwlZZl
- ohD5y0WwZsNz4YlOs7McThG19EyUaDfjZ4XYa4D/MzT4bCGbEh41YwKyo1+RoN+RJ2lK
- spzQ==
-X-Gm-Message-State: AOAM531ZwAJjlwln7mR6neqvjqqi1+BE/9h9pd3RwP2oh1F9Mweyh/k5
- wPj4NmXFhCdNsPaSZSixpLdxdA==
-X-Google-Smtp-Source: ABdhPJwa4UlIiRK8ddEfDwebMrox6H3d/ykkO28Xw4xqDKaO3FfOhp6l1OES1SxqUnsLmkGyOzP4bw==
-X-Received: by 2002:a05:6512:3496:: with SMTP id
- v22mr5725316lfr.230.1604341194619; 
- Mon, 02 Nov 2020 10:19:54 -0800 (PST)
-Received: from navi.cosmonova.net.ua ([95.67.24.131])
- by smtp.gmail.com with ESMTPSA id c6sm2527007lfm.226.2020.11.02.10.19.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 10:19:53 -0800 (PST)
-From: Andrew Melnychenko <andrew@daynix.com>
-To: jasowang@redhat.com,
-	mst@redhat.com
-Subject: [RFC PATCH 3/6] ebpf: Added eBPF RSS program.
-Date: Mon,  2 Nov 2020 20:51:13 +0200
-Message-Id: <20201102185115.7425-4-andrew@daynix.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201102185115.7425-1-andrew@daynix.com>
-References: <20201102185115.7425-1-andrew@daynix.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kZeUl-0006HE-Ta
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:23:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60813)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kZeUj-0007HU-RB
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 13:23:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604341432;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ftHdmlbo3Beonif/lBCxuo10ZO9J1OjYSksFW/oikAE=;
+ b=CPMXWvQ3jpCpWPRIjVvV50CLfIzz04TLwf5sC9LDyqOAa88CJqfaV9oK1ZkCzUoShU82K7
+ rHwT1DGiyJLz6E+dzW6ZdTJB/ddxCuNUkkAq1WOXE2j70oPY+bPDioQTM693bu+zVZDOUT
+ Scmf7+Afn3lblpHZ7kWLVK3b+f++UIo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-BcKO-S--OHSSG3w6F-ag9Q-1; Mon, 02 Nov 2020 13:23:47 -0500
+X-MC-Unique: BcKO-S--OHSSG3w6F-ag9Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6B111006C98;
+ Mon,  2 Nov 2020 18:23:46 +0000 (UTC)
+Received: from work-vm (ovpn-114-142.ams2.redhat.com [10.36.114.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BD91F5C5DE;
+ Mon,  2 Nov 2020 18:23:42 +0000 (UTC)
+Date: Mon, 2 Nov 2020 18:23:39 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH 1/2] migration: Unify reset of last_rb on destination
+ node when recover
+Message-ID: <20201102182339.GK3673@work-vm>
+References: <20201102153010.11979-1-peterx@redhat.com>
+ <20201102153010.11979-2-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=2a00:1450:4864:20::143;
- envelope-from=andrew@daynix.com; helo=mail-lf1-x143.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201102153010.11979-2-peterx@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 01:33:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,1189 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com, yuri.benditovich@daynix.com, Andrew <andrew@daynix.com>,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrew <andrew@daynix.com>
+* Peter Xu (peterx@redhat.com) wrote:
+> When postcopy recover happens, we need to reset last_rb after each return of
+> postcopy_pause_fault_thread() because that means we just got the postcopy
+> migration continued.
+> 
+> Unify this reset to the place right before we want to kick the fault thread
+> again, when we get the command MIG_CMD_POSTCOPY_RESUME from source.
+> 
+> This is actually more than that - because the main thread on destination will
+> now be able to call migrate_send_rp_req_pages_pending() too, so the fault
+> thread is not the only user of last_rb now.  Move the reset earlier will allow
+> the first call to migrate_send_rp_req_pages_pending() to use the reset value
+> even if called from the main thread.
+> 
+> (NOTE: this is not a real fix to 0c26781c09 mentioned below, however it is just
+>  a mark that when picking up 0c26781c09 we'd better have this one too; the real
+>  fix will come later)
+> 
+> Fixes: 0c26781c09 ("migration: Sync requested pages after postcopy recovery")
+> Tested-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-RSS program and Makefile to build it.
-Also, added a python script that would generate '.h' file.
-The data in that file may be loaded by eBPF API.
-EBPF compilation is not required for building qemu.
-You can use Makefile if you need to regenerate tun_rss_steering.h.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
----
- ebpf/EbpfElf_to_C.py    |  67 +++++
- ebpf/Makefile.ebpf      |  38 +++
- ebpf/rss.bpf.c          | 470 +++++++++++++++++++++++++++++++++
- ebpf/tun_rss_steering.h | 556 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 1131 insertions(+)
- create mode 100644 ebpf/EbpfElf_to_C.py
- create mode 100755 ebpf/Makefile.ebpf
- create mode 100644 ebpf/rss.bpf.c
- create mode 100644 ebpf/tun_rss_steering.h
-
-diff --git a/ebpf/EbpfElf_to_C.py b/ebpf/EbpfElf_to_C.py
-new file mode 100644
-index 0000000000..a6e3476f2b
---- /dev/null
-+++ b/ebpf/EbpfElf_to_C.py
-@@ -0,0 +1,67 @@
-+#!/usr/bin/python3
-+# pip install pyelftools
-+
-+import sys
-+import argparse
-+
-+from elftools.elf.elffile import ELFFile
-+from elftools.elf.relocation import RelocationSection
-+from elftools.elf.sections import Section
-+from elftools.elf.sections import SymbolTableSection
-+
-+def process_file(filename, prog_name):
-+    print('Processing file:', filename)
-+    with open(filename, 'rb') as f:
-+        with open("%s.h" % prog_name, 'w') as w:
-+
-+            elffile = ELFFile(f)
-+
-+            symtab = elffile.get_section_by_name(".symtab")
-+            if not isinstance(symtab, SymbolTableSection):
-+                print('  The file has no %s section' % ".symtab")
-+                return -1
-+
-+            prog_sec = elffile.get_section_by_name(prog_name);
-+            if not isinstance(prog_sec, Section):
-+                print('  The file has no %s section' % prog_name)
-+                return -1
-+
-+            w.write('#ifndef %s\n' % prog_name.upper())
-+            w.write('#define %s\n\n' % prog_name.upper())
-+
-+            w.write("struct bpf_insn ins%s[] = {\n" % prog_name)
-+            insns = [prog_sec.data()[i:i + 8] for i in range(0, prog_sec.data_size, 8)]
-+            for x in insns:
-+                w.write( \
-+                    '    {0x%02x, 0x%02x, 0x%02x, 0x%02x%02x, 0x%02x%02x%02x%02x},\n' \
-+                    % (x[0], x[1] & 0x0f, (x[1] >> 4) & 0x0f, \
-+                       x[3], x[2], x[7], x[6], x[5], x[4]))
-+            w.write('};\n\n')
-+
-+            reladyn_name = '.rel' + prog_name
-+            reladyn = elffile.get_section_by_name(reladyn_name)
-+
-+            if isinstance(reladyn, RelocationSection):
-+                w.write('struct fixup_mapfd_t rel%s[] = {\n' % prog_name)
-+                for reloc in reladyn.iter_relocations():
-+                    w.write('    {"%s", %i},\n' \
-+                        % (symtab.get_symbol(reloc['r_info_sym']).name, \
-+                           (reloc['r_offset']/8)))
-+                w.write('};\n\n')
-+            else:
-+               print('  The file has no %s section' % reladyn_name)
-+
-+            w.write('#endif /* %s */\n' % prog_name.upper())
-+
-+    return 0
-+
-+if __name__ == '__main__':
-+    parser = argparse.ArgumentParser(
-+        description='Convert eBPF ELF to C header. '
-+                    'Section name will be used in C namings.')
-+    parser.add_argument('--file', '-f', nargs=1, required=True,
-+                        help='eBPF ELF file')
-+    parser.add_argument('--section', '-s', nargs=1, required=True,
-+                        help='section in ELF with eBPF program.')
-+    args = parser.parse_args()
-+    sys.exit(process_file(args.file[0], args.section[0]))
-diff --git a/ebpf/Makefile.ebpf b/ebpf/Makefile.ebpf
-new file mode 100755
-index 0000000000..f7008d7d32
---- /dev/null
-+++ b/ebpf/Makefile.ebpf
-@@ -0,0 +1,38 @@
-+OBJS = rss.bpf.o
-+
-+LLC ?= llc
-+CLANG ?= clang
-+INC_FLAGS = -nostdinc -isystem `$(CLANG) -print-file-name=include`
-+EXTRA_CFLAGS ?= -O2 -emit-llvm
-+
-+linuxhdrs = ~/src/kernel/master
-+
-+LINUXINCLUDE =  -I $(linuxhdrs)/arch/x86/include/uapi \
-+                -I $(linuxhdrs)/arch/x86/include/generated/uapi \
-+                -I $(linuxhdrs)/arch/x86/include/generated \
-+                -I $(linuxhdrs)/include/generated/uapi \
-+                -I $(linuxhdrs)/include/uapi \
-+                -I $(linuxhdrs)/include \
-+                -I $(linuxhdrs)/tools/lib
-+
-+all: $(OBJS)
-+
-+.PHONY: clean
-+
-+clean:
-+	rm -f $(OBJS)
-+
-+INC_FLAGS = -nostdinc -isystem `$(CLANG) -print-file-name=include`
-+
-+$(OBJS):  %.o:%.c
-+	$(CLANG) $(INC_FLAGS) \
-+                -D__KERNEL__ -D__ASM_SYSREG_H \
-+                -Wno-unused-value -Wno-pointer-sign \
-+                -Wno-compare-distinct-pointer-types \
-+                -Wno-gnu-variable-sized-type-not-at-end \
-+                -Wno-address-of-packed-member -Wno-tautological-compare \
-+                -Wno-unknown-warning-option \
-+                -I../include $(LINUXINCLUDE) \
-+                $(EXTRA_CFLAGS) -c $< -o -| $(LLC) -march=bpf -filetype=obj -o $@
-+	python3 EbpfElf_to_C.py -f rss.bpf.o -s tun_rss_steering
-+
-diff --git a/ebpf/rss.bpf.c b/ebpf/rss.bpf.c
-new file mode 100644
-index 0000000000..084fc33f96
---- /dev/null
-+++ b/ebpf/rss.bpf.c
-@@ -0,0 +1,470 @@
-+#include <stddef.h>
-+#include <stdbool.h>
-+#include <linux/bpf.h>
-+
-+#include <linux/in.h>
-+#include <linux/if_ether.h>
-+#include <linux/ip.h>
-+#include <linux/ipv6.h>
-+
-+#include <linux/udp.h>
-+#include <linux/tcp.h>
-+
-+#include <bpf/bpf_helpers.h>
-+#include <linux/virtio_net.h>
-+
-+/*
-+ * Prepare:
-+ * Requires llvm, clang, python3 with pyelftools, linux kernel tree
-+ *
-+ * Build tun_rss_steering.h:
-+ * make -f Mefile.ebpf clean all
-+ */
-+
-+#define INDIRECTION_TABLE_SIZE 128
-+#define HASH_CALCULATION_BUFFER_SIZE 36
-+
-+struct rss_config_t {
-+    __u8 redirect;
-+    __u8 populate_hash;
-+    __u32 hash_types;
-+    __u16 indirections_len;
-+    __u16 default_queue;
-+};
-+
-+struct toeplitz_key_data_t {
-+    __u32 leftmost_32_bits;
-+    __u8 next_byte[HASH_CALCULATION_BUFFER_SIZE];
-+};
-+
-+struct packet_hash_info_t {
-+    __u8 is_ipv4;
-+    __u8 is_ipv6;
-+    __u8 is_udp;
-+    __u8 is_tcp;
-+    __u8 is_ipv6_ext_src;
-+    __u8 is_ipv6_ext_dst;
-+
-+    __u16 src_port;
-+    __u16 dst_port;
-+
-+    union {
-+        struct {
-+            __be32 in_src;
-+            __be32 in_dst;
-+        };
-+
-+        struct {
-+            struct in6_addr in6_src;
-+            struct in6_addr in6_dst;
-+            struct in6_addr in6_ext_src;
-+            struct in6_addr in6_ext_dst;
-+        };
-+    };
-+};
-+
-+struct {
-+    __uint(type, BPF_MAP_TYPE_ARRAY);
-+    __type(key, __u32);
-+    __type(value, struct rss_config_t);
-+    __uint(max_entries, 1);
-+} tap_rss_map_configurations SEC(".maps");
-+
-+struct {
-+    __uint(type, BPF_MAP_TYPE_ARRAY);
-+    __type(key, __u32);
-+    __type(value, struct toeplitz_key_data_t);
-+    __uint(max_entries, 1);
-+} tap_rss_map_toeplitz_key SEC(".maps");
-+
-+struct {
-+    __uint(type, BPF_MAP_TYPE_ARRAY);
-+    __type(key, __u32);
-+    __type(value, __u16);
-+    __uint(max_entries, INDIRECTION_TABLE_SIZE);
-+} tap_rss_map_indirection_table SEC(".maps");
-+
-+
-+static inline void net_rx_rss_add_chunk(__u8 *rss_input, size_t *bytes_written,
-+                                        const void *ptr, size_t size) {
-+    __builtin_memcpy(&rss_input[*bytes_written], ptr, size);
-+    *bytes_written += size;
-+}
-+
-+static inline
-+void net_toeplitz_add(__u32 *result,
-+                      __u8 *input,
-+                      __u32 len
-+        , struct toeplitz_key_data_t *key) {
-+
-+    __u32 accumulator = *result;
-+    __u32 leftmost_32_bits = key->leftmost_32_bits;
-+    __u32 byte;
-+
-+    for (byte = 0; byte < HASH_CALCULATION_BUFFER_SIZE; byte++) {
-+        __u8 input_byte = input[byte];
-+        __u8 key_byte = key->next_byte[byte];
-+        __u8 bit;
-+
-+        for (bit = 0; bit < 8; bit++) {
-+            if (input_byte & (1 << 7)) {
-+                accumulator ^= leftmost_32_bits;
-+            }
-+
-+            leftmost_32_bits =
-+                    (leftmost_32_bits << 1) | ((key_byte & (1 << 7)) >> 7);
-+
-+            input_byte <<= 1;
-+            key_byte <<= 1;
-+        }
-+    }
-+
-+    *result = accumulator;
-+}
-+
-+
-+static inline int ip6_extension_header_type(__u8 hdr_type)
-+{
-+    switch (hdr_type) {
-+    case IPPROTO_HOPOPTS:
-+    case IPPROTO_ROUTING:
-+    case IPPROTO_FRAGMENT:
-+    case IPPROTO_ICMPV6:
-+    case IPPROTO_NONE:
-+    case IPPROTO_DSTOPTS:
-+    case IPPROTO_MH:
-+        return 1;
-+    default:
-+        return 0;
-+    }
-+}
-+/*
-+ * According to https://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml
-+ * we suspect that there are would be no more than 11 extensions in IPv6 header,
-+ * also there is 27 TLV options for Destination and Hop-by-hop extensions.
-+ * Need to choose reasonable amount of maximum extensions/options we may check to find
-+ * ext src/dst.
-+ */
-+#define IP6_EXTENSIONS_COUNT 11
-+#define IP6_OPTIONS_COUNT 30
-+
-+static inline void parse_ipv6_ext(struct __sk_buff *skb,
-+        struct packet_hash_info_t *info,
-+        __u8 *l4_protocol, size_t *l4_offset)
-+{
-+    if (!ip6_extension_header_type(*l4_protocol)) {
-+        return;
-+    }
-+
-+    struct ipv6_opt_hdr ext_hdr = {};
-+
-+    for (unsigned int i = 0; i < IP6_EXTENSIONS_COUNT; ++i) {
-+
-+        bpf_skb_load_bytes_relative(skb, *l4_offset, &ext_hdr,
-+                                    sizeof(ext_hdr), BPF_HDR_START_NET);
-+
-+        if (*l4_protocol == IPPROTO_ROUTING) {
-+            struct ipv6_rt_hdr ext_rt = {};
-+
-+            bpf_skb_load_bytes_relative(skb, *l4_offset, &ext_rt,
-+                                        sizeof(ext_rt), BPF_HDR_START_NET);
-+
-+            if ((ext_rt.type == IPV6_SRCRT_TYPE_2) &&
-+                    (ext_rt.hdrlen == sizeof(struct in6_addr) / 8) &&
-+                    (ext_rt.segments_left == 1)) {
-+
-+                bpf_skb_load_bytes_relative(skb,
-+                    *l4_offset + offsetof(struct rt2_hdr, addr),
-+                    &info->in6_ext_dst, sizeof(info->in6_ext_dst),
-+                    BPF_HDR_START_NET);
-+
-+                info->is_ipv6_ext_dst = 1;
-+            }
-+
-+        } else if (*l4_protocol == IPPROTO_DSTOPTS) {
-+            struct ipv6_opt_t {
-+                __u8 type;
-+                __u8 length;
-+            } __attribute__((packed)) opt = {};
-+
-+            size_t opt_offset = sizeof(ext_hdr);
-+
-+            for (unsigned int j = 0; j < IP6_OPTIONS_COUNT; ++j) {
-+                bpf_skb_load_bytes_relative(skb, *l4_offset + opt_offset,
-+                                        &opt, sizeof(opt), BPF_HDR_START_NET);
-+
-+                opt_offset += (opt.type == IPV6_TLV_PAD1) ?
-+                        1 : opt.length + sizeof(opt);
-+
-+                if (opt_offset + 1 >= ext_hdr.hdrlen * 8) {
-+                    break;
-+                }
-+
-+                if (opt.type == IPV6_TLV_HAO) {
-+                    bpf_skb_load_bytes_relative(skb,
-+                        *l4_offset + opt_offset + offsetof(struct ipv6_destopt_hao, addr),
-+                        &info->is_ipv6_ext_src, sizeof(info->is_ipv6_ext_src),
-+                        BPF_HDR_START_NET);
-+
-+                    info->is_ipv6_ext_src = 1;
-+                    break;
-+                }
-+            }
-+        }
-+
-+        *l4_protocol = ext_hdr.nexthdr;
-+        *l4_offset += (ext_hdr.hdrlen + 1) * 8;
-+
-+        if (!ip6_extension_header_type(ext_hdr.nexthdr)) {
-+            return;
-+        }
-+    }
-+}
-+
-+static inline void parse_packet(struct __sk_buff *skb,
-+        struct packet_hash_info_t *info)
-+{
-+    if (!info || !skb) {
-+        return;
-+    }
-+
-+    size_t l4_offset = 0;
-+    __u8 l4_protocol = 0;
-+    __u16 l3_protocol = __be16_to_cpu(skb->protocol);
-+
-+    if (l3_protocol == ETH_P_IP) {
-+        info->is_ipv4 = 1;
-+
-+        struct iphdr ip = {};
-+        bpf_skb_load_bytes_relative(skb, 0, &ip, sizeof(ip),
-+                                    BPF_HDR_START_NET);
-+
-+        info->in_src = ip.saddr;
-+        info->in_dst = ip.daddr;
-+
-+        l4_protocol = ip.protocol;
-+        l4_offset = ip.ihl * 4;
-+    } else if (l3_protocol == ETH_P_IPV6) {
-+        info->is_ipv6 = 1;
-+
-+        struct ipv6hdr ip6 = {};
-+        bpf_skb_load_bytes_relative(skb, 0, &ip6, sizeof(ip6),
-+                                    BPF_HDR_START_NET);
-+
-+        info->in6_src = ip6.saddr;
-+        info->in6_dst = ip6.daddr;
-+
-+        l4_protocol = ip6.nexthdr;
-+        l4_offset = sizeof(ip6);
-+
-+        parse_ipv6_ext(skb, info, &l4_protocol, &l4_offset);
-+    }
-+
-+    if (l4_protocol != 0) {
-+        if (l4_protocol == IPPROTO_TCP) {
-+            info->is_tcp = 1;
-+
-+            struct tcphdr tcp = {};
-+            bpf_skb_load_bytes_relative(skb, l4_offset, &tcp, sizeof(tcp),
-+                                        BPF_HDR_START_NET);
-+
-+            info->src_port = tcp.source;
-+            info->dst_port = tcp.dest;
-+        } else if (l4_protocol == IPPROTO_UDP) { /* TODO: add udplite? */
-+            info->is_udp = 1;
-+
-+            struct udphdr udp = {};
-+            bpf_skb_load_bytes_relative(skb, l4_offset, &udp, sizeof(udp),
-+                                        BPF_HDR_START_NET);
-+
-+            info->src_port = udp.source;
-+            info->dst_port = udp.dest;
-+        }
-+    }
-+}
-+
-+static inline __u32 calculate_rss_hash(struct __sk_buff *skb,
-+        struct rss_config_t *config, struct toeplitz_key_data_t *toe)
-+{
-+    __u8 rss_input[HASH_CALCULATION_BUFFER_SIZE] = {};
-+    size_t bytes_written = 0;
-+    __u32 result = 0;
-+    struct packet_hash_info_t packet_info = {};
-+
-+    parse_packet(skb, &packet_info);
-+
-+    if (packet_info.is_ipv4) {
-+        if (packet_info.is_tcp &&
-+            config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4) {
-+
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.in_src,
-+                                 sizeof(packet_info.in_src));
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.in_dst,
-+                                 sizeof(packet_info.in_dst));
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.src_port,
-+                                 sizeof(packet_info.src_port));
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.dst_port,
-+                                 sizeof(packet_info.dst_port));
-+        } else if (packet_info.is_udp &&
-+                   config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4) {
-+
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.in_src,
-+                                 sizeof(packet_info.in_src));
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.in_dst,
-+                                 sizeof(packet_info.in_dst));
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.src_port,
-+                                 sizeof(packet_info.src_port));
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.dst_port,
-+                                 sizeof(packet_info.dst_port));
-+        } else if (config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_IPv4) {
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.in_src,
-+                                 sizeof(packet_info.in_src));
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.in_dst,
-+                                 sizeof(packet_info.in_dst));
-+        }
-+    } else if (packet_info.is_ipv6) {
-+        if (packet_info.is_tcp &&
-+            config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_TCPv6) {
-+
-+            if (packet_info.is_ipv6_ext_src &&
-+                config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_TCP_EX) {
-+
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_ext_src,
-+                                     sizeof(packet_info.in6_ext_src));
-+            } else {
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_src,
-+                                     sizeof(packet_info.in6_src));
-+            }
-+            if (packet_info.is_ipv6_ext_dst &&
-+                config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_TCP_EX) {
-+
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_ext_dst,
-+                                     sizeof(packet_info.in6_ext_dst));
-+            } else {
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_dst,
-+                                     sizeof(packet_info.in6_dst));
-+            }
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.src_port,
-+                                 sizeof(packet_info.src_port));
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.dst_port,
-+                                 sizeof(packet_info.dst_port));
-+        } else if (packet_info.is_udp &&
-+                   config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_UDPv6) {
-+
-+            if (packet_info.is_ipv6_ext_src &&
-+               config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_UDP_EX) {
-+
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_ext_src,
-+                                     sizeof(packet_info.in6_ext_src));
-+            } else {
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_src,
-+                                     sizeof(packet_info.in6_src));
-+            }
-+            if (packet_info.is_ipv6_ext_dst &&
-+               config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_UDP_EX) {
-+
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_ext_dst,
-+                                     sizeof(packet_info.in6_ext_dst));
-+            } else {
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_dst,
-+                                     sizeof(packet_info.in6_dst));
-+            }
-+
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.src_port,
-+                                 sizeof(packet_info.src_port));
-+            net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                 &packet_info.dst_port,
-+                                 sizeof(packet_info.dst_port));
-+
-+        } else if (config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_IPv6) {
-+            if (packet_info.is_ipv6_ext_src &&
-+               config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_IP_EX) {
-+
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_ext_src,
-+                                     sizeof(packet_info.in6_ext_src));
-+            } else {
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_src,
-+                                     sizeof(packet_info.in6_src));
-+            }
-+            if (packet_info.is_ipv6_ext_dst &&
-+                config->hash_types & VIRTIO_NET_RSS_HASH_TYPE_IP_EX) {
-+
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_ext_dst,
-+                                     sizeof(packet_info.in6_ext_dst));
-+            } else {
-+                net_rx_rss_add_chunk(rss_input, &bytes_written,
-+                                     &packet_info.in6_dst,
-+                                     sizeof(packet_info.in6_dst));
-+            }
-+        }
-+    }
-+
-+    if (bytes_written) {
-+        net_toeplitz_add(&result, rss_input, bytes_written, toe);
-+    }
-+
-+    return result;
-+}
-+
-+SEC("tun_rss_steering")
-+int tun_rss_steering_prog(struct __sk_buff *skb)
-+{
-+
-+    struct rss_config_t *config = 0;
-+    struct toeplitz_key_data_t *toe = 0;
-+
-+    __u32 key = 0;
-+    __u32 hash = 0;
-+
-+    config = bpf_map_lookup_elem(&tap_rss_map_configurations, &key);
-+    toe = bpf_map_lookup_elem(&tap_rss_map_toeplitz_key, &key);
-+
-+    if (config && toe) {
-+        if (!config->redirect) {
-+            return config->default_queue;
-+        }
-+
-+        hash = calculate_rss_hash(skb, config, toe);
-+        if (hash) {
-+            __u32 table_idx = hash % config->indirections_len;
-+            __u16 *queue = 0;
-+
-+            queue = bpf_map_lookup_elem(&tap_rss_map_indirection_table,
-+                                        &table_idx);
-+
-+            if (queue) {
-+                return *queue;
-+            }
-+        }
-+
-+        return config->default_queue;
-+    }
-+
-+    return -1;
-+}
-+
-+char _license[] SEC("license") = "GPL";
-diff --git a/ebpf/tun_rss_steering.h b/ebpf/tun_rss_steering.h
-new file mode 100644
-index 0000000000..bbf63a109a
---- /dev/null
-+++ b/ebpf/tun_rss_steering.h
-@@ -0,0 +1,556 @@
-+#ifndef TUN_RSS_STEERING
-+#define TUN_RSS_STEERING
-+
-+struct bpf_insn instun_rss_steering[] = {
-+    {0xbf, 0x09, 0x01, 0x0000, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xff4c, 0x00000000},
-+    {0xbf, 0x06, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x06, 0x00, 0x0000, 0xffffff4c},
-+    {0x18, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x00, 0x00, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x02, 0x06, 0x0000, 0x00000000},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0xbf, 0x07, 0x00, 0x0000, 0x00000000},
-+    {0x18, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x00, 0x00, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x02, 0x06, 0x0000, 0x00000000},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0xbf, 0x08, 0x00, 0x0000, 0x00000000},
-+    {0x18, 0x00, 0x00, 0x0000, 0xffffffff},
-+    {0x00, 0x00, 0x00, 0x0000, 0x00000000},
-+    {0x15, 0x07, 0x00, 0x016e, 0x00000000},
-+    {0xbf, 0x05, 0x08, 0x0000, 0x00000000},
-+    {0x15, 0x05, 0x00, 0x016c, 0x00000000},
-+    {0x71, 0x01, 0x07, 0x0000, 0x00000000},
-+    {0x55, 0x01, 0x00, 0x0001, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x0168, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xffc0, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffb8, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffb0, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffa8, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffa0, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xff98, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff90, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff88, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff80, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff78, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff70, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff68, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff60, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff58, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff50, 0x00000000},
-+    {0x15, 0x09, 0x00, 0x007e, 0x00000000},
-+    {0x61, 0x01, 0x09, 0x0010, 0x00000000},
-+    {0xdc, 0x01, 0x00, 0x0000, 0x00000010},
-+    {0x15, 0x01, 0x00, 0x0030, 0x000086dd},
-+    {0x55, 0x01, 0x00, 0x007a, 0x00000800},
-+    {0x7b, 0x0a, 0x05, 0xff28, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0x73, 0x0a, 0x01, 0xff50, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xffe0, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffd8, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffd0, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xffffffd0},
-+    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
-+    {0xb7, 0x02, 0x00, 0x0000, 0x00000000},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000014},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
-+    {0x61, 0x01, 0x0a, 0xffdc, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xff5c, 0x00000000},
-+    {0x61, 0x01, 0x0a, 0xffe0, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xff60, 0x00000000},
-+    {0x71, 0x06, 0x0a, 0xffd9, 0x00000000},
-+    {0x71, 0x01, 0x0a, 0xffd0, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000002},
-+    {0x57, 0x01, 0x00, 0x0000, 0x0000003c},
-+    {0x7b, 0x0a, 0x01, 0xff40, 0x00000000},
-+    {0x57, 0x06, 0x00, 0x0000, 0x000000ff},
-+    {0x15, 0x06, 0x00, 0x0051, 0x00000011},
-+    {0x79, 0x05, 0x0a, 0xff28, 0x00000000},
-+    {0x55, 0x06, 0x00, 0x005f, 0x00000006},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0x73, 0x0a, 0x01, 0xff53, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xffe0, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffd8, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffd0, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xffffffd0},
-+    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
-+    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000014},
-+    {0xbf, 0x06, 0x05, 0x0000, 0x00000000},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
-+    {0xbf, 0x05, 0x06, 0x0000, 0x00000000},
-+    {0x69, 0x01, 0x0a, 0xffd0, 0x00000000},
-+    {0x6b, 0x0a, 0x01, 0xff56, 0x00000000},
-+    {0x69, 0x01, 0x0a, 0xffd2, 0x00000000},
-+    {0x6b, 0x0a, 0x01, 0xff58, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x004b, 0x00000000},
-+    {0x7b, 0x0a, 0x05, 0xff28, 0x00000000},
-+    {0x7b, 0x0a, 0x07, 0xff10, 0x00000000},
-+    {0xb7, 0x07, 0x00, 0x0000, 0x00000001},
-+    {0x73, 0x0a, 0x07, 0xff51, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xfff0, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffe8, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffe0, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffd8, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffd0, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xffffffd0},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000028},
-+    {0x7b, 0x0a, 0x01, 0xff40, 0x00000000},
-+    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
-+    {0xb7, 0x02, 0x00, 0x0000, 0x00000000},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000028},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
-+    {0x79, 0x01, 0x0a, 0xffd8, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xff5c, 0x00000000},
-+    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x63, 0x0a, 0x01, 0xff60, 0x00000000},
-+    {0x79, 0x01, 0x0a, 0xffe0, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xff64, 0x00000000},
-+    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x63, 0x0a, 0x01, 0xff68, 0x00000000},
-+    {0x79, 0x01, 0x0a, 0xffe8, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xff6c, 0x00000000},
-+    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x63, 0x0a, 0x01, 0xff70, 0x00000000},
-+    {0x79, 0x01, 0x0a, 0xfff0, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xff74, 0x00000000},
-+    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x63, 0x0a, 0x01, 0xff78, 0x00000000},
-+    {0x71, 0x06, 0x0a, 0xffd6, 0x00000000},
-+    {0x25, 0x06, 0x00, 0x0126, 0x0000003c},
-+    {0x6f, 0x07, 0x06, 0x0000, 0x00000000},
-+    {0x18, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0x00, 0x00, 0x00, 0x0000, 0x1c001800},
-+    {0x5f, 0x07, 0x01, 0x0000, 0x00000000},
-+    {0x55, 0x07, 0x00, 0x0001, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x0120, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x6b, 0x0a, 0x01, 0xfffe, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000028},
-+    {0x7b, 0x0a, 0x01, 0xff40, 0x00000000},
-+    {0xbf, 0x01, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x01, 0x00, 0x0000, 0xffffff8c},
-+    {0x7b, 0x0a, 0x01, 0xff20, 0x00000000},
-+    {0xbf, 0x01, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x01, 0x00, 0x0000, 0xffffff54},
-+    {0x7b, 0x0a, 0x01, 0xff18, 0x00000000},
-+    {0x18, 0x07, 0x00, 0x0000, 0x00000001},
-+    {0x00, 0x00, 0x00, 0x0000, 0x1c001800},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xff38, 0x00000000},
-+    {0x7b, 0x0a, 0x08, 0xff30, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x0153, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0x73, 0x0a, 0x01, 0xff52, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffd0, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xffffffd0},
-+    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
-+    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000008},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
-+    {0x69, 0x01, 0x0a, 0xffd0, 0x00000000},
-+    {0x6b, 0x0a, 0x01, 0xff56, 0x00000000},
-+    {0x69, 0x01, 0x0a, 0xffd2, 0x00000000},
-+    {0x6b, 0x0a, 0x01, 0xff58, 0x00000000},
-+    {0x79, 0x05, 0x0a, 0xff28, 0x00000000},
-+    {0x71, 0x01, 0x0a, 0xff50, 0x00000000},
-+    {0x15, 0x01, 0x00, 0x000f, 0x00000000},
-+    {0x61, 0x01, 0x07, 0x0004, 0x00000000},
-+    {0x71, 0x02, 0x0a, 0xff53, 0x00000000},
-+    {0x15, 0x02, 0x00, 0x002b, 0x00000000},
-+    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x57, 0x02, 0x00, 0x0000, 0x00000002},
-+    {0x15, 0x02, 0x00, 0x0028, 0x00000000},
-+    {0x61, 0x01, 0x0a, 0xff5c, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xffa0, 0x00000000},
-+    {0x61, 0x01, 0x0a, 0xff60, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xffa4, 0x00000000},
-+    {0x69, 0x01, 0x0a, 0xff56, 0x00000000},
-+    {0x6b, 0x0a, 0x01, 0xffa8, 0x00000000},
-+    {0x69, 0x01, 0x0a, 0xff58, 0x00000000},
-+    {0x6b, 0x0a, 0x01, 0xffaa, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x005e, 0x00000000},
-+    {0x71, 0x01, 0x0a, 0xff51, 0x00000000},
-+    {0x15, 0x01, 0x00, 0x00c6, 0x00000000},
-+    {0x61, 0x01, 0x07, 0x0004, 0x00000000},
-+    {0x71, 0x02, 0x0a, 0xff53, 0x00000000},
-+    {0x15, 0x02, 0x00, 0x0027, 0x00000000},
-+    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x57, 0x02, 0x00, 0x0000, 0x00000010},
-+    {0x15, 0x02, 0x00, 0x0024, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xffffff5c},
-+    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x02, 0x00, 0x0000, 0xffffff7c},
-+    {0x71, 0x04, 0x0a, 0xff54, 0x00000000},
-+    {0x55, 0x04, 0x00, 0x0001, 0x00000000},
-+    {0xbf, 0x02, 0x03, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000038},
-+    {0xc7, 0x01, 0x00, 0x0000, 0x00000038},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000000},
-+    {0x6d, 0x04, 0x01, 0x0001, 0x00000000},
-+    {0xbf, 0x02, 0x03, 0x0000, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xffffff6c},
-+    {0xbf, 0x05, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x05, 0x00, 0x0000, 0xffffff8c},
-+    {0x6d, 0x04, 0x01, 0x0001, 0x00000000},
-+    {0xbf, 0x05, 0x03, 0x0000, 0x00000000},
-+    {0x71, 0x01, 0x0a, 0xff55, 0x00000000},
-+    {0x15, 0x01, 0x00, 0x0028, 0x00000000},
-+    {0xbf, 0x03, 0x05, 0x0000, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x0026, 0x00000000},
-+    {0x71, 0x02, 0x0a, 0xff52, 0x00000000},
-+    {0x15, 0x02, 0x00, 0x0004, 0x00000000},
-+    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x57, 0x02, 0x00, 0x0000, 0x00000004},
-+    {0x15, 0x02, 0x00, 0x0001, 0x00000000},
-+    {0x05, 0x00, 0x00, 0xffd2, 0x00000000},
-+    {0x57, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0x15, 0x01, 0x00, 0x00a1, 0x00000000},
-+    {0x61, 0x01, 0x0a, 0xff5c, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xffa0, 0x00000000},
-+    {0x61, 0x01, 0x0a, 0xff60, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xffa4, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x0032, 0x00000000},
-+    {0x71, 0x02, 0x0a, 0xff52, 0x00000000},
-+    {0x15, 0x02, 0x00, 0x009e, 0x00000000},
-+    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x57, 0x02, 0x00, 0x0000, 0x00000020},
-+    {0x15, 0x02, 0x00, 0x009b, 0x00000000},
-+    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x02, 0x00, 0x0000, 0xffffff5c},
-+    {0x71, 0x04, 0x0a, 0xff54, 0x00000000},
-+    {0xbf, 0x03, 0x02, 0x0000, 0x00000000},
-+    {0x15, 0x04, 0x00, 0x0002, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xffffff7c},
-+    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
-+    {0x57, 0x01, 0x00, 0x0000, 0x00000100},
-+    {0x15, 0x01, 0x00, 0x0001, 0x00000000},
-+    {0xbf, 0x02, 0x03, 0x0000, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xffffff6c},
-+    {0x71, 0x05, 0x0a, 0xff55, 0x00000000},
-+    {0xbf, 0x04, 0x03, 0x0000, 0x00000000},
-+    {0x15, 0x05, 0x00, 0x0002, 0x00000000},
-+    {0xbf, 0x04, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x04, 0x00, 0x0000, 0xffffff8c},
-+    {0x15, 0x01, 0x00, 0x0001, 0x00000000},
-+    {0xbf, 0x03, 0x04, 0x0000, 0x00000000},
-+    {0x61, 0x01, 0x02, 0x0004, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x61, 0x04, 0x02, 0x0000, 0x00000000},
-+    {0x4f, 0x01, 0x04, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffa0, 0x00000000},
-+    {0x61, 0x01, 0x02, 0x0008, 0x00000000},
-+    {0x61, 0x02, 0x02, 0x000c, 0x00000000},
-+    {0x67, 0x02, 0x00, 0x0000, 0x00000020},
-+    {0x4f, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x02, 0xffa8, 0x00000000},
-+    {0x61, 0x01, 0x03, 0x0000, 0x00000000},
-+    {0x61, 0x02, 0x03, 0x0004, 0x00000000},
-+    {0x61, 0x04, 0x03, 0x0008, 0x00000000},
-+    {0x61, 0x03, 0x03, 0x000c, 0x00000000},
-+    {0x69, 0x05, 0x0a, 0xff58, 0x00000000},
-+    {0x6b, 0x0a, 0x05, 0xffc2, 0x00000000},
-+    {0x69, 0x05, 0x0a, 0xff56, 0x00000000},
-+    {0x6b, 0x0a, 0x05, 0xffc0, 0x00000000},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000020},
-+    {0x4f, 0x03, 0x04, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x03, 0xffb8, 0x00000000},
-+    {0x67, 0x02, 0x00, 0x0000, 0x00000020},
-+    {0x4f, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x02, 0xffb0, 0x00000000},
-+    {0xbf, 0x05, 0x00, 0x0000, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x07, 0x08, 0x00, 0x0000, 0x00000004},
-+    {0x61, 0x03, 0x05, 0x0000, 0x00000000},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x02, 0x00, 0x0000, 0xffffffa0},
-+    {0x0f, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x71, 0x04, 0x02, 0x0000, 0x00000000},
-+    {0xbf, 0x02, 0x04, 0x0000, 0x00000000},
-+    {0x67, 0x02, 0x00, 0x0000, 0x00000038},
-+    {0xc7, 0x02, 0x00, 0x0000, 0x0000003f},
-+    {0x5f, 0x02, 0x03, 0x0000, 0x00000000},
-+    {0xaf, 0x02, 0x05, 0x0000, 0x00000000},
-+    {0xbf, 0x05, 0x08, 0x0000, 0x00000000},
-+    {0x0f, 0x05, 0x01, 0x0000, 0x00000000},
-+    {0x71, 0x05, 0x05, 0x0000, 0x00000000},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
-+    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
-+    {0x77, 0x00, 0x00, 0x0000, 0x00000007},
-+    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
-+    {0x67, 0x00, 0x00, 0x0000, 0x00000039},
-+    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
-+    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
-+    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
-+    {0x77, 0x00, 0x00, 0x0000, 0x00000006},
-+    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
-+    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
-+    {0x67, 0x00, 0x00, 0x0000, 0x0000003a},
-+    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
-+    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
-+    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
-+    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
-+    {0x77, 0x00, 0x00, 0x0000, 0x00000005},
-+    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
-+    {0x67, 0x00, 0x00, 0x0000, 0x0000003b},
-+    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
-+    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
-+    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
-+    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
-+    {0x77, 0x00, 0x00, 0x0000, 0x00000004},
-+    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
-+    {0x67, 0x00, 0x00, 0x0000, 0x0000003c},
-+    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
-+    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
-+    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
-+    {0x77, 0x00, 0x00, 0x0000, 0x00000003},
-+    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
-+    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
-+    {0x67, 0x00, 0x00, 0x0000, 0x0000003d},
-+    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
-+    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
-+    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
-+    {0x77, 0x00, 0x00, 0x0000, 0x00000002},
-+    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
-+    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x04, 0x0000, 0x00000000},
-+    {0x67, 0x00, 0x00, 0x0000, 0x0000003e},
-+    {0xc7, 0x00, 0x00, 0x0000, 0x0000003f},
-+    {0x5f, 0x00, 0x03, 0x0000, 0x00000000},
-+    {0xaf, 0x02, 0x00, 0x0000, 0x00000000},
-+    {0xbf, 0x00, 0x05, 0x0000, 0x00000000},
-+    {0x77, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0x57, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
-+    {0x4f, 0x03, 0x00, 0x0000, 0x00000000},
-+    {0x57, 0x04, 0x00, 0x0000, 0x00000001},
-+    {0x87, 0x04, 0x00, 0x0000, 0x00000000},
-+    {0x5f, 0x04, 0x03, 0x0000, 0x00000000},
-+    {0xaf, 0x02, 0x04, 0x0000, 0x00000000},
-+    {0x57, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000001},
-+    {0x4f, 0x03, 0x05, 0x0000, 0x00000000},
-+    {0x07, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0xbf, 0x05, 0x02, 0x0000, 0x00000000},
-+    {0x15, 0x01, 0x00, 0x0001, 0x00000024},
-+    {0x05, 0x00, 0x00, 0xffa9, 0x00000000},
-+    {0xbf, 0x01, 0x02, 0x0000, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x15, 0x01, 0x00, 0x000b, 0x00000000},
-+    {0x69, 0x03, 0x07, 0x0008, 0x00000000},
-+    {0x3f, 0x01, 0x03, 0x0000, 0x00000000},
-+    {0x2f, 0x01, 0x03, 0x0000, 0x00000000},
-+    {0x1f, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x63, 0x0a, 0x02, 0xff50, 0x00000000},
-+    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x02, 0x00, 0x0000, 0xffffff50},
-+    {0x18, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x00, 0x00, 0x00, 0x0000, 0x00000000},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000001},
-+    {0x55, 0x00, 0x00, 0x0002, 0x00000000},
-+    {0x69, 0x00, 0x07, 0x000a, 0x00000000},
-+    {0x95, 0x00, 0x00, 0x0000, 0x00000000},
-+    {0x69, 0x00, 0x00, 0x0000, 0x00000000},
-+    {0x05, 0x00, 0x00, 0xfffd, 0x00000000},
-+    {0xbf, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x57, 0x02, 0x00, 0x0000, 0x00000008},
-+    {0x15, 0x02, 0x00, 0xfff9, 0x00000000},
-+    {0xbf, 0x02, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x02, 0x00, 0x0000, 0xffffff5c},
-+    {0x71, 0x04, 0x0a, 0xff54, 0x00000000},
-+    {0xbf, 0x03, 0x02, 0x0000, 0x00000000},
-+    {0x15, 0x04, 0x00, 0x0002, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xffffff7c},
-+    {0x57, 0x01, 0x00, 0x0000, 0x00000040},
-+    {0x15, 0x01, 0x00, 0x0001, 0x00000000},
-+    {0xbf, 0x02, 0x03, 0x0000, 0x00000000},
-+    {0x61, 0x03, 0x02, 0x0004, 0x00000000},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000020},
-+    {0x61, 0x04, 0x02, 0x0000, 0x00000000},
-+    {0x4f, 0x03, 0x04, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x03, 0xffa0, 0x00000000},
-+    {0x61, 0x03, 0x02, 0x0008, 0x00000000},
-+    {0x61, 0x02, 0x02, 0x000c, 0x00000000},
-+    {0x67, 0x02, 0x00, 0x0000, 0x00000020},
-+    {0x4f, 0x02, 0x03, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x02, 0xffa8, 0x00000000},
-+    {0x15, 0x01, 0x00, 0x0079, 0x00000000},
-+    {0x71, 0x01, 0x0a, 0xff55, 0x00000000},
-+    {0x15, 0x01, 0x00, 0x0077, 0x00000000},
-+    {0x61, 0x01, 0x0a, 0xff98, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x61, 0x02, 0x0a, 0xff94, 0x00000000},
-+    {0x4f, 0x01, 0x02, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffb8, 0x00000000},
-+    {0x61, 0x01, 0x0a, 0xff90, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x61, 0x02, 0x0a, 0xff8c, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x0076, 0x00000000},
-+    {0x15, 0x06, 0x00, 0xfedf, 0x00000087},
-+    {0x05, 0x00, 0x00, 0x003f, 0x00000000},
-+    {0x0f, 0x06, 0x09, 0x0000, 0x00000000},
-+    {0xbf, 0x02, 0x06, 0x0000, 0x00000000},
-+    {0x07, 0x02, 0x00, 0x0000, 0x00000001},
-+    {0x71, 0x03, 0x0a, 0xffff, 0x00000000},
-+    {0x67, 0x03, 0x00, 0x0000, 0x00000003},
-+    {0x3d, 0x02, 0x03, 0x0022, 0x00000000},
-+    {0x55, 0x01, 0x00, 0x000c, 0x000000c9},
-+    {0x79, 0x01, 0x0a, 0xff40, 0x00000000},
-+    {0x0f, 0x06, 0x01, 0x0000, 0x00000000},
-+    {0x07, 0x06, 0x00, 0x0000, 0x00000002},
-+    {0xbf, 0x01, 0x07, 0x0000, 0x00000000},
-+    {0xbf, 0x02, 0x06, 0x0000, 0x00000000},
-+    {0x79, 0x03, 0x0a, 0xff18, 0x00000000},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000001},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0x73, 0x0a, 0x01, 0xff54, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x0015, 0x00000000},
-+    {0x07, 0x08, 0x00, 0x0000, 0xffffffff},
-+    {0xbf, 0x01, 0x08, 0x0000, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0xbf, 0x09, 0x06, 0x0000, 0x00000000},
-+    {0x15, 0x01, 0x00, 0x000f, 0x00000000},
-+    {0xbf, 0x02, 0x09, 0x0000, 0x00000000},
-+    {0x79, 0x01, 0x0a, 0xff40, 0x00000000},
-+    {0x0f, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xfffffff8},
-+    {0xb7, 0x06, 0x00, 0x0000, 0x00000001},
-+    {0xbf, 0x01, 0x07, 0x0000, 0x00000000},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000002},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
-+    {0x71, 0x01, 0x0a, 0xfff8, 0x00000000},
-+    {0x15, 0x01, 0x00, 0xffdb, 0x00000000},
-+    {0x71, 0x06, 0x0a, 0xfff9, 0x00000000},
-+    {0x07, 0x06, 0x00, 0x0000, 0x00000002},
-+    {0x05, 0x00, 0x00, 0xffd8, 0x00000000},
-+    {0x79, 0x08, 0x0a, 0xff30, 0x00000000},
-+    {0xbf, 0x09, 0x07, 0x0000, 0x00000000},
-+    {0x18, 0x07, 0x00, 0x0000, 0x00000001},
-+    {0x00, 0x00, 0x00, 0x0000, 0x1c001800},
-+    {0x71, 0x01, 0x0a, 0xffff, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000003},
-+    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
-+    {0x0f, 0x02, 0x01, 0x0000, 0x00000000},
-+    {0x07, 0x02, 0x00, 0x0000, 0x00000008},
-+    {0x7b, 0x0a, 0x02, 0xff40, 0x00000000},
-+    {0x71, 0x06, 0x0a, 0xfffe, 0x00000000},
-+    {0x25, 0x06, 0x00, 0x0036, 0x0000003c},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0x6f, 0x01, 0x06, 0x0000, 0x00000000},
-+    {0x5f, 0x01, 0x07, 0x0000, 0x00000000},
-+    {0x55, 0x01, 0x00, 0x0001, 0x00000000},
-+    {0x05, 0x00, 0x00, 0x0031, 0x00000000},
-+    {0x79, 0x01, 0x0a, 0xff38, 0x00000000},
-+    {0x07, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0x7b, 0x0a, 0x01, 0xff38, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x77, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x55, 0x01, 0x00, 0x0002, 0x0000000b},
-+    {0x79, 0x07, 0x0a, 0xff10, 0x00000000},
-+    {0x05, 0x00, 0x00, 0xfe5a, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xfffffffe},
-+    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
-+    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000002},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
-+    {0xbf, 0x01, 0x06, 0x0000, 0x00000000},
-+    {0x15, 0x01, 0x00, 0x001a, 0x0000003c},
-+    {0x55, 0x01, 0x00, 0xffe1, 0x0000002b},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x63, 0x0a, 0x01, 0xfff8, 0x00000000},
-+    {0xbf, 0x03, 0x0a, 0x0000, 0x00000000},
-+    {0x07, 0x03, 0x00, 0x0000, 0xfffffff8},
-+    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
-+    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000004},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
-+    {0x71, 0x01, 0x0a, 0xfffa, 0x00000000},
-+    {0x55, 0x01, 0x00, 0xffd6, 0x00000002},
-+    {0x71, 0x01, 0x0a, 0xfff9, 0x00000000},
-+    {0x55, 0x01, 0x00, 0xffd4, 0x00000002},
-+    {0x71, 0x01, 0x0a, 0xfffb, 0x00000000},
-+    {0x55, 0x01, 0x00, 0xffd2, 0x00000001},
-+    {0x79, 0x02, 0x0a, 0xff40, 0x00000000},
-+    {0x07, 0x02, 0x00, 0x0000, 0x00000008},
-+    {0xbf, 0x01, 0x09, 0x0000, 0x00000000},
-+    {0x79, 0x03, 0x0a, 0xff20, 0x00000000},
-+    {0xb7, 0x04, 0x00, 0x0000, 0x00000010},
-+    {0xb7, 0x05, 0x00, 0x0000, 0x00000001},
-+    {0x85, 0x00, 0x00, 0x0000, 0x00000044},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000001},
-+    {0x73, 0x0a, 0x01, 0xff55, 0x00000000},
-+    {0x05, 0x00, 0x00, 0xffc8, 0x00000000},
-+    {0xbf, 0x07, 0x09, 0x0000, 0x00000000},
-+    {0xb7, 0x01, 0x00, 0x0000, 0x00000000},
-+    {0x6b, 0x0a, 0x01, 0xfff8, 0x00000000},
-+    {0xb7, 0x09, 0x00, 0x0000, 0x00000002},
-+    {0xb7, 0x08, 0x00, 0x0000, 0x0000001e},
-+    {0x05, 0x00, 0x00, 0xffaf, 0x00000000},
-+    {0x15, 0x06, 0x00, 0xffce, 0x00000087},
-+    {0x05, 0x00, 0x00, 0xffd3, 0x00000000},
-+    {0x61, 0x01, 0x0a, 0xff78, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x61, 0x02, 0x0a, 0xff74, 0x00000000},
-+    {0x4f, 0x01, 0x02, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffb8, 0x00000000},
-+    {0x61, 0x01, 0x0a, 0xff70, 0x00000000},
-+    {0x67, 0x01, 0x00, 0x0000, 0x00000020},
-+    {0x61, 0x02, 0x0a, 0xff6c, 0x00000000},
-+    {0x4f, 0x01, 0x02, 0x0000, 0x00000000},
-+    {0x7b, 0x0a, 0x01, 0xffb0, 0x00000000},
-+    {0x05, 0x00, 0x00, 0xfef6, 0x00000000},
-+};
-+
-+struct fixup_mapfd_t reltun_rss_steering[] = {
-+    {"tap_rss_map_configurations", 5},
-+    {"tap_rss_map_toeplitz_key", 10},
-+    {"tap_rss_map_indirection_table", 379},
-+};
-+
-+#endif /* TUN_RSS_STEERING */
+> ---
+>  migration/postcopy-ram.c | 2 --
+>  migration/savevm.c       | 6 ++++++
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index d3bb3a744b..d99842eb1b 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -903,7 +903,6 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>               * the channel is rebuilt.
+>               */
+>              if (postcopy_pause_fault_thread(mis)) {
+> -                mis->last_rb = NULL;
+>                  /* Continue to read the userfaultfd */
+>              } else {
+>                  error_report("%s: paused but don't allow to continue",
+> @@ -985,7 +984,6 @@ retry:
+>                  /* May be network failure, try to wait for recovery */
+>                  if (ret == -EIO && postcopy_pause_fault_thread(mis)) {
+>                      /* We got reconnected somehow, try to continue */
+> -                    mis->last_rb = NULL;
+>                      goto retry;
+>                  } else {
+>                      /* This is a unavoidable fault */
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 21ccba9fb3..e8834991ec 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2061,6 +2061,12 @@ static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+>          return 0;
+>      }
+>  
+> +    /*
+> +     * Reset the last_rb before we resend any page req to source again, since
+> +     * the source should have it reset already.
+> +     */
+> +    mis->last_rb = NULL;
+> +
+>      /*
+>       * This means source VM is ready to resume the postcopy migration.
+>       * It's time to switch state and release the fault thread to
+> -- 
+> 2.26.2
+> 
 -- 
-2.28.0
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
