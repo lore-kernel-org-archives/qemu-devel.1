@@ -7,41 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7CFCC4742C
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9EEC388F2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:02:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37FD32225E
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:57:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37FD32225E
+	by mail.kernel.org (Postfix) with ESMTPS id 7C8A622243
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:02:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C8A622243
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZlZI-0003wM-5P
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 20:57:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59920)
+	id 1kZleQ-0007Je-Iy
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 21:02:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kZlWg-000252-GS; Mon, 02 Nov 2020 20:54:22 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2496)
+ id 1kZlWo-00027N-Gg; Mon, 02 Nov 2020 20:54:30 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2495)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kZlVN-0001nl-JX; Mon, 02 Nov 2020 20:54:22 -0500
+ id 1kZlVM-0001md-Iv; Mon, 02 Nov 2020 20:54:30 -0500
 Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CQCV035wCzhfRQ;
- Tue,  3 Nov 2020 09:52:56 +0800 (CST)
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CQCTv1DNmzhdWD;
+ Tue,  3 Nov 2020 09:52:51 +0800 (CST)
 Received: from huawei.com (10.175.104.175) by DGGEMS410-HUB.china.huawei.com
  (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Tue, 3 Nov 2020
- 09:52:51 +0800
+ 09:52:45 +0800
 From: Chen Qun <kuhn.chenqun@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH 5/6] plugins/loader: fix uninitialized variable warning in
- plugin_reset_uninstall()
-Date: Tue, 3 Nov 2020 09:52:27 +0800
-Message-ID: <20201103015228.2250547-6-kuhn.chenqun@huawei.com>
+Subject: [PATCH 1/6] target/xtensa: fix uninitialized variable warning
+Date: Tue, 3 Nov 2020 09:52:23 +0800
+Message-ID: <20201103015228.2250547-2-kuhn.chenqun@huawei.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20201103015228.2250547-1-kuhn.chenqun@huawei.com>
 References: <20201103015228.2250547-1-kuhn.chenqun@huawei.com>
@@ -72,47 +71,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chen Qun <kuhn.chenqun@huawei.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+Cc: Max Filippov <jcmvbkbc@gmail.com>, Chen Qun <kuhn.chenqun@huawei.com>,
  zhang.zhanghailiang@huawei.com, ganqixin@huawei.com,
  Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After the WITH_QEMU_LOCK_GUARD macro is added, the compiler cannot identify
- that the statements in the macro must be executed. As a result, some variables
- assignment statements in the macro may be considered as unexecuted by the compiler.
+The compiler cannot determine whether the return values of the xtensa_operand_is_register(isa, opc, opnd)
+ and xtensa_operand_is_visible(isa, opc, opnd) functions are the same.
+So,it assumes that 'rf' is not assigned, but it's used.
 
 The compiler showed warning:
-plugins/loader.c: In function ‘plugin_reset_uninstall’:
-plugins/loader.c:382:15: warning: ‘ctx’ may be used uninitialized in this function [-Wmaybe-uninitialized]
- 382 |     data->ctx = ctx;
-     |     ~~~~~~~~~~^~~~~
+target/xtensa/translate.c: In function ‘disas_xtensa_insn’:
+target/xtensa/translate.c:985:43: warning: ‘rf’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  985 |                     arg[vopnd].num_bits = xtensa_regfile_num_bits(isa, rf);
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add a default value for 'expire_time' to prevented the warning.
+Add a default value for 'rf' to prevented the warning.
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 ---
-Cc: "Alex Bennée" <alex.bennee@linaro.org>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 ---
- plugins/loader.c | 2 +-
+ target/xtensa/translate.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/plugins/loader.c b/plugins/loader.c
-index 8ac5dbc20f..88593fe138 100644
---- a/plugins/loader.c
-+++ b/plugins/loader.c
-@@ -367,7 +367,7 @@ void plugin_reset_uninstall(qemu_plugin_id_t id,
-                             bool reset)
- {
-     struct qemu_plugin_reset_data *data;
--    struct qemu_plugin_ctx *ctx;
-+    struct qemu_plugin_ctx *ctx = NULL;
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index 944a157747..eea851bbe7 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -953,7 +953,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
  
-     WITH_QEMU_LOCK_GUARD(&plugin.lock) {
-         ctx = plugin_id_to_ctx_locked(id);
+         for (opnd = vopnd = 0; opnd < opnds; ++opnd) {
+             void **register_file = NULL;
+-            xtensa_regfile rf;
++            xtensa_regfile rf = -1;
+ 
+             if (xtensa_operand_is_register(isa, opc, opnd)) {
+                 rf = xtensa_operand_regfile(isa, opc, opnd);
 -- 
 2.27.0
 
