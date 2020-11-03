@@ -2,88 +2,75 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88908C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 08:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C564BC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 08:32:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE20F223BD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 08:14:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22F1B22264
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 08:32:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6DtxnTZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE20F223BD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ECcPcpol"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F1B22264
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZrSj-0005TX-Tv
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 03:14:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44472)
+	id 1kZrju-0000wO-Te
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 03:32:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mszeredi@redhat.com>)
- id 1kZrS7-000537-P1
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 03:14:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39980)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kZrjI-0000Ve-Pl
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 03:31:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58757)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mszeredi@redhat.com>)
- id 1kZrS5-0006Us-UT
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 03:14:03 -0500
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kZrjH-0003px-1x
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 03:31:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604391240;
+ s=mimecast20190719; t=1604392305;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=C5XPqwMXV/cEH5DzGwLL+JPvPX0O0Sq1f005dYrCkG0=;
- b=d6DtxnTZACty19oOsTq5CFRj7h8NG11N0QF3wrToK9dx0FRxRzu5xQhLD6Q2AqL9Xoh7zh
- +Avl15Ce0Ln+pe/5AFjV/prtxygs6pl5bc+nftayhyYxQFkNKOWKMnpUbO53DVll3ynV5V
- FZBFqRt5egB/jm0IefpdDYFot++vey0=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-_hAiI5LBMDualqXGqmJBDQ-1; Tue, 03 Nov 2020 03:13:51 -0500
-X-MC-Unique: _hAiI5LBMDualqXGqmJBDQ-1
-Received: by mail-qv1-f70.google.com with SMTP id v4so9797247qvr.19
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 00:13:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=C5XPqwMXV/cEH5DzGwLL+JPvPX0O0Sq1f005dYrCkG0=;
- b=XoYGgaNYh54qVMYvhZ9HyFThiJz22/NPZPqqdp49DFoemaw5p3iPQcaere2KEo1QQt
- PoRbreAx9cSP/oAwTbICjWgC3TjJqVUVBX+/CX+irUl6YDx68N1QlC40j9lAyhAWFG2x
- 0JkJwT1JuaAM0X1jvSye9ODTmwNvJi9tWBiCl2QyNGWFLqamH/aRMFhfiWM7MgwhuoG+
- hi6r1+KbRVi83Vj+vhEL6gzv22sYILAz6aXsQRLxe58hueje9zj25DHxuxwnMzlKbk2d
- f110mzjGwH2pb6JRPs1nds55nj200sJ3nQ0zh9pz43jXEFAJEBy0P+4MDnLoXRcP0qNz
- uYkg==
-X-Gm-Message-State: AOAM53333OWonrcw33GWdN8ODDh4WVrrwk1ukFvukcmwmv7kEUz+M1xH
- r6lWowik8frtzmd4lGEVPe7+VvnMB38XDIgncNbNRgVKGlbQLoe9t0kC8vxUiHiQwJTuQ3OZaQA
- RsFzw2njc0M6F+DGJeeHQvTnGsu+Mt9k=
-X-Received: by 2002:ad4:4674:: with SMTP id z20mr1733086qvv.16.1604391230772; 
- Tue, 03 Nov 2020 00:13:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzd+TfFwBiL07ckV0FSTFcaoTCQm0NcFGWZCcosfosavMcCOxF3dKa5IsBRIaCbuG+f6S5EnER3S5ZhqohdXLI=
-X-Received: by 2002:ad4:4674:: with SMTP id z20mr1733078qvv.16.1604391230621; 
- Tue, 03 Nov 2020 00:13:50 -0800 (PST)
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ucFyqj6VlRWZDcFPD9Jho38yFiNOgohvFrOnBq5r98w=;
+ b=ECcPcpolMPG1CVBlIQiROFuxTum5bGoRJfnkxr7zgpygv6Lj1Q+RPixRvtrzNfbMXjxzXt
+ VaIOHLm+jVlnSvabR//QHUnU0v5w42YoICq1JN3DxJ9zvwSKX6bTyBTxvSEWoCfz8ZnHCz
+ eGImzdvMdwAUb42px9B12oyDwH1Jpmw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-kzU0KSNIM36RF_PTWm5piw-1; Tue, 03 Nov 2020 03:31:42 -0500
+X-MC-Unique: kzU0KSNIM36RF_PTWm5piw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33D891074649
+ for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 08:31:41 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EBFEA73670
+ for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 08:31:39 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for-5.2] meson: use b_staticpic=false for meson >=0.56.0
+Date: Tue,  3 Nov 2020 03:31:39 -0500
+Message-Id: <20201103083139.18634-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20201102161859.156603-1-mreitz@redhat.com>
-In-Reply-To: <20201102161859.156603-1-mreitz@redhat.com>
-From: Miklos Szeredi <mszeredi@redhat.com>
-Date: Tue, 3 Nov 2020 09:13:40 +0100
-Message-ID: <CAOssrKd7nu+td7v-=L_utWY-hHOgpD7_9eSsaZHqCDwTOKMBWA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/7] virtiofsd: Announce submounts to the guest
-To: Max Reitz <mreitz@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mszeredi@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mszeredi@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -106,39 +93,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs-list <virtio-fs@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 2, 2020 at 5:19 PM Max Reitz <mreitz@redhat.com> wrote:
->
-> RFC: https://www.redhat.com/archives/virtio-fs/2020-May/msg00024.html
-> v1: https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg03598.htm=
-l
-> v2: https://lists.nongnu.org/archive/html/qemu-devel/2020-10/msg09117.htm=
-l
->
-> Branch: https://github.com/XanClic/qemu.git virtiofs-submounts-v4
-> Branch: https://git.xanclic.moe/XanClic/qemu.git virtiofs-submounts-v4
->
->
-> Hi,
->
-> In an effort to cut this cover letter shorter, I=E2=80=99ll defer to the =
-cover
-> letter of v2 linked above concerning the general description of this
-> series, and limit myself to describing the differences from v2:
+Meson 0.56.0 correctly builds non-PIC static libraries with -fPIE if
+b_pie=true.  We do not have to pass b_staticpic=true if PIE is requested
+if Meson is new-enough, which improves performance.
 
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ configure   | 6 +++++-
+ meson.build | 4 ++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-Other than the issues in 5/7:
-
-Reviewed-by: Miklos Szeredi <mszeredi@redhat.com>
-
-Thanks,
-Miklos
+diff --git a/configure b/configure
+index 6df4306c88..b9a3984365 100755
+--- a/configure
++++ b/configure
+@@ -6953,6 +6953,10 @@ fi
+ mv $cross config-meson.cross
+ 
+ rm -rf meson-private meson-info meson-logs
++unset staticpic
++if ! version_ge "$($meson --version)" 0.56.0; then
++  staticpic=$(if test "$pie" = yes; then echo true; else echo false; fi)
++fi
+ NINJA=$ninja $meson setup \
+         --prefix "$prefix" \
+         --libdir "$libdir" \
+@@ -6972,7 +6976,7 @@ NINJA=$ninja $meson setup \
+         -Dwerror=$(if test "$werror" = yes; then echo true; else echo false; fi) \
+         -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
+         -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
+-        -Db_staticpic=$(if test "$pie" = yes; then echo true; else echo false; fi) \
++        ${staticpic:+-Db_staticpic=$staticpic} \
+         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
+         -Dmalloc=$malloc -Dmalloc_trim=$malloc_trim -Dsparse=$sparse \
+         -Dkvm=$kvm -Dhax=$hax -Dwhpx=$whpx -Dhvf=$hvf \
+diff --git a/meson.build b/meson.build
+index 47e32e1fcb..205ba6b6f8 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1,6 +1,6 @@
+ project('qemu', ['c'], meson_version: '>=0.55.0',
+-        default_options: ['warning_level=1', 'c_std=gnu99', 'cpp_std=gnu++11',
+-                          'b_colorout=auto'],
++        default_options: ['warning_level=1', 'c_std=gnu99', 'cpp_std=gnu++11', 'b_colorout=auto'] +
++                         (meson.version().version_compare('>=0.56.0') ? [ 'b_staticpic=false' ] : []),
+         version: run_command('head', meson.source_root() / 'VERSION').stdout().strip())
+ 
+ not_found = dependency('', required: false)
+-- 
+2.26.2
 
 
