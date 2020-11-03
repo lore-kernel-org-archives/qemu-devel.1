@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4EBC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:36:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F17F0C388F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:36:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12DF8206DB
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:36:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B75F206DB
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:36:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3ryhhun"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12DF8206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPGdZhRh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B75F206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka0EY-000056-6Z
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 12:36:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60478)
+	id 1ka0Ea-000085-ES
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 12:36:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ka09o-0001Ul-LR; Tue, 03 Nov 2020 12:31:44 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34111)
+ id 1ka0A5-0001nb-JT; Tue, 03 Nov 2020 12:32:01 -0500
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:38851)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ka09m-0007bo-T7; Tue, 03 Nov 2020 12:31:44 -0500
-Received: by mail-wr1-x434.google.com with SMTP id e6so2144860wro.1;
- Tue, 03 Nov 2020 09:31:41 -0800 (PST)
+ id 1ka0A3-0007dM-86; Tue, 03 Nov 2020 12:32:01 -0500
+Received: by mail-wm1-x32b.google.com with SMTP id h62so110557wme.3;
+ Tue, 03 Nov 2020 09:31:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=flfR7C3ZpMvn4beKvApVO0gmRbPM0MVpe29hyYCIhJU=;
- b=h3ryhhunZS3camgASrkSqLiX82noUhgPpWVbaaZGIykh5WlC0RfkDvnAc+zJCoVr2H
- 4yImEP+dKbT3MhHxxlHzbPT5WbDkrSboo57H61BuAYKMP9uPuyjXFgsX/1YASzDrIH2s
- WXZ9pY9cC3JReV/L8m6qDVO4Mg5dLWLbl/+FU36ERhB8GMt4dGR4S7iiF6PDm6nzhH03
- 1a+xkqfaBmL/oYGUI/Y+6Wp1mkGPVY4mS6grCzml3pqcTSO6SHHtN5i7kfhHarFRQbWZ
- vW3fT7kk27UyAdekCSXGo8GZmWP80wPSmuGhwuPO7/+KZb21VLO99wS1gdEgq1E1Enk1
- afvg==
+ bh=s/6NX9jbGA7gWKbxB5Gz4aNw6mxohCMAm/BDmMgMuFc=;
+ b=aPGdZhRhlCljuTfRkVrwfmgnEjNRm91Ya9Ario1LCuXRJbnfGTHuXXc3tM2Vv3xMi+
+ axoaYyCsl2BJ/gH1l9E5l69242bHCufFrQeVjIRFL4wOSWKariuLPJe3fzM5OuQCAmz/
+ /VKBJ2pU0kqYEG7R7QG+JVahvDNFewaNxl8ahlfhU9dkgiHnGjFnheguCmvQKenDcU74
+ RjdFq+MJ3XnpHm27uUHBDtKrCoF0ZyWO9FAwzkcbFrIwSiJX5prBTF/HQBFKhNegiX3W
+ uj37iEZlJYf/ivn9/wTjpTJsGKHtTHWKjxIAG7cwIXeGNy6QnwacrauDasGKmVUh5Ifs
+ 2ScQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=flfR7C3ZpMvn4beKvApVO0gmRbPM0MVpe29hyYCIhJU=;
- b=mA17BVDDzJ5R9quOCgOuomAtwamJB2Eip0raGhS8egkSsHgkCAiOaVo1KOwdPXeNAF
- OdzZ8D3kYkyjzqBLKXdR4a6VKEHy1oT4Z08dz6Ca33QPFOHUhPslOPtKwVpe0TvImOK2
- 4Uv/5NZgAjF8m+XdPfxFIpephhGuGGf22DfLGUCECm3rtLsCREUWOPFGqamTBd0KaKwR
- 78dKpPOS+CkVkOUIpCC1WetOqtMzIVPM76zQDaLLMxzqT+nM/tqx3LLoajRxHGjiURrt
- kOsKpR6smOIwXYGye0+NMKZetjD/NaQweRs8l3FyUysbMXAI9omt4uirrXZTUTYxOt9f
- PDYQ==
-X-Gm-Message-State: AOAM530Zlw0vmv2EHkS6+zQmxTepZzDLMUSvmtfGkCZf/7N7XaHm2Q5q
- DlLimb3M/QRCEJn+1J/cbYLzZKZjbrI=
-X-Google-Smtp-Source: ABdhPJyZ+iAE2mxZugn6hufNKrr9JKzoMLQqYjgvZwFdgQaQojHRbVMdQ2r4lYeGTnEMSSyJUcRoJA==
-X-Received: by 2002:a5d:6944:: with SMTP id r4mr27496606wrw.151.1604424700260; 
- Tue, 03 Nov 2020 09:31:40 -0800 (PST)
+ bh=s/6NX9jbGA7gWKbxB5Gz4aNw6mxohCMAm/BDmMgMuFc=;
+ b=UinxCjaqBDeHkzHzCZoCZOhIOGy9Am6d1rHBS4LWgeoNunJnuEuGdnPfq+9IlUQ9js
+ 4xAyYz4WdGW6DQb/VWQH+mHHnOms4qFeDBKezybQaD2foBr/Wdj3fBNgHarMVil+dc+K
+ IHFSFw1bochziGKEh3MEI0EmxCm0hzp6y/vi66Wk3lKNefsggUmxYvzwjFfw4KG32x/L
+ lLHcRRzjfnOJBql0FoDyRPECCMkwECrdWXJvfylEs5DYpm0GbBbv4jDaMuF2Y3VWXhsd
+ 1KogGI6K+lnGkHQUdXVEjNM5yNE909xcOwbhqK3B3+dCKpZD1/WG8TXyu94OMALSrGux
+ Qw9Q==
+X-Gm-Message-State: AOAM533ToPKtI+GOPR+92A0oeWl0NzynXj1a3F1GvO2YaShcBnMX1ZGA
+ sRbyGT1of+lyJI5X96QFeARiMOiZZEg=
+X-Google-Smtp-Source: ABdhPJzT7wzpZtCeZDjiMhRxZj8TRCwYEFF9RU7pepL0NWAs+cN8DhXitSSUbhjm4ecqA1/4pu8ecA==
+X-Received: by 2002:a1c:1b85:: with SMTP id b127mr199522wmb.163.1604424716577; 
+ Tue, 03 Nov 2020 09:31:56 -0800 (PST)
 Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id n6sm26713461wrj.60.2020.11.03.09.31.38
+ by smtp.gmail.com with ESMTPSA id h7sm26814506wrt.45.2020.11.03.09.31.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 09:31:39 -0800 (PST)
+ Tue, 03 Nov 2020 09:31:55 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/6] hw/mips: Fix Lesser GPL version number
-Date: Tue,  3 Nov 2020 18:31:23 +0100
-Message-Id: <20201103173127.2704256-3-f4bug@amsat.org>
+Subject: [PULL 5/6] target/mips: Fix Lesser GPL version number
+Date: Tue,  3 Nov 2020 18:31:26 +0100
+Message-Id: <20201103173127.2704256-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201103173127.2704256-1-f4bug@amsat.org>
 References: <20201103173127.2704256-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x434.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -124,18 +124,36 @@ Message-Id: <20201016143509.26692-1-chetan4windows@gmail.com>
 [PMD: Split hw/ vs target/]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/mips/cps.h      | 2 +-
- include/hw/misc/mips_cpc.h | 2 +-
- include/hw/misc/mips_itu.h | 2 +-
- hw/mips/cps.c              | 2 +-
- hw/misc/mips_cpc.c         | 2 +-
- hw/misc/mips_itu.c         | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+ target/mips/cp0_helper.c         | 2 +-
+ target/mips/dsp_helper.c         | 2 +-
+ target/mips/fpu_helper.c         | 2 +-
+ target/mips/gdbstub.c            | 2 +-
+ target/mips/helper.c             | 2 +-
+ target/mips/lmmi_helper.c        | 2 +-
+ target/mips/mips-semi.c          | 2 +-
+ target/mips/msa_helper.c         | 2 +-
+ target/mips/op_helper.c          | 2 +-
+ target/mips/translate.c          | 2 +-
+ target/mips/translate_init.c.inc | 2 +-
+ 11 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/include/hw/mips/cps.h b/include/hw/mips/cps.h
-index 859a8d4a674..04d636246ab 100644
---- a/include/hw/mips/cps.h
-+++ b/include/hw/mips/cps.h
+diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
+index 12143ac55b9..709cc9a7e3d 100644
+--- a/target/mips/cp0_helper.c
++++ b/target/mips/cp0_helper.c
+@@ -8,7 +8,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/mips/dsp_helper.c b/target/mips/dsp_helper.c
+index 8c58eeb0bf8..09b6e5fb15a 100644
+--- a/target/mips/dsp_helper.c
++++ b/target/mips/dsp_helper.c
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -145,10 +163,36 @@ index 859a8d4a674..04d636246ab 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/hw/misc/mips_cpc.h b/include/hw/misc/mips_cpc.h
-index e5dccea151f..fcafbd5e002 100644
---- a/include/hw/misc/mips_cpc.h
-+++ b/include/hw/misc/mips_cpc.h
+diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+index 6cc956c023d..020b768e87b 100644
+--- a/target/mips/fpu_helper.c
++++ b/target/mips/fpu_helper.c
+@@ -8,7 +8,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/mips/gdbstub.c b/target/mips/gdbstub.c
+index 98f56e660d2..e39f8d75cf0 100644
+--- a/target/mips/gdbstub.c
++++ b/target/mips/gdbstub.c
+@@ -7,7 +7,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index afd78b1990b..063b65c0528 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -158,10 +202,10 @@ index e5dccea151f..fcafbd5e002 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/hw/misc/mips_itu.h b/include/hw/misc/mips_itu.h
-index 96347dbf65d..50d961106da 100644
---- a/include/hw/misc/mips_itu.h
-+++ b/include/hw/misc/mips_itu.h
+diff --git a/target/mips/lmmi_helper.c b/target/mips/lmmi_helper.c
+index 6c645cf679a..abeb7736aeb 100644
+--- a/target/mips/lmmi_helper.c
++++ b/target/mips/lmmi_helper.c
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -171,10 +215,10 @@ index 96347dbf65d..50d961106da 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index c624821315a..962b1b0b87c 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
+diff --git a/target/mips/mips-semi.c b/target/mips/mips-semi.c
+index 10a710c1e80..898251aa023 100644
+--- a/target/mips/mips-semi.c
++++ b/target/mips/mips-semi.c
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -184,10 +228,10 @@ index c624821315a..962b1b0b87c 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/hw/misc/mips_cpc.c b/hw/misc/mips_cpc.c
-index 7c11fb3d447..4a94c870546 100644
---- a/hw/misc/mips_cpc.c
-+++ b/hw/misc/mips_cpc.c
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index 6865addaf6a..249f0fdad80 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -197,11 +241,37 @@ index 7c11fb3d447..4a94c870546 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/hw/misc/mips_itu.c b/hw/misc/mips_itu.c
-index 35409852588..133399598fc 100644
---- a/hw/misc/mips_itu.c
-+++ b/hw/misc/mips_itu.c
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 0050d0616b6..5184a1838be 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
 @@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index f449758606d..3197a692c45 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -10,7 +10,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/mips/translate_init.c.inc b/target/mips/translate_init.c.inc
+index fb5a9b38e5d..ea85d5c6a79 100644
+--- a/target/mips/translate_init.c.inc
++++ b/target/mips/translate_init.c.inc
+@@ -7,7 +7,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
   * License as published by the Free Software Foundation; either
