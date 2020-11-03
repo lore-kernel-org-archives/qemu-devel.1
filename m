@@ -2,113 +2,102 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D3AC00A89
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E9DC00A89
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9397A22243
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:20:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D136222264
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:22:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VCfyTdT7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9397A22243
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXRwW54A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D136222264
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZlvw-0002mj-KP
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 21:20:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37370)
+	id 1kZlyC-0004ok-01
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 21:22:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36372)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZloE-0005fz-C8
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 21:12:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56260)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZljy-0002El-BA
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 21:08:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33242)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZloC-0004DZ-QT
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 21:12:30 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZljw-0003e4-H3
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 21:08:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604369545;
+ s=mimecast20190719; t=1604369283;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZLShU8l8nGVanUwnbwUmc67eR4WJS0nl6uROTb3rb2A=;
- b=VCfyTdT7VpUXQO8gk3XXxTK2LQ62bQiCy6XaYaMmz9yJAoIiPGmjMlpwjD4xsbIZAjTK8Y
- ydeu5z5GupQaHmHLMzjDZAhOXwj7RwoZjSaMNlfyhqWV563RX4uuRcA+ePRTJOQUtj2JbJ
- kHTFYeUw87By8/GColoVckz58qhvQ1c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-257-jfEft-PrPRelOyQy4EKhBQ-1; Mon, 02 Nov 2020 21:12:21 -0500
-X-MC-Unique: jfEft-PrPRelOyQy4EKhBQ-1
-Received: by mail-wm1-f72.google.com with SMTP id u207so4058473wmu.4
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 18:12:21 -0800 (PST)
+ bh=rxz0K8Rx7B0HHvdzSABsXnGF+kDXzjJU6AYfb2kJrPg=;
+ b=hXRwW54AjGJ05TijHa97gYGvUhG7r9BBRkKOzZt8f8RIx4KBktJlRbSDjM2ZkAUOERXM+L
+ z7xNcUsD789NbSIP9nCeQpR1VMH5WPIvSBveVGRK+Evo90VwSZddhUDmoWP8lgZ671QfY4
+ D0vYtWPwlYKs2egOIwxgG2EI98iaOkg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-_o3AJTSQM96SY8ln2E6Dtw-1; Mon, 02 Nov 2020 21:08:00 -0500
+X-MC-Unique: _o3AJTSQM96SY8ln2E6Dtw-1
+Received: by mail-wm1-f71.google.com with SMTP id u207so4057573wmu.4
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 18:07:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZLShU8l8nGVanUwnbwUmc67eR4WJS0nl6uROTb3rb2A=;
- b=ljlrsAVW1O8puiaMJZFht3Z0t/fjx7enhssusrWWebEH7i8rk/wF2s8dl9AvloGM6k
- OnBHRRP3vtI+UJNQgOTEWwPlOUqcGryR0RdNtN04yDmv+MtDBYc+/sqJGvoWKkhVPoJL
- vWhyThDUcDWJ5VcdjoxOJH+ZUhC57pR5IjBT/E714FfDyTL6ZR1xhnEKSUd1f5XsBA1z
- nstegiHBDFPLMBZq8tpELHIMfvzdmaqNQz3rQFyZKeGcX8lGMsMTpJPjkagNYjOE5dDE
- WwNshRM/lDDrzJ1UqiSpMMrD66nwCEfb5u4fM/yzTHc3LyxvdoqvgNpnxrro7iiWHB4C
- h1qA==
-X-Gm-Message-State: AOAM532geR1fnEVvD8GLgqe82diVhaCx+6svcDNhCT/R1RQ61cwOuUkW
- PbAssRLRKXwAOHKRvy24jIg1YD+wJbN9eTaK9m3y7Ji49LR/GhN4gKXChcfCIJ7wkymoMGDq50S
- 8XQIxEqNrtjEKSAw=
-X-Received: by 2002:a05:6000:4c:: with SMTP id
- k12mr22565725wrx.278.1604369540550; 
- Mon, 02 Nov 2020 18:12:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwQWK50gnG+2IocF2guAyCmcKwnN4cMfWYxoOaI80OcSkE9WuS0WJcYhq6/Tr6jIze+SapDcA==
-X-Received: by 2002:a05:6000:4c:: with SMTP id
- k12mr22565709wrx.278.1604369540415; 
- Mon, 02 Nov 2020 18:12:20 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=rxz0K8Rx7B0HHvdzSABsXnGF+kDXzjJU6AYfb2kJrPg=;
+ b=OHx4lDrEUwDN2Zhl/+YcOCloKufIBzgAqYQSKfpcX/e4wiS1QuVXvpwjcHqTUAPXzS
+ BuOKFC8BpISbUFvZX/Z8VROazOeNZ4DHTDYxPhxPWmyquQYKusmWZ0Ofx0EfVPvNBJDO
+ KMXInxk0aBNeGCo+PgIigS+cyPlFko1XwDkNNB6gNJGjx/4TxguZTiquAvsDmrdNtDve
+ 7jPFfUrj5xqQEk3EBUQ2j3rNtaJD7BcMveX56urp0jyHA9db/qApsFRvip3kvX9JpLt8
+ eSzOy3rTSjZ7FLntJ5wY/TAPBJjtGzs6smd2tUsG90HJ4WFVPdFuD2uKjoleB2zZtti2
+ 3ezA==
+X-Gm-Message-State: AOAM530nD1GY7HhNs53GroljX0/n+yeSphBLtD6H0CppM78ugG0hdSP0
+ cjl0xat6bHLxRa7jPzbvGFxQooHgVUvoOp1cz45Sga4lB+nWH1Yiz0cWdn99OEVUDKnxXhizJiX
+ nKEoL8h0HTf8+Rt4=
+X-Received: by 2002:adf:ea0b:: with SMTP id q11mr23596525wrm.80.1604369278692; 
+ Mon, 02 Nov 2020 18:07:58 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzsX3gsJC8u9RlFrPaiMyavPKnXzu6zJwhqOZNGQt+ckmqKHEkfLkTrjzuOepnazkna1ClCMg==
+X-Received: by 2002:adf:ea0b:: with SMTP id q11mr23596510wrm.80.1604369278571; 
+ Mon, 02 Nov 2020 18:07:58 -0800 (PST)
+Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id m14sm24233009wro.43.2020.11.02.18.12.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Nov 2020 18:12:19 -0800 (PST)
-Subject: Re: [PATCH-for-5.2? 3/5] tests/acceptance: Skip incomplete
- virtio_version tests using '@skip'
-To: "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20201102144245.2134077-1-philmd@redhat.com>
- <20201102144245.2134077-4-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <974b193f-cf4b-832b-b963-e4a72fa14028@redhat.com>
-Date: Tue, 3 Nov 2020 03:12:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ by smtp.gmail.com with ESMTPSA id y187sm1213180wmg.33.2020.11.02.18.07.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Nov 2020 18:07:58 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.2 v3 4/7] util/vfio-helpers: Trace where BARs are mapped
+Date: Tue,  3 Nov 2020 03:07:30 +0100
+Message-Id: <20201103020733.2303148-5-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201103020733.2303148-1-philmd@redhat.com>
+References: <20201103020733.2303148-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201102144245.2134077-4-philmd@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 20:52:37
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 20:52:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,75 +110,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Fabien Chouteau <chouteau@adacore.com>, Aurelien Jarno <aurelien@aurel32.net>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- Antony Pavlov <antonynpavlov@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/2/20 3:42 PM, Philippe Mathieu-Daudé wrote:
-> Prefer skipping incomplete tests with the "@skip" keyword,
-> rather than commenting the code.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  tests/acceptance/virtio_version.py | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tests/acceptance/virtio_version.py b/tests/acceptance/virtio_version.py
-> index 33593c29dd0..187bbfa1f42 100644
-> --- a/tests/acceptance/virtio_version.py
-> +++ b/tests/acceptance/virtio_version.py
+For debugging purpose, trace where a BAR is mapped.
 
-And I forgot:
-
--- >8 --
-@@ -14,6 +14,7 @@
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..',
-'python'))
- from qemu.machine import QEMUMachine
- from avocado_qemu import Test
-+from avocado import skip
-
- # Virtio Device IDs:
- VIRTIO_NET = 1
+Reviewed-by: Fam Zheng <fam@euphon.net>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
+ util/vfio-helpers.c | 2 ++
+ util/trace-events   | 1 +
+ 2 files changed, 3 insertions(+)
 
-> @@ -140,17 +140,20 @@ def check_all_variants(self, qemu_devtype, virtio_devid):
->          self.assertIn('conventional-pci-device', trans_ifaces)
->          self.assertNotIn('pci-express-device', trans_ifaces)
->  
-> +    @skip("virtio-blk requires 'driver' parameter")
-> +    def test_conventional_devs_driver(self):
-> +        self.check_all_variants('virtio-blk-pci', VIRTIO_BLOCK)
-> +
-> +    @skip("virtio-9p requires 'fsdev' parameter")
-> +    def test_conventional_devs_fsdev(self):
-> +        self.check_all_variants('virtio-9p-pci', VIRTIO_9P)
->  
->      def test_conventional_devs(self):
->          self.check_all_variants('virtio-net-pci', VIRTIO_NET)
-> -        # virtio-blk requires 'driver' parameter
-> -        #self.check_all_variants('virtio-blk-pci', VIRTIO_BLOCK)
->          self.check_all_variants('virtio-serial-pci', VIRTIO_CONSOLE)
->          self.check_all_variants('virtio-rng-pci', VIRTIO_RNG)
->          self.check_all_variants('virtio-balloon-pci', VIRTIO_BALLOON)
->          self.check_all_variants('virtio-scsi-pci', VIRTIO_SCSI)
-> -        # virtio-9p requires 'fsdev' parameter
-> -        #self.check_all_variants('virtio-9p-pci', VIRTIO_9P)
->  
->      def check_modern_only(self, qemu_devtype, virtio_devid):
->          """Check if a modern-only virtio device type behaves as expected"""
-> 
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index cd6287c3a98..278c54902e7 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -166,6 +166,8 @@ void *qemu_vfio_pci_map_bar(QEMUVFIOState *s, int index,
+     p = mmap(NULL, MIN(size, s->bar_region_info[index].size - offset),
+              prot, MAP_SHARED,
+              s->device, s->bar_region_info[index].offset + offset);
++    trace_qemu_vfio_pci_map_bar(index, s->bar_region_info[index].offset ,
++                                size, offset, p);
+     if (p == MAP_FAILED) {
+         error_setg_errno(errp, errno, "Failed to map BAR region");
+         p = NULL;
+diff --git a/util/trace-events b/util/trace-events
+index 0753e4a0ed1..52d43cda3f3 100644
+--- a/util/trace-events
++++ b/util/trace-events
+@@ -88,3 +88,4 @@ qemu_vfio_dma_unmap(void *s, void *host) "s %p host %p"
+ qemu_vfio_pci_read_config(void *buf, int ofs, int size, uint64_t region_ofs, uint64_t region_size) "read cfg ptr %p ofs 0x%x size 0x%x (region addr 0x%"PRIx64" size 0x%"PRIx64")"
+ qemu_vfio_pci_write_config(void *buf, int ofs, int size, uint64_t region_ofs, uint64_t region_size) "write cfg ptr %p ofs 0x%x size 0x%x (region addr 0x%"PRIx64" size 0x%"PRIx64")"
+ qemu_vfio_region_info(const char *desc, uint64_t region_ofs, uint64_t region_size, uint32_t cap_offset) "region '%s' addr 0x%"PRIx64" size 0x%"PRIx64" cap_ofs 0x%"PRIx32
++qemu_vfio_pci_map_bar(int index, uint64_t region_ofs, uint64_t region_size, int ofs, void *host) "map region bar#%d addr 0x%"PRIx64" size 0x%"PRIx64" ofs 0x%x host %p"
+-- 
+2.26.2
 
 
