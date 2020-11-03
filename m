@@ -2,102 +2,97 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E51DC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4111FC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:39:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3539E2072C
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:38:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9BD652072C
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:39:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6RmiUje"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3539E2072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B79xc1Qq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD652072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZzK9-0003B2-9S
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:38:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43796)
+	id 1kZzLE-0004Cf-KK
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:39:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kZzJH-0002bd-Tz
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:37:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40001)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kZzJG-0007bI-6Z
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:37:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604421444;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=J6YvgHAwlz4iV1ZQgZv2DUJcFbEr6dcFvxuLoxix+ew=;
- b=e6RmiUjeMVKLRmgd7Qu5TfkuRGKUE/H6svn2GwlP5vPje+dOYlBQiF1QsPy3wWDzXM24ir
- eKW/j/TRvn3AiZrrcW/Og6oKjQm/KAY5HN6Yg+seJ42yU+hF8daqUVFOP+ulRu/Nt0iyrl
- H3gW3YlugYXmxA94AAoAndlTQtAwgQM=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-JlxMqC6bM8iKMzjjPr6sOw-1; Tue, 03 Nov 2020 11:37:23 -0500
-X-MC-Unique: JlxMqC6bM8iKMzjjPr6sOw-1
-Received: by mail-qv1-f71.google.com with SMTP id l16so9434303qvt.17
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 08:37:22 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kZzKK-0003Vf-SJ
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:38:32 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39656)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kZzKJ-0007yh-7x
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:38:32 -0500
+Received: by mail-pf1-x444.google.com with SMTP id z3so8308512pfz.6
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 08:38:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=FQfyNYKw3s3KbpdNAbop7Y3DNBRmNlEUc42AuKxdeE8=;
+ b=B79xc1Qq7dIJ8WGWxxcAir6QZ2k/3vMslMfrrHftK/qR7tPxwwhCi8KqXjDIy2IV8u
+ gMP4SU82W6m/qHMXDw1ux6iYzLkkBBF0pv7L9C+CtPpwvjrrN1ce5t+k7jSfHfshSKDL
+ qpuT1vMqEEV/LB3a9PphmivATnpHya0iGjekuiaZ5q02dg7PvY3SQow+qNxRTitITqIV
+ 4X4rq6072Z8r9SaBfJbYNG4Vc7ciDS9hNcUOC2fAQQmeAtjLFT08y+9gKreKPbAC3WR6
+ PGGhXgf9RJaPMsNRyeY2GsJ6Bq2FaKQ7R56e4y9rvT/CFGeH+QC5B6XDduSgSWyT4bWx
+ Jg6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=J6YvgHAwlz4iV1ZQgZv2DUJcFbEr6dcFvxuLoxix+ew=;
- b=raQndyKFfzOXQZo2n9AajQeEThKfTndokPq7ZuDxgLrA/ZZ++ZU4M4pktJO/uPgSCr
- pK+DfKiOjx1d8iXrt1JlAFaTtT2jYVYbz/BGQvqup2nXIO+kk+9ozzJ/q4edIbV9CUSo
- giz/DqydShcJY2ABqMrYYWhBL48owvlOQWrPQrtq3nIqUWBQptpI4dN3/iCM7OPPIdr+
- JZBQTu3NK73LgTJBXpLlvBpDiaNo5kOaBGgLjqQ5zDdW+rwN1HtKvTPvBn0LYUZN3TjK
- yEF0lYUsu5jR0/7IQlCleOHab9Xdz/JqvI9dtN+o1eCQPdCjOWNPsXxATe2Dm0veFuVE
- 5rMA==
-X-Gm-Message-State: AOAM531m5FMFY12jNzlIBV8iIksr54xbWvRRCV1+vdgNe1SZJPzMvjzX
- GJYm/OJxJAPc9P9I7UPSQ2VfxBvENZTTsj/COybPKb5VqH/2uzZk47ChWg1Z4G1j9N8fxeJP1pQ
- uHX937CcBGGVAsG0=
-X-Received: by 2002:a0c:f3c2:: with SMTP id f2mr11281288qvm.24.1604421442426; 
- Tue, 03 Nov 2020 08:37:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw2Nhw/TyEkkvpNgTUJ3BNUUoC278hISsfdvr2Aod1HFqRcQrh0iCttpz0Gv3ouBwTWITKqJQ==
-X-Received: by 2002:a0c:f3c2:: with SMTP id f2mr11281272qvm.24.1604421442156; 
- Tue, 03 Nov 2020 08:37:22 -0800 (PST)
-Received: from xz-x1
- (bras-vprn-toroon474qw-lp130-20-174-93-89-196.dsl.bell.ca. [174.93.89.196])
- by smtp.gmail.com with ESMTPSA id i18sm10534031qtv.38.2020.11.03.08.37.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 08:37:21 -0800 (PST)
-Date: Tue, 3 Nov 2020 11:37:18 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RFC] memory: pause all vCPUs for the duration of memory
- transactions
-Message-ID: <20201103163718.GH20600@xz-x1>
-References: <20201026084916.3103221-1-vkuznets@redhat.com>
- <20201102195729.GA20600@xz-x1>
- <87v9emy4g2.fsf@vitty.brq.redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FQfyNYKw3s3KbpdNAbop7Y3DNBRmNlEUc42AuKxdeE8=;
+ b=MWcp+XhOAJ+0gPKM9eqTh4uj7fHWRCm/oYfzlL9URFtwwyx58lMuZEk2xGvrnX9wiN
+ +oRNGN9A+tNoejjwgagYer/l/mUtJ835JNTv19G+PfBFLoJAvyFKVVySkzV7f7ptpkic
+ dgzIXDGTzbebxKyXmmNK9spGkreRv6M44lWnRHSgmEf22RWQPS87f8eO3Q3i9KvqTzaR
+ 5HEe6+NOGhNKEo9YiI5CVIDkaTTAmda2tY3t5JUBfeNIl7zmLlWu7nDiogCAFH+vhSn9
+ WxC7Jh5BWosWgD3W6ZRZhS/FKkdBYtTKYTatGb86GZuYY3G0eMcIQqppQKlIQiRJQmBF
+ G0IQ==
+X-Gm-Message-State: AOAM530QPmr8mSu6Gew+SpvT4TrMhjZUDiXdYCLZvNvCr/eji/c3qITu
+ QbmvTIusOPmt0JN8xOHdA+sOP3szHTsubw==
+X-Google-Smtp-Source: ABdhPJzN101k/v1x0z77zpl2Il1nHSre/LqPxss3mCEkWc6NmsvAeTHCczsXqg1BfowFyeXdh49UAA==
+X-Received: by 2002:a63:d946:: with SMTP id e6mr18093228pgj.113.1604421508903; 
+ Tue, 03 Nov 2020 08:38:28 -0800 (PST)
+Received: from [172.16.1.221] (76-14-210-194.or.wavecable.com. [76.14.210.194])
+ by smtp.gmail.com with ESMTPSA id ca5sm4178124pjb.27.2020.11.03.08.38.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Nov 2020 08:38:27 -0800 (PST)
+Subject: Re: [PATCH 14/14] target/arm: enable Secure EL2 in max CPU
+To: =?UTF-8?Q?R=c3=a9mi_Denis-Courmont?= <remi@remlab.net>, qemu-arm@nongnu.org
+References: <2172054.ElGaqSPkdT@basile.remlab.net>
+ <20201102105802.39332-14-remi.denis.courmont@huawei.com>
+ <4572030.GXAFRqVoOG@basile.remlab.net>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6f32973b-ec84-51c7-0809-95e931ee432a@linaro.org>
+Date: Tue, 3 Nov 2020 08:38:25 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <87v9emy4g2.fsf@vitty.brq.redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <4572030.GXAFRqVoOG@basile.remlab.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,60 +105,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 03, 2020 at 02:07:09PM +0100, Vitaly Kuznetsov wrote:
-> In case it is a normal access from the guest, yes, but AFAIR here
-> guest's CR3 is pointing to non existent memory and when KVM detects that
-> it injects #PF by itself without a loop through userspace.
+On 11/2/20 11:38 PM, Rémi Denis-Courmont wrote:
+> Answering my own patch as I have a policy question here...
+> 
+> This exposes SEL2 without TTST (small translation tables). On a logical level, 
+> the two extensions are orthogonal. But per DDI0487, SEL2 implies TTST, so I am 
+> not sure if this is considered an acceptable deviation in QEMU, or if 
+> implementing TTST is deemed necessary.
 
-I see, thanks Vitaly.  I think this kind of answered my previous confusion on
-why we can't just bounce all these to QEMU since I thought QEMU should try to
-take the bql if it's mmio access - probably because there're quite a lot of
-references to guest memslots in kernel that cannot be naturally treated as
-guest MMIO access (especially for nested, maybe?) so that maybe it's very hard
-to cover all of them.  Paolo has mentioned quite a few times that he'd prefer a
-kernel solution for this; I feel like I understand better on the reason now..
+We should implement TTST, yes.  I don't think we need to be 100% strict on the
+ordering, so long as they are both done for the next qemu release in the
+spring.  I don't think it should be difficult.
 
-Have any of us tried to collect the requirements on this new kernel interface
-(if to be proposed)?  I'm kind of thinking how it would look like to solve all
-the pains we have right now.
+FWIW, we left aarch32 fp16 unimplemented for quite some time, even though that
+was required for full compliance with aarch64 fp16.
 
-Firstly, I think we'd likely want to have the capability to handle "holes" in
-memslots, either to punch a hole, which iiuc is the problem behind this patch.
-Or the reversed operation, which is to fill up a whole that we've just punched.
-The other major one could be virtio-mem who would like to extend or shrink an
-existing memslot.  However IIUC that's also doable with the "hole" idea in that
-we can create the memslot with the maximum supported size, then "punch a hole"
-at the end of the memslot just like it shrinked.  When extend, we shrink the
-hole instead rather than the memslot.
+> Note that there's what seems like an editorial error in the spec: VSTCR 
+> documentation covers the scenario that TTST is not supported by the CPU, even 
+> though then VSTCR should not exist.
 
-Then there's the other case where we want to keep the dirty bitmap when
-punching a hole on existing ram.  If with the "hole" idea in the kernel, it
-seems easy too - when we punch the hole, we drop dirty bitmaps only for the
-range covered by the hole.  Then we won't lose the rest bitmaps that where the
-RAM still makes sense, since the memslot will use the same bitmap before/after
-punching a hole.
+Indeed.  ;-)
 
-So now an simple idea comes to my mind (I think we can have even more better,
-or more complicated ideas, e.g., to make kvm memslot a tree? But I'll start
-with the simple): maybe we just need to teach each kvm memslot to take "holes"
-within itself.  By default, there's no holes with KVM_SET_USER_MEMORY_REGION
-configured kvm memslots, then we can configure holes for each memslot using a
-new flag (assuming, KVM_MEM_SET_HOLE) of the same ioctl (after LOG_DIRTY_PAGES
-and READ_ONLY).  Initially we may add a restriction on how many holes we need,
-so the holes can also be an array.
 
-Thoughts?
-
-Thanks,
-
--- 
-Peter Xu
+r~
 
 
