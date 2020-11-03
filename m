@@ -2,69 +2,71 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CDDBC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:41:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01083C388F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:43:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5364122243
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:41:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74EF822243
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:43:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ts3Ix3o3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5364122243
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OMzlmvBS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74EF822243
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZvcT-0006ds-62
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:41:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52042)
+	id 1kZveW-0007z9-7P
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:43:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kZvb2-0005aR-QX
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:39:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35974)
+ id 1kZvWO-0000y7-UJ
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:34:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37217)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kZvb0-0006OO-MZ
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:39:32 -0500
+ id 1kZvWN-0004hk-7X
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:34:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604407165;
+ s=mimecast20190719; t=1604406882;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UI6Y4+XlJlwrHvxocB3ncP7ba8NPybAEToiaJnoIIyI=;
- b=Ts3Ix3o3h8sV7RTCxennQ5YDR6aviviUMswXgDMyrv+5rs8PKBwbNzYbDkim8aXRi0iZCY
- aNvqkQTIy0QrE4saQAGGxZKp4zAQDKTguLfydcADuFVE3o/d9k8MCOQXuI8MDKQkKLcz/y
- kDd9K938EfEl7UJmrzCsLk/lpYJElCY=
+ bh=lj3DazDN9nw5shyE1SyTwTcGhFsfdmApgeVxitLjVRg=;
+ b=OMzlmvBSDhUiy/nWoFXpfo4dPj+DCpK788Y1oW0kVU3uetZsHE14zCEpJDeYhQ/WyejRPY
+ 4ikiZGLcybtFyKKQszgNKJCJbj65b0aEyFjery5wXEnnpq/rXLOECKUobh4EDk8wPlQ8Tv
+ vILO8X8ugj4e1ruu+JRAF526mXaHMdg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-z2r4LVopP_-IEtFB6vhpUA-1; Tue, 03 Nov 2020 07:39:21 -0500
-X-MC-Unique: z2r4LVopP_-IEtFB6vhpUA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-548-NPSjMMHbMmqqj84coRjRGw-1; Tue, 03 Nov 2020 07:34:40 -0500
+X-MC-Unique: NPSjMMHbMmqqj84coRjRGw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4245180364D;
- Tue,  3 Nov 2020 12:39:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BECA879519;
+ Tue,  3 Nov 2020 12:34:39 +0000 (UTC)
 Received: from localhost (unknown [10.40.208.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F47F1002D49;
- Tue,  3 Nov 2020 12:39:16 +0000 (UTC)
-Date: Tue, 3 Nov 2020 13:39:13 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 96B7B21E90;
+ Tue,  3 Nov 2020 12:34:37 +0000 (UTC)
+Date: Tue, 3 Nov 2020 13:34:36 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-To: Ying Fang <fangying1@huawei.com>
-Subject: Re: Question on UEFI ACPI tables setup and probing on arm64
-Message-ID: <20201103133913.1fee3337@redhat.com>
-In-Reply-To: <ee3b7fdf-f6ba-cafc-5b44-42b0bcda01c5@huawei.com>
-References: <ee3b7fdf-f6ba-cafc-5b44-42b0bcda01c5@huawei.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH 14/20] i386: Remove unnecessary prefix from error message
+Message-ID: <20201103133436.6ac2c336@redhat.com>
+In-Reply-To: <20201030202131.796967-15-ehabkost@redhat.com>
+References: <20201030202131.796967-1-ehabkost@redhat.com>
+ <20201030202131.796967-15-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -94,67 +96,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, lersek@redhat.com,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- "wangzhigang17@huawei.com" <wangzhigang17@huawei.com>, philmd@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 30 Oct 2020 10:50:01 +0800
-Ying Fang <fangying1@huawei.com> wrote:
+On Fri, 30 Oct 2020 16:21:25 -0400
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> Hi,
+> object_property_parse() will add a
+>   "Property '<TYPE>.<PROP>' can't take value '<VALUE>'"
+> prefix automatically for us.
 > 
-> I have a question on UEFI/ACPI tables setup and probing on arm64 platform.
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-CCing Laszlo,
-who might know how it's implemented.
- 
-> Currently on arm64 platform guest can be booted with both fdt and ACPI
-> supported. If ACPI is enabled, [1] says the only defined method for
-> passing ACPI tables to the kernel is via the UEFI system configuration
-> table. So AFAIK, ACPI Should be dependent on UEFI.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> ---
+>  target/i386/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> What's more [2] says UEFI kernel support on the ARM architectures
-> is only available through a *stub*. The stub populates the FDT /chosen
-> node with some UEFI parameters describing the UEFI location info.
-> 
-> So i dump /sys/firmware/fdt from the guest, it does have something like:
-> 
-> /dts-v1/;
-> 
-> / {
-> 	#size-cells = <0x02>;
-> 	#address-cells = <0x02>;
-> 
-> 	chosen {
-> 		linux,uefi-mmap-desc-ver = <0x01>;
-> 		linux,uefi-mmap-desc-size = <0x30>;
-> 		linux,uefi-mmap-size = <0x810>;
-> 		linux,uefi-mmap-start = <0x04 0x3c0ce018>;
-> 		linux,uefi-system-table = <0x04 0x3f8b0018>;
-> 		bootargs = "BOOT_IMAGE=/vmlinuz-4.19.90-2003.4.0.0036.oe1.aarch64 
-> root=/dev/mapper/openeuler-root ro rd.lvm.lv=openeuler/root 
-> rd.lvm.lv=openeuler/swap video=VGA-1:640x480-32@60me 
-> smmu.bypassdev=0x1000:0x17 smmu.bypassdev=0x1000:0x15 
-> crashkernel=1024M,high video=efifb:off video=VGA-1:640x480-32@60me";
-> 		linux,initrd-end = <0x04 0x3a85a5da>;
-> 		linux,initrd-start = <0x04 0x392f2000>;
-> 	};
-> };
-> 
-> But the question is that I did not see any code adding the uefi
-> in fdt chosen node in *arm_load_dtb* or anywhere else.
-> Qemu only maps the OVMF binary file into a pflash device.
-> So I'm really confused on how UEFI information is provided to
-> guest by qemu. Does anybody know of the details about it ?
-> 
-> [1] https://www.kernel.org/doc/html/latest/arm64/arm-acpi.html
-> [2] https://www.kernel.org/doc/Documentation/arm/uefi.rst
-> 
-> Thanks.
-> Ying
-> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 0d8606958e..2c00f94308 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -4529,7 +4529,7 @@ static void x86_cpuid_set_vendor(Object *obj, const char *value,
+>      int i;
+>  
+>      if (strlen(value) != CPUID_VENDOR_SZ) {
+> -        error_setg(errp, QERR_PROPERTY_VALUE_BAD, "", "vendor", value);
+> +        error_setg(errp, "invalid vendor ID");
+>          return;
+>      }
+>  
 
 
