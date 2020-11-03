@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD23AC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 641A4C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2ADF520756
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:40:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0336720780
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:40:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="f04RQgJ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ADF520756
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="dtOlCLt3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0336720780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZyPu-0002JQ-4t
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:40:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51912)
+	id 1kZyQV-0003e0-VO
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:40:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51442)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
- id 1kZyKN-0002TF-3R
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:34:31 -0500
+ id 1kZyJV-0001bM-Kx
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:33:37 -0500
 Received: from esa6.hgst.iphmx.com ([216.71.154.45]:14996)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
- id 1kZyKD-0001EJ-Gb
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:34:27 -0500
+ id 1kZyJS-0001EJ-RO
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:33:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1604417662; x=1635953662;
+ t=1604417615; x=1635953615;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=GQeiFHPgNUNLdTN/HqvHjPj+kySyVyfKiMFndpNHjIA=;
- b=f04RQgJ74XBNl6U2iry4QwjYaSxE+hz0o4J2DlbzDA+lRgWj7N9nuabk
- ucZn62px1kIO47w+6pwjG49Vge/hjcGeG+w+AXTCfB7N185oZvIwJJTXU
- QPbaUirqNnl1BBm/gHY0ARlMpnIbifZuPHUTnBl9e9SqoyMGkd8RUAxM4
- k/rHYsO9s8LReCBLyNNrTdrsJ3zeVQS8c9TvFzpZlHA5MbOgNB6nAS3AP
- yuofTT/lZaMQBGIQkX0F4AioGOJY5EGPhLvsM3tZqmjFzbBiFlGDiyvcF
- wvC0bIGbPa2e/N/exANtRiIjcus3D7cmg0/MC4OCsJXVpHKa8RyjxS11v Q==;
-IronPort-SDR: fGS/xKaVKE5Df6JnlX6WkC/ql4xgocfKt2mT93Y0kx7/5/YB74RYub5+5xvhqdyje1zgFA6lZQ
- pEUikK8GH5Tv/Vgc/NSTPVI5LBehwEh7DEAOdIy2xwJJN4163+26rpcY5VvZU8aLB3t5n1YQg1
- sW9eBLqP90luPKEjRp2jfV6iyMvactGbCdiQ6POPlBWwpL86EMxaYLKHOvLDSevEZf1MTsDsoc
- b/1L8mG4lgktN4eg5924S7PjQDgqMbyjsSioozZjfN/NeX4XR9+miyUbe/lyvU3uzMSOwYctYD
- g7c=
-X-IronPort-AV: E=Sophos;i="5.77,448,1596470400"; d="scan'208";a="152867486"
+ bh=g4WdlHNUsSqm5IYl1xQpaPDV/gYQAaTlwhWn8+X0BO0=;
+ b=dtOlCLt3IkE6aVP9LBANvkQbezCH7yaZTpba/j7ngfJMlc+s/tMvwMbu
+ U9GsqgHN/bs/uneiN5J+9jJPTAf5LccM2TVdynXSyzSLAhJ+kZQX6L0PR
+ +77yK1dMJy4ggeiPdeRPvJ8c/WmXsW5VwlALPqZcD3XBQR7kH55PS4fy2
+ T+mEUYYl/2EGpbWT4lHKBlj96JQ8jDxuGMdJagqYh3bbr+2TINMDWMR/D
+ yeCI8VBAP/Hy+Z+yg76WkhFuK+Nf6KqgkFpREZmkZ1GahwcdB53Rn+sJQ
+ +2XTPZukclV3pCBoCQZ6ded8nVWk6R+pX/vX7Gtuv0vAPlIp3rUQbx9ks Q==;
+IronPort-SDR: hDo9LPVF1pEKiVED61HUAjvxmdX0QHENUZQGAy/7gtzzMclY+1tcnfyL2Js5NkWDmRG3xd1cNK
+ 8/Uj88YtxjoYTiE4xm8e+cxHBvLdsRNp5clWvKe6syHjd+LhjWydDxvq7dDJQ+vcZAdWOP9eu1
+ S3Rpw5QR4EJ2IoR2a4yIV/xUfnENKozq6JNnwDH7ex/2esHSRVqeXW5JDq/aIjFp/LWDit0PXJ
+ G17Wo5ghpmgGvKuEWdJfZ6DAyt4h+pYs4/Vfe9B8zFnwGFIlOCsfXk96liXnO6r+PATnJKzwH1
+ tL0=
+X-IronPort-AV: E=Sophos;i="5.77,448,1596470400"; d="scan'208";a="152867465"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 03 Nov 2020 23:33:28 +0800
-IronPort-SDR: 1N1gy6M4UNWGHMRGUVt1s3XjPxCJhH9k89eiUZ4mK0IdQLaIdyk0gYqzJYpsWGfFTpJlFGwMML
- +BK161Vv9HlVRbN58W+gI7NVmVxRaHZn1H480Sf2XEYDwrpzir28/0iFokM/gR0GbydFq3sip0
- Sna/CgOBIymR23VVzY9M9rgzhsVjx7HnNG4uIpJQ/5i34siKs3uNEpv+f6ZItG5ay14WLnK3TX
- nO6/0qiItmAO/3y+jdL/Fxon2MXtnAtRrZhEj31WB6i+VIge63Z5wqZnZOpJ9eHX6jmBZSq3+/
- Bdi15QI53u5q2SVBf657uFmV
+ by ob1.hgst.iphmx.com with ESMTP; 03 Nov 2020 23:33:26 +0800
+IronPort-SDR: iC7plak0tBkWUXGG9ie4QnfHTNAr1ZpGlpvacY4XQ9H4mryFjTpXyBOj6XgXm2A4fbjDCwjq+N
+ p4LGZB78QjIypmaUZBl042CfCVYlSLydGg/A5JIrm3G4TckcN9sVGixnC4e1UuIr7oLIyHYglK
+ 0mKgllcLqeiYmvU3S7Ebe0+YPAUhr4USP/Zi6czzX6SUDxq778SV6yPdhIZzbJ99hivbPLTA7I
+ 1KlAQDd9kNfSVJ3HRaPvpFgaeajfOzaezEEs/r7LrrephTws3N0ETD+0pHnBCiukTMHYdtLMhv
+ fSLGWup9/tsoPXcA0FcTDQCu
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 03 Nov 2020 07:19:36 -0800
-IronPort-SDR: IFjrgivLKDs+cCbvx/BWBuFplMxvaMR5lfXMflFfmyLvMa8El9KWo/fo9iEKMk+txjJrSc6/FP
- AgmxCi1v+v5qWbnzsvuNvbqj6QTaP8F6ytqAJSxj3BefxX4wqjbGZ9pjOgVgNE3IBUl3zCwaCK
- gmwYuZmiHbbvTfIAwf9Z6OFN0PgbyQb9PNBVXdJyOF5Vk83TfxrhAe1E1Pv0G8n/6wCji8qtrq
- n6QvyRzJjMR1tOvb63WCmU2nJsY9O8F2g2Mgvxhj/CAFNzD2Efv34bb89Ez+qVL9be0xk2Qx44
- 6LU=
+ 03 Nov 2020 07:19:34 -0800
+IronPort-SDR: eOqWtonO9HwqCFgkUMpS5s285aYyZzZFl39sZx40qnepr9cdHxm0meCE0ZCP3AAJILYPFhLkC8
+ 2IzCOrdKqvflpmDCAqAWNKhbABAvex6SPQngW//I675ImrfdkkLsRj4XwupAnTYvxTfM5+d4oM
+ bSckxfYrnP1kCbnuCO9FgUhTrNxDDntJpcaUuyXyd7/nOBfFGRu1++v/j7DNz+Tvoq3ksMBGJS
+ 1Vv+EPlWPLP6lZ4sPdzvcfLuYionv/zhpp+AD5lLzYtxnRKHgwIfVnCOs5yD3yUbpXG5v7caPD
+ Sts=
 WDCIronportException: Internal
 Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.60.113])
- by uls-op-cesaip01.wdc.com with ESMTP; 03 Nov 2020 07:33:28 -0800
+ by uls-op-cesaip01.wdc.com with ESMTP; 03 Nov 2020 07:33:26 -0800
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL v2 17/19] hw/riscv: microchip_pfsoc: Correct DDR memory map
-Date: Tue,  3 Nov 2020 07:21:48 -0800
-Message-Id: <20201103152150.2677566-18-alistair.francis@wdc.com>
+Subject: [PULL v2 08/19] target/riscv: Add sifive_plic vmstate
+Date: Tue,  3 Nov 2020 07:21:39 -0800
+Message-Id: <20201103152150.2677566-9-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201103152150.2677566-1-alistair.francis@wdc.com>
 References: <20201103152150.2677566-1-alistair.francis@wdc.com>
@@ -109,136 +109,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
+ Yifei Jiang <jiangyifei@huawei.com>, Yipeng Yin <yinyipeng1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+From: Yifei Jiang <jiangyifei@huawei.com>
 
-When system memory is larger than 1 GiB (high memory), PolarFire SoC
-maps it at address 0x10_0000_0000. Address 0xC000_0000 and above is
-aliased to the same 1 GiB low memory with different cache attributes.
+Add sifive_plic vmstate for supporting sifive_plic migration.
+Current vmstate framework only supports one structure parameter
+as num field to describe variable length arrays, so introduce
+num_enables.
 
-At present QEMU maps the system memory contiguously from 0x8000_0000.
-This corrects the wrong QEMU logic. Note address 0x14_0000_0000 is
-the alias to the high memory, and even physical memory is only 1 GiB,
-the HSS codes still tries to probe the high memory alias address.
-It seems there is no issue on the real hardware, so we will have to
-take that into the consideration in our emulation. Due to this, we
-we increase the default system memory size to 1537 MiB (the minimum
-required high memory size by HSS) so that user gets notified an error
-when less than 1537 MiB is specified.
-
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20201101170538.3732-1-bmeng.cn@gmail.com
+Message-id: 20201026115530.304-7-jiangyifei@huawei.com
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- include/hw/riscv/microchip_pfsoc.h |  5 ++-
- hw/riscv/microchip_pfsoc.c         | 50 ++++++++++++++++++++++++++----
- 2 files changed, 48 insertions(+), 7 deletions(-)
+ include/hw/intc/sifive_plic.h |  1 +
+ hw/intc/sifive_plic.c         | 26 +++++++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-index f34a6b3fd7..db77e9c84a 100644
---- a/include/hw/riscv/microchip_pfsoc.h
-+++ b/include/hw/riscv/microchip_pfsoc.h
-@@ -105,7 +105,10 @@ enum {
-     MICROCHIP_PFSOC_ENVM_CFG,
-     MICROCHIP_PFSOC_ENVM_DATA,
-     MICROCHIP_PFSOC_IOSCB,
--    MICROCHIP_PFSOC_DRAM,
-+    MICROCHIP_PFSOC_DRAM_LO,
-+    MICROCHIP_PFSOC_DRAM_LO_ALIAS,
-+    MICROCHIP_PFSOC_DRAM_HI,
-+    MICROCHIP_PFSOC_DRAM_HI_ALIAS
- };
+diff --git a/include/hw/intc/sifive_plic.h b/include/hw/intc/sifive_plic.h
+index b75b1f145d..1e451a270c 100644
+--- a/include/hw/intc/sifive_plic.h
++++ b/include/hw/intc/sifive_plic.h
+@@ -52,6 +52,7 @@ struct SiFivePLICState {
+     uint32_t num_addrs;
+     uint32_t num_harts;
+     uint32_t bitfield_words;
++    uint32_t num_enables;
+     PLICAddr *addr_config;
+     uint32_t *source_priority;
+     uint32_t *target_priority;
+diff --git a/hw/intc/sifive_plic.c b/hw/intc/sifive_plic.c
+index f42fd695d8..97a1a27a9a 100644
+--- a/hw/intc/sifive_plic.c
++++ b/hw/intc/sifive_plic.c
+@@ -30,6 +30,7 @@
+ #include "hw/intc/sifive_plic.h"
+ #include "target/riscv/cpu.h"
+ #include "sysemu/sysemu.h"
++#include "migration/vmstate.h"
  
- enum {
-diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-index 44a84732ac..96cb8b983a 100644
---- a/hw/riscv/microchip_pfsoc.c
-+++ b/hw/riscv/microchip_pfsoc.c
-@@ -121,7 +121,10 @@ static const struct MemmapEntry {
-     [MICROCHIP_PFSOC_ENVM_CFG] =        { 0x20200000,     0x1000 },
-     [MICROCHIP_PFSOC_ENVM_DATA] =       { 0x20220000,    0x20000 },
-     [MICROCHIP_PFSOC_IOSCB] =           { 0x30000000, 0x10000000 },
--    [MICROCHIP_PFSOC_DRAM] =            { 0x80000000,        0x0 },
-+    [MICROCHIP_PFSOC_DRAM_LO] =         { 0x80000000, 0x40000000 },
-+    [MICROCHIP_PFSOC_DRAM_LO_ALIAS] =   { 0xc0000000, 0x40000000 },
-+    [MICROCHIP_PFSOC_DRAM_HI] =       { 0x1000000000,        0x0 },
-+    [MICROCHIP_PFSOC_DRAM_HI_ALIAS] = { 0x1400000000,        0x0 },
- };
+ #define RISCV_DEBUG_PLIC 0
  
- static void microchip_pfsoc_soc_instance_init(Object *obj)
-@@ -424,7 +427,11 @@ static void microchip_icicle_kit_machine_init(MachineState *machine)
-     const struct MemmapEntry *memmap = microchip_pfsoc_memmap;
-     MicrochipIcicleKitState *s = MICROCHIP_ICICLE_KIT_MACHINE(machine);
-     MemoryRegion *system_memory = get_system_memory();
--    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-+    MemoryRegion *mem_low = g_new(MemoryRegion, 1);
-+    MemoryRegion *mem_low_alias = g_new(MemoryRegion, 1);
-+    MemoryRegion *mem_high = g_new(MemoryRegion, 1);
-+    MemoryRegion *mem_high_alias = g_new(MemoryRegion, 1);
-+    uint64_t mem_high_size;
-     DriveInfo *dinfo = drive_get_next(IF_SD);
+@@ -448,11 +449,12 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
+                           TYPE_SIFIVE_PLIC, plic->aperture_size);
+     parse_hart_config(plic);
+     plic->bitfield_words = (plic->num_sources + 31) >> 5;
++    plic->num_enables = plic->bitfield_words * plic->num_addrs;
+     plic->source_priority = g_new0(uint32_t, plic->num_sources);
+     plic->target_priority = g_new(uint32_t, plic->num_addrs);
+     plic->pending = g_new0(uint32_t, plic->bitfield_words);
+     plic->claimed = g_new0(uint32_t, plic->bitfield_words);
+-    plic->enable = g_new0(uint32_t, plic->bitfield_words * plic->num_addrs);
++    plic->enable = g_new0(uint32_t, plic->num_enables);
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
+     qdev_init_gpio_in(dev, sifive_plic_irq_request, plic->num_sources);
  
-     /* Sanity check on RAM size */
-@@ -441,10 +448,33 @@ static void microchip_icicle_kit_machine_init(MachineState *machine)
-     qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
- 
-     /* Register RAM */
--    memory_region_init_ram(main_mem, NULL, "microchip.icicle.kit.ram",
--                           machine->ram_size, &error_fatal);
-+    memory_region_init_ram(mem_low, NULL, "microchip.icicle.kit.ram_low",
-+                           memmap[MICROCHIP_PFSOC_DRAM_LO].size,
-+                           &error_fatal);
-+    memory_region_init_alias(mem_low_alias, NULL,
-+                             "microchip.icicle.kit.ram_low.alias",
-+                             mem_low, 0,
-+                             memmap[MICROCHIP_PFSOC_DRAM_LO_ALIAS].size);
-+    memory_region_add_subregion(system_memory,
-+                                memmap[MICROCHIP_PFSOC_DRAM_LO].base,
-+                                mem_low);
-     memory_region_add_subregion(system_memory,
--                                memmap[MICROCHIP_PFSOC_DRAM].base, main_mem);
-+                                memmap[MICROCHIP_PFSOC_DRAM_LO_ALIAS].base,
-+                                mem_low_alias);
-+
-+    mem_high_size = machine->ram_size - 1 * GiB;
-+
-+    memory_region_init_ram(mem_high, NULL, "microchip.icicle.kit.ram_high",
-+                           mem_high_size, &error_fatal);
-+    memory_region_init_alias(mem_high_alias, NULL,
-+                             "microchip.icicle.kit.ram_high.alias",
-+                             mem_high, 0, mem_high_size);
-+    memory_region_add_subregion(system_memory,
-+                                memmap[MICROCHIP_PFSOC_DRAM_HI].base,
-+                                mem_high);
-+    memory_region_add_subregion(system_memory,
-+                                memmap[MICROCHIP_PFSOC_DRAM_HI_ALIAS].base,
-+                                mem_high_alias);
- 
-     /* Load the firmware */
-     riscv_find_and_load_firmware(machine, BIOS_FILENAME, RESET_VECTOR, NULL);
-@@ -470,7 +500,15 @@ static void microchip_icicle_kit_machine_class_init(ObjectClass *oc, void *data)
-                    MICROCHIP_PFSOC_COMPUTE_CPU_COUNT;
-     mc->min_cpus = MICROCHIP_PFSOC_MANAGEMENT_CPU_COUNT + 1;
-     mc->default_cpus = mc->min_cpus;
--    mc->default_ram_size = 1 * GiB;
-+
-+    /*
-+     * Map 513 MiB high memory, the mimimum required high memory size, because
-+     * HSS will do memory test against the high memory address range regardless
-+     * of physical memory installed.
-+     *
-+     * See memory_tests() in mss_ddr.c in the HSS source code.
-+     */
-+    mc->default_ram_size = 1537 * MiB;
+@@ -472,12 +474,34 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
+     msi_nonbroken = true;
  }
  
- static const TypeInfo microchip_icicle_kit_machine_typeinfo = {
++static const VMStateDescription vmstate_sifive_plic = {
++    .name = "riscv_sifive_plic",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++            VMSTATE_VARRAY_UINT32(source_priority, SiFivePLICState,
++                                  num_sources, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(target_priority, SiFivePLICState,
++                                  num_addrs, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(pending, SiFivePLICState, bitfield_words, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(claimed, SiFivePLICState, bitfield_words, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(enable, SiFivePLICState, num_enables, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_END_OF_LIST()
++        }
++};
++
+ static void sifive_plic_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     device_class_set_props(dc, sifive_plic_properties);
+     dc->realize = sifive_plic_realize;
++    dc->vmsd = &vmstate_sifive_plic;
+ }
+ 
+ static const TypeInfo sifive_plic_info = {
 -- 
 2.28.0
 
