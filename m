@@ -2,77 +2,76 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 977A8C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 589B5C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:13:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F18BF20757
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:13:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C273320757
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:13:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RnttWad6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F18BF20757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NdSFgfLU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C273320757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZxzu-0008Ba-Ut
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:13:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41424)
+	id 1kZy0B-0000Fd-Qq
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:13:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kZxsQ-0002bi-PP
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:05:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59089)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kZxkb-0001J6-90
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:57:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22423)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kZxsM-0008Gu-8f
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:05:37 -0500
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kZxkX-0005V4-Fo
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:57:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604415932;
+ s=mimecast20190719; t=1604415447;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cAq0zPlTXsCKa/xZUGjvTNU8Jth3STSSJ2gNaKzIHiM=;
- b=RnttWad6QhE4GG4hzahlAHvUBsiCdj717FfyzEocb0kfA5XUOiQeuKSSQGksfFNfkRyCC3
- f6daszdEVxllV0hcY/Ah8I1jQkmpVvHXQfW0u88XVvTiw6eLTd+RalaMtyP0l4xfe6OPGs
- ZeqDJs9mX9blkzgI+wGWH7gY2H1lS24=
+ bh=JmjH+RXJAKPLltutGlToEaOaDac+EnKM6h7VI2aeC48=;
+ b=NdSFgfLUAYGKFT0ASVoJnOU6V92DsmJScDQYQ4IzAyhfOuT6m4R+6UK4JV3ssgWe6H98R7
+ AmfYOLBjOX5Iio407uZz/nknlNkdc9AxBFf2IHTQaCPAcYuBqsW5ENE+wJ5b9NDZmYMnIs
+ Ar1Qs3c2vkKxSUHxyPN5OYoyHzLPVLE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-519-XYTBq8TpOAWY-r1FcIceKg-1; Tue, 03 Nov 2020 10:05:14 -0500
-X-MC-Unique: XYTBq8TpOAWY-r1FcIceKg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-585-JaGi608MOrm0hbpQTpC87w-1; Tue, 03 Nov 2020 09:57:24 -0500
+X-MC-Unique: JaGi608MOrm0hbpQTpC87w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2788D18C89D0;
- Tue,  3 Nov 2020 15:05:13 +0000 (UTC)
-Received: from localhost (ovpn-115-37.ams2.redhat.com [10.36.115.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BBB897512C;
- Tue,  3 Nov 2020 15:05:09 +0000 (UTC)
-Date: Tue, 3 Nov 2020 15:05:08 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: VFIO Migration
-Message-ID: <20201103150508.GB253848@stefanha-x1.localdomain>
-References: <20201102111153.GC42093@stefanha-x1.localdomain>
- <20201103113929.GH205187@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E39B11009E2F;
+ Tue,  3 Nov 2020 14:57:22 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E4DB610AF;
+ Tue,  3 Nov 2020 14:57:11 +0000 (UTC)
+Date: Tue, 3 Nov 2020 15:57:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Eric DeVolder <eric.devolder@oracle.com>
+Subject: Re: [PATCH 0/1] acpi: Implement ACPI ERST support for guests
+Message-ID: <20201103155709.410240e4@redhat.com>
+In-Reply-To: <1603743573-9870-1-git-send-email-eric.devolder@oracle.com>
+References: <1603743573-9870-1-git-send-email-eric.devolder@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20201103113929.GH205187@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="H+4ONPRPur6+Ovig"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,160 +94,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
- quintela@redhat.com, Jason Wang <jasowang@redhat.com>,
- Felipe Franciosi <felipe@nutanix.com>, Kirti Wankhede <kwankhede@nvidia.com>,
- qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, konrad.wilk@oracle.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
+ lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---H+4ONPRPur6+Ovig
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, 26 Oct 2020 16:19:32 -0400
+Eric DeVolder <eric.devolder@oracle.com> wrote:
 
-On Tue, Nov 03, 2020 at 11:39:29AM +0000, Daniel P. Berrang=E9 wrote:
-> On Mon, Nov 02, 2020 at 11:11:53AM +0000, Stefan Hajnoczi wrote:
-> > Overview
-> > --------
-> > The purpose of device states is to save the device at a point in time a=
-nd then
-> > restore the device back to the saved state later. This is more challeng=
-ing than
-> > it first appears.
-> >=20
-> > The process of saving a device state and loading it later is called
-> > *migration*. The state may be loaded by the same device that saved it o=
-r by a
-> > new instance of the device, possibly running on a different computer.
-> >=20
-> > It must be possible to migrate to a newer implementation of the device
-> > as well as to an older implementation of the device. This allows users
-> > to upgrade and roll back their systems.
-> >=20
-> > Migration can fail if loading the device state is not possible. It shou=
-ld fail
-> > early with a clear error message. It must not appear to complete but le=
-ave the
-> > device inoperable due to a migration problem.
->=20
-> I think there needs to be an addition requirement.
->=20
->  It must be possible for a management application to query the supported
->  versions, independantly of execution of a migration  operation.
->=20
-> This is important to large scale data center / cloud management applicati=
-ons
-> because before initiating a migration they need to *automatically* select
-> a target host with high level of confidence that is will be compatible wi=
-th
-> the source host.
->=20
-> Today QEMU migration compatibility is largely determined by the machine
-> type version. Apps can query the supported machine types for host to
-> check whether it is compatible. Similarly they will query CPU model
-> features to check compatiblity.
->=20
-> Validation and error checking at time of migration is of course still
-> required, but the goal should be that an mgmt application will *NEVER*
-> hit these errors because they will have pre-selected a host that is
-> known to be compatible based on reported versions that are supported.
+> This changeset introduces support for the ACPI Error Record
+> Serialization Table, ERST.
+> 
+> The change to hw/acpi/meson.build simply adds in the new .c file
+> for compilation.
+> 
+> The change to hw/i386/acpi-build.c calls out the building of the
+> ERST table (and also creates the associated device).
+> 
+> The new file hw/acpi/erst.c contains the building of the ERST
+> table, as well as the simple device for exchanging error records.
+> 
+> The new file include/hw/acpi/erst.h contains associated definitions
+> and declarations for ERST.
+> 
+> The primary description of this changeset is in the patch commit
+> message.
+> 
+> NOTES: When reviewing, I would especially appreciate feedback
+> on the following topics:
+> 
+> - The hope is to have ERST always present if ACPI is enabled, however,
+>   I have found it difficult to devise a method for passing the base
+>   address that does not require the workaround at the bottom of
+>   build_erst(). The issues I encountered are:
+>   - desire to keep this is common ACPI code
+>   - the device requires a qdev_new(), this needs to happen early,
+>     thus the workaround in build_erst()
+>   - the base address is machine/arch specific (eg ARM vs x86)
+>   I've not found a nice way to thread this needle, so what I've settled
+>   on is to simply lump ERST on to the CONFIG_ACPI (rather than a
+>   separate CONFIG_ACPI_ERST), and the workaround at the bottom of
+>   build_erst(). I suspect there is a better way for a built-in/
+>   always present device. This does not support "-device acpi-erst,...".
+> 
+> - I found a base address that "worked", but would like an address
+>   that would be known to be availabe, and then to document/reserve
+>   it for ERST. This takes into account that the base address can be
+>   different for x86 vs ARM.
+> 
+> - I've run this through checkpatch, and all issues addressed except
+>   for the long lines in build_erst(). For readable I left the long
+>   lines, but will change if asked.
+> 
+> - What else do I need to provide?
 
-Okay. What do you think of the following?
+For now, I have just several generic comments:
 
-  [
-    {
-      "model": "https://qemu.org/devices/e1000e",
-      "params": [
-        "rss",
-=09...more configuration parameters...
-      ],
-      "versions": [
-        {
-=09  "name": "1",
-=09  "params": [],
-=09},
-=09{
-=09  "name": "2",
-=09  "params": ["rss=3Don"],
-=09},
-=09...more versions...
-      ]
-    },
-    ...more device models...
-  ]
+1. that's quite a lot code to maintain, why not use existing UEFI vars
+   as pstore storage instead? 
+   Not sure ancient ACPI table is a way to go, with NVDIMMs around
+   it probably possible to use pstores ram backend or make it work
+   with nvdimms directly. The only benefit of ERST is that it should
+   just work without extra configuration, but then UEFI backend
+   would probably also just work.
 
-The management tool can generate the configuration parameter list by
-expanding a version into its params.
+2. patch is too big to review, please split it up in smaller chunks.
 
-Configuration parameter types and input ranges need more thought. For
-example, version 1 of the device might not have rx-table-size (it's
-effectively 0). Version 2 introduces rx-table-size and sets it to 32.
-Version 3 raises the value to 64. In addition, the user can set a custom
-value like rx-table-size=3D48. I haven't defined the rules for this yet,
-but it's clear there needs to be a way to extend configuration
-parameters.
+3. Use of packed structures is discouraged in new ACPI code,
+   see build_ghes_v2() as an example for building ACPI tables.
 
-To check migration compatibility:
-1. Verify that the device model URL matches the JSON data[n].model
-   field.
-2. For every configuration parameter name from the source device,
-   check that it is contained within the JSON data[n].params list.
+4. Maybe instead of SYSBUS device, implement it as a PCI device and
+   use its BAR/control registers for pstore storage and control interface.
+   It could save you headache of picking address where to map it +
+   it would take care of migration part automatically, as firmware
+   would do it for you and then QEMU could pickup firmware programmed
+   address and put it into ERST table.
 
-> > VFIO Implementation
-> > -------------------
-> > The following applies both to kernel VFIO/mdev drivers and vfio-user de=
-vice
-> > backends.
-> >=20
-> > Devices are instantiated based on a version and/or configuration parame=
-ters:
-> > * ``version=3D1`` - use the device configuration aliased by version 1
-> > * ``version=3D2,rx-filter-size=3D64`` - use version 1 and override ``rx=
--filter-size``
-> > * ``rx-filter-size=3D0`` - directly set configuration parameters withou=
-t using a version
-> >=20
-> > Device creation fails if the version and/or configuration parameters ar=
-e not
-> > supported.
-> >=20
-> > There must be a mechanism to query the "latest" configuration for a dev=
-ice
-> > model. It may simply report the ``version=3D5`` where 5 is the latest v=
-ersion but
-> > it could also report all configuration parameters instead of using a ve=
-rsion
-> > alias.
->=20
-> The mechanism needs to be able to report all supported versions strings,
-> not simple the latest version string. I think we need to specify the
-> actual mechanism todo this query too, because we can't end up in a place
-> where there's a different approach to queries for each device type.
+5. instead of dealing with file for storage directly, reuse hostmem backend
+   to provide it to for your device. ex: pc-dimm. i.e. split device
+   on frontend and backend
 
-Makes sense.
 
-Stefan
-
---H+4ONPRPur6+Ovig
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+hcaQACgkQnKSrs4Gr
-c8g6Ogf/eWtotESqLmCJ0a9GcW3GIqdB3JGnTYdvVIt0LBP188BGJ688ZH08zte+
-LZUxSY5aG+GCqvQnvL5vNrJHISSr3x5wObgraSbiC8mvRPIF8bqdkb+5gsSY68+C
-FFLUptnEqxHA0pK8DeAbS4aMXeliRSlP2d1xXABWFiHOB9l1h0AAuSWqUDjGIuJu
-oa6eIDYfmGoEtrevvUyO0aOwNuOQkOHhQXCjDCLaKrih/WjxVaSVZx2EVH+Jvh1v
-NjL2LQvuw3fmQI/6U6n5YhDZxYRhzcWb8qTmb76tZAsrLFA6Pukz+QsyWkNVjTUx
-8DbRffI+ELiEjN+kZizB/puiEi9Svw==
-=hDcY
------END PGP SIGNATURE-----
-
---H+4ONPRPur6+Ovig--
+> Signed-off-by: Eric DeVolder <eric.devolder@oracle.com>
+> 
+> ---
+>  hw/acpi/erst.c         | 909 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/acpi/meson.build    |   1 +
+>  hw/i386/acpi-build.c   |   4 +
+>  include/hw/acpi/erst.h |  97 ++++++
+>  4 files changed, 1011 insertions(+)
+>  create mode 100644 hw/acpi/erst.c
+>  create mode 100644 include/hw/acpi/erst.h
+> 
 
 
