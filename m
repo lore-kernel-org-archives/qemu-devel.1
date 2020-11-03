@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BCCC388F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D3B4C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:04:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0F4622243
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:04:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7ABBE22243
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:04:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mm67grlD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0F4622243
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PdjH0/U6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ABBE22243
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZwvN-0008Ko-Oc
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 09:04:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49130)
+	id 1kZwvR-0008UD-DZ
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 09:04:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZwte-0006cg-Nm
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:02:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59025)
+ id 1kZwts-0006od-LI
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:03:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50561)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZwtc-0003JF-NR
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:02:50 -0500
+ id 1kZwtp-0003N3-2x
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:03:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604412167;
+ s=mimecast20190719; t=1604412179;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6OAWpeNJOTmFeutAt/IAKX1bcweNNiyWJXLlAbyUjjw=;
- b=Mm67grlDUoajg952sb4KkooruOCwN5O0/hIXSLoc+9tsGO+ppnpt6EV9vyrnUVgFFrJl42
- PlEzfghNIUncAi4cC2MfTgGqpVEafc6mY5+6rgvbmyAqcbR4778GmFdSAHcwJJOIclxT3o
- auPCJC0McFgSb/wlzAr+zMhUqglzjB8=
+ bh=YC2TS3VqAycTRmYfO/3l/0PPPilQhWOhqd3f45gFHJI=;
+ b=PdjH0/U6CwNzRs0ZsOTXvyt6f+Twh8PyvSlCdGGgu8vqxujl34ZS4cgJCsvd7pFIxaL2pC
+ hqMTCNYZ4Y0B22gm9hfo4Mj/M5cgZr9kqbsm1HSMIf9ETuvoVRuBjJ6/iCmNlcONrMLdlo
+ 8XPs8OBbcTIHyfGjrmsiiB8isK4W0c8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-7-3bmHm7Nwekw6KHr-dHxg-1; Tue, 03 Nov 2020 09:02:45 -0500
-X-MC-Unique: 7-3bmHm7Nwekw6KHr-dHxg-1
+ us-mta-182-7dAK9RtPPpOFv1CZ_rcU9g-1; Tue, 03 Nov 2020 09:02:57 -0500
+X-MC-Unique: 7dAK9RtPPpOFv1CZ_rcU9g-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 014E9186DD21
- for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 14:02:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 850C0835B49
+ for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 14:02:56 +0000 (UTC)
 Received: from fedora.redhat.com (ovpn-115-87.ams2.redhat.com [10.36.115.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 12BA55B4D9;
- Tue,  3 Nov 2020 14:02:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B13FB5B4D6;
+ Tue,  3 Nov 2020 14:02:47 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/11] test-util-sockets: Clean up SocketAddress construction
-Date: Tue,  3 Nov 2020 14:02:17 +0000
-Message-Id: <20201103140225.496776-4-berrange@redhat.com>
+Subject: [PULL 05/11] test-util-sockets: Synchronize properly, don't sleep(1)
+Date: Tue,  3 Nov 2020 14:02:19 +0000
+Message-Id: <20201103140225.496776-6-berrange@redhat.com>
 In-Reply-To: <20201103140225.496776-1-berrange@redhat.com>
 References: <20201103140225.496776-1-berrange@redhat.com>
 MIME-Version: 1.0
@@ -105,147 +105,89 @@ Sender: "Qemu-devel"
 
 From: Markus Armbruster <armbru@redhat.com>
 
-The thread functions build the SocketAddress from global variable
-@abstract_sock_name and the tight flag passed as pointer
-argument (either NULL or (gpointer)1).  There is no need for such
-hackery; simply pass the SocketAddress instead.
+The abstract sockets test spawns a thread to listen and accept, and a
+second one to connect, with a sleep(1) in between to "ensure" the
+former is listening when the latter tries to connect.  Review fail.
+Risks spurious test failure, say when a heavily loaded machine doesn't
+schedule the first thread quickly enough.  It's also slow.
 
-While there, dumb down g_rand_int_range() to g_random_int().
+Listen and accept in the main thread, and start the connect thread in
+between.  Look ma, no sleep!  Run time drops from 2s wall clock to a
+few milliseconds.
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- tests/test-util-sockets.c | 64 ++++++++++++++++-----------------------
- 1 file changed, 26 insertions(+), 38 deletions(-)
+ tests/test-util-sockets.c | 40 +++++++++++++--------------------------
+ 1 file changed, 13 insertions(+), 27 deletions(-)
 
 diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index 9d317e73a6..a4792253ba 100644
+index 40ff893e64..4cedf622f0 100644
 --- a/tests/test-util-sockets.c
 +++ b/tests/test-util-sockets.c
-@@ -230,25 +230,15 @@ static void test_socket_fd_pass_num_nocli(void)
+@@ -230,26 +230,6 @@ static void test_socket_fd_pass_num_nocli(void)
  #endif
  
  #ifdef __linux__
--static gchar *abstract_sock_name;
+-static gpointer unix_server_thread_func(gpointer user_data)
+-{
+-    SocketAddress *addr = user_data;
+-    int fd;
+-    int connfd;
+-    struct sockaddr_un un;
+-    socklen_t len = sizeof(un);
 -
- static gpointer unix_server_thread_func(gpointer user_data)
- {
--    SocketAddress addr;
--    Error *err = NULL;
--    int fd = -1;
--    int connfd = -1;
-+    SocketAddress *addr = user_data;
-+    int fd;
-+    int connfd;
-     struct sockaddr_un un;
-     socklen_t len = sizeof(un);
- 
--    addr.type = SOCKET_ADDRESS_TYPE_UNIX;
--    addr.u.q_unix.path = abstract_sock_name;
--    addr.u.q_unix.has_tight = true;
--    addr.u.q_unix.tight = user_data != NULL;
--    addr.u.q_unix.has_abstract = true;
--    addr.u.q_unix.abstract = true;
+-    fd = socket_listen(addr, 1, &error_abort);
+-    g_assert_cmpint(fd, >=, 0);
+-    g_assert(fd_is_socket(fd));
 -
--    fd = socket_listen(&addr, 1, &err);
-+    fd = socket_listen(addr, 1, &error_abort);
-     g_assert_cmpint(fd, >=, 0);
-     g_assert(fd_is_socket(fd));
- 
-@@ -257,69 +247,67 @@ static gpointer unix_server_thread_func(gpointer user_data)
-     close(connfd);
- 
-     close(fd);
+-    connfd = accept(fd, (struct sockaddr *)&un, &len);
+-    g_assert_cmpint(connfd, !=, -1);
+-    close(connfd);
 -
-     return NULL;
- }
- 
+-    close(fd);
+-    return NULL;
+-}
+-
  static gpointer unix_client_thread_func(gpointer user_data)
  {
--    SocketAddress addr;
--    Error *err = NULL;
--    int fd = -1;
--
--    addr.type = SOCKET_ADDRESS_TYPE_UNIX;
--    addr.u.q_unix.path = abstract_sock_name;
--    addr.u.q_unix.has_tight = true;
--    addr.u.q_unix.tight = user_data != NULL;
--    addr.u.q_unix.has_abstract = true;
--    addr.u.q_unix.abstract = true;
--
--    fd = socket_connect(&addr, &err);
-+    SocketAddress *addr = user_data;
-+    int fd;
+     SocketAddress *addr = user_data;
+@@ -263,20 +243,26 @@ static gpointer unix_client_thread_func(gpointer user_data)
  
-+    fd = socket_connect(addr, &error_abort);
-     g_assert_cmpint(fd, >=, 0);
--
-     close(fd);
--
-     return NULL;
- }
- 
- static void test_socket_unix_abstract_good(void)
+ static void test_socket_unix_abstract_one(SocketAddress *addr)
  {
--    GRand *r = g_rand_new();
-+    SocketAddress addr;
+-    GThread *serv, *cli;
+-
+-    serv = g_thread_new("abstract_unix_server",
+-                        unix_server_thread_func,
+-                        addr);
++    int fd, connfd;
++    GThread *cli;
++    struct sockaddr_un un;
++    socklen_t len = sizeof(un);
  
--    abstract_sock_name = g_strdup_printf("unix-%d-%d", getpid(),
--                                         g_rand_int_range(r, 100, 1000));
-+    addr.type = SOCKET_ADDRESS_TYPE_UNIX;
-+    addr.u.q_unix.path = g_strdup_printf("unix-%d-%u",
-+                                         getpid(), g_random_int());
-+    addr.u.q_unix.has_abstract = true;
-+    addr.u.q_unix.abstract = true;
- 
-     /* non tight socklen serv and cli */
-+
-+    addr.u.q_unix.has_tight = false;
-+    addr.u.q_unix.tight = false;
-+
-     GThread *serv = g_thread_new("abstract_unix_server",
-                                  unix_server_thread_func,
--                                 NULL);
-+                                 &addr);
- 
-     sleep(1);
- 
-     GThread *cli = g_thread_new("abstract_unix_client",
-                                 unix_client_thread_func,
--                                NULL);
-+                                &addr);
- 
-     g_thread_join(cli);
-     g_thread_join(serv);
- 
-     /* tight socklen serv and cli */
-+
-+    addr.u.q_unix.has_tight = true;
-+    addr.u.q_unix.tight = true;
-+
-     serv = g_thread_new("abstract_unix_server",
-                         unix_server_thread_func,
--                        (gpointer)1);
-+                        &addr);
- 
-     sleep(1);
+-    sleep(1);
++    fd = socket_listen(addr, 1, &error_abort);
++    g_assert_cmpint(fd, >=, 0);
++    g_assert(fd_is_socket(fd));
  
      cli = g_thread_new("abstract_unix_client",
                         unix_client_thread_func,
--                       (gpointer)1);
-+                       &addr);
+                        addr);
  
++    connfd = accept(fd, (struct sockaddr *)&un, &len);
++    g_assert_cmpint(connfd, !=, -1);
++    close(connfd);
++
++    close(fd);
++
      g_thread_join(cli);
-     g_thread_join(serv);
- 
--    g_free(abstract_sock_name);
--    g_rand_free(r);
-+    g_free(addr.u.q_unix.path);
+-    g_thread_join(serv);
  }
- #endif
  
+ static void test_socket_unix_abstract_good(void)
 -- 
 2.28.0
 
