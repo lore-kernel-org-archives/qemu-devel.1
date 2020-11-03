@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D95BCC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9100C5517A
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:10:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63F7022226
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:10:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EF34223C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:10:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fdUc5uDn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63F7022226
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOUwzoTw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EF34223C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZx0t-0006iH-Ce
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 09:10:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49150)
+	id 1kZx13-00077D-VA
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 09:10:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZwtk-0006mH-SP
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:02:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43578)
+ id 1kZwu5-00072E-4m
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:03:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28182)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZwte-0003KT-O7
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:02:56 -0500
+ id 1kZwu3-0003RF-67
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:03:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604412169;
+ s=mimecast20190719; t=1604412194;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=f2timKX3kYoLzqTmK3/PTTSCfa+DsK9FvWxwyfITMiA=;
- b=fdUc5uDnDrPU7BeB2W2vSEVmltDgb8doqSgdC6XzdfguWfWwmyCKJ2EfPPVmZQMt23qqly
- WjEp13PX8cazsrh5hQATtvF09N4keFRfAWZsqwdmZvChTQxMG+MLJ9J06kjWhzdGV5p3o9
- QmB0OP+q8RzCweOyEJsa76n9OYURF0Q=
+ bh=TexKsOB/m5ww6iBN9k0jVR9Z5fLzd2GGDypDU4iooE4=;
+ b=EOUwzoTwYkYZ8gNsQfNH4R13kNVtAwbCIJjA/o58RHv283RAdj7W+okV3+Mu6Y0aJxtIwN
+ n3SirGYJjnRr6J0pahexqST8a5015Bmhy2FhslQ97+v/xQ1MnR77dFDIB7MpJKoHZmf2v2
+ GxSOjK/yKfsfhOsAIK3yxLsPqg7IsnU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-3jCnUYG0Oi619MXKBtAqTw-1; Tue, 03 Nov 2020 09:02:48 -0500
-X-MC-Unique: 3jCnUYG0Oi619MXKBtAqTw-1
+ us-mta-41-IoKXVtzvNLqLMk9B4Uskkg-1; Tue, 03 Nov 2020 09:03:12 -0500
+X-MC-Unique: IoKXVtzvNLqLMk9B4Uskkg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48BDC1009E25
- for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 14:02:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEE7786ABD1
+ for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 14:03:11 +0000 (UTC)
 Received: from fedora.redhat.com (ovpn-115-87.ams2.redhat.com [10.36.115.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 688915B4D6;
- Tue,  3 Nov 2020 14:02:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9E3865B4D8;
+ Tue,  3 Nov 2020 14:03:06 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/11] test-util-sockets: Factor out
- test_socket_unix_abstract_one()
-Date: Tue,  3 Nov 2020 14:02:18 +0000
-Message-Id: <20201103140225.496776-5-berrange@redhat.com>
+Subject: [PULL 10/11] sockets: Bypass "replace empty @path" for abstract unix
+ sockets
+Date: Tue,  3 Nov 2020 14:02:24 +0000
+Message-Id: <20201103140225.496776-11-berrange@redhat.com>
 In-Reply-To: <20201103140225.496776-1-berrange@redhat.com>
 References: <20201103140225.496776-1-berrange@redhat.com>
 MIME-Version: 1.0
@@ -106,86 +106,37 @@ Sender: "Qemu-devel"
 
 From: Markus Armbruster <armbru@redhat.com>
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+unix_listen_saddr() replaces empty @path by unique value.  It obtains
+the value by creating and deleting a unique temporary file with
+mkstemp().  This is racy, as the comment explains.  It's also entirely
+undocumented as far as I can tell.  Goes back to commit d247d25f18
+"sockets: helper functions for qemu (Gerd Hoffman)", v0.10.0.
+
+Since abstract socket addresses have no connection with filesystem
+pathnames, making them up with mkstemp() seems inappropriate.  Bypass
+the replacement of empty @path.
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- tests/test-util-sockets.c | 48 ++++++++++++++++-----------------------
- 1 file changed, 20 insertions(+), 28 deletions(-)
+ util/qemu-sockets.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index a4792253ba..40ff893e64 100644
---- a/tests/test-util-sockets.c
-+++ b/tests/test-util-sockets.c
-@@ -261,6 +261,24 @@ static gpointer unix_client_thread_func(gpointer user_data)
-     return NULL;
- }
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index a578c434c2..671717499f 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -877,7 +877,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+         return -1;
+     }
  
-+static void test_socket_unix_abstract_one(SocketAddress *addr)
-+{
-+    GThread *serv, *cli;
-+
-+    serv = g_thread_new("abstract_unix_server",
-+                        unix_server_thread_func,
-+                        addr);
-+
-+    sleep(1);
-+
-+    cli = g_thread_new("abstract_unix_client",
-+                       unix_client_thread_func,
-+                       addr);
-+
-+    g_thread_join(cli);
-+    g_thread_join(serv);
-+}
-+
- static void test_socket_unix_abstract_good(void)
- {
-     SocketAddress addr;
-@@ -272,40 +290,14 @@ static void test_socket_unix_abstract_good(void)
-     addr.u.q_unix.abstract = true;
- 
-     /* non tight socklen serv and cli */
--
-     addr.u.q_unix.has_tight = false;
-     addr.u.q_unix.tight = false;
--
--    GThread *serv = g_thread_new("abstract_unix_server",
--                                 unix_server_thread_func,
--                                 &addr);
--
--    sleep(1);
--
--    GThread *cli = g_thread_new("abstract_unix_client",
--                                unix_client_thread_func,
--                                &addr);
--
--    g_thread_join(cli);
--    g_thread_join(serv);
-+    test_socket_unix_abstract_one(&addr);
- 
-     /* tight socklen serv and cli */
--
-     addr.u.q_unix.has_tight = true;
-     addr.u.q_unix.tight = true;
--
--    serv = g_thread_new("abstract_unix_server",
--                        unix_server_thread_func,
--                        &addr);
--
--    sleep(1);
--
--    cli = g_thread_new("abstract_unix_client",
--                       unix_client_thread_func,
--                       &addr);
--
--    g_thread_join(cli);
--    g_thread_join(serv);
-+    test_socket_unix_abstract_one(&addr);
- 
-     g_free(addr.u.q_unix.path);
- }
+-    if (saddr->path && saddr->path[0]) {
++    if (saddr->path[0] || saddr->abstract) {
+         path = saddr->path;
+     } else {
+         const char *tmpdir = getenv("TMPDIR");
 -- 
 2.28.0
 
