@@ -2,93 +2,93 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1,
+	WEIRD_QUOTING autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93456C388F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 11:23:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57791C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 11:24:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCB86208B6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 11:22:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB3C820731
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 11:24:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SSCCsS/i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB86208B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="Coa0etZS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3C820731
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZuOw-0007n6-Kd
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 06:22:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34264)
+	id 1kZuQJ-0000c6-LE
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 06:24:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kZuL7-0006Nx-3z
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 06:19:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56829)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kZuL4-0003iU-1o
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 06:19:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604402335;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=EAeQ5/Jo2c/2thI0ZrCMUz59e04yd31oXdxP1WgsShQ=;
- b=SSCCsS/iBC+8boiUbfNCyyws+5+pLmFFHBfrbMubitPF5I0dHyUWYwwuEx+vmnhS0kifdK
- iXqCuGWLAPU5XP3M72J3nxlkeLnq4C8dgBCLsj4+My8Xl+ZL/+G6uHLpZ5VW+RSVfMtp23
- pmu7xiwfZ+jkziJE8Uj3NXntXFCGgzQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-lUuFpB6CNwGy6n6uCJWFJA-1; Tue, 03 Nov 2020 06:18:54 -0500
-X-MC-Unique: lUuFpB6CNwGy6n6uCJWFJA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDA6E1084D6F;
- Tue,  3 Nov 2020 11:18:52 +0000 (UTC)
-Received: from kaapi (unknown [10.33.36.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F33755794;
- Tue,  3 Nov 2020 11:18:50 +0000 (UTC)
-Date: Tue, 3 Nov 2020 16:48:47 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: About 'qemu-security' mailing list
-In-Reply-To: <nycvar.YSQ.7.78.906.2010201935590.1506567@xnncv>
-Message-ID: <rrq49r0-qr6p-23o0-n1pr-364189541118@erqung.pbz>
-References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
- <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
- <20200914101517.GD579094@stefanha-x1.localdomain>
- <nycvar.YSQ.7.78.906.2009151536090.10832@xnncv>
- <20200916111025.GA756728@stefanha-x1.localdomain>
- <nycvar.YSQ.7.78.906.2009181031500.10832@xnncv> <m2362z8dvx.fsf@oracle.com>
- <nycvar.YSQ.7.78.906.2010011502290.830962@xnncv> <m2mu166uyg.fsf@oracle.com>
- <nycvar.YSQ.7.78.906.2010012320290.830962@xnncv>
- <nycvar.YSQ.7.78.906.2010161910530.1246156@xnncv>
- <nycvar.YSQ.7.78.906.2010201935590.1506567@xnncv>
+ (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1kZuPh-0008Tn-No
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 06:23:45 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39672)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1kZuPf-0005Pc-Kh
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 06:23:45 -0500
+Received: by mail-wm1-x343.google.com with SMTP id 205so4640417wma.4
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 03:23:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=QrCy0ptCmo+IcRbkhv465ExulosTAPj5gllxESOYYNw=;
+ b=Coa0etZSFfyeWp5V7U2tfjIGUhz39srC5jb4qAy2iiduICqJOgOzKZgXkI4eczzsrU
+ o3qbVw6RQ1L1oqLASqigDvw4O5ic21GNC7dJ8GP83N17bDyMGkzkdkXSZpnrz7S3dYUu
+ dk9Rq3OxHkYWebGP2JxInsC6YYW38LDDUQXGOsGSxdKnJrn5X6nwccoEUhL+kc2H72qo
+ smoj+otVrF2F4r4g0cyy+1SEiXyw51hzy9ZFrMzP74wHPrfvLjQ3bH/NGbN/By/9JCXi
+ +ti3W+U+HhKDTZfLqv3hgbmwdu/Tl4PViiCdMCwzFKt4crtfs9ywzWgzJuqQ/hM2ZgpX
+ PAQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=QrCy0ptCmo+IcRbkhv465ExulosTAPj5gllxESOYYNw=;
+ b=FuY5OKVTIdtF8JSSQBu5o/jWQVQW7Netwl5of1t63djbQI4F0c0v8udhTVyroJcEAi
+ gIA9bucLx2NCCiJxVsUBmXoZn9LWwugUXi679ojYYb7X6V29zZRiIxqOupi3j6ls5r+7
+ 6ympQqBYhyulYS/xevHiCg1vgObrZzKSZrzwpX93XYPTRfZ8k+rkv03BGHKUjD0e/rXK
+ RurWDMcJ+fBfvxq+waA+GE7V6RIUmn8+HzrYwhx/9PFr9bcKcxBAsBlkoGVAw02hFMfH
+ CO3FOkRmo+4fbYgxAJBSRS0wcCR/Ge9jGT1XKx0FQLCY45ZHYCWiRJmknyltPuDM7dTC
+ thZg==
+X-Gm-Message-State: AOAM533cl5MmEU0SXwqLzWfkjxBAJ8eBPB1E+iFeAJ7We6+DDHWWyqly
+ VZDdvTznBskM43PHbpdhqXfrqg==
+X-Google-Smtp-Source: ABdhPJwnYiXY40LQDyTVPMGqiYvIv0qs/6L1ShwTqYr+mPIYs3+7ccqUYFyuvkjFizZwiVJfwgl4vg==
+X-Received: by 2002:a1c:1946:: with SMTP id 67mr3010886wmz.15.1604402621789;
+ Tue, 03 Nov 2020 03:23:41 -0800 (PST)
+Received: from vanye (cpc92880-cmbg19-2-0-cust79.5-4.cable.virginm.net.
+ [82.27.104.80])
+ by smtp.gmail.com with ESMTPSA id b4sm17758251wro.57.2020.11.03.03.23.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Nov 2020 03:23:41 -0800 (PST)
+Date: Tue, 3 Nov 2020 11:23:39 +0000
+From: Leif Lindholm <leif@nuviainc.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: [RFC PATCH] docs: add some notes on the sbsa-ref machine
+Message-ID: <20201103112339.GP1664@vanye>
+References: <20201103104710.27150-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201103104710.27150-1-alex.bennee@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=leif@nuviainc.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, WEIRD_QUOTING=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,35 +101,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Darren Kenny <darren.kenny@oracle.com>
+Cc: Graeme Gregory <graeme@nuviainc.com>,
+ Hongbo Zhang <hongbo.zhang@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Shashi Mallela <shashi.mallela@linaro.org>, qemu-devel@nongnu.org,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+-- On Tue, 20 Oct 2020, P J P wrote --+
-| +-- On Fri, 16 Oct 2020, P J P wrote --+
-| | * So ie. we need to:
-| | 
-| |   1. Create/setup a regular non-encrypted 'qemu-security' list.
-| | 
-| |   2. Invite representatives from user/downstream communities to subscribe to 
-| |      it.
-| | 
-| |   3. Collect & store their PGP public keys. Also create a key for the list.
-| | 
-| |   4. Write 'encrypt & email' automation tool(s) to provide encryption support.
-| | 
-| |   5. Document and publish above details and list workflow on a page.
-| | 
-| | ...wdyt?
-|
+On Tue, Nov 03, 2020 at 10:47:10 +0000, Alex Bennée wrote:
+> We should at least document what this machine is about.
 
-Ping...!
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+Thanks!
+(comments below)
 
+> Cc: Graeme Gregory <graeme@nuviainc.com>
+> Cc: Leif Lindholm <leif@nuviainc.com>
+> Cc: Hongbo Zhang <hongbo.zhang@linaro.org>
+> Cc: Shashi Mallela <shashi.mallela@linaro.org>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  docs/system/arm/sbsa.rst   | 30 ++++++++++++++++++++++++++++++
+>  docs/system/target-arm.rst |  1 +
+>  2 files changed, 31 insertions(+)
+>  create mode 100644 docs/system/arm/sbsa.rst
+> 
+> diff --git a/docs/system/arm/sbsa.rst b/docs/system/arm/sbsa.rst
+> new file mode 100644
+> index 0000000000..a47c9360de
+> --- /dev/null
+> +++ b/docs/system/arm/sbsa.rst
+> @@ -0,0 +1,30 @@
+> +Arm Server Base System Architecture Reference board (``sbsa-ref``)
+> +==================================================================
+> +
+> +While the `virt` board is a generic board platform that doesn't match
+> +any real hardware the `sbsa-ref` board intends to look like real
+> +hardware. The `Server Base System Architecture
+> +<https://developer.arm.com/documentation/den0029/latest>` defines a
+> +minimum base line of hardware support and importantly how the firmware
+> +reports that to any operating system. It is a static system that
+> +reports a very minimal DT to the firmware for command line input to
+> +the firmware.
+
+I think you mean the right thing, but ...
+"a very minimal DT to the firmware for non-discoverable information
+ about components affected by the qemu command line"
+ (i.e. cpus and memory)
+
+> As a result it must have a firmware specifically built
+> +to expect a certain hardware layout (as you would in a real machine).
+> +
+> +It is intended to be a machine for developing firmware and testing
+> +standards compliance with operating systems.
+> +
+> +Supported devices
+> +"""""""""""""""""
+> +
+> +The sbsa-ref board supports:
+> +
+> +  - A configurable number of Cortex-A57 cpus
+> +  - GIC version 3
+
+The intent was always for sbsa-ref to be tracking SBSA development, so
+I wonder whether we should be documenting specific versions of cpu and
+gic (and then keep remembering to update the docs).
+My short-term plan was to swap the a57 for "max", but
+documentation-wise, could we just say "number of aarch64 cpus"?
+Could we refer to the gic as "latest supported emulated"?
+
+/
+    Leif
+
+> +  - System bus AHCI controller.
+> +  - System bus EHCI controller.
+> +  - CDROM and hard disc on AHCI bus.
+> +  - E1000E ethernet card on PCIE bus.
+> +  - VGA display adaptor on PCIE bus.
+> +  - A generic SBSA watchdog device
+> +
+> diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+> index fdcf25c237..9636f3fd00 100644
+> --- a/docs/system/target-arm.rst
+> +++ b/docs/system/target-arm.rst
+> @@ -79,6 +79,7 @@ undocumented; you can get a complete list by running
+>     arm/mps2
+>     arm/musca
+>     arm/realview
+> +   arm/sbsa-ref
+>     arm/versatile
+>     arm/vexpress
+>     arm/aspeed
+> -- 
+> 2.20.1
+> 
 
