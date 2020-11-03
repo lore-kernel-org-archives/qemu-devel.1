@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7DF0C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:24:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70211C4742C
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:26:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49BEC22226
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:24:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49BEC22226
+	by mail.kernel.org (Postfix) with ESMTPS id CD53222264
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:26:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD53222264
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZvMZ-0004pU-97
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:24:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47880)
+	id 1kZvNw-00079J-RI
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:26:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kZvIN-0008QM-PN
+ id 1kZvIN-0008PI-CE
  for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:20:15 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2323)
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2322)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kZvII-000856-OO
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:20:15 -0500
+ id 1kZvIH-00084w-Qf
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:20:14 -0500
 Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CQTPZ2Wn5zkcR3;
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CQTPZ2HkYzkcQ0;
  Tue,  3 Nov 2020 20:20:02 +0800 (CST)
 Received: from localhost (10.174.184.155) by DGGEMS406-HUB.china.huawei.com
  (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Tue, 3 Nov 2020
  20:19:55 +0800
 From: Jiahui Cen <cenjiahui@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v9 2/8] fw_cfg: Write the extra roots into the fw_cfg
-Date: Tue, 3 Nov 2020 20:01:51 +0800
-Message-ID: <20201103120157.2286-3-cenjiahui@huawei.com>
+Subject: [PATCH v9 1/8] acpi: Extract two APIs from acpi_dsdt_add_pci
+Date: Tue, 3 Nov 2020 20:01:50 +0800
+Message-ID: <20201103120157.2286-2-cenjiahui@huawei.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201103120157.2286-1-cenjiahui@huawei.com>
 References: <20201103120157.2286-1-cenjiahui@huawei.com>
@@ -83,152 +83,185 @@ Sender: "Qemu-devel"
 
 From: Yubo Miao <miaoyubo@huawei.com>
 
-Write the extra roots into the fw_cfg, therefore the uefi could
-get the extra roots. Only if the uefi knows there are extra roots,
-the config space of devices behind the root could be obtained.
+Extract two APIs acpi_dsdt_add_pci_route_table and
+acpi_dsdt_add_pci_osc from acpi_dsdt_add_pci. The first
+API is used to specify the pci route table and the second
+API is used to declare the operation system capabilities.
+These two APIs would be used to specify the pxb-pcie in DSDT.
 
 Signed-off-by: Yubo Miao <miaoyubo@huawei.com>
 Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
 ---
- hw/arm/virt.c              |  8 ++++++++
- hw/i386/pc.c               | 18 ++----------------
- hw/nvram/fw_cfg.c          | 20 ++++++++++++++++++++
- include/hw/nvram/fw_cfg.h  |  2 ++
- include/hw/pci/pcie_host.h |  4 ++++
- 5 files changed, 36 insertions(+), 16 deletions(-)
+ hw/pci-host/gpex-acpi.c | 118 +++++++++++++++++++++++-----------------
+ 1 file changed, 67 insertions(+), 51 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 27dbeb549e..58c3695290 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -78,6 +78,8 @@
- #include "hw/virtio/virtio-iommu.h"
- #include "hw/char/pl011.h"
- #include "qemu/guest-random.h"
-+#include "hw/pci/pci_bus.h"
-+#include "hw/pci/pcie_host.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1463,6 +1465,10 @@ void virt_machine_done(Notifier *notifier, void *data)
-     ARMCPU *cpu = ARM_CPU(first_cpu);
-     struct arm_boot_info *info = &vms->bootinfo;
-     AddressSpace *as = arm_boot_address_space(cpu, info);
-+    PCIHostState *s = PCI_GET_PCIE_HOST_STATE;
-+
-+    PCIBus *bus = s->bus;
-+    FWCfgState *fw_cfg = vms->fw_cfg;
- 
-     /*
-      * If the user provided a dtb, we assume the dynamic sysbus nodes
-@@ -1481,6 +1487,8 @@ void virt_machine_done(Notifier *notifier, void *data)
-         exit(1);
-     }
- 
-+    fw_cfg_write_extra_pci_roots(bus, fw_cfg);
-+
-     virt_acpi_setup(vms);
-     virt_build_smbios(vms);
- }
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 5e6c0023e0..bdd2301d19 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -778,26 +778,12 @@ void pc_machine_done(Notifier *notifier, void *data)
-                                         PCMachineState, machine_done);
-     X86MachineState *x86ms = X86_MACHINE(pcms);
-     PCIBus *bus = pcms->bus;
-+    FWCfgState *fw_cfg = x86ms->fw_cfg;
- 
-     /* set the number of CPUs */
-     x86_rtc_set_cpus_count(x86ms->rtc, x86ms->boot_cpus);
- 
--    if (bus) {
--        int extra_hosts = 0;
--
--        QLIST_FOREACH(bus, &bus->child, sibling) {
--            /* look for expander root buses */
--            if (pci_bus_is_root(bus)) {
--                extra_hosts++;
--            }
--        }
--        if (extra_hosts && x86ms->fw_cfg) {
--            uint64_t *val = g_malloc(sizeof(*val));
--            *val = cpu_to_le64(extra_hosts);
--            fw_cfg_add_file(x86ms->fw_cfg,
--                    "etc/extra-pci-roots", val, sizeof(*val));
--        }
--    }
-+    fw_cfg_write_extra_pci_roots(bus, fw_cfg);
- 
-     acpi_setup();
-     if (x86ms->fw_cfg) {
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 08539a1aab..33dcbdd31d 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -40,6 +40,7 @@
- #include "qemu/cutils.h"
- #include "qapi/error.h"
+diff --git a/hw/pci-host/gpex-acpi.c b/hw/pci-host/gpex-acpi.c
+index dbb350a837..86ddb52cbd 100644
+--- a/hw/pci-host/gpex-acpi.c
++++ b/hw/pci-host/gpex-acpi.c
+@@ -2,20 +2,10 @@
  #include "hw/acpi/aml-build.h"
-+#include "hw/pci/pci_bus.h"
+ #include "hw/pci-host/gpex.h"
  
- #define FW_CFG_FILE_SLOTS_DFLT 0x20
+-void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
++static void acpi_dsdt_add_pci_route_table(Aml *dev, Aml *scope, uint32_t irq)
+ {
+-    int nr_pcie_buses = cfg->ecam.size / PCIE_MMCFG_SIZE_MIN;
+-    Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
+     int i, slot_no;
+-
+-    Aml *dev = aml_device("%s", "PCI0");
+-    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
+-    aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
+-    aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")));
+-    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
++    Aml *method, *crs;
  
-@@ -742,6 +743,25 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s, uint16_t key,
-     return ptr;
- }
+     /* Declare the PCI Routing Table. */
+     Aml *rt_pkg = aml_varpackage(PCI_SLOT_MAX * PCI_NUM_PINS);
+@@ -34,7 +24,7 @@ void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
  
-+void fw_cfg_write_extra_pci_roots(PCIBus *bus, FWCfgState *s)
+     /* Create GSI link device */
+     for (i = 0; i < PCI_NUM_PINS; i++) {
+-        uint32_t irqs = cfg->irq + i;
++        uint32_t irqs = irq + i;
+         Aml *dev_gsi = aml_device("GSI%d", i);
+         aml_append(dev_gsi, aml_name_decl("_HID", aml_string("PNP0C0F")));
+         aml_append(dev_gsi, aml_name_decl("_UID", aml_int(i)));
+@@ -52,43 +42,11 @@ void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
+         aml_append(dev_gsi, method);
+         aml_append(dev, dev_gsi);
+     }
++}
+ 
+-    method = aml_method("_CBA", 0, AML_NOTSERIALIZED);
+-    aml_append(method, aml_return(aml_int(cfg->ecam.base)));
+-    aml_append(dev, method);
+-
+-    Aml *rbuf = aml_resource_template();
+-    aml_append(rbuf,
+-        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
+-                            0x0000, 0x0000, nr_pcie_buses - 1, 0x0000,
+-                            nr_pcie_buses));
+-    if (cfg->mmio32.size) {
+-        aml_append(rbuf,
+-                   aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
+-                                    AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
+-                                    cfg->mmio32.base,
+-                                    cfg->mmio32.base + cfg->mmio32.size - 1,
+-                                    0x0000,
+-                                    cfg->mmio32.size));
+-    }
+-    if (cfg->pio.size) {
+-        aml_append(rbuf,
+-                   aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
+-                                AML_ENTIRE_RANGE, 0x0000, 0x0000,
+-                                cfg->pio.size - 1,
+-                                cfg->pio.base,
+-                                cfg->pio.size));
+-    }
+-    if (cfg->mmio64.size) {
+-        aml_append(rbuf,
+-                   aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
+-                                    AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
+-                                    cfg->mmio64.base,
+-                                    cfg->mmio64.base + cfg->mmio64.size - 1,
+-                                    0x0000,
+-                                    cfg->mmio64.size));
+-    }
+-    aml_append(dev, aml_name_decl("_CRS", rbuf));
++static void acpi_dsdt_add_pci_osc(Aml *dev, Aml *scope)
 +{
-+    if (bus) {
-+        int extra_hosts = 0;
-+        QLIST_FOREACH(bus, &bus->child, sibling) {
-+            /* look for expander root buses */
-+            if (pci_bus_is_root(bus)) {
-+                extra_hosts++;
-+            }
-+        }
-+        if (extra_hosts && s) {
-+            uint64_t *val = g_malloc(sizeof(*val));
-+            *val = cpu_to_le64(extra_hosts);
-+            fw_cfg_add_file(s,
-+                   "etc/extra-pci-roots", val, sizeof(*val));
-+        }
-+    }
++    Aml *method, *UUID, *ifctx, *ifctx1, *elsectx, *buf;
+ 
+     /* Declare an _OSC (OS Control Handoff) method */
+     aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+@@ -97,7 +55,8 @@ void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
+     aml_append(method,
+         aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+ 
+-    /* PCI Firmware Specification 3.0
++    /*
++     * PCI Firmware Specification 3.0
+      * 4.5.1. _OSC Interface for PCI Host Bridge Devices
+      * The _OSC interface for a PCI/PCI-X/PCI Express hierarchy is
+      * identified by the Universal Unique IDentifier (UUID)
+@@ -142,7 +101,8 @@ void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
+ 
+     method = aml_method("_DSM", 4, AML_NOTSERIALIZED);
+ 
+-    /* PCI Firmware Specification 3.0
++    /*
++     * PCI Firmware Specification 3.0
+      * 4.6.1. _DSM for PCI Express Slot Information
+      * The UUID in _DSM in this context is
+      * {E5C937D0-3553-4D7A-9117-EA4D19C3434D}
+@@ -160,6 +120,62 @@ void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
+     buf = aml_buffer(1, byte_list);
+     aml_append(method, aml_return(buf));
+     aml_append(dev, method);
 +}
 +
- void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, void *data, size_t len)
- {
-     trace_fw_cfg_add_bytes(key, trace_key_name(key), len);
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index 8a9f5738bf..0dc75ba6ca 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -104,6 +104,8 @@ struct FWCfgMemState {
-     MemoryRegionOps wide_data_ops;
- };
- 
-+void fw_cfg_write_extra_pci_roots(PCIBus *bus, FWCfgState *s);
++void acpi_dsdt_add_gpex(Aml *scope, struct GPEXConfig *cfg)
++{
++    int nr_pcie_buses = cfg->ecam.size / PCIE_MMCFG_SIZE_MIN;
++    Aml *method, *crs;
 +
- /**
-  * fw_cfg_add_bytes:
-  * @s: fw_cfg device being modified
-diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
-index 076457b270..12f48ddd59 100644
---- a/include/hw/pci/pcie_host.h
-+++ b/include/hw/pci/pcie_host.h
-@@ -27,6 +27,10 @@
++    Aml *dev = aml_device("%s", "PCI0");
++    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
++    aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
++    aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
++    aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
++    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
++    aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")));
++    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
++
++    acpi_dsdt_add_pci_route_table(dev, scope, cfg->irq);
++
++    method = aml_method("_CBA", 0, AML_NOTSERIALIZED);
++    aml_append(method, aml_return(aml_int(cfg->ecam.base)));
++    aml_append(dev, method);
++
++    Aml *rbuf = aml_resource_template();
++    aml_append(rbuf,
++        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
++                            0x0000, 0x0000, nr_pcie_buses - 1, 0x0000,
++                            nr_pcie_buses));
++    if (cfg->mmio32.size) {
++        aml_append(rbuf,
++                   aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
++                                    AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
++                                    cfg->mmio32.base,
++                                    cfg->mmio32.base + cfg->mmio32.size - 1,
++                                    0x0000,
++                                    cfg->mmio32.size));
++    }
++    if (cfg->pio.size) {
++        aml_append(rbuf,
++                   aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
++                                AML_ENTIRE_RANGE, 0x0000, 0x0000,
++                                cfg->pio.size - 1,
++                                cfg->pio.base,
++                                cfg->pio.size));
++    }
++    if (cfg->mmio64.size) {
++        aml_append(rbuf,
++                   aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
++                                    AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
++                                    cfg->mmio64.base,
++                                    cfg->mmio64.base + cfg->mmio64.size - 1,
++                                    0x0000,
++                                    cfg->mmio64.size));
++    }
++    aml_append(dev, aml_name_decl("_CRS", rbuf));
++
++    acpi_dsdt_add_pci_osc(dev, scope);
  
- #define TYPE_PCIE_HOST_BRIDGE "pcie-host-bridge"
- OBJECT_DECLARE_SIMPLE_TYPE(PCIExpressHost, PCIE_HOST_BRIDGE)
-+#define PCI_GET_PCIE_HOST_STATE \
-+    OBJECT_CHECK(PCIHostState, \
-+                 object_resolve_path_type("", "pcie-host-bridge", NULL), \
-+                 TYPE_PCIE_HOST_BRIDGE)
- 
- #define PCIE_HOST_MCFG_BASE "MCFG"
- #define PCIE_HOST_MCFG_SIZE "mcfg_size"
+     Aml *dev_res0 = aml_device("%s", "RES0");
+     aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
 -- 
 2.19.1
 
