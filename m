@@ -2,91 +2,80 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9DFDC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 627B9C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:37:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB91022277
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:36:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF63722277
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:37:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5W5ELuZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB91022277
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VJnTmlnu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF63722277
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZpw2-0001dt-92
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 01:36:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54120)
+	id 1kZpwQ-0001xj-Iw
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 01:37:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZpv3-0000tX-G2
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:35:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20358)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZpvP-00013Q-EM
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:36:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48910)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZpv0-00036s-TX
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:35:49 -0500
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZpvM-0003DL-E6
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:36:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604385345;
+ s=mimecast20190719; t=1604385366;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=TzTQd6zsga848TZhSH4IIn0GT9mIurRHr8Lw0mt05Oc=;
- b=Y5W5ELuZXFxO43DKXRbN3T3DsM3DHgNz8rL2nRkHjEi8sq7IlTVe7V3erSAyWqaFnjl22o
- 4byne6tcKTiBn5cA1ebvq8eGjISdRobovgv3/Mzhb2nfNHLyH98kA+yLdTJnr1g2F0t/zs
- Ay5BGr1fDnj6Gqz/48gyR+H2DfY+NfM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-a-Yaiu-xN4es_XkKOiE3AQ-1; Tue, 03 Nov 2020 01:35:44 -0500
-X-MC-Unique: a-Yaiu-xN4es_XkKOiE3AQ-1
-Received: by mail-wr1-f72.google.com with SMTP id h11so4466923wrq.20
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 22:35:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=TzTQd6zsga848TZhSH4IIn0GT9mIurRHr8Lw0mt05Oc=;
- b=poUlm6ujaw/W324g6CqzVkqxDaJwUahnDBxTlBZQxrHj4AiC0jrk5rcplZo0AA0QSl
- Vb9qA5SN+BgPXkhH886bWC7aa0+gCJRFJbyk/aEMKgB+KYAED6uaBSmw4+pyXGN1REmY
- iUMfV983hx4zX7RllJsUKRrxC0T6NPcRlibX+/jy+ea7+RiIine4wUu86c7jFFln6l0P
- 1CI2LU+Lu23vSn9NrTO8kJnPEie0xKswZMhCW7n/Cw7MWqHPE5QTTHjxd1tlRiJ0YyKe
- tsqOnCei9J8bl7gzPsnWAWzCgE8GuiEk38CqeE/DR5ondgcl/frsEB70M05X+KGmHNkj
- pvpg==
-X-Gm-Message-State: AOAM530JVKvmRtLY0MpLqIa6ziwyJTFWpcyLIvjS876J081h8rJkApOt
- izjbM3nBrYiTqIuUpOq6Zw5ew8sXXreqWqcce+6PC58Yp6qyKmsAbnmDsIWbJZnyOLGpqEpYsJ3
- EoCpfLQqCFsqAlA0=
-X-Received: by 2002:a05:600c:d5:: with SMTP id
- u21mr1866028wmm.28.1604385343152; 
- Mon, 02 Nov 2020 22:35:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzDxYt5GtMt+qrxaNt9L6v08RKe4SQ9boutdzJR3FLKPWpjQnafJ1rQNgYRZf6OOXGo9VeA1g==
-X-Received: by 2002:a05:600c:d5:: with SMTP id
- u21mr1866007wmm.28.1604385342949; 
- Mon, 02 Nov 2020 22:35:42 -0800 (PST)
-Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id r1sm26295157wro.18.2020.11.02.22.35.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 22:35:42 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 v2] hw/virtio/vhost-backend: Fix Coverity CID 1432871
-Date: Tue,  3 Nov 2020 07:35:41 +0100
-Message-Id: <20201103063541.2463363-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
+ in-reply-to:in-reply-to:references:references;
+ bh=Mv8cClp2zIDi4pd6r6mHxpJ7DL6izVIgfX2y9sxMmVg=;
+ b=VJnTmlnu2Y4ZY2Di0wEpfEgtIcyQ4xf5ycb+sKttPV0Gr7mUUkSqttOfIa/Am3SXJ4BC7Q
+ YiQkLyDVe7fEQE7ToQYCbB4b6Czt1/ciec61ofIFE+9gGKfd25V3Kd1hcHhHm3Q4Q4in+l
+ H2AJcDpASQWOEUliv/l/5HbbLZSht9A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-XI6QfvWJN2q1wq2UWrLOtw-1; Tue, 03 Nov 2020 01:36:05 -0500
+X-MC-Unique: XI6QfvWJN2q1wq2UWrLOtw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18D0C188C126;
+ Tue,  3 Nov 2020 06:36:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
+ [10.36.112.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CD9C16F142;
+ Tue,  3 Nov 2020 06:35:57 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 5BBAA1132BD6; Tue,  3 Nov 2020 07:35:56 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v2 11/11] sockets: Make abstract UnixSocketAddress
+ depend on CONFIG_LINUX
+References: <20201102094422.173975-1-armbru@redhat.com>
+ <20201102094422.173975-12-armbru@redhat.com>
+ <e98fe4e1-b641-97ef-e697-11281d085c04@redhat.com>
+Date: Tue, 03 Nov 2020 07:35:56 +0100
+In-Reply-To: <e98fe4e1-b641-97ef-e697-11281d085c04@redhat.com> (Eric Blake's
+ message of "Mon, 2 Nov 2020 08:12:57 -0600")
+Message-ID: <87lffjoskz.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -109,54 +98,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, berrange@redhat.com, zxq_yx_007@163.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, marcandre.lureau@redhat.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix uninitialized value issues reported by Coverity:
+Eric Blake <eblake@redhat.com> writes:
 
-  Field 'msg.reserved' is uninitialized when calling write().
+> On 11/2/20 3:44 AM, Markus Armbruster wrote:
+>> The abstract socket namespace is a non-portable Linux extension.  An
+>> attempt to use it elsewhere should fail with ENOENT (the abstract
+>> address looks like a "" pathname, which does not resolve).  We report
+>> this failure like
+>> 
+>>     Failed to connect socket abc: No such file or directory
+>> 
+>> Tolerable, although ENOTSUP would be better.
+>> 
+>> However, introspection lies: it has @abstract regardless of host
+>> support.  Easy enough to fix: since Linux provides them since 2.2,
+>> 'if': 'defined(CONFIG_LINUX)' should do.
+>> 
+>> The above failure becomes
+>> 
+>>     Parameter 'backend.data.addr.data.abstract' is unexpected
+>> 
+>> I consider this an improvement.
+>> 
+>
+> Commit message lacks mention of the fact that we are now explicitly not
+> outputting 'strict' for non-abstract sockets (in fact, that change could
 
-While the 'struct vhost_msg' does not have a 'reserved' field,
-we still initialize it to have the two parts of the function
-consistent.
+I trust you mean 'tight'.
 
-Reported-by: Coverity (CID 1432864: UNINIT)
-Fixes: c471ad0e9bd ("vhost_net: device IOTLB support")
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
-v2: comment 'struct vhost_msg' is also initialized (Peter)
----
- hw/virtio/vhost-backend.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> be squashed in 9/11 if you wanted to do it there).
 
-diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-index 88c8ecc9e03..222bbcc62de 100644
---- a/hw/virtio/vhost-backend.c
-+++ b/hw/virtio/vhost-backend.c
-@@ -257,7 +257,7 @@ static int vhost_kernel_send_device_iotlb_msg(struct vhost_dev *dev,
-                                               struct vhost_iotlb_msg *imsg)
- {
-     if (dev->backend_cap & (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)) {
--        struct vhost_msg_v2 msg;
-+        struct vhost_msg_v2 msg = {};
- 
-         msg.type = VHOST_IOTLB_MSG_V2;
-         msg.iotlb = *imsg;
-@@ -267,7 +267,7 @@ static int vhost_kernel_send_device_iotlb_msg(struct vhost_dev *dev,
-             return -EFAULT;
-         }
-     } else {
--        struct vhost_msg msg;
-+        struct vhost_msg msg = {};
- 
-         msg.type = VHOST_IOTLB_MSG;
-         msg.iotlb = *imsg;
--- 
-2.26.2
+Less churn.  I'll do it if I need to respin.
+
+>                                                     But as this cleans
+> up the code I mentioned in 9/11, I'll leave it up to Dan if the commit
+> message needs a tweak; the end result is fine if we don't feel like a v3
+> spin just for moving hunks around.
+
+Neglecting to mention the change in the commit message isn't *too* bad,
+because the change "only" corrects something new in this series, which
+makes a future question "why did this go away?" relatively unlikely.
+
+That said, I'm happy to respin if you think it's worthwhile.  Just ask.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+>> +++ b/chardev/char-socket.c
+>> @@ -444,14 +444,20 @@ static char *qemu_chr_socket_address(SocketChardev *s, const char *prefix)
+>>          break;
+>>      case SOCKET_ADDRESS_TYPE_UNIX:
+>>      {
+>> +        const char *tight = "", *abstract = "";
+>>          UnixSocketAddress *sa = &s->addr->u.q_unix;
+>>  
+>> -        return g_strdup_printf("%sunix:%s%s%s%s", prefix,
+>> -                               s->addr->u.q_unix.path,
+>> -                               sa->has_abstract && sa->abstract
+>> -                               ? ",abstract" : "",
+>> -                               sa->has_tight && sa->tight
+>> -                               ? ",tight" : "",
+>
+> Unconditional output if tight is true (which is its stated default)...
+>
+>> +#ifdef CONFIG_LINUX
+>> +        if (sa->has_abstract && sa->abstract) {
+>> +            abstract = ",abstract";
+>> +            if (sa->has_tight && sa->tight) {
+>> +                tight = ",tight";
+>> +            }
+>> +        }
+>> +#endif
+>> +
+>> +        return g_strdup_printf("%sunix:%s%s%s%s", prefix, sa->path,
+>> +                               abstract, tight,
+>
+> ...vs. the now-nicer conditional where tight is only present if abstract.
 
 
