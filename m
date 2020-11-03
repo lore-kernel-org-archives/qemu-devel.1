@@ -2,86 +2,89 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15022C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE123C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:01:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BE3122264
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:01:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54A0B2080C
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:01:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FNBm+VPD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BE3122264
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UDwIFbnK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54A0B2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZykA-0004Ko-Kz
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:01:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60148)
+	id 1kZykQ-0004pb-C4
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:01:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZyij-00032Y-PP
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:59:41 -0500
-Received: from mail-ej1-x635.google.com ([2a00:1450:4864:20::635]:37215)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kZyih-0002J3-UW
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:59:41 -0500
-Received: by mail-ej1-x635.google.com with SMTP id gn41so7578062ejc.4
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 07:59:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=90PcIvnK3QaxkyGFVcQl/vw8IMnm+CzLWTPAREKXP4g=;
- b=FNBm+VPDogYJ48z/nCIpeVH2x1HJEUCLCKVMdYbdzIOgTam5TXAlvSjdft5FbUSzP8
- Psxccr1rbW/ZPZ83Z6QOwbYj9DDwLhNloVPIYfnaflFmw32zw0qmK1FTiaqSwi4VM8TH
- ZMtEOg8Qu9gaK8XOxpILmYGcmq/vPL8RjC3FAVVjd4PqLpCOi22XvXi5liNsHoIaj/c5
- wP/BHmASaw4dkAa7l6Khkk2imiXVwyhpsg2lJZV9Nvw2iucmuylO4Hahfbuah0rpRCsv
- S/oVtBkIJSgkQUbeaVUW3wr2htewedev+ItL0SvNVZ6sZy6RHsbJXIDIGabxZvu1hbyS
- x9mA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=90PcIvnK3QaxkyGFVcQl/vw8IMnm+CzLWTPAREKXP4g=;
- b=fMvBcUeemu6Gj/2YrhwnSLfaHqj1eS/LjcM/bvrXFzf9u+pO22foGCqmV9AEcGC7aY
- zo3mHUj9iklXaSV5q46kUDsFhBi/Y7fyuzZehahjiVb0rm4GFGnqJQVwpFOzp/omA68X
- Tc0bpPt86MsJ66McA4ZsdRcsQRbYz93SSrs5cq4pxAIYuPSzI6h7N3Aogds+bMFr4ZUA
- fh2qfWTTLeRokLf3qOS3ZoFUqi3ao2g9jNdg6mYnHJyZ2rCCU0yy5zkIKMa41BL5EGwk
- EjUbLSnCibRnvU+BdzlzBpdm+FnMz7B++F9oxaX3+oPul2gUpouAGAIqoNnJwMJdt+22
- 9pCw==
-X-Gm-Message-State: AOAM531uoKHOWGn/szwCh2iY36292Jm+owu3uleGhIUULngOvf4yDLHB
- xPeLkbZBDo4Xa6YCzyOWuxG+njy1L4v+U1t0ta3Mbw==
-X-Google-Smtp-Source: ABdhPJzOy4R1OmfT2ikDJwe514YtWzNJGlLzloQRY8XSOF3uUlAfeYcL97TGY0wDkD2uqtAaJ0ExtSmzS+7qJSSzlhE=
-X-Received: by 2002:a17:906:6949:: with SMTP id
- c9mr8571298ejs.482.1604419178151; 
- Tue, 03 Nov 2020 07:59:38 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZyjF-0003Qo-VN
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:00:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52077)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZyjC-0002Vm-VW
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:00:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604419209;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=IeBEkZ3rPPd3tykenEV5yTcAv5+AKEtQKdvPy2HzDwc=;
+ b=UDwIFbnKW4PhyTv3lJgX1c843B5Q5G3VJiLlTRB1n+y40TG/v65CmqxLzwyqrt/HiUKEVf
+ PhqMuIJllAu4VtdW1o7kQq8Nek8No+c6jejsVJE9OOo6602jGsQe0sZVTlogrD3Bd0SWPJ
+ QUrmn3xuOg0MYNcPaR7d7/KamQJ10WI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-lwe-oJdYNd2sAYfs9ZcLOg-1; Tue, 03 Nov 2020 11:00:07 -0500
+X-MC-Unique: lwe-oJdYNd2sAYfs9ZcLOg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 487B218BA283
+ for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 16:00:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
+ [10.36.112.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D52F27512A;
+ Tue,  3 Nov 2020 16:00:05 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 4DA3A1132BD6; Tue,  3 Nov 2020 17:00:04 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] qapi: make all parsing visitors parse boolean options
+ the same
+References: <20201103142344.402353-1-pbonzini@redhat.com>
+Date: Tue, 03 Nov 2020 17:00:04 +0100
+In-Reply-To: <20201103142344.402353-1-pbonzini@redhat.com> (Paolo Bonzini's
+ message of "Tue, 3 Nov 2020 09:23:44 -0500")
+Message-ID: <871rhajurf.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20201103142306.71782-1-mst@redhat.com>
-In-Reply-To: <20201103142306.71782-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Nov 2020 15:59:26 +0000
-Message-ID: <CAFEAcA_xrTeHybdCro0CNar1dsMtfGG2ucHtF=j_QsU2g-JZxw@mail.gmail.com>
-Subject: Re: [PULL 00/38] pc,pci,vhost,virtio: fixes
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::635;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x635.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,47 +97,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 3 Nov 2020 at 14:34, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> The following changes since commit c7a7a877b716cf14848f1fd5c754d293e2f8d852:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20201102' into staging (2020-11-03 10:38:05 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to cf0bdd0a703911f80fc645dec97f17c4415af267:
->
->   vhost-user-blk-test: fix races by using fd passing (2020-11-03 09:19:12 -0500)
->
-> ----------------------------------------------------------------
-> pc,pci,vhost,virtio: fixes
->
-> Lots of fixes all over the place.
-> virtio-mem and virtio-iommu patches are kind of fixes but
-> it seems better to just make them behave sanely than
-> try to educate users about the limitations ...
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ----------------------------------------------------------------
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Fails to compile on 32-bit host:
+> OptsVisitor, StringInputVisitor and the keyval visitor have
+> three different ideas of how a human could write the value of
+> a boolean option.  Pay homage to the backwards-compatibility
+> gods and make the new common helper accept all four sets: on/off,
+> true/false, y/n and yes/no.
 
-../../hw/vfio/common.c: In function 'vfio_listener_region_del':
-../../hw/vfio/common.c:953:20: error: invalid operands to binary ==
-(have 'Int128 {aka struct Int128}' and 'Int128 {aka struct Int128}')
-         if (llsize == int128_2_64()) {
-                    ^~ ~~~~~~~~~~~~~
+Mention the match is now case-insensitive?
 
-This needs to use int128_eq() to do the comparison.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/qapi/util.h          |  2 ++
+>  qapi/opts-visitor.c          | 13 +------------
+>  qapi/qapi-util.c             | 23 +++++++++++++++++++++++
+>  qapi/qobject-input-visitor.c | 11 +----------
+>  qapi/string-input-visitor.c  | 17 +----------------
+>  5 files changed, 28 insertions(+), 38 deletions(-)
+>
+> diff --git a/include/qapi/util.h b/include/qapi/util.h
+> index bc312e90aa..6178e98e97 100644
+> --- a/include/qapi/util.h
+> +++ b/include/qapi/util.h
+> @@ -19,6 +19,8 @@ typedef struct QEnumLookup {
+>  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val);
+>  int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+>                      int def, Error **errp);
+> +bool qapi_bool_parse(const char *name, const char *value, bool *obj,
+> +                     Error **errp);
+>  
+>  int parse_qapi_name(const char *name, bool complete);
+>  
+> diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+> index 7781c23a42..9b3a735e6d 100644
+> --- a/qapi/opts-visitor.c
+> +++ b/qapi/opts-visitor.c
 
-thanks
--- PMM
+Oh no, the options visitor!
+
+> @@ -379,19 +379,8 @@ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+   /* mimics qemu-option.c::parse_option_bool() */
+
+This comment becomes wrong.
+
+   static bool
+   opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+   {
+       OptsVisitor *ov = to_ov(v);
+       const QemuOpt *opt;
+
+       opt = lookup_scalar(ov, name, errp);
+>      if (!opt) {
+>          return false;
+>      }
+> -
+>      if (opt->str) {
+> -        if (strcmp(opt->str, "on") == 0 ||
+> -            strcmp(opt->str, "yes") == 0 ||
+> -            strcmp(opt->str, "y") == 0) {
+> -            *obj = true;
+> -        } else if (strcmp(opt->str, "off") == 0 ||
+> -            strcmp(opt->str, "no") == 0 ||
+> -            strcmp(opt->str, "n") == 0) {
+> -            *obj = false;
+> -        } else {
+> -            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
+> -                       "on|yes|y|off|no|n");
+> +        if (!qapi_bool_parse(name, opt->str, obj, errp)) {
+
+Exploits lookup_name() ensures name == opt->name.
+
+Obviously true when ov->list_mode == LM_NONE: lookup_name() returns the
+last QemuOpt of that name.
+
+We don't get here when ov->list_mode == LM_TRAVERSED: lookup_name()
+fails.
+
+"Obviously" true when ov->list_mode == LM_IN_PROGRESS: lookup_name()
+returns the next remaining QemuOpt of that name (I think).
+
+>              return false;
+>          }
+>      } else {
+> diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+> index 29a6c98b53..8a98813e42 100644
+> --- a/qapi/qapi-util.c
+> +++ b/qapi/qapi-util.c
+> @@ -13,6 +13,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu/ctype.h"
+> +#include "qapi/qmp/qerror.h"
+>  
+>  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+>  {
+> @@ -40,6 +41,28 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+>      return def;
+>  }
+>  
+> +bool qapi_bool_parse(const char *name, const char *value, bool *obj, Error **errp)
+> +{
+> +    if (!strcasecmp(value, "on") ||
+> +        !strcasecmp(value, "yes") ||
+> +        !strcasecmp(value, "true") ||
+> +        !strcasecmp(value, "y")) {
+
+I'd prefer breaking the lines before the || operator (Knuth style).
+
+> +        *obj = true;
+> +        return true;
+> +    }
+> +    if (!strcasecmp(value, "off") ||
+> +        !strcasecmp(value, "no") ||
+> +        !strcasecmp(value, "false") ||
+> +        !strcasecmp(value, "n")) {
+> +        *obj = false;
+> +        return true;
+> +    }
+> +
+> +    error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
+> +               "boolean (on/off, yes/no, true/false, y/n)");
+> +    return false;
+
+Baroque.  Not this patch's fault.  I'm half-tempted to deprecate
+everything but 'on' and 'off', case-sensitive.
+
+Recommend to have the error message only mention the preferred form.  I
+like the laconic "'on' or 'off'".  It's really all the user needs to
+know.
+
+You copied the name ?: "null" from the string input visitor.  It's bad
+there (but nobody cares), and it's bad here (where I care).  I think it
+should be left to callers.  See also next hunk.
+
+> +}
+> +
+>  /*
+>   * Parse a valid QAPI name from @str.
+>   * A valid name consists of letters, digits, hyphen and underscore.
+> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+> index 7b184b50a7..183472e5e4 100644
+> --- a/qapi/qobject-input-visitor.c
+> +++ b/qapi/qobject-input-visitor.c
+> @@ -512,16 +512,7 @@ static bool qobject_input_type_bool_keyval(Visitor *v, const char *name,
+>          return false;
+>      }
+>  
+> -    if (!strcmp(str, "on")) {
+> -        *obj = true;
+> -    } else if (!strcmp(str, "off")) {
+> -        *obj = false;
+> -    } else {
+> -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+> -                   full_name(qiv, name), "'on' or 'off'");
+> -        return false;
+> -    }
+> -    return true;
+> +    return qapi_bool_parse(name, str, obj, errp);
+
+Error message regresses from full_name(), which is never null, to name
+?: "null".
+
+Test case:
+
+    $ qemu-storage-daemon --blockdev qcow2,node-name=node0,file.driver=file,file.filename=tmp.qcow2,file.x-check-cache-dropped=xxx
+    qemu-storage-daemon: --blockdev qcow2,node-name=node0,file.driver=file,file.filename=tmp.qcow2,file.x-check-cache-dropped=xxx: Parameter 'file.x-check-cache-dropped' expects 'on' or 'off'
+
+!name happens for ['bool'].  The error message is user-hostile then.  No
+test case, because ['bool'] occurs only in tests/ right now.
+
+>  }
+>  
+>  static bool qobject_input_type_str(Visitor *v, const char *name, char **obj,
+> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+> index 6e53396ea3..ba2697d70f 100644
+> --- a/qapi/string-input-visitor.c
+> +++ b/qapi/string-input-visitor.c
+
+Oh no, the string visitor!
+
+> @@ -332,22 +332,7 @@ static bool parse_type_bool(Visitor *v, const char *name, bool *obj,
+>      StringInputVisitor *siv = to_siv(v);
+>  
+>      assert(siv->lm == LM_NONE);
+> -    if (!strcasecmp(siv->string, "on") ||
+> -        !strcasecmp(siv->string, "yes") ||
+> -        !strcasecmp(siv->string, "true")) {
+> -        *obj = true;
+> -        return true;
+> -    }
+> -    if (!strcasecmp(siv->string, "off") ||
+> -        !strcasecmp(siv->string, "no") ||
+> -        !strcasecmp(siv->string, "false")) {
+> -        *obj = false;
+> -        return true;
+> -    }
+> -
+> -    error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+> -               "boolean");
+> -    return false;
+> +    return qapi_bool_parse(name, siv->string, obj, errp);
+>  }
+>  
+>  static bool parse_type_str(Visitor *v, const char *name, char **obj,
+
+Puh!
+
 
