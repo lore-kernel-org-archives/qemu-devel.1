@@ -2,89 +2,89 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40816C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 08:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E1BC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:01:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A9212071A
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 08:48:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01EA120756
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:01:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S4efmURn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A9212071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gk9wj9Ud"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01EA120756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZrzk-0003Ug-AV
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 03:48:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52000)
+	id 1kZsCA-0005jj-TB
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 04:01:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55442)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kZrz8-00035x-R3
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 03:48:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59821)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kZsB0-0005El-1p
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:00:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46252)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kZrz5-00009b-9s
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 03:48:10 -0500
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kZsAw-0003wg-64
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:00:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604393285;
+ s=mimecast20190719; t=1604394021;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=X15lXvtojGuf6Vbt9c4MQsM4+Gp1FV5LlTPipQra+xU=;
- b=S4efmURn3eVE45aVV1cnhe61CByHIqyQvsvNbgwG7FzU0xlchZPF+3mveJVCceO7gp7+2w
- pW+exlae8t19HqaEtwuftHygRDjvHrhk82qd09C2JTNrP1IQ8eKjtODJZPXTyiNY7D4Znp
- 669Bzs9IsUPoqwiMbhP+bSCgc4lA+lg=
+ bh=GPXsXTezcXIB1ny6YU0t2HN0AfYZZpLRli9QV2ILw5Q=;
+ b=Gk9wj9UdEKCHcevlEBgEgtmuxCi/BeFmAOrI/X0ZAf0j9+DW4eU3n0zLom7whAH4a3ZGOa
+ pvp4+GOQZ5qPf8cEZa39VMskC86cy0sYewX8Xh0xu/J3mkSN5jWAB5/zr2VxvlLwcenSZK
+ RvPmzBaYtBnyb/Z1GNVJRBJxNZtZ+VU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-VJkLfGPhPTq1uL79IKcSwg-1; Tue, 03 Nov 2020 03:48:02 -0500
-X-MC-Unique: VJkLfGPhPTq1uL79IKcSwg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-268-pFCrKgdQNdqpjhu_61_GnA-1; Tue, 03 Nov 2020 04:00:19 -0500
+X-MC-Unique: pFCrKgdQNdqpjhu_61_GnA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AFC110199B6;
- Tue,  3 Nov 2020 08:47:52 +0000 (UTC)
-Received: from [10.72.13.208] (ovpn-13-208.pek2.redhat.com [10.72.13.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A35D65DA8C;
- Tue,  3 Nov 2020 08:46:55 +0000 (UTC)
-Subject: Re: VFIO Migration
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <20201102111153.GC42093@stefanha-x1.localdomain>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <ac694df6-0842-3483-dfc6-db82830bb02b@redhat.com>
-Date: Tue, 3 Nov 2020 16:46:53 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 468CD8030C4
+ for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 09:00:18 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.195.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6626260C04;
+ Tue,  3 Nov 2020 09:00:16 +0000 (UTC)
+Subject: Re: [PATCH v3 5/7] virtiofsd: Announce sub-mount points
+To: Miklos Szeredi <mszeredi@redhat.com>
+References: <20201102161859.156603-1-mreitz@redhat.com>
+ <20201102161859.156603-6-mreitz@redhat.com>
+ <CAOssrKdrRV6vbooVnMH2Hrq3XPAG6uX4N8nxgwxRDzAyKF1A1g@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <cecb2ca8-d15a-76e7-a34d-c37b85929961@redhat.com>
+Date: Tue, 3 Nov 2020 10:00:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201102111153.GC42093@stefanha-x1.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <CAOssrKdrRV6vbooVnMH2Hrq3XPAG6uX4N8nxgwxRDzAyKF1A1g@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jasowang@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -99,268 +99,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- quintela@redhat.com, qemu-devel@nongnu.org,
- Kirti Wankhede <kwankhede@nvidia.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>
+Cc: virtio-fs-list <virtio-fs@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 03.11.20 09:10, Miklos Szeredi wrote:
+> On Mon, Nov 2, 2020 at 5:19 PM Max Reitz <mreitz@redhat.com> wrote:
+>>
+>> Whenever we encounter a directory with an st_dev or mount ID that
+>> differs from that of its parent, we set the FUSE_ATTR_SUBMOUNT flag so
+>> the guest can create a submount for it.
+>>
+>> We only need to do so in lo_do_lookup().  The following functions return
+>> a fuse_attr object:
+>> - lo_create(), though fuse_reply_create(): Calls lo_do_lookup().
+>> - lo_lookup(), though fuse_reply_entry(): Calls lo_do_lookup().
+>> - lo_mknod_symlink(), through fuse_reply_entry(): Calls lo_do_lookup().
+>> - lo_link(), through fuse_reply_entry(): Creating a link cannot create a
+>>   submount, so there is no need to check for it.
+>> - lo_getattr(), through fuse_reply_attr(): Announcing submounts when the
+>>   node is first detected (at lookup) is sufficient.  We do not need to
+>>   return the submount attribute later.
+>> - lo_do_readdir(), through fuse_add_direntry_plus(): Calls
+>>   lo_do_lookup().
+>>
+>> Make announcing submounts optional, so submounts are only announced to
+>> the guest with the announce_submounts option.  Some users may prefer the
+>> current behavior, so that the guest learns nothing about the host mount
+>> structure.
+>>
+>> (announce_submounts is force-disabled when the guest does not present
+>> the FUSE_SUBMOUNTS capability, or when there is no statx().)
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>>  tools/virtiofsd/helper.c         |  1 +
+>>  tools/virtiofsd/passthrough_ll.c | 22 ++++++++++++++++++++++
+>>  2 files changed, 23 insertions(+)
+>>
+>> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+>> index 2e181a49b5..4433724d3a 100644
+>> --- a/tools/virtiofsd/helper.c
+>> +++ b/tools/virtiofsd/helper.c
+>> @@ -190,6 +190,7 @@ void fuse_cmdline_help(void)
+>>             "                               retain/discard O_DIRECT flags passed down\n"
+>>             "                               to virtiofsd from guest applications.\n"
+>>             "                               default: no_allow_direct_io\n"
+>> +           "    -o announce_submounts      Announce sub-mount points to the guest\n"
+>>             );
+>>  }
+>>
+>> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+>> index 34d107975f..ec1008bceb 100644
+>> --- a/tools/virtiofsd/passthrough_ll.c
+>> +++ b/tools/virtiofsd/passthrough_ll.c
+>> @@ -40,6 +40,7 @@
+>>  #include "fuse_virtio.h"
+>>  #include "fuse_log.h"
+>>  #include "fuse_lowlevel.h"
+>> +#include "standard-headers/linux/fuse.h"
+>>  #include <assert.h>
+>>  #include <cap-ng.h>
+>>  #include <dirent.h>
+>> @@ -167,6 +168,7 @@ struct lo_data {
+>>      int readdirplus_set;
+>>      int readdirplus_clear;
+>>      int allow_direct_io;
+>> +    int announce_submounts;
+>>      bool use_statx;
+>>      struct lo_inode root;
+>>      GHashTable *inodes; /* protected by lo->mutex */
+>> @@ -207,6 +209,7 @@ static const struct fuse_opt lo_opts[] = {
+>>      { "no_readdirplus", offsetof(struct lo_data, readdirplus_clear), 1 },
+>>      { "allow_direct_io", offsetof(struct lo_data, allow_direct_io), 1 },
+>>      { "no_allow_direct_io", offsetof(struct lo_data, allow_direct_io), 0 },
+>> +    { "announce_submounts", offsetof(struct lo_data, announce_submounts), 1 },
+>>      FUSE_OPT_END
+>>  };
+>>  static bool use_syslog = false;
+>> @@ -601,6 +604,20 @@ static void lo_init(void *userdata, struct fuse_conn_info *conn)
+>>          fuse_log(FUSE_LOG_DEBUG, "lo_init: disabling readdirplus\n");
+>>          conn->want &= ~FUSE_CAP_READDIRPLUS;
+>>      }
+>> +
+>> +    if (!(conn->capable & FUSE_CAP_SUBMOUNTS) && lo->announce_submounts) {
+>> +        fuse_log(FUSE_LOG_WARNING, "lo_init: Cannot announce submounts, client "
+>> +                 "does not support it\n");
+>> +        lo->announce_submounts = false;
+>> +    }
+>> +
+>> +#ifndef CONFIG_STATX
+>> +    if (lo->announce_submounts) {
+>> +        fuse_log(FUSE_LOG_WARNING, "lo_init: Cannot announce submounts, there "
+>> +                 "is no statx()\n");
+>> +        lo->announce_submounts = false;
+> 
+> Minor issue: this warns only when libc doesn't have statx, and not
+> when kernel doesn't have it.
+> 
+>> +    }
+>> +#endif
+>>  }
+>>
+>>  static void lo_getattr(fuse_req_t req, fuse_ino_t ino,
+>> @@ -877,6 +894,11 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *name,
+>>          goto out_err;
+>>      }
+>>
+>> +    if (S_ISDIR(e->attr.st_mode) && lo->announce_submounts &&
+>> +        (e->attr.st_dev != dir->key.dev || mnt_id != dir->key.mnt_id)) {
+>> +        e->attr_flags |= FUSE_ATTR_SUBMOUNT;
+>> +    }
+> 
+> ... and since announce_submounts isn't turned off in case the kernel
+> doesn't have STATX_MNT_ID, this will trigger a submount when crossing
+> into a different filesystem.
 
-On 2020/11/2 下午7:11, Stefan Hajnoczi wrote:
-> There is discussion about VFIO migration in the "Re: Out-of-Process
-> Device Emulation session at KVM Forum 2020" thread. The current status
-> is that Kirti proposed a VFIO device region type for saving and loading
-> device state. There is currently no guidance on migrating between
-> different device versions or device implementations from different
-> vendors. This is known to be non-trivial and raised discussion about
-> whether it should really be handled by VFIO or centralized in QEMU.
->
-> Below is a document that describes how to ensure migration compatibility
-> in VFIO. It does not require changes to the VFIO migration interface. It
-> can be used for both VFIO/mdev kernel devices and vfio-user devices.
->
-> The idea is that the device state blob is opaque to the VMM but the same
-> level of migration compatibility that exists today is still available.
+Oh.  Yes.  I totally forgot that when writing the warning.
 
+> Possible solutions:
+> 
+> a) test and warn at startup in case kernel doesn't have statx
+> 
+> b) do not test st_dev, only mnt_id (which will always be zero if not supported)
+> 
+> c) merge announce_submounts and use_statx, which are basically doing
+> the same thing
 
-So if we can't mandate this or there's no way to validate this. Vendor 
-is still free to implement their own protocol which could lead a lot of 
-maintaining burden.
+Isn’t that a single thing?  I.e., if we decide not to test st_dev, then
+we should do all of these, I think.
 
+OTOH, we could also just drop the warning (that statx()) isn’t
+available, because as the code is, we can still announce submounts.  The
+only problem is that we’ll suffer from the bug fixed by patch 4
+(different mounts with the same st_dev being treated as the same tree),
+but that’s unrelated to announcing submounts.
 
->
-> I hope this will help us reach consensus and let us discuss specifics.
->
-> If you followed the previous discussion, I changed the approach from
-> sending a magic constant in the device state blob to identifying device
-> models by URIs. Therefore the device state structure does not need to be
-> defined here - the critical information for ensuring device migration
-> compatibility is the device model and configuration defined below.
->
-> Stefan
-> ---
-> VFIO Migration
-> ==============
-> This document describes how to save and load VFIO device states. Saving a
-> device state produces a snapshot of a VFIO device's state that can be loaded
-> again at a later point in time to resume the device from the snapshot.
->
-> The data representation of the device state is outside the scope of this
-> document.
->
-> Overview
-> --------
-> The purpose of device states is to save the device at a point in time and then
-> restore the device back to the saved state later. This is more challenging than
-> it first appears.
->
-> The process of saving a device state and loading it later is called
-> *migration*. The state may be loaded by the same device that saved it or by a
-> new instance of the device, possibly running on a different computer.
->
-> It must be possible to migrate to a newer implementation of the device
-> as well as to an older implementation of the device. This allows users
-> to upgrade and roll back their systems.
->
-> Migration can fail if loading the device state is not possible. It should fail
-> early with a clear error message. It must not appear to complete but leave the
-> device inoperable due to a migration problem.
+(Well, to be fair, not having statx() does break one thing about
+submounts: I suppose you could mount a device inside of its own mount
+(“mount $mount_opts $dir; mount $mount_opts $dir/sub” – then $dir/sub
+wouldn’t be marked as a submount without statx()), but that probably
+yields a host of other problems besides not announcing the nested mount
+as a submount (virtiofsd would treat $dir/sub as the same node as $dir,
+I think), so again, I wouldn’t worry too much about not getting the
+FUSE_SUBMOUNT flag right.)
 
+So I think I’d rather just drop the warning and leave the rest as it is.
+ Not least because STATX_MNT_ID is rather new.
 
-For VFIO-user, how management know that a VM can be migrated from src to 
-dst? For kernel, we have sysfs.
-
-
->
-> The rest of this document describes how these requirements can be met.
->
-> Device Models
-> -------------
-> Devices have a *hardware interface* consisting of hardware registers,
-> interrupts, and so on.
->
-> The hardware interface together with the device state representation is called
-> a *device model*. Device models can be assigned URIs such as
-> https://qemu.org/devices/e1000e to uniquely identify them.
-
-
-It looks worse than 
-"pci://vendor_id.device_id.subvendor_id.subdevice_id". "e1000e" means a 
-lot of different 8275X implementations that have subtle but easy to be 
-ignored differences.
-
-And is it possible to have a list of URIs here?
-
-
->
-> Multiple implementations of a device model may exist. They are they are
-> interchangeable if they follow the same hardware interface and device
-> state representation.
->
-> Multiple implementations of the same hardware interface may exist with
-> different device state representations, in which case the device models are not
-> interchangeable and must be assigned different URIs.
->
-> Migration is only possible when the same device model is supported by the
-> *source* and the *destination* devices.
->
-> Device Configuration
-> --------------------
-> Device models may have parameters that affect the hardware interface or device
-> state representation. For example, a network card may have a configurable
-> address filtering table size parameter called ``rx-filter-size``. A
-> device state saved with ``rx-filter-size=32`` cannot be safely loaded
-> into a device with ``rx-filter-size=0``, because changing the size from
-> 32 to 0 may disrupt device operation.
-
-
-Do we allow the migration from "rx-filter-size=16" to 
-"rx-filter-size=32" (I guess not?) And should we extend the concept to 
-"device capability" instead of just state representation.  E.g src has 
-CAP_X=on,CAP_Y=off but dst has CAP_X=on,CAP_Y=on, so we disallow the 
-migration from src to dst.
-
-
->
-> A list of configuration parameters is called the *device configuration*.
-> Migration is expected to succeed when the same device model and configuration
-> that was used for saving the device state is used again to load it.
->
-> Note that not all parameters used to instantiate a device need to be part of
-> the device configuration. For example, assigning a network card to a specific
-> physical port is not part of the device configuration since it is not part of
-> the device's hardware interface or the device state representation.
-
-
-Yes, but the task needs to be done by management somehow. So do you 
-expect a vendor specific provisioning API here?
-
-
-> The device
-> state can be loaded and run on a different physical port without affecting the
-> operation of the device. Therefore the physical port is not part of the device
-> configuration.
->
-> However, secondary aspects related to the physical port may affect the device's
-> hardware interface and need to be reflected in the device configuration. The
-> link speed may depend on the physical port and be reported through the device's
-> hardware interface. In that case a ``link-speed`` configuration parameter is
-> required to prevent unexpected changes to the link speed after migration.
->
-> Note that the device configuration is a conservative bound on device
-> states that can be migrated successfully since not all configuration
-> parameters may be strictly required to match on the source and
-> destination devices. For example, if the device's hardware interface has
-> not yet been initialized then changes to the link speed may not be
-> noticed. However, accurately representing runtime constraints is complex
-> and risks introducing migration bugs, so no attempt is made to support
-> them to achieve more relaxed bounds on successful migrations.
->
-> Device Versions
-> ---------------
-> As a device evolves, the number of configuration parameters required may become
-> inconvenient for users to express in full. A device configuration can be
-> aliased by a *device version*, which is a shorthand for the full device
-> configuration. This makes it easy to apply a standard device configuration
-> without listing every configuration parameter explicitly.
-
-
-I'm not sure how to apply the device versions consider the device state 
-is opaque or the device needs to export another API to do this?
-
-
->
-> For example, if address filtering support was added to a network card then
-> device versions and the corresponding configurations may look like this:
-> * ``version=1`` - Behaves as if ``rx-filter-size=0``
-> * ``version=2`` - ``rx-filter-size=32``
->
-> Device States
-> -------------
-> The details of the device state representation are not covered in this document
-> but the general requirements are discussed here.
->
-> The device state consists of data accessible through the device's hardware
-> interface and internal state that is needed to restore device operation.
-> State in the hardware interface includes the values of hardware registers.
-> An example of internal state is an index value needed to avoid processing
-> queued requests more than once.
->
-> Changes can be made to the device state representation as follows. Each change
-> to device state must have a corresponding device configuration parameter that
-> allows the change to toggled:
->
-> * When the parameter is disabled the hardware interface and device state
->    representation are unchanged. This allows old device states to be loaded.
->
-> * When the parameter is enabled the change comes into effect.
->
-> * The parameter's default value disables the change. Therefore old versions do
->    not have to explicitly specify the parameter.
->
-> The following example illustrates migration from an old device
-> implementation to a new one. A version=1 network card is migrated to a
-> new device implementation that is also capable of version=2 and adds the
-> rx-filter-size=32 parameter. The new device is instantiated with
-> version=1, which disables rx-filter-size and is capable of loading the
-> version=1 device state. The migration completes successfully but note
-> the device is still operating at version=1 level in the new device.
->
-> The following example illustrates migration from a new device
-> implementation back to an older one. The new device implementation
-> supports version=1 and version=2. The old device implementation supports
-> version=1 only. Therefore the device can only be migrated when
-> instantiated with version=1 or the equivalent full configuration
-> parameters.
-
-
-In qemu we have subsection to facilitate the case when some fields were 
-forgot to migrate. Do we need something similar here?
-
-
->
-> Orchestrating Migrations
-> ------------------------
-> The following steps must be followed to migrate devices:
->
-> 1. Check that the source and destination devices support the same device model.
->
-> 2. Check that the destination device supports the source device's
->     configuration. Each configuration parameter must be accepted by the
->     destination in order to ensure that it will be possible to load the device
->     state.
->
-> 3. The device state is saved on the source and loaded on the destination.
->
-> 4. If migration succeeds then the destination resumes operation and the source
->     must not resume operation. If the migration fails then the source resumes
->     operation and the destination must not resume operation.
->
-> VFIO Implementation
-> -------------------
-> The following applies both to kernel VFIO/mdev drivers and vfio-user device
-> backends.
->
-> Devices are instantiated based on a version and/or configuration parameters:
-> * ``version=1`` - use the device configuration aliased by version 1
-> * ``version=2,rx-filter-size=64`` - use version 1 and override ``rx-filter-size``
-> * ``rx-filter-size=0`` - directly set configuration parameters without using a version
->
-> Device creation fails if the version and/or configuration parameters are not
-> supported.
->
-> There must be a mechanism to query the "latest" configuration for a device
-> model. It may simply report the ``version=5`` where 5 is the latest version but
-> it could also report all configuration parameters instead of using a version
-> alias.
-
-
-Thanks
+Max
 
 
