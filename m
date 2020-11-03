@@ -2,90 +2,88 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC2BC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:33:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C34C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:33:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C736221FB
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:33:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9279422370
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:33:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SHbvYqR1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C736221FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IgTa3Qxq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9279422370
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka0B1-000396-JA
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 12:32:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60392)
+	id 1ka0B5-0003KE-Ig
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 12:33:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ka09e-0001Pi-Ee; Tue, 03 Nov 2020 12:31:34 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:38984)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ka09b-0007aa-Kn; Tue, 03 Nov 2020 12:31:34 -0500
-Received: by mail-wr1-x434.google.com with SMTP id y12so19383612wrp.6;
- Tue, 03 Nov 2020 09:31:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=OGe7LmXDmA7ZhWoq/eh/9/xncpJoEzNZlAd0PDxZhgU=;
- b=SHbvYqR14F7crSVw4JF3wmZNhx0fJRJVAYe4QVJpwRNOQwUx+iHYc357Of3wUCOM8r
- htrZ4g7YK30p6A1+o+x/VoV30DLhEf3biZ7Kzg3QR4np/bglFagHj2SaS2frf9hTRtVX
- ikfOi0fEX1OU8e9MGNtt/7DZz4HftD5BxTS28HqljahlK9+8SkjXHSx5PtT4Bk4UzhRB
- BSa+j+PgrjvYGea42hTjrWW0zB1wzwxXbwy/wlTLH1hTM7YiltVCElDA9ffJvyTWkIvw
- avtzni1Tiw4U0BfwjXYxQKZETmO9BddhBrabmBAhh//UcE4lMOrk9LMyQ6lA6b1/9CNy
- 8IKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=OGe7LmXDmA7ZhWoq/eh/9/xncpJoEzNZlAd0PDxZhgU=;
- b=oxSOtJkgLCT2E1leoKUN/Z5HcfDGnP45IKUbXBgFu4q3wVQLvsM3U44+IwBRkvcD61
- 2/g0oxa8ZkcFaMKbmrwgEKjU72SJAI/ImRM++rxGUn/96NGqFhdrBdVmNI7MMdaLu2dS
- qfOs0iFte/rm0IBPuDoL8s2fDdB8PhoA46/jakXT7moRStGZRHk2BPB6KYkOsMqfJtS9
- ptCcCVi3opN52K1hgADkzPJLoWMePoKfyAwLMU9RK5UfcmHgN0pusa4vbRjvjl1t5pao
- QlEO7m+9mEEYf8f7mC4UR+G4viN7aCUlJr8lN6b0nE0sS96fM7dw04ovqhouNogwurL/
- OWwQ==
-X-Gm-Message-State: AOAM532htEgUTYOBZntOMFyXZE0laly8mINasfb8ZOoviVEo11t8P0fb
- GYNZZyiFmEUpfMher/0B/L+W7m41ccM=
-X-Google-Smtp-Source: ABdhPJwJ+M/QI4232QlwsgZeNd44Wm/+Ud7hAlvUirQ901Vp05r1I2SKOUY6XdlE4lvFBRZ4jOFzeA==
-X-Received: by 2002:a5d:4e8f:: with SMTP id e15mr17555669wru.390.1604424689586; 
- Tue, 03 Nov 2020 09:31:29 -0800 (PST)
-Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id s188sm3590837wmf.45.2020.11.03.09.31.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 09:31:28 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 0/6] Mips fixes patches
-Date: Tue,  3 Nov 2020 18:31:21 +0100
-Message-Id: <20201103173127.2704256-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1ka09z-0001Zm-Hk
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 12:31:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30382)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1ka09v-0007cY-Cp
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 12:31:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604424708;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AV6uN+96HsV282QBlLAmU6Oh19cDXX/t/5p7UE0egcw=;
+ b=IgTa3QxqchmwkSZ7MDP2UL0E9ggtNFOAMqnUwlIabx6tPj2vuoDfJTg0WfRdzU35cRKPhK
+ kReofRMrWNCvOf66caeiNPnbHY5HPdq+H/2fONbtJffqTguM2N/XuS+RV+8jNdUVpFQ54c
+ LFfBo86KHK2svHPEPSv1WNEBkosxNPw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-545-7KVERFg5Nzycv7rvcmA8CA-1; Tue, 03 Nov 2020 12:31:43 -0500
+X-MC-Unique: 7KVERFg5Nzycv7rvcmA8CA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8794F8049FE;
+ Tue,  3 Nov 2020 17:31:42 +0000 (UTC)
+Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C5E705C5DE;
+ Tue,  3 Nov 2020 17:31:35 +0000 (UTC)
+Date: Tue, 3 Nov 2020 10:31:35 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Subject: Re: VFIO Migration
+Message-ID: <20201103103135.7da0a9c5@w520.home>
+In-Reply-To: <20201103153356.GO205187@redhat.com>
+References: <20201102111153.GC42093@stefanha-x1.localdomain>
+ <ly5z6m79c0.fsf@redhat.com> <20201103153356.GO205187@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x434.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,99 +96,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-block@nongnu.org, Paul Burton <paulburton@kernel.org>,
- libvir-list@redhat.com, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhc@lemote.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
+ quintela@redhat.com, Jason Wang <jasowang@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Kirti Wankhede <kwankhede@nvidia.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 83851c7c60c90e9fb6a23ff48076387a77bc33cd=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/mdroth/tags/qga-pull-2020-10-27-v3-=
-ta=3D=0D
-g' into staging (2020-11-03 12:47:58 +0000)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  https://gitlab.com/philmd/qemu.git tags/mips-fixes-20201103=0D
-=0D
-for you to fetch changes up to 8a805609d126ff2be9ad9ec118185dfc52633d6f:=0D
-=0D
-  target/mips: Add unaligned access support for MIPS64R6 and Loongson-3 (20=
-20=3D=0D
--11-03 16:51:13 +0100)=0D
-=0D
-----------------------------------------------------------------=0D
-MIPS patches queue=0D
-=0D
-- Removal of the 'r4k' machine (deprecated before 5.0)=0D
-- Fix LGPL license text (Chetan Pant)=0D
-- Support unaligned accesses on Loongson-3 (Huacai Chen)=0D
-- Fix out-of-bound access in Loongson-3 embedded I/O interrupt=0D
-  controller (Alex Chen)=0D
-=0D
-CI jobs results:=0D
-. https://cirrus-ci.com/build/6324890389184512=0D
-. https://gitlab.com/philmd/qemu/-/pipelines/211275262=0D
-. https://travis-ci.org/github/philmd/qemu/builds/741188958=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-AlexChen (1):=0D
-  hw/intc/loongson: Fix incorrect 'core' calculation in=0D
-    liointc_read/write=0D
-=0D
-Chetan Pant (3):=0D
-  hw/mips: Fix Lesser GPL version number=0D
-  hw/mips/boston: Fix Lesser GPL version number=0D
-  target/mips: Fix Lesser GPL version number=0D
-=0D
-Huacai Chen (1):=0D
-  target/mips: Add unaligned access support for MIPS64R6 and Loongson-3=0D
-=0D
-Philippe Mathieu-Daud=3DC3=3DA9 (1):=0D
-  hw/mips: Remove the 'r4k' machine=0D
-=0D
- docs/system/deprecated.rst                    |  12 +-=0D
- .../devices/mips-softmmu-common.mak           |   1 -=0D
- include/hw/mips/cps.h                         |   2 +-=0D
- include/hw/misc/mips_cpc.h                    |   2 +-=0D
- include/hw/misc/mips_itu.h                    |   2 +-=0D
- include/hw/pci-host/xilinx-pcie.h             |   2 +-=0D
- hw/core/loader-fit.c                          |   2 +-=0D
- hw/intc/loongson_liointc.c                    |   4 +-=0D
- hw/mips/boston.c                              |   2 +-=0D
- hw/mips/cps.c                                 |   2 +-=0D
- hw/mips/r4k.c                                 | 318 ------------------=0D
- hw/misc/mips_cpc.c                            |   2 +-=0D
- hw/misc/mips_itu.c                            |   2 +-=0D
- hw/pci-host/xilinx-pcie.c                     |   2 +-=0D
- target/mips/cp0_helper.c                      |   2 +-=0D
- target/mips/dsp_helper.c                      |   2 +-=0D
- target/mips/fpu_helper.c                      |   2 +-=0D
- target/mips/gdbstub.c                         |   2 +-=0D
- target/mips/helper.c                          |   2 +-=0D
- target/mips/lmmi_helper.c                     |   2 +-=0D
- target/mips/mips-semi.c                       |   2 +-=0D
- target/mips/msa_helper.c                      |   2 +-=0D
- target/mips/op_helper.c                       |   2 +-=0D
- target/mips/translate.c                       |   6 +-=0D
- tests/qtest/cdrom-test.c                      |   2 +-=0D
- tests/qtest/endianness-test.c                 |   2 -=0D
- MAINTAINERS                                   |   6 -=0D
- hw/mips/Kconfig                               |  13 -=0D
- hw/mips/meson.build                           |   1 -=0D
- target/mips/translate_init.c.inc              |   2 +-=0D
- 30 files changed, 32 insertions(+), 373 deletions(-)=0D
- delete mode 100644 hw/mips/r4k.c=0D
-=0D
---=3D20=0D
-2.26.2=0D
-=0D
+On Tue, 3 Nov 2020 15:33:56 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+
+> On Tue, Nov 03, 2020 at 04:23:43PM +0100, Christophe de Dinechin wrote:
+> >=20
+> > On 2020-11-02 at 12:11 CET, Stefan Hajnoczi wrote... =20
+> > > There is discussion about VFIO migration in the "Re: Out-of-Process
+> > > Device Emulation session at KVM Forum 2020" thread. The current statu=
+s
+> > > is that Kirti proposed a VFIO device region type for saving and loadi=
+ng
+> > > device state. There is currently no guidance on migrating between
+> > > different device versions or device implementations from different
+> > > vendors. This is known to be non-trivial and raised discussion about
+> > > whether it should really be handled by VFIO or centralized in QEMU.
+> > >
+> > > Below is a document that describes how to ensure migration compatibil=
+ity
+> > > in VFIO. It does not require changes to the VFIO migration interface.=
+ It
+> > > can be used for both VFIO/mdev kernel devices and vfio-user devices.
+> > >
+> > > The idea is that the device state blob is opaque to the VMM but the s=
+ame
+> > > level of migration compatibility that exists today is still available=
+.
+> > >
+> > > I hope this will help us reach consensus and let us discuss specifics=
+.
+> > >
+> > > If you followed the previous discussion, I changed the approach from
+> > > sending a magic constant in the device state blob to identifying devi=
+ce
+> > > models by URIs. Therefore the device state structure does not need to=
+ be
+> > > defined here - the critical information for ensuring device migration
+> > > compatibility is the device model and configuration defined below.
+> > >
+> > > Stefan
+> > > ---
+> > > VFIO Migration
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > This document describes how to save and load VFIO device states. Savi=
+ng a
+> > > device state produces a snapshot of a VFIO device's state that can be=
+ loaded
+> > > again at a later point in time to resume the device from the snapshot=
+.
+> > >
+> > > The data representation of the device state is outside the scope of t=
+his
+> > > document.
+> > >
+> > > Overview
+> > > --------
+> > > The purpose of device states is to save the device at a point in time=
+ and then
+> > > restore the device back to the saved state later. This is more challe=
+nging than
+> > > it first appears.
+> > >
+> > > The process of saving a device state and loading it later is called
+> > > *migration*. The state may be loaded by the same device that saved it=
+ or by a
+> > > new instance of the device, possibly running on a different computer.
+> > >
+> > > It must be possible to migrate to a newer implementation of the devic=
+e
+> > > as well as to an older implementation of the device. This allows user=
+s
+> > > to upgrade and roll back their systems.
+> > >
+> > > Migration can fail if loading the device state is not possible. It sh=
+ould fail
+> > > early with a clear error message. It must not appear to complete but =
+leave the
+> > > device inoperable due to a migration problem.
+> > >
+> > > The rest of this document describes how these requirements can be met=
+.
+> > >
+> > > Device Models
+> > > -------------
+> > > Devices have a *hardware interface* consisting of hardware registers,
+> > > interrupts, and so on.
+> > >
+> > > The hardware interface together with the device state representation =
+is called
+> > > a *device model*. Device models can be assigned URIs such as
+> > > https://qemu.org/devices/e1000e to uniquely identify them. =20
+> >=20
+> > Like others, I think we should either
+> >=20
+> > a) Give a relatively strong requirement regarding what is at the URL in
+> > question, e.g. docs, maybe even a machine-readable schema describing
+> > configuration and state for the device. Leaving the option "there can b=
+e
+> > nothing here" is IMO asking for trouble.
+> >=20
+> > b) simply call that a unique ID, and then either drop the https: entire=
+ly or
+> > use something else, like pci:// or, to be more specific, vfio://
+> >=20
+> > I'd favor option (b) for a different practical reason. URLs are subject=
+ to
+> > redirection and other mishaps. For example, using https:// begs the que=
+stion
+> > whether
+> > https://qemu.org/devices/e1000e and
+> > https://www.qemu.org/devices/e1000e
+> > should be treated as the same device. I believe that your intent is tha=
+t
+> > they shouldn't, but if the qemu web server redirects to www, and someon=
+e
+> > wants to copy-paste their web browser's URL bar to the command line, th=
+ey'd
+> > get the wrong one. =20
+>=20
+> That's not a real world problem IMHO, because neither of these URLs
+> ever need resolve to a real webpage, and thus not need to be cut +
+> paste from a browser.
+>=20
+> They are simply expressing a resource identifier using a URI as a
+> convenient format. This is the same as an XML namespace using a URI,
+> and rarely, if ever, resolving to any actual web page.
+>=20
+> This is a good thing, because if you say there needs to be a real page
+> there, then it creates a pile of corporate beaurocracy for contributors.
+> I can freely create a URI under https://redhat.com for purposes of being
+> a identifier, but I cannot get any content published there without jumpin=
+g
+> through many tedious corporate approvals and stand a good chance of being
+> rejected.
+>=20
+> If we're truely treating the URIs as an opaque string, we don't especiall=
+y
+> need to define any rules other than to say it should be under a domain th=
+at
+> you have authority over either directly, or via membership of a project
+> that delegates. We can suggest "https" since seeing "http" is a red flag
+> for many people these days.
+
+Hmm, an opaque string, sort of like the existing "name" attribute we
+have now where Christophe quoted some examples in his message.  Thanks,
+
+Alex
+
 
