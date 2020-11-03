@@ -2,92 +2,99 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7336AC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 19:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F070C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 20:01:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC38520E65
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 19:59:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9499520674
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 20:01:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O/ByFCCe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC38520E65
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iJKdzq+1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9499520674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka2Si-0002lc-Lt
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 14:59:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35444)
+	id 1ka2Ux-0003ve-Ff
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 15:01:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1ka2Rn-0002JK-Mr
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 14:58:27 -0500
-Received: from mail-il1-x131.google.com ([2607:f8b0:4864:20::131]:36175)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1ka2Rl-0002Ik-KU
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 14:58:27 -0500
-Received: by mail-il1-x131.google.com with SMTP id p10so17249578ile.3
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 11:58:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=u6q8jG5bHWI7eqWyRnKTw72n3Ayv/dRHFS2O0XAnqOo=;
- b=O/ByFCCeA9qkSC7tWZe4JHSw0FntCsNn0iL0nO5PQvLcHhnmQ0X9rp5QKuEDfxXzVe
- /aKorRp3iU4cuzAim4uxITvLlxdj9WUctEet3/4iph+bcKpn+bR6v4xNXvEp0yyB5riP
- AzmhNzU6u9tBot1WcxsTEDgWOymMnMrTD2fiQH+6nywdAzlh1m1wWR4B5BcYpYKasvJ6
- j47SBghU/4Df8Qv7Vbp8usSPItZqANtehRgeMyAibYIRhrM/3QwRdZgemStDHT6qTiKf
- /mKYkCwSYql47Ek6mn/qXJPBgLAtkr8SLo+YlxMbJqivHPw9VPwvw9mq4+SsZPn8oV1M
- 305Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=u6q8jG5bHWI7eqWyRnKTw72n3Ayv/dRHFS2O0XAnqOo=;
- b=uNmOs+8oo6MFIHECG8vifXsIRxkfuOYfhTQ21ChzuYtLUZfAx7SmMQpmo/kI9CYanM
- zVdN370CXRlwUt3d6UFoHt3StRyyll4xepMcqNxE+neLvqcu99b8YjaFnCPWAqH9rh6K
- 2H/SnO8vvN04aPMpsj0rZZ/FWD+ipaoRIxtcrmb980F9dketTeeK6EpAuXW7iCJjM918
- IF71jRcZkTc4yhpRm/7r80YfhtbmiwQdAp08o3iHB0eyGVoGcEFUsirfWhv6VnjKsfEG
- t4eN2h8M2csNdX/TEpp6OnerZ1fanwsDQL6tZYv6IihmHFkgTnv34lolm30iEU48/Kkp
- eyKA==
-X-Gm-Message-State: AOAM530EKNnoSGwRm2Z2kZBuF5csNZqS0Yh/yqkFp7fBTKRKuQA3fb7B
- YnHZNGoyFxHw9LZsvZO00pRfyWKlR6osfDmCPsc=
-X-Google-Smtp-Source: ABdhPJyNqQ/5sEmG3UGN1Q4lGKmLr3DpBPdkMU56zipHqc738QOo91eiqH1cTqoDZ92IgRcdtBbS6NUSIwGAkIifBMg=
-X-Received: by 2002:a92:d991:: with SMTP id r17mr14022620iln.227.1604433504515; 
- Tue, 03 Nov 2020 11:58:24 -0800 (PST)
+ (Exim 4.90_1)
+ (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
+ id 1ka2Te-0003LZ-4M
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 15:00:22 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:41372)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
+ id 1ka2TZ-0002T1-Uo
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 15:00:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1604433617; x=1635969617;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=H3g8UXCzVOhSh+fFjb7cBfvP7RgEX58h3+CsdHSPvKg=;
+ b=iJKdzq+1/FI15lAuw9gpvYfgKBL1CTSi5YESV0kEbeO2BOA1v/Kz13II
+ G0MkaVuoj0OmgcLlCqe8orXTxE1tS7o69toRiRo7MaQBo5zJtub4C7Peo
+ etaSLxB6kXuntapofP2UN4TDhKIsw5RmvoY7oO6kvA45H7qNprgTwa9ON
+ EWdhrhaXIMoDOcreUdB+gOe4MfNQ+AfDY5ig08aodLXJ76+PKI2MxXMQ9
+ PXPUWoSa6byhBvaqTQsftzGdq5fHAcEne+hAkYDdTZ9ai0fV+bXZUS2B/
+ NhXDZ46Z4bTsup/eYbzc1eTz9ka+2eFLkS09fhPG7yAKTHvK4Zr2280G0 A==;
+IronPort-SDR: rD7XkZKWXDGZNwa+wgrfD1MWVRIAlZ5Jh1qyFlZ0r9PvyObDv0idnMsmmgdY/HeAJf/OIXojvA
+ UfniWq/UOjcbLOOF7s7M4bh8NtqGhLz71Ds/V1OraRqHWbhse/FzvBt/gEszJfINPJU243xfQO
+ Eyk6nTKluWGxN1314ljPcxPVMvUPCuvzALZR0L2tudmaSJ5bHTdY6vmuDWpTtPlMYQpHPsv6Ie
+ n/ZwaAYCdkqvnGKn5qlWTey/341qVz+nj+H1yz3PZN8DRZcoKNp2BuXt09V+38VE3ak8nGrHVB
+ GMg=
+X-IronPort-AV: E=Sophos;i="5.77,448,1596470400"; d="scan'208";a="151792545"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 04 Nov 2020 04:00:14 +0800
+IronPort-SDR: CmoDcSgKpIoAw6civCykElet466O2Og3hgVOk6Yz7OZyWx3R7F8FFVzjSnaEuuAIeaCPFuJT/T
+ t3HytlqUeGT3Y9XRZkY9krSayadG8IBKI9cwDGWKLdNW56BxF6kP3DDMJfs2NSWy2Ya1GN2cXn
+ YkDlpCEaeh6LTI9evhqzHfyUBvm+1bwRLt88d9r7ap2aMt1mCgXLrqvCt45OwOyD79CUV2SoH/
+ RKSboi4SPI2T2Q7ynEnf7aJLA109ohCzhjLnduEmWgZ2jU+P+2u2WW3PuQiChXjKCyrKn1SfS6
+ YLyrjBt973L1cXRxf4Kt7UUI
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Nov 2020 11:46:23 -0800
+IronPort-SDR: 3bMZnyft4cFtFqsGtvD10MwkDncQNyArU3/G3UP53kQqaX+Jj2g26rHivGT5N0FUYuBZiXQwxo
+ Qwfy/FV2WLYW+5E4JmvDCaIs+6Ezl4QWL8c1WKnC0GSNv/M8HSbSwLMWgnPL9K9eVNSEd1Fy9s
+ Fj6WyvfPdFJOPF2sF0wy26+CajW3f9jy+XpYt+FAotomWlceeSPzrjgf3a5LRy0jhdDKEHD74Y
+ JSSZVGsRfHdpfoXb7aB/+FOwpV5SAkJGAatuisSGEPRF/X39a6suBtpav2phd2XnxhqELD33o2
+ Nqo=
+WDCIronportException: Internal
+Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.60.113])
+ by uls-op-cesaip02.wdc.com with ESMTP; 03 Nov 2020 12:00:15 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	laurent@vivier.eu
+Subject: [PATCH v1 1/1] linux-user/syscall: Fix missing
+ target_to_host_timespec64() check
+Date: Tue,  3 Nov 2020 11:48:44 -0800
+Message-Id: <cad74fae734d2562746b94acd9c34b00081c89bf.1604432881.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-References: <20200330102945.2388294-1-laurent@vivier.eu>
- <20200330102945.2388294-2-laurent@vivier.eu>
- <CAFEAcA97s+jiZxH+ObdFeFgs7-Wub6XjZvJFmL2s4voRrny38Q@mail.gmail.com>
- <a1fd7792-b7fa-6e86-4a24-b53fb7ecac0f@vivier.eu>
- <CAKmqyKN81bBXtJei7ch3CFLqjsnyiVfZOmYuTEL68a=i7JNPOQ@mail.gmail.com>
- <7a26a668-cd6f-8d7c-5c35-fd15ad74a92b@vivier.eu>
-In-Reply-To: <7a26a668-cd6f-8d7c-5c35-fd15ad74a92b@vivier.eu>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 3 Nov 2020 11:46:28 -0800
-Message-ID: <CAKmqyKO7LDqXt8=1mw0g8dLoTN1cDyL_PP-+cD8k0tCn+4xRgw@mail.gmail.com>
-Subject: Re: [PULL 1/1] linux-user: Support futex_time64
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::131;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x131.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.153.144;
+ envelope-from=prvs=569a91e0c=alistair.francis@wdc.com;
+ helo=esa5.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 14:48:57
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,79 +108,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
- Alistair Francis <alistair.francis@wdc.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: alistair23@gmail.com, alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 3, 2020 at 8:00 AM Laurent Vivier <laurent@vivier.eu> wrote:
->
-> Le 03/11/2020 =C3=A0 16:40, Alistair Francis a =C3=A9crit :
-> > On Mon, Nov 2, 2020 at 11:29 PM Laurent Vivier <laurent@vivier.eu> wrot=
-e:
-> >>
-> >> Le 02/11/2020 =C3=A0 19:15, Peter Maydell a =C3=A9crit :
-> >>> On Mon, 30 Mar 2020 at 11:31, Laurent Vivier <laurent@vivier.eu> wrot=
-e:
-> >>>>
-> >>>> From: Alistair Francis <alistair.francis@wdc.com>
-> >>>>
-> >>>> Add support for host and target futex_time64. If futex_time64 exists=
- on
-> >>>> the host we try that first before falling back to the standard futex
-> >>>> syscall.
-> >>>
-> >>> Hi; I dunno why Coverity's only just noticed this, but in
-> >>> CID 1432339 it points out:
-> >>>
-> >>>> +#if defined(TARGET_NR_futex_time64)
-> >>>> +static int do_futex_time64(target_ulong uaddr, int op, int val, tar=
-get_ulong timeout,
-> >>>> +                           target_ulong uaddr2, int val3)
-> >>>> +{
-> >>>> +    struct timespec ts, *pts;
-> >>>> +    int base_op;
-> >>>> +
-> >>>> +    /* ??? We assume FUTEX_* constants are the same on both host
-> >>>> +       and target.  */
-> >>>> +#ifdef FUTEX_CMD_MASK
-> >>>> +    base_op =3D op & FUTEX_CMD_MASK;
-> >>>> +#else
-> >>>> +    base_op =3D op;
-> >>>> +#endif
-> >>>> +    switch (base_op) {
-> >>>> +    case FUTEX_WAIT:
-> >>>> +    case FUTEX_WAIT_BITSET:
-> >>>> +        if (timeout) {
-> >>>> +            pts =3D &ts;
-> >>>> +            target_to_host_timespec64(pts, timeout);
-> >>>
-> >>> ...that here we call target_to_host_timespec64(), which can
-> >>> fail with -TARGET_EFAULT, but (unlike all the other times we call
-> >>> the function) we aren't checking its return value.
-> >>> Is there missing error handling code here ?
-> >>>
-> >>
-> >> I think the code is like that because this is a cut&paste of function
-> >> do_futex() witl "s/timespec/timespec64/".
-> >>
-> >> And yes I think we should check for the return value.
-> >> I'm going to fix that.
-> >
-> > Thanks! Let me know if you want me to do it and I can send a patch inst=
-ead.
-> >
->
-> If you have time, please do.
+Coverity pointed out (CID 1432339) that target_to_host_timespec64() can
+fail with -TARGET_EFAULT but we never check the return value. This patch
+checks the return value and handles the error.
 
-Sending the patch now.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ linux-user/syscall.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Alistair
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 6fef8181e7..3160a9ba06 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7592,7 +7592,9 @@ static int do_futex_time64(target_ulong uaddr, int op, int val, target_ulong tim
+     case FUTEX_WAIT_BITSET:
+         if (timeout) {
+             pts = &ts;
+-            target_to_host_timespec64(pts, timeout);
++            if (target_to_host_timespec64(pts, timeout)) {
++                return -TARGET_EFAULT;
++            }
+         } else {
+             pts = NULL;
+         }
+-- 
+2.28.0
 
->
-> Thanks
-> Laurent
->
 
