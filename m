@@ -2,79 +2,81 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F386AC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 543D0C388F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:39:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 671ED20757
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:38:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BABD8223AC
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:39:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMJ1BldB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 671ED20757
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fQnzIRwR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BABD8223AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZxSR-0000kg-EO
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 09:38:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32902)
+	id 1kZxTN-0001zr-Ke
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 09:39:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxOB-0003l4-Mo
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:34:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36861)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxOY-0004RZ-SN
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:34:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25598)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxO9-0006JR-PU
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:34:23 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxOX-0006Rh-8c
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:34:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604414061;
+ s=mimecast20190719; t=1604414084;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Sdg1XQq2wWnBWKWHjU6hAJQnpSiiinwLqOwmCIMoYHk=;
- b=gMJ1BldBcONnwywErmCJlwpKjGPSpbZtDpXer1iLUa/s646OZkpeMqiV1bx9meyDhOjInE
- OuWzUqPRGOzfCSKLBymUUhb1NpbQff3ueYUppODW2LiYtaZaPJWdc8cOL3h1eSAQVNOtZ/
- /cjaIOQsJKHxWt1yV6bc5qrshTTdKD4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-dfQUqnVUOH-w1n5bhIRxqA-1; Tue, 03 Nov 2020 09:34:18 -0500
-X-MC-Unique: dfQUqnVUOH-w1n5bhIRxqA-1
-Received: by mail-wr1-f72.google.com with SMTP id w6so272045wrk.1
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 06:34:17 -0800 (PST)
+ bh=4t5NY5zyTFxf5JdPvPR+dRhfn/ny8MSoW1vs+UM3VkI=;
+ b=fQnzIRwRyw0v3Ytg9G61HLlIlcx3wL+n/5u8DD5zSPZKJzBcc7WV9L4nmia3KDZDrlaZX3
+ IngAFlpNaL8gv33Vx5OArb1AFeDvkt8fke0uP/bM6yFCppYQ5nWT/g8/PD0SfgM4FeCKB9
+ jrIWs/65U6pGyC5YcsZ2LX5c9JcKuIQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-210--JzF20M8MySZowuuoKzrzA-1; Tue, 03 Nov 2020 09:34:35 -0500
+X-MC-Unique: -JzF20M8MySZowuuoKzrzA-1
+Received: by mail-wm1-f70.google.com with SMTP id l16so2703643wmh.1
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 06:34:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Sdg1XQq2wWnBWKWHjU6hAJQnpSiiinwLqOwmCIMoYHk=;
- b=SHWmKLzhpm7NhAHVVoGVTXWwZ+i++yuf2TDfuAmjYC1odWvYG0XwnzNHejgqRg/1n6
- NTJ8VJZAtacdCeWTYX0ehvRlLjKIXCZT4goay+Oy1o1GvtaK08g11qR/Ex7K1YNkclnX
- bdNl3HZ0civgWC75/IUg85S+A+J5gFAVtdD4xYEHiPmLqxGOpRz49jCOylEfajY+VzuO
- a4ALWGDyEFEJkhgU7Yj0xHwA8cYWUIe8QM6CARZaCzpiE+u1/psIr5UqdlVsH5Ru155o
- DMG4b777XpPOSQNCtADByaVpxY+Y7iMbVo2esagL23hF2JrVcWkY/DpOU8GsrOHW7Kqa
- iosA==
-X-Gm-Message-State: AOAM531gWATwrF/kos2p7sWqBLb2P/MK3hZgeRkbsmAyiPfbrxupr6FR
- Lagl0rM75c/OfkajbxmPFwOSNSpyDQGqD1E5DQBp7NJg8V8FPK8d/eDj3+abAIATLbucuxFhren
- T8wxgEV2UIy0nXpg=
-X-Received: by 2002:a7b:c101:: with SMTP id w1mr48925wmi.170.1604414056797;
- Tue, 03 Nov 2020 06:34:16 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz/2WkFi7ZaRYoe3SsHv9nM8ohAUKmhhnQrFY8zjY8vaa7LxsI/6TTm/6ia1kLf7Vos59J/wg==
-X-Received: by 2002:a7b:c101:: with SMTP id w1mr48913wmi.170.1604414056652;
- Tue, 03 Nov 2020 06:34:16 -0800 (PST)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=4t5NY5zyTFxf5JdPvPR+dRhfn/ny8MSoW1vs+UM3VkI=;
+ b=XDJFyD5vNFkAw09MyD2MWyOO6knihCEsqf30Tnmei7t5IbtZiWSdIjYTQ5SrLSmsaR
+ 8z3X5YM6DWUUEFrucngHhKGg31jGzYXvtpSCUhVvtOsttosVLjHRzp41AbrGSH4RO3tV
+ 12Y5A/bX816imKinEWab6qM0hX8OTIrIZg4pYcPB/WNXPIH8EbLpz42URSnFGRcYBWfC
+ adaOuJqjHpWm9+Fe2lwctEeujM9U5HAkcMyFiUQ7ch4bFbbiXR9OyvNMzEKzSs7mefAo
+ wSHmS8Hfc24dB6oJoeBxjQjbYGfS1UUixb1yKlFRL17vIbyV+66DLcW0ZjzXyDn3YGyr
+ zfdg==
+X-Gm-Message-State: AOAM5333bb5VVvkJePjE/1pAmq4Ok1PtBF56A/YzVywEml6bTVkHeHlB
+ NwRBHuM3JCuREoeQb63GutqqFFBb44KEthuHN41HCFHSIBUUw+0k4+xVXcQ7T4dOmAyMpudV+W9
+ 3TlZsIXRE2aM5/Ls=
+X-Received: by 2002:adf:ea0e:: with SMTP id q14mr26129648wrm.373.1604414072888; 
+ Tue, 03 Nov 2020 06:34:32 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwireeXor2w1ab/4FxGfEn44C89A1cVQHfyhSkn3leFSmAyEHLXzqE6R+joZWF3lxMKZfoVRA==
+X-Received: by 2002:adf:ea0e:: with SMTP id q14mr26129631wrm.373.1604414072695; 
+ Tue, 03 Nov 2020 06:34:32 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id e2sm27690990wrr.85.2020.11.03.06.34.15
+ by smtp.gmail.com with ESMTPSA id j71sm3391633wmj.10.2020.11.03.06.34.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 06:34:16 -0800 (PST)
-Date: Tue, 3 Nov 2020 09:34:14 -0500
+ Tue, 03 Nov 2020 06:34:32 -0800 (PST)
+Date: Tue, 3 Nov 2020 09:34:30 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/38] memory-device: Support big alignment requirements
-Message-ID: <20201103142306.71782-6-mst@redhat.com>
+Subject: [PULL 11/38] hw/virtio/vhost-backend: Fix Coverity CID 1432871
+Message-ID: <20201103142306.71782-12-mst@redhat.com>
 References: <20201103142306.71782-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201103142306.71782-1-mst@redhat.com>
@@ -84,18 +86,19 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,66 +113,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- David Hildenbrand <david@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Let's warn instead of bailing out - the worst thing that can happen is
-that we'll fail hot/coldplug later. The user got warned, and this should
-be rare.
+Fix uninitialized value issues reported by Coverity:
 
-This will be necessary for memory devices with rather big (user-defined)
-alignment requirements - say a virtio-mem device with a 2G block size -
-which will become important, for example, when supporting vfio in the
-future.
+  Field 'msg.reserved' is uninitialized when calling write().
 
-Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20201008083029.9504-5-david@redhat.com>
+While the 'struct vhost_msg' does not have a 'reserved' field,
+we still initialize it to have the two parts of the function
+consistent.
+
+Reported-by: Coverity (CID 1432864: UNINIT)
+Fixes: c471ad0e9bd ("vhost_net: device IOTLB support")
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20201103063541.2463363-1-philmd@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/mem/memory-device.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ hw/virtio/vhost-backend.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 4bc9cf0917..8a736f1a26 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -119,9 +119,10 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+index 88c8ecc9e0..222bbcc62d 100644
+--- a/hw/virtio/vhost-backend.c
++++ b/hw/virtio/vhost-backend.c
+@@ -257,7 +257,7 @@ static int vhost_kernel_send_device_iotlb_msg(struct vhost_dev *dev,
+                                               struct vhost_iotlb_msg *imsg)
+ {
+     if (dev->backend_cap & (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)) {
+-        struct vhost_msg_v2 msg;
++        struct vhost_msg_v2 msg = {};
  
-     /* start of address space indicates the maximum alignment we expect */
-     if (!QEMU_IS_ALIGNED(range_lob(&as), align)) {
--        error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
--                   align);
--        return 0;
-+        warn_report("the alignment (0x%" PRIx64 ") exceeds the expected"
-+                    " maximum alignment, memory will get fragmented and not"
-+                    " all 'maxmem' might be usable for memory devices.",
-+                    align);
-     }
- 
-     memory_device_check_addable(ms, size, &err);
-@@ -151,7 +152,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
-             return 0;
+         msg.type = VHOST_IOTLB_MSG_V2;
+         msg.iotlb = *imsg;
+@@ -267,7 +267,7 @@ static int vhost_kernel_send_device_iotlb_msg(struct vhost_dev *dev,
+             return -EFAULT;
          }
      } else {
--        if (range_init(&new, range_lob(&as), size)) {
-+        if (range_init(&new, QEMU_ALIGN_UP(range_lob(&as), align), size)) {
-             error_setg(errp, "can't add memory device, device too big");
-             return 0;
-         }
+-        struct vhost_msg msg;
++        struct vhost_msg msg = {};
+ 
+         msg.type = VHOST_IOTLB_MSG;
+         msg.iotlb = *imsg;
 -- 
 MST
 
