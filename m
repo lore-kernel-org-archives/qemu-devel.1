@@ -2,89 +2,84 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6D0C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A61CC55178
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:31:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E8D522400
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:23:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F328C223BD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:31:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AnROhhVI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E8D522400
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HQgnYPlI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F328C223BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZsWu-00036u-1j
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 04:23:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60640)
+	id 1kZseg-0006Ps-Nv
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 04:31:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34250)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1kZsVu-0002ax-Qe; Tue, 03 Nov 2020 04:22:02 -0500
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:32836)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1kZsVp-0003FV-Ca; Tue, 03 Nov 2020 04:22:02 -0500
-Received: by mail-ej1-x644.google.com with SMTP id 7so23125641ejm.0;
- Tue, 03 Nov 2020 01:21:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=VZGdbd6PfgqXysXvFRLP0E425CHntjnZXgWfm24fL20=;
- b=AnROhhVIpRbRxbBdNyp2Sa3JNc7EpbAIN5fr/FQFODse2vvrDZOuZt9VRVv7lZqUHK
- EpmiRXUZgep7PNRd5gHbd+QE+wjeofHpGqbRUoLrnL995iKRbKt2I+TwQZnYTSLEfYwv
- J6h8Lx+2L4/dLOgDok0ti/cP3nsnd6zTzZ0KaG4tQJ089L/Wmeo2hnUeJj+J8I2Bpo0a
- Z9k/yUL9MCvQq1Cg7YC2rmz02jEQrDMUMLYumvmLAOlgqE0X6JthfSkZXIeUK3TBxcws
- Z3U2oCK850eYGIZYij56jigmJT/fENZEeVHLYpRjVqbp8XWX2YnwQ5bGh6uXPHZpz4Kq
- i/Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=VZGdbd6PfgqXysXvFRLP0E425CHntjnZXgWfm24fL20=;
- b=oNEX7R6p99CqxsQHSLJ28yA4++jqNeDTOcJpwtsUPwp8diZwKQa+f6I88c3tl6uLar
- 4HpHZRHvugqshdaQEBn82fgpGAqLZAKUfQf9wCvcr6Oj7hGaY375yHHpN3OqqU/7T5DL
- rgqYl3QmC/0PiLsvkw/Q0PC1QJGXBn0BIpEwsTAgZdD2dTKk15hqbx9JlL0ApgUxew5V
- GwaNbN0anTFCIzQTzGsFPMblP+bmIrp65+S5kpxeZDtXbaoU99LwIGfnxOuwz+GBBrJk
- pNN8nsCAuWk1W/2xxJo1ZjQ9yYBEWFH3f9clg9OW/Ieb3pyw5aGUExpcMyTqeGEMcYX1
- xOQg==
-X-Gm-Message-State: AOAM531eUmoFU6B5JlY18sjGRyUygdGXzTB1276HD4tufsrU0inUkRs5
- rUw21P8dYPli3D//pLtrhjbQHdZE5EG7fuYwoCQ=
-X-Google-Smtp-Source: ABdhPJycVQ8+SLiEekkGveLsyb3z0+N2W80JhbqbIsaYvIcAVSl7Ro9cimtgHU5tyZeey0JW6VBphQXMJVetNdoYH0s=
-X-Received: by 2002:a17:907:119e:: with SMTP id
- uz30mr18801418ejb.125.1604395314766; 
- Tue, 03 Nov 2020 01:21:54 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kZsdx-0005h2-Ky
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:30:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49046)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kZsdu-00069O-Qy
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:30:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604395816;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=0od/EUrbF2/BZiB3Uz0bTfFvvGcuSmLwp2lfH8xNDgw=;
+ b=HQgnYPlIjjqADSDKSuMMpYy7vpwllHYr6TOL8LN6r+94mmAy7NAxg7ki69rbrp4kRfUPI5
+ BawjzEevlTfuC8H0C5Ezt33WaBar8xk0O28MqXm4T/Rz9+pWD2VZRPLtyusKlzMSOfVgDq
+ bSdDws2reP379sBiOoA+h91BIQ9fxB4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-38-j8M6aCl0P9-DHafV_N_Opw-1; Tue, 03 Nov 2020 04:30:12 -0500
+X-MC-Unique: j8M6aCl0P9-DHafV_N_Opw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0605D1087D7C;
+ Tue,  3 Nov 2020 09:30:11 +0000 (UTC)
+Received: from merkur.fritz.box (ovpn-113-164.ams2.redhat.com [10.36.113.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3684037DD;
+ Tue,  3 Nov 2020 09:30:08 +0000 (UTC)
+Date: Tue, 3 Nov 2020 10:30:07 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: AlexChen <alex.chen@huawei.com>
+Subject: Re: [PATCH] block/vvfat: Fix bad printf format specifiers
+Message-ID: <20201103093007.GB5509@merkur.fritz.box>
+References: <5F9FF319.7060108@huawei.com>
 MIME-Version: 1.0
-References: <20201103015228.2250547-1-kuhn.chenqun@huawei.com>
- <20201103015228.2250547-2-kuhn.chenqun@huawei.com>
-In-Reply-To: <20201103015228.2250547-2-kuhn.chenqun@huawei.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 3 Nov 2020 01:21:43 -0800
-Message-ID: <CAMo8BfK5wDgvzWFsC0WHyztUCiGR0dGnJgJiAVt5aG7nt8PsDw@mail.gmail.com>
-Subject: Re: [PATCH 1/6] target/xtensa: fix uninitialized variable warning
-To: Chen Qun <kuhn.chenqun@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.374,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <5F9FF319.7060108@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,71 +92,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Euler Robot <euler.robot@huawei.com>, qemu-devel <qemu-devel@nongnu.org>,
- ganqixin@huawei.com, zhang.zhanghailiang@huawei.com
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, zhang.zhanghailiang@huawei.com,
+ QEMU <qemu-devel@nongnu.org>, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 2, 2020 at 5:52 PM Chen Qun <kuhn.chenqun@huawei.com> wrote:
->
-> The compiler cannot determine whether the return values of the xtensa_ope=
-rand_is_register(isa, opc, opnd)
->  and xtensa_operand_is_visible(isa, opc, opnd) functions are the same.
-
-It doesn't have to because 1) they definitely are not the same, but
-2) it doesn't matter.
-
-> So,it assumes that 'rf' is not assigned, but it's used.
-
-The assumption is wrong. rf is used under the 'if (register_file)'
-condition and register_file is initialized to NULL and then set
-to something non-NULL based on the value of rf here:
-
-958             if (xtensa_operand_is_register(isa, opc, opnd)) {
-959                 rf =3D xtensa_operand_regfile(isa, opc, opnd);
-960                 register_file =3D dc->config->regfile[rf];
-
-> The compiler showed warning:
-> target/xtensa/translate.c: In function =E2=80=98disas_xtensa_insn=E2=80=
-=99:
-> target/xtensa/translate.c:985:43: warning: =E2=80=98rf=E2=80=99 may be us=
-ed uninitialized in this function [-Wmaybe-uninitialized]
->   985 |                     arg[vopnd].num_bits =3D xtensa_regfile_num_bi=
-ts(isa, rf);
->       |                                           ^~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~
->
-> Add a default value for 'rf' to prevented the warning.
-
-I don't see it doing default build with gcc 8.3. But then I don't see
--Wmaybe-uninitialized in the compiler command line either.
-
+Am 02.11.2020 um 12:52 hat AlexChen geschrieben:
+> We should use printf format specifier "%u" instead of "%d" for
+> argument of type "unsigned int".
+> In addition, fix two error format problems found by checkpatch.pl:
+> ERROR: space required after that ',' (ctx:VxV)
+> +        fprintf(stderr,"%s attributes=0x%02x begin=%u size=%d\n",
+>                        ^
+> ERROR: line over 90 characters
+> +        fprintf(stderr, "%d, %s (%u, %d)\n", i, commit->path ? commit->path : "(null)", commit->param.rename.cluster, commit->action);
+> 
 > Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Signed-off-by: Alex Chen <alex.chen@huawei.com>
 > ---
-> Cc: Max Filippov <jcmvbkbc@gmail.com>
-> ---
->  target/xtensa/translate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-> index 944a157747..eea851bbe7 100644
-> --- a/target/xtensa/translate.c
-> +++ b/target/xtensa/translate.c
-> @@ -953,7 +953,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, Di=
-sasContext *dc)
->
->          for (opnd =3D vopnd =3D 0; opnd < opnds; ++opnd) {
->              void **register_file =3D NULL;
-> -            xtensa_regfile rf;
-> +            xtensa_regfile rf =3D -1;
+>  block/vvfat.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/vvfat.c b/block/vvfat.c
+> index 5abb90e7c7..cc2ec9af21 100644
+> --- a/block/vvfat.c
+> +++ b/block/vvfat.c
+> @@ -1437,7 +1437,7 @@ static void print_direntry(const direntry_t* direntry)
+>          for(i=0;i<11;i++)
+>              ADD_CHAR(direntry->name[i]);
+>          buffer[j] = 0;
+> -        fprintf(stderr,"%s attributes=0x%02x begin=%d size=%d\n",
+> +        fprintf(stderr, "%s attributes=0x%02x begin=%u size=%d\n",
+>                  buffer,
+>                  direntry->attributes,
+>                  begin_of_direntry(direntry),le32_to_cpu(direntry->size));
 
-Please use XTENSA_UNDEFINED instead if you still think this
-is worth changing.
+direntry->size is unsigned, too, so if we want to fix this, I think we
+should fix both specifiers.
 
---=20
-Thanks.
--- Max
+The rest of the patch looks good.
+
+Kevin
+
 
