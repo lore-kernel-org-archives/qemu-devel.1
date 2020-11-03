@@ -2,65 +2,85 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F59AC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:33:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 153E9C4742C
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:36:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2C1B223BF
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:33:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2C1B223BF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6399E223BD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:36:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JV4ld3FC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6399E223BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZsgx-0007U9-Up
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 04:33:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34812)
+	id 1kZsjb-0000ou-DC
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 04:36:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kZsfw-0006yS-66
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:32:24 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:2125)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kZsfs-0006xH-Vn
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:32:23 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CQPgq1s1fz722w;
- Tue,  3 Nov 2020 17:32:07 +0800 (CST)
-Received: from [10.174.187.138] (10.174.187.138) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 3 Nov 2020 17:32:01 +0800
-Message-ID: <5FA12391.8090400@huawei.com>
-Date: Tue, 3 Nov 2020 17:32:01 +0800
-From: AlexChen <alex.chen@huawei.com>
-User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
- rv:17.0) Gecko/20130509 Thunderbird/17.0.6
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kZshr-0008DC-6t
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:34:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29415)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kZshp-0007Xk-A0
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:34:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604396060;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=pRv2+8OcrmO2oFwJgIlOcpbZBtq115/VHjU+TWrgje8=;
+ b=JV4ld3FCOYLl+FFGG65YkXDgFTVKTE3/uUzniOx9rNEorVuxDAyZgj1f+w48hlXKPVoj/o
+ EchdkG9cDlRBmrlhyq7Pa2cYf0JPzYl/LpWXGfw7Ykj8kozmF1tefooowTo4cNZu77T1gq
+ Uysngy3bGck1DHvinOTHQEBp6Dc/DZY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-krz3cIwBPSeUzNRcM-6AWA-1; Tue, 03 Nov 2020 04:34:18 -0500
+X-MC-Unique: krz3cIwBPSeUzNRcM-6AWA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D634064169;
+ Tue,  3 Nov 2020 09:34:17 +0000 (UTC)
+Received: from merkur.fritz.box (ovpn-113-164.ams2.redhat.com [10.36.113.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DA2585B4AE;
+ Tue,  3 Nov 2020 09:34:16 +0000 (UTC)
+Date: Tue, 3 Nov 2020 10:34:14 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Tuguoyi <tu.guoyi@h3c.com>
+Subject: Re: [PATCH] qemu-img: Make sure @sn_opts can be deleted in all error
+ cases
+Message-ID: <20201103093414.GC5509@merkur.fritz.box>
+References: <6ff1c5d372944494be3932274f75485d@h3c.com>
 MIME-Version: 1.0
-To: <chenhc@lemote.com>, <jiaxun.yang@flygoat.com>
-Subject: [PATCH] hw/intc: Fix incorrect calculation of core in liointc_read()
- and liointc_write()
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.138]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=alex.chen@huawei.com;
- helo=szxga07-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 04:32:14
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <6ff1c5d372944494be3932274f75485d@h3c.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,46 +93,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhengchuan@huawei.com, QEMU <qemu-devel@nongnu.org>,
- zhang.zhanghailiang@huawei.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to the loongson spec
-(http://www.loongson.cn/uploadfile/cpu/3B1500/Loongson_3B1500_cpu_user_1.pdf)
-and the macro definition(#define R_PERCORE_ISR(x) (0x40 + 0x8 * x)), we know
-that the ISR size of per CORE is 8, so here we need to divide
-(addr - R_PERCORE_ISR(0)) by 8, not 4.
+Am 02.11.2020 um 10:04 hat Tuguoyi geschrieben:
+> @sn_opts is initialized at the beginning, so it should be deleted
+> after jumping to the lable 'fail_getopt'
+> 
+> Signed-off-by: Guoyi Tu <tu.guoyi@h3c.com>
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Alex Chen <alex.chen@huawei.com>
----
- hw/intc/loongson_liointc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks, applied to the block branch.
 
-diff --git a/hw/intc/loongson_liointc.c b/hw/intc/loongson_liointc.c
-index 30fb375b72..fbbfb57ee9 100644
---- a/hw/intc/loongson_liointc.c
-+++ b/hw/intc/loongson_liointc.c
-@@ -130,7 +130,7 @@ liointc_read(void *opaque, hwaddr addr, unsigned int size)
+Kevin
 
-     if (addr >= R_PERCORE_ISR(0) &&
-         addr < R_PERCORE_ISR(NUM_CORES)) {
--        int core = (addr - R_PERCORE_ISR(0)) / 4;
-+        int core = (addr - R_PERCORE_ISR(0)) / 8;
-         r = p->per_core_isr[core];
-         goto out;
-     }
-@@ -173,7 +173,7 @@ liointc_write(void *opaque, hwaddr addr,
-
-     if (addr >= R_PERCORE_ISR(0) &&
-         addr < R_PERCORE_ISR(NUM_CORES)) {
--        int core = (addr - R_PERCORE_ISR(0)) / 4;
-+        int core = (addr - R_PERCORE_ISR(0)) / 8;
-         p->per_core_isr[core] = value;
-         goto out;
-     }
--- 
-2.19.1
 
