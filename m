@@ -2,81 +2,68 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB632C00A89
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F7AC00A89
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:11:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9530F22243
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:08:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9530F22243
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 490DC22243
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 02:11:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 490DC22243
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZlka-0001u6-B7
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 21:08:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35854)
+	id 1kZlmp-0003kd-0o
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 21:11:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kZlhm-0000r4-8u
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 21:05:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34536)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kZlhb-0003I0-Vc
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 21:05:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kZlhW-0004ID-BE
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 02:05:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 482982E8071
- for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 02:05:34 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kZlXh-0003Mv-3H; Mon, 02 Nov 2020 20:55:25 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2497)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kZlVW-0001qK-Vk; Mon, 02 Nov 2020 20:55:24 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CQCV52BHyzhbQl;
+ Tue,  3 Nov 2020 09:53:01 +0800 (CST)
+Received: from huawei.com (10.175.104.175) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Tue, 3 Nov 2020
+ 09:52:52 +0800
+From: Chen Qun <kuhn.chenqun@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
+Subject: [PATCH 6/6] migration: fix uninitialized variable warning in
+ migrate_send_rp_req_pages()
+Date: Tue, 3 Nov 2020 09:52:28 +0800
+Message-ID: <20201103015228.2250547-7-kuhn.chenqun@huawei.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20201103015228.2250547-1-kuhn.chenqun@huawei.com>
+References: <20201103015228.2250547-1-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Nov 2020 01:58:38 -0000
-From: Gaoning Pan <1901981@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
- assignee=pgn@zju.edu.cn; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: hades0506
-X-Launchpad-Bug-Reporter: Gaoning Pan (hades0506)
-X-Launchpad-Bug-Modifier: Gaoning Pan (hades0506)
-References: <160395133608.8291.17236692663498581160.malonedeb@soybean.canonical.com>
-Message-Id: <160436871882.15308.16146638296185112505.launchpad@wampee.canonical.com>
-Subject: [Bug 1901981] Re: assert issue locates in hw/usb/dev-storage.c:248:
- usb_msd_send_status
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="96ff31b88b65a0d0ea73b89333fe7c4a2669d8fb"; Instance="production"
-X-Launchpad-Hash: 01ff174060e60c9f5aa07b53ccb87c66783440d4
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 21:05:34
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.175.104.175]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=kuhn.chenqun@huawei.com; helo=szxga05-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 20:52:53
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,52 +72,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1901981 <1901981@bugs.launchpad.net>
+Cc: zhang.zhanghailiang@huawei.com, Juan
+ Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ ganqixin@huawei.com, Euler Robot <euler.robot@huawei.com>,
+ Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Gaoning Pan (hades0506)
+After the WITH_QEMU_LOCK_GUARD macro is added, the compiler cannot identify
+ that the statements in the macro must be executed. As a result, some variables
+ assignment statements in the macro may be considered as unexecuted by the compiler.
 
--- =
+The compiler showed warning:
+migration/migration.c: In function ‘migrate_send_rp_req_pages’:
+migration/migration.c:384:8: warning: ‘received’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+ 384 |     if (received) {
+     |        ^
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1901981
+Add a default value for 'received' to prevented the warning.
 
-Title:
-  assert issue locates in hw/usb/dev-storage.c:248: usb_msd_send_status
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+---
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+---
+ migration/migration.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Status in QEMU:
-  New
+diff --git a/migration/migration.c b/migration/migration.c
+index 9bb4fee5ac..de90486a61 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -361,7 +361,7 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis,
+                               RAMBlock *rb, ram_addr_t start, uint64_t haddr)
+ {
+     void *aligned = (void *)(uintptr_t)(haddr & (-qemu_ram_pagesize(rb)));
+-    bool received;
++    bool received = false;
+ 
+     WITH_QEMU_LOCK_GUARD(&mis->page_request_mutex) {
+         received = ramblock_recv_bitmap_test_byte_offset(rb, start);
+-- 
+2.27.0
 
-Bug description:
-  Hello,
-
-  I found an assertion failure through hw/usb/dev-storage.c.
-
-  This was found in latest version 5.1.0.
-
-  --------
-
-  qemu-system-x86_64: hw/usb/dev-storage.c:248: usb_msd_send_status: Assert=
-ion `s->csw.sig =3D=3D cpu_to_le32(0x53425355)' failed.
-  [1]    29544 abort      sudo  -enable-kvm -boot c -m 2G -drive format=3Dq=
-cow2,file=3D./ubuntu.img -nic
-
-  To reproduce the assertion failure, please run the QEMU with following
-  command line.
-
-  =
-
-  $ qemu-system-x86_64 -enable-kvm -boot c -m 2G -drive format=3Dqcow2,file=
-=3D./ubuntu.img -nic user,model=3Drtl8139,hostfwd=3Dtcp:0.0.0.0:5555-:22 -d=
-evice piix4-usb-uhci,id=3Duhci -device usb-storage,drive=3Dmydrive -drive i=
-d=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone
-
-  The poc is attached.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1901981/+subscriptions
 
