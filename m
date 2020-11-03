@@ -2,88 +2,101 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9D5C388F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:04:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0137C55178
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:05:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16581223EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:04:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FCAA223AB
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:05:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="csOmvRoT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16581223EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gdDejzMw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FCAA223AB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZynC-0007er-2I
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:04:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51908)
+	id 1kZyoF-0000As-5Z
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:05:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZyKK-0002SF-63
+ (Exim 4.90_1)
+ (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
+ id 1kZyKN-0002UH-SE
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:34:33 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:15001)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
+ id 1kZyKD-0001FT-GW
  for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:34:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59838)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZyKB-0001Yy-E0
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:34:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604417655;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=tDrfVqgWg6tODD6yKIm0jvFc9id1uR+tuxL7cz2+wM8=;
- b=csOmvRoTPxdhBHtBedr1QenTBpapfEGBESnE1PGa3sTlqHiSZIwG5/CM1ReeSRKgSf+s08
- O27c4YOZHj9CaE1phbAW75hIdCpY2k3ojh8xzgwlRod8//FhGQS1Afm2L0bmD+BmbDAOto
- xoAUqomGujYLKLwu981Hqz0M7P8GKGk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-5nGOXHFxPzemNab9hs_yHQ-1; Tue, 03 Nov 2020 10:34:14 -0500
-X-MC-Unique: 5nGOXHFxPzemNab9hs_yHQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC8A810866A0;
- Tue,  3 Nov 2020 15:34:12 +0000 (UTC)
-Received: from redhat.com (ovpn-115-87.ams2.redhat.com [10.36.115.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 86AD11C4;
- Tue,  3 Nov 2020 15:33:59 +0000 (UTC)
-Date: Tue, 3 Nov 2020 15:33:56 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: VFIO Migration
-Message-ID: <20201103153356.GO205187@redhat.com>
-References: <20201102111153.GC42093@stefanha-x1.localdomain>
- <ly5z6m79c0.fsf@redhat.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1604417662; x=1635953662;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=gfyFOauU6Gej1Dn0hI4aczlzFeYXPNOkCE53IqC40bY=;
+ b=gdDejzMwv3YPaFgsTgYX1WaCX/J8xoFvgaSIroRCs7qQGXx55GJGJ9SW
+ iKiR4wCiViII5KjWzYuAKcWDOcoo2h+Yhf9aVF9phj20GpgBmb+ERDM8D
+ woDBc3IU661hLYEXG1sOoUxApeAYh0RIcV4xUGLUERqLyxNctxbeq7GGE
+ oCIvL2dxugoogzoC2Y/FmBjluPQS7T7HilKy+yPUl8KKc8wUD14xl1avf
+ u6ItYNU/WF9rGFGvf/7TNieVc57I5Obfi7yjqQ/rcviXiUvZj8FsJitqB
+ D0kpHc1wYI/vKKxGHnwPDdjehfkMgegp0SrkG2mPGfVrln2lXosegbN85 Q==;
+IronPort-SDR: UXa88enkiHN9SWtIIH8g+bUc7t6Km8EmeA76DFpz0yXFypHrCEo4iknLEwSUPhFWDp9OIXruZW
+ /Bbg/0Jni/7+nTIVbi1bpNpamYSVRtr8LsIPQqBxY9m+JwUpHb83rotK9aee2Yjif/YXwFqXGp
+ XThpx985tSl4GIz4WSFbeBy1gwl5t5QLYHB+alS4cLMJ9jieNH8ViXse+HSId7NhqtForIovTW
+ cqkevWEYThRrK5B0V4w744udIKvHfj/otI8roWvQcEMK6ghzV7vYXKVo1wug7eKlewc0ga/WYE
+ Orw=
+X-IronPort-AV: E=Sophos;i="5.77,448,1596470400"; d="scan'208";a="152867488"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 03 Nov 2020 23:33:28 +0800
+IronPort-SDR: 75I30xPdcWm6L+50XsVplSRYW86pD+PduwmJ4pbHPCN/FV+/mj0fN7CD8T8uATFRURJjhBWwyO
+ 2X7+iG7rKcqQZFeD+HLGi9soAkPJ9hOhhu7oq3ficq/1+G5kNPzOq3OQhs/JfZGrux5N3ikXr5
+ Dj8wqCIsmSTS67mXmkrVTiee4zX1oA8EoTufdKQ9+y8Ibf0n3BfLS+ObpVtA8ZYLjS0ATKvidJ
+ G8ap6Ylug84sHCuWfnkW5/Qdpgf2Q3Cu5x/tW6rrAJai9YId8VG6G91UxMQZjbLodeoEkxyIJ2
+ S26CcqjvVUJfWYBGKtdCxRqI
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Nov 2020 07:19:37 -0800
+IronPort-SDR: mnZtCmTsqEFzU18mCjIXP9pXVXu33b4ClzdI/2A9WDlD8AqjD+IXsNMm1wptEIKnKJw6hPwAGB
+ C6jl3VkJJXV7+yMoB/tXVN5RMA47YIf3gwAmN9ffvp//QA86kz/u9FJv2RPxdkddjMnXtN2JTr
+ lvizXMaitmanU3aSeKvxWbVmHV0bz9nDNmOqyRuHDPoeExBt5i7YTiIBQKL426fIGiVwhpCkh2
+ O65Z6E/Zm7VN2Q5c7holByzfrq7zVzy1+e0nWJCWA99zbrvJjklbYJZV8eOT5DIqOgPcYJmaNb
+ oag=
+WDCIronportException: Internal
+Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.60.113])
+ by uls-op-cesaip01.wdc.com with ESMTP; 03 Nov 2020 07:33:29 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PULL v2 18/19] hw/riscv: microchip_pfsoc: Hook the I2C1 controller
+Date: Tue,  3 Nov 2020 07:21:49 -0800
+Message-Id: <20201103152150.2677566-19-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201103152150.2677566-1-alistair.francis@wdc.com>
+References: <20201103152150.2677566-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <ly5z6m79c0.fsf@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.154.45;
+ envelope-from=prvs=569a91e0c=alistair.francis@wdc.com;
+ helo=esa6.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 10:33:23
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,131 +109,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
- quintela@redhat.com, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>,
- Kirti Wankhede <kwankhede@nvidia.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Felipe Franciosi <felipe@nutanix.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 03, 2020 at 04:23:43PM +0100, Christophe de Dinechin wrote:
-> 
-> On 2020-11-02 at 12:11 CET, Stefan Hajnoczi wrote...
-> > There is discussion about VFIO migration in the "Re: Out-of-Process
-> > Device Emulation session at KVM Forum 2020" thread. The current status
-> > is that Kirti proposed a VFIO device region type for saving and loading
-> > device state. There is currently no guidance on migrating between
-> > different device versions or device implementations from different
-> > vendors. This is known to be non-trivial and raised discussion about
-> > whether it should really be handled by VFIO or centralized in QEMU.
-> >
-> > Below is a document that describes how to ensure migration compatibility
-> > in VFIO. It does not require changes to the VFIO migration interface. It
-> > can be used for both VFIO/mdev kernel devices and vfio-user devices.
-> >
-> > The idea is that the device state blob is opaque to the VMM but the same
-> > level of migration compatibility that exists today is still available.
-> >
-> > I hope this will help us reach consensus and let us discuss specifics.
-> >
-> > If you followed the previous discussion, I changed the approach from
-> > sending a magic constant in the device state blob to identifying device
-> > models by URIs. Therefore the device state structure does not need to be
-> > defined here - the critical information for ensuring device migration
-> > compatibility is the device model and configuration defined below.
-> >
-> > Stefan
-> > ---
-> > VFIO Migration
-> > ==============
-> > This document describes how to save and load VFIO device states. Saving a
-> > device state produces a snapshot of a VFIO device's state that can be loaded
-> > again at a later point in time to resume the device from the snapshot.
-> >
-> > The data representation of the device state is outside the scope of this
-> > document.
-> >
-> > Overview
-> > --------
-> > The purpose of device states is to save the device at a point in time and then
-> > restore the device back to the saved state later. This is more challenging than
-> > it first appears.
-> >
-> > The process of saving a device state and loading it later is called
-> > *migration*. The state may be loaded by the same device that saved it or by a
-> > new instance of the device, possibly running on a different computer.
-> >
-> > It must be possible to migrate to a newer implementation of the device
-> > as well as to an older implementation of the device. This allows users
-> > to upgrade and roll back their systems.
-> >
-> > Migration can fail if loading the device state is not possible. It should fail
-> > early with a clear error message. It must not appear to complete but leave the
-> > device inoperable due to a migration problem.
-> >
-> > The rest of this document describes how these requirements can be met.
-> >
-> > Device Models
-> > -------------
-> > Devices have a *hardware interface* consisting of hardware registers,
-> > interrupts, and so on.
-> >
-> > The hardware interface together with the device state representation is called
-> > a *device model*. Device models can be assigned URIs such as
-> > https://qemu.org/devices/e1000e to uniquely identify them.
-> 
-> Like others, I think we should either
-> 
-> a) Give a relatively strong requirement regarding what is at the URL in
-> question, e.g. docs, maybe even a machine-readable schema describing
-> configuration and state for the device. Leaving the option "there can be
-> nothing here" is IMO asking for trouble.
-> 
-> b) simply call that a unique ID, and then either drop the https: entirely or
-> use something else, like pci:// or, to be more specific, vfio://
-> 
-> I'd favor option (b) for a different practical reason. URLs are subject to
-> redirection and other mishaps. For example, using https:// begs the question
-> whether
-> https://qemu.org/devices/e1000e and
-> https://www.qemu.org/devices/e1000e
-> should be treated as the same device. I believe that your intent is that
-> they shouldn't, but if the qemu web server redirects to www, and someone
-> wants to copy-paste their web browser's URL bar to the command line, they'd
-> get the wrong one.
+From: Bin Meng <bin.meng@windriver.com>
 
-That's not a real world problem IMHO, because neither of these URLs
-ever need resolve to a real webpage, and thus not need to be cut +
-paste from a browser.
+The latest SD card image [1] released by Microchip ships a Linux
+kernel with built-in PolarFire SoC I2C driver support. The device
+tree file includes the description for the I2C1 node hence kernel
+tries to probe the I2C1 device during boot.
 
-They are simply expressing a resource identifier using a URI as a
-convenient format. This is the same as an XML namespace using a URI,
-and rarely, if ever, resolving to any actual web page.
+It is enough to create an unimplemented device for I2C1 to allow
+the kernel to continue booting to the shell.
 
-This is a good thing, because if you say there needs to be a real page
-there, then it creates a pile of corporate beaurocracy for contributors.
-I can freely create a URI under https://redhat.com for purposes of being
-a identifier, but I cannot get any content published there without jumping
-through many tedious corporate approvals and stand a good chance of being
-rejected.
+[1] ftp://ftpsoc.microsemi.com/outgoing/core-image-minimal-dev-icicle-kit-es-sd-20201009141623.rootfs.wic.gz
 
-If we're truely treating the URIs as an opaque string, we don't especially
-need to define any rules other than to say it should be under a domain that
-you have authority over either directly, or via membership of a project
-that delegates. We can suggest "https" since seeing "http" is a red flag
-for many people these days.
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 1603863010-15807-11-git-send-email-bmeng.cn@gmail.com
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ include/hw/riscv/microchip_pfsoc.h | 1 +
+ hw/riscv/microchip_pfsoc.c         | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
-Regards,
-Daniel
+diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
+index db77e9c84a..51d44637db 100644
+--- a/include/hw/riscv/microchip_pfsoc.h
++++ b/include/hw/riscv/microchip_pfsoc.h
+@@ -97,6 +97,7 @@ enum {
+     MICROCHIP_PFSOC_MMUART2,
+     MICROCHIP_PFSOC_MMUART3,
+     MICROCHIP_PFSOC_MMUART4,
++    MICROCHIP_PFSOC_I2C1,
+     MICROCHIP_PFSOC_GEM0,
+     MICROCHIP_PFSOC_GEM1,
+     MICROCHIP_PFSOC_GPIO0,
+diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
+index 96cb8b983a..37ac46a1af 100644
+--- a/hw/riscv/microchip_pfsoc.c
++++ b/hw/riscv/microchip_pfsoc.c
+@@ -113,6 +113,7 @@ static const struct MemmapEntry {
+     [MICROCHIP_PFSOC_MMUART2] =         { 0x20102000,     0x1000 },
+     [MICROCHIP_PFSOC_MMUART3] =         { 0x20104000,     0x1000 },
+     [MICROCHIP_PFSOC_MMUART4] =         { 0x20106000,     0x1000 },
++    [MICROCHIP_PFSOC_I2C1] =            { 0x2010b000,     0x1000 },
+     [MICROCHIP_PFSOC_GEM0] =            { 0x20110000,     0x2000 },
+     [MICROCHIP_PFSOC_GEM1] =            { 0x20112000,     0x2000 },
+     [MICROCHIP_PFSOC_GPIO0] =           { 0x20120000,     0x1000 },
+@@ -343,6 +344,11 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
+         qdev_get_gpio_in(DEVICE(s->plic), MICROCHIP_PFSOC_MMUART4_IRQ),
+         serial_hd(4));
+ 
++    /* I2C1 */
++    create_unimplemented_device("microchip.pfsoc.i2c1",
++        memmap[MICROCHIP_PFSOC_I2C1].base,
++        memmap[MICROCHIP_PFSOC_I2C1].size);
++
+     /* GEMs */
+ 
+     nd = &nd_table[0];
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.28.0
 
 
