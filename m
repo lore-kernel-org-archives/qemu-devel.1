@@ -2,77 +2,80 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B82BC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 21:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC7DC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 21:11:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE861207BC
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 21:08:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C14520757
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 21:11:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xRSvniba"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE861207BC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XUx3YZrE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C14520757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka3Y2-0005rF-L8
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 16:08:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52218)
+	id 1ka3aU-00007L-Vn
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 16:11:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1ka3X3-00052K-BF
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 16:07:58 -0500
-Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:35961)
+ id 1ka3ZG-0007IP-VL
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 16:10:16 -0500
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:42234)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1ka3X0-0003gc-W5
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 16:07:56 -0500
-Received: by mail-ed1-x533.google.com with SMTP id o20so1890596eds.3
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 13:07:54 -0800 (PST)
+ id 1ka3ZE-0003wg-Mw
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 16:10:14 -0500
+Received: by mail-ed1-x543.google.com with SMTP id a71so14634611edf.9
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 13:10:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=41gyJN7miB9+IYas/AMVopXUI+lg6opWFtS/Hgn+5Mk=;
- b=xRSvnibasYe67oIbvVQu/cIC9A1nDbjB1aTXsl2C3cn/p1R9BZqqNcl38bJ/Mf7ADR
- c9m0lDXEGy4LqDHgC3wAZB5gABDYRD6KjKm3jKzMNTzhzzXjIDpcAxesgAqH6jWwP5ua
- 71GfFEWmcn3Q8WyjfZFRwbslLKev4j28EMkxm5p3iQS44X010nvEk1y6YH/c0UcTZc7K
- z3kQhVLMMYBtAtX4Ze2ysQ+F8ep/ehfIyLkh+l73B3NzRCAIB3UTjyYqp6dyzZ9jpV99
- 8nBoFuJm2PckVktqYRvXspaqy7DSkH9FWaaijv/DJzHq9ARqSAIcMRfEC0TccELfbOxS
- GY6A==
+ :cc:content-transfer-encoding;
+ bh=D8J5YnwMiKtuBHs93Jo3559UDGw6HB+5E6SQAuE1UCs=;
+ b=XUx3YZrE9RFHLic3rb8JFbbMbyLfVbM5EelWWaplc4W4dEdYKcf2bYw2kRk7SS3Nbm
+ hPVdAdcnsSjeC0kH/6gzY3OY0+JFBIgbQBIsPgGwPnWZSpjnEz7lb4OK4jCXa7TU5iry
+ G4HyX5czi7TnTwgqweUMuA3Sov/0Ed0kQhpM5Ga/ECxpYnmOe4ZWc0HQncSM3j9ONVEu
+ v6tGpRZh2rJGYUlDYcxafup1wDRq8xTod5gJDL2CD4AtwqpD6vUiGfGQMOxDtjJtlzU6
+ wIbQum0hrbThgHUkyV3SAExaCVkC3Cdep5BYzXWPpvSMr2c4VUNoWsFO0KpBz+0ZAv9v
+ fk/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=41gyJN7miB9+IYas/AMVopXUI+lg6opWFtS/Hgn+5Mk=;
- b=pJr6p0JA9k2kV1NSHl511B9iYIl6zJ6xgtl7JOtqO1bcaRWFIWe+83C0FWlAgSUky8
- saNzAGxOfeuuRr7blI/T6/jWNqQ3AwC1DTm9GyYNg5Kl2CZV8DgF18da4ZO0d41sFIS3
- f2UWqDaTyd6/BFrlLR3TAw1qz70oE340vx7CxKkEt4bd9KCz0zlQAuhXeIrYObQyjWP4
- Z7oxYjZrjrvPsJ7Lyv5qjV2w9fAPCxLCkF04R3TJLksGr2x/XbCkl3cMCRWeHYRRPVLa
- h3laT/pLedgjKwZTM+ZCz3wyswcai8TvTStYGA+eLOkrJfkrhamuQ6MdDPBWd/XhkHc5
- kCYw==
-X-Gm-Message-State: AOAM530dHGCWPc1SCAhmnHgA2JSLBGh7PMaGxpg9w2IlHj/Ly92LqCL5
- lob70OmbBr2VVTEtNNf/MGiFPYHyWTK22Qpcb2eYYA==
-X-Google-Smtp-Source: ABdhPJzzwE6tro4MYuh6d26dgSsVTdIYx/9b5NZ5bKjYwsjZbR9ebPF+lrVkKlIQgwlTY+RIjBV+SPASyRdBWQVIfZ4=
-X-Received: by 2002:a05:6402:b35:: with SMTP id
- bo21mr24509550edb.52.1604437673034; 
- Tue, 03 Nov 2020 13:07:53 -0800 (PST)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=D8J5YnwMiKtuBHs93Jo3559UDGw6HB+5E6SQAuE1UCs=;
+ b=ZMa7fEwUT2FaF1xYIY4uXYE8zrdnm4zeGtTwQsJOSVMuBNISjFad3XSDcOWkoKy2gP
+ sYIliqzYET2gc4Beih4Jmlo80DGZpBtXBD+7oiIqrOS9b7PsLT2QBS8rXuMMLUSX/cxR
+ fd7RIUZVw7AgELK+a3Q99j+Vj55HVbk2N6sfgNhQ5g4nPsv/Y9ivVc4g2YH5CRYEhZu5
+ U7IlF6rYfyaZgzJmeDgsPl+vbl2H7eq2ZN3r0CILvhq06IKsJQQ8zqNmkHGWa1Fl4MEP
+ UN5+FYMTpsD81S2WqOpkQTG7cM6YC7nRnDXnYX5oqY5bWUoCdaBnqLkWchAAdC/LYb15
+ 0Svw==
+X-Gm-Message-State: AOAM530nBizb99QYPL3C7PnXDS8RkHpf2HeaeK3JVMKTFQd6IIh8DqQv
+ 1YcTAME0t9gcyhWv/gPf4Tj24zra8sESA+Ih/kkcVQ==
+X-Google-Smtp-Source: ABdhPJxWaYQHeQMgU3ST9atP8QzUa49IdLaidg+zToR7O6YxD6wtyXjMHEu7B8O6w3tGB85UhRBXML2kqOat7S8MqXQ=
+X-Received: by 2002:aa7:c9cb:: with SMTP id i11mr13774570edt.100.1604437809093; 
+ Tue, 03 Nov 2020 13:10:09 -0800 (PST)
 MIME-Version: 1.0
-References: <20201103152150.2677566-1-alistair.francis@wdc.com>
-In-Reply-To: <20201103152150.2677566-1-alistair.francis@wdc.com>
+References: <2172054.ElGaqSPkdT@basile.remlab.net>
+ <20201102105802.39332-9-remi.denis.courmont@huawei.com>
+ <d26e76be-9be6-e658-48c7-0f5246508517@linaro.org>
+In-Reply-To: <d26e76be-9be6-e658-48c7-0f5246508517@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Nov 2020 21:07:41 +0000
-Message-ID: <CAFEAcA98Ve8i7Up2M=iRo+_KGfUGan9xKU_TKb2882GuVZS6fA@mail.gmail.com>
-Subject: Re: [PULL v2 00/19] riscv-to-apply queue
-To: Alistair Francis <alistair.francis@wdc.com>
+Date: Tue, 3 Nov 2020 21:09:57 +0000
+Message-ID: <CAFEAcA-jnWsR_CM1t6DNu09f84m7HTSpfnOiV0DEBFDdP-DQzg@mail.gmail.com>
+Subject: Re: [PATCH 09/14] target/arm: add ARMv8.4-SEL2 system registers
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::533;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x533.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -94,37 +97,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair23@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ remi.denis.courmont@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 3 Nov 2020 at 15:33, Alistair Francis <alistair.francis@wdc.com> wrote:
+On Tue, 3 Nov 2020 at 19:50, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> The following changes since commit 83851c7c60c90e9fb6a23ff48076387a77bc33cd:
+> On 11/2/20 2:57 AM, remi.denis.courmont@huawei.com wrote:
+> > From: R=C3=A9mi Denis-Courmont <remi.denis.courmont@huawei.com>
+> >
+> > Signed-off-by: R=C3=A9mi Denis-Courmont <remi.denis.courmont@huawei.com=
 >
->   Merge remote-tracking branch 'remotes/mdroth/tags/qga-pull-2020-10-27-v3-tag' into staging (2020-11-03 12:47:58 +0000)
+> > ---
+> >  target/arm/cpu.h    |  2 ++
+> >  target/arm/helper.c | 24 ++++++++++++++++++++++++
+> >  2 files changed, 26 insertions(+)
 >
-> are available in the Git repository at:
->
->   git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20201103
->
-> for you to fetch changes up to 422819776101520cb56658ee5facf926526cf870:
->
->   target/riscv/csr.c : add space before the open parenthesis '(' (2020-11-03 07:17:23 -0800)
->
-> ----------------------------------------------------------------
-> This series adds support for migration to RISC-V QEMU and expands the
-> Microchip PFSoC to allow unmodified HSS and Linux boots.
->
-> ----------------------------------------------------------------
+> These need a new VMStateDescription section in machine.c.
 
+Do they? I think they're handled by the existing generic
+migration-of-sysregs code...
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
+thanks
 -- PMM
 
