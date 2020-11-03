@@ -2,90 +2,65 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8122CC388F2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 03:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F6FC388F2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 04:07:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8BE22080D
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 03:41:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WKT6Jqh9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8BE22080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1DC2922245
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 04:07:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DC2922245
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZnCH-0006fU-U9
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 22:41:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56460)
+	id 1kZnbc-0002Nb-2b
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 23:07:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kZnAm-00069V-Gy
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 22:39:52 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46490)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kZnAk-000635-Mi
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 22:39:52 -0500
-Received: by mail-pg1-x543.google.com with SMTP id w4so2373394pgg.13
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 19:39:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=bfjAIfz0w/Qz72IXs6gPJpI6mQ4YZEZ6ztRDcjP9YP4=;
- b=WKT6Jqh9laSkSuK0Gx4ybedfN1D9vFCRx56mPQkSKXL8cFkS3kGH0APhVPMqahGe1/
- qtqiybKaqa0D3wTMSVa4zPIHQfg4X1swtqPeovt5MuzUbtGB1tRRQOp71h2FT2kE1q+8
- MOMONCd+Q55s7gYYBTQQkebfwkYnpZBuECDNkHkAtdGn7ByLQXngCOGVBoK8DOAtvLGR
- r/TCIBSVPAp2NUdnC3rxH2JroOWnbADTFdeZ1Kxq25u2BHKHj7+YN2bNt9gUFSx1X8do
- sm/SGXEtA+gs9f9k2MvW2U//XMRJe0jNWSgZJH5E2D5FiHcJgSQgUroiMneFtGY1sA0r
- mE1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=bfjAIfz0w/Qz72IXs6gPJpI6mQ4YZEZ6ztRDcjP9YP4=;
- b=EPyKY4bnskPsUa+u8sp3xjHlVBH9QCpKhi0C1ombyWiUF47b2CsI5AqlLPFj+L0iDw
- ehlglCJN0IMzq6Ba2PKHVYCzoC5rNPo2erIFbPwyftv/1yjCN7UTpo6hCIEZYQZ4UaCI
- o/zr2eoH9cZCkK4P0dMP3Yg0VPll5wW3hRr1EHu3XyQBZMb5ZUqSpz7rl+llqoTA5Lau
- eh4ZH8NeYlA3KF1UMX6zMu0qknJzpyIfdJC9RA+BGLzGP6N0aRw9zo+8Qc0bG7WTzTsW
- T6+3eVwr9FJhfKI9mgDrrnLIhs+ouCqO1J6vv24JqK4am0j5qLQMIWwDWSq8ukkTa66W
- HwWA==
-X-Gm-Message-State: AOAM531QtrcPM0V+UTUchv9WkqKw082/e64tozboLI5bci8zNe04I4q2
- kyWEX78S9osrtGSWmeZBkjE2nciLINyR0w==
-X-Google-Smtp-Source: ABdhPJzeyT8MqCBaVYWqdeE3dJuk9WiDwhJ5ipPq8QcFVRxCy1La9IJwU3eKHeZU+yKFXX1QcQO3Bg==
-X-Received: by 2002:a17:90b:783:: with SMTP id
- l3mr1673992pjz.122.1604374788665; 
- Mon, 02 Nov 2020 19:39:48 -0800 (PST)
-Received: from localhost.localdomain (76-14-210-194.or.wavecable.com.
- [76.14.210.194])
- by smtp.gmail.com with ESMTPSA id j5sm952875pjb.56.2020.11.02.19.39.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Nov 2020 19:39:48 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.2] tcg: Remove assert from set_jmp_reset_offset
-Date: Mon,  2 Nov 2020 19:39:47 -0800
-Message-Id: <20201103033947.94157-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
+ (Exim 4.90_1) (envelope-from <chaihaoyu1@huawei.com>)
+ id 1kZnaq-0001xZ-87
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 23:06:48 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2498)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chaihaoyu1@huawei.com>)
+ id 1kZnak-0006rN-0Z
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 23:06:47 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CQGRx0phrzhfYP;
+ Tue,  3 Nov 2020 12:06:21 +0800 (CST)
+Received: from [10.108.235.54] (10.108.235.54) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 3 Nov 2020 12:06:14 +0800
+Subject: [PATCH v2 1/3] softmmu: Do not use C99 // comments
+To: <qemu-devel@nongnu.org>, <pbonzini@redhat.com>
+References: <160398385565.11191.16172040000588233087@66eaa9a8a123>
+From: chaihaoyu <chaihaoyu1@huawei.com>
+Message-ID: <edcc3e56-2419-8645-8639-d9e50d710a1d@huawei.com>
+Date: Tue, 3 Nov 2020 12:06:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <160398385565.11191.16172040000588233087@66eaa9a8a123>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.108.235.54]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=chaihaoyu1@huawei.com; helo=szxga05-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 20:52:53
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,50 +74,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <saipava@xilinx.com>
+Cc: alex.chen@huawei.com, hunongda@huawei.com, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The range check done here is done later, more appropriately,
-at the end of tcg_gen_code.  There, a failing range check
-results in a returned error code, which causes the TB to be
-restarted at half the size.
+Hi, recently I found some code style problems while using checkpatch.pl tool,please review.
 
-Reported-by: Sai Pavan Boddu <saipava@xilinx.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 3 Nov 2020 11:01:40 +0800
+signed-off-by: Haoyu Chai<chaihaoyu1@huawei.com>
 ---
+ softmmu/memory.c         | 2 +-
+ softmmu/memory_mapping.c | 2 +-
+ softmmu/physmem.c        | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-Sai, would you try this against your failing testcase?
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index 107ce0a4f8..5fb591b001 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -36,7 +36,7 @@
+ #include "hw/boards.h"
+ #include "migration/vmstate.h"
 
+-//#define DEBUG_UNASSIGNED
++/* #define DEBUG_UNASSIGNED */
 
-r~
+ static unsigned memory_region_transaction_depth;
+ static bool memory_region_update_pending;
+diff --git a/softmmu/memory_mapping.c b/softmmu/memory_mapping.c
+index 18d0b8067c..f64053499e 100644
+--- a/softmmu/memory_mapping.c
++++ b/softmmu/memory_mapping.c
+@@ -19,7 +19,7 @@
+ #include "exec/memory.h"
+ #include "exec/address-spaces.h"
 
----
- tcg/tcg.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+-//#define DEBUG_GUEST_PHYS_REGION_ADD
++/* #define DEBUG_GUEST_PHYS_REGION_ADD */
 
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index f49f1a7f35..43c6cf8f52 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -335,10 +335,11 @@ static bool tcg_resolve_relocs(TCGContext *s)
- 
- static void set_jmp_reset_offset(TCGContext *s, int which)
- {
--    size_t off = tcg_current_code_size(s);
--    s->tb_jmp_reset_offset[which] = off;
--    /* Make sure that we didn't overflow the stored offset.  */
--    assert(s->tb_jmp_reset_offset[which] == off);
-+    /*
-+     * We will check for overflow at the end of the opcode loop in
-+     * tcg_gen_code, where we bound tcg_current_code_size to UINT16_MAX.
-+     */
-+    s->tb_jmp_reset_offset[which] = tcg_current_code_size(s);
- }
- 
- #include "tcg-target.c.inc"
+ static void memory_mapping_list_add_mapping_sorted(MemoryMappingList *list,
+                                                    MemoryMapping *mapping)
+diff --git a/softmmu/physmem.c b/softmmu/physmem.c
+index 44ffb60b5d..78c1b6580a 100644
+--- a/softmmu/physmem.c
++++ b/softmmu/physmem.c
+@@ -75,7 +75,7 @@
+ #include <daxctl/libdaxctl.h>
+ #endif
+
+-//#define DEBUG_SUBPAGE
++/* #define DEBUG_SUBPAGE */
+
+ /* ram_list is read under rcu_read_lock()/rcu_read_unlock().  Writes
+  * are protected by the ramlist lock.
 -- 
-2.25.1
-
 
