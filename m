@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D854C388F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7DF0C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:24:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D96522226
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:24:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D96522226
+	by mail.kernel.org (Postfix) with ESMTPS id 49BEC22226
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:24:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49BEC22226
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZvMU-0004fQ-LZ
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:24:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47862)
+	id 1kZvMZ-0004pU-97
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:24:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kZvIM-0008Np-N3
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:20:14 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:2129)
+ id 1kZvIN-0008QM-PN
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:20:15 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2323)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kZvII-000854-AB
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:20:14 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CQTPc74msz702w;
- Tue,  3 Nov 2020 20:20:04 +0800 (CST)
-Received: from localhost (10.174.184.155) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Tue, 3 Nov 2020
- 20:19:59 +0800
+ id 1kZvII-000856-OO
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:20:15 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CQTPZ2Wn5zkcR3;
+ Tue,  3 Nov 2020 20:20:02 +0800 (CST)
+Received: from localhost (10.174.184.155) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Tue, 3 Nov 2020
+ 20:19:55 +0800
 From: Jiahui Cen <cenjiahui@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v9 8/8] unit-test: Add the binary file and clear diff.h
-Date: Tue, 3 Nov 2020 20:01:57 +0800
-Message-ID: <20201103120157.2286-9-cenjiahui@huawei.com>
+Subject: [PATCH v9 2/8] fw_cfg: Write the extra roots into the fw_cfg
+Date: Tue, 3 Nov 2020 20:01:51 +0800
+Message-ID: <20201103120157.2286-3-cenjiahui@huawei.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201103120157.2286-1-cenjiahui@huawei.com>
 References: <20201103120157.2286-1-cenjiahui@huawei.com>
@@ -51,9 +51,9 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.184.155]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=cenjiahui@huawei.com;
- helo=szxga07-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 04:32:14
+Received-SPF: pass client-ip=45.249.212.190; envelope-from=cenjiahui@huawei.com;
+ helo=szxga04-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 04:56:56
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -83,65 +83,152 @@ Sender: "Qemu-devel"
 
 From: Yubo Miao <miaoyubo@huawei.com>
 
-Add the binary file DSDT.pxb and clear bios-tables-test-allowed-diff.h
+Write the extra roots into the fw_cfg, therefore the uefi could
+get the extra roots. Only if the uefi knows there are extra roots,
+the config space of devices behind the root could be obtained.
 
 Signed-off-by: Yubo Miao <miaoyubo@huawei.com>
 Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
 ---
- tests/data/acpi/virt/DSDT.pxb               | Bin 0 -> 7802 bytes
- tests/qtest/bios-tables-test-allowed-diff.h |   1 -
- 2 files changed, 1 deletion(-)
- create mode 100644 tests/data/acpi/virt/DSDT.pxb
+ hw/arm/virt.c              |  8 ++++++++
+ hw/i386/pc.c               | 18 ++----------------
+ hw/nvram/fw_cfg.c          | 20 ++++++++++++++++++++
+ include/hw/nvram/fw_cfg.h  |  2 ++
+ include/hw/pci/pcie_host.h |  4 ++++
+ 5 files changed, 36 insertions(+), 16 deletions(-)
 
-diff --git a/tests/data/acpi/virt/DSDT.pxb b/tests/data/acpi/virt/DSDT.pxb
-new file mode 100644
-index 0000000000000000000000000000000000000000..d5f0533a02d62bc2ae2db9b9de9484e5c06652fe
-GIT binary patch
-literal 7802
-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
-ATL1t6
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index 90c53925fc..dfb8523c8b 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1,2 +1 @@
- /* List of comma-separated changed AML files to ignore */
--"tests/data/acpi/virt/DSDT.pxb",
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 27dbeb549e..58c3695290 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -78,6 +78,8 @@
+ #include "hw/virtio/virtio-iommu.h"
+ #include "hw/char/pl011.h"
+ #include "qemu/guest-random.h"
++#include "hw/pci/pci_bus.h"
++#include "hw/pci/pcie_host.h"
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -1463,6 +1465,10 @@ void virt_machine_done(Notifier *notifier, void *data)
+     ARMCPU *cpu = ARM_CPU(first_cpu);
+     struct arm_boot_info *info = &vms->bootinfo;
+     AddressSpace *as = arm_boot_address_space(cpu, info);
++    PCIHostState *s = PCI_GET_PCIE_HOST_STATE;
++
++    PCIBus *bus = s->bus;
++    FWCfgState *fw_cfg = vms->fw_cfg;
+ 
+     /*
+      * If the user provided a dtb, we assume the dynamic sysbus nodes
+@@ -1481,6 +1487,8 @@ void virt_machine_done(Notifier *notifier, void *data)
+         exit(1);
+     }
+ 
++    fw_cfg_write_extra_pci_roots(bus, fw_cfg);
++
+     virt_acpi_setup(vms);
+     virt_build_smbios(vms);
+ }
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 5e6c0023e0..bdd2301d19 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -778,26 +778,12 @@ void pc_machine_done(Notifier *notifier, void *data)
+                                         PCMachineState, machine_done);
+     X86MachineState *x86ms = X86_MACHINE(pcms);
+     PCIBus *bus = pcms->bus;
++    FWCfgState *fw_cfg = x86ms->fw_cfg;
+ 
+     /* set the number of CPUs */
+     x86_rtc_set_cpus_count(x86ms->rtc, x86ms->boot_cpus);
+ 
+-    if (bus) {
+-        int extra_hosts = 0;
+-
+-        QLIST_FOREACH(bus, &bus->child, sibling) {
+-            /* look for expander root buses */
+-            if (pci_bus_is_root(bus)) {
+-                extra_hosts++;
+-            }
+-        }
+-        if (extra_hosts && x86ms->fw_cfg) {
+-            uint64_t *val = g_malloc(sizeof(*val));
+-            *val = cpu_to_le64(extra_hosts);
+-            fw_cfg_add_file(x86ms->fw_cfg,
+-                    "etc/extra-pci-roots", val, sizeof(*val));
+-        }
+-    }
++    fw_cfg_write_extra_pci_roots(bus, fw_cfg);
+ 
+     acpi_setup();
+     if (x86ms->fw_cfg) {
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 08539a1aab..33dcbdd31d 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -40,6 +40,7 @@
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "hw/acpi/aml-build.h"
++#include "hw/pci/pci_bus.h"
+ 
+ #define FW_CFG_FILE_SLOTS_DFLT 0x20
+ 
+@@ -742,6 +743,25 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s, uint16_t key,
+     return ptr;
+ }
+ 
++void fw_cfg_write_extra_pci_roots(PCIBus *bus, FWCfgState *s)
++{
++    if (bus) {
++        int extra_hosts = 0;
++        QLIST_FOREACH(bus, &bus->child, sibling) {
++            /* look for expander root buses */
++            if (pci_bus_is_root(bus)) {
++                extra_hosts++;
++            }
++        }
++        if (extra_hosts && s) {
++            uint64_t *val = g_malloc(sizeof(*val));
++            *val = cpu_to_le64(extra_hosts);
++            fw_cfg_add_file(s,
++                   "etc/extra-pci-roots", val, sizeof(*val));
++        }
++    }
++}
++
+ void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, void *data, size_t len)
+ {
+     trace_fw_cfg_add_bytes(key, trace_key_name(key), len);
+diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+index 8a9f5738bf..0dc75ba6ca 100644
+--- a/include/hw/nvram/fw_cfg.h
++++ b/include/hw/nvram/fw_cfg.h
+@@ -104,6 +104,8 @@ struct FWCfgMemState {
+     MemoryRegionOps wide_data_ops;
+ };
+ 
++void fw_cfg_write_extra_pci_roots(PCIBus *bus, FWCfgState *s);
++
+ /**
+  * fw_cfg_add_bytes:
+  * @s: fw_cfg device being modified
+diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
+index 076457b270..12f48ddd59 100644
+--- a/include/hw/pci/pcie_host.h
++++ b/include/hw/pci/pcie_host.h
+@@ -27,6 +27,10 @@
+ 
+ #define TYPE_PCIE_HOST_BRIDGE "pcie-host-bridge"
+ OBJECT_DECLARE_SIMPLE_TYPE(PCIExpressHost, PCIE_HOST_BRIDGE)
++#define PCI_GET_PCIE_HOST_STATE \
++    OBJECT_CHECK(PCIHostState, \
++                 object_resolve_path_type("", "pcie-host-bridge", NULL), \
++                 TYPE_PCIE_HOST_BRIDGE)
+ 
+ #define PCIE_HOST_MCFG_BASE "MCFG"
+ #define PCIE_HOST_MCFG_SIZE "mcfg_size"
 -- 
 2.19.1
 
