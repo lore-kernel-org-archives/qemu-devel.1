@@ -2,79 +2,79 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20445C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5675AC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:00:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8790020757
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:59:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3CBE20757
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:00:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUJqmSod"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8790020757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVv42ByH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3CBE20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZxmh-0003t6-LB
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 09:59:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33274)
+	id 1kZxnk-0005Da-Lu
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:00:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxOn-0004hN-PV
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:35:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40854)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxPj-0005uG-Lk
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:35:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30307)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxOl-0006Wt-RE
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:35:01 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxPg-0006ye-Up
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:35:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604414099;
+ s=mimecast20190719; t=1604414155;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=ERBcIzJjq9q9CekQaOnDD1IPGOplWp3LnON28jdWCRA=;
- b=XUJqmSod9j/kouwF45ZfM8gR5iVRvoMjD+e40ygQXAJKtP7jslSs5Q8BlWjFTHFG5guwWE
- FwM/nBHcLlpBlaukp5AGxZyyc/FHVEkStdr7ZIU+40CkJIUPxZqx8fOglRBBXjXHnbYT8y
- I4gF8FVxq+LpHaA6rH5m5Xo5grKKYLA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-C14vhzHKMuGSyGDO_yAorQ-1; Tue, 03 Nov 2020 09:34:57 -0500
-X-MC-Unique: C14vhzHKMuGSyGDO_yAorQ-1
-Received: by mail-wm1-f72.google.com with SMTP id y187so1889106wmy.3
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 06:34:56 -0800 (PST)
+ bh=TD7SW6oID+mQnZFy+V2Ba30n404JJ+wGVVREK/DvNQg=;
+ b=SVv42ByHYUU0gMHvCE/nKGUepcUaT1ragNRXVdFaeJ+1XWHOmW3oxQeIJQZLAq5e/z4i8i
+ dB5KPyp+KxolN6PyVa6E0RuKwv/emI3PiizBz48vmkNLinAT5dPPiGSRL0/k+dIJv5B7H1
+ cCRT/oVm3KcAU4AZlkSC+L8kFMQRtTc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-1DJSvekjP_6WegRXWGz23w-1; Tue, 03 Nov 2020 09:35:33 -0500
+X-MC-Unique: 1DJSvekjP_6WegRXWGz23w-1
+Received: by mail-wm1-f71.google.com with SMTP id y26so347540wmj.7
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 06:35:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=ERBcIzJjq9q9CekQaOnDD1IPGOplWp3LnON28jdWCRA=;
- b=DjHQk/XGH9j984619wcLfIGd3wSe1TTaJ4qlHGnOkx17znQVN/ElOHiWEdo3YImuN2
- GgUxzzMGJDdSCfIs4pcIFnlMe245GEmNaZCs6GpEsI0Gu8Gh2zkrkkIOS17s75wU3mYO
- iXC3nG9R43wRYWt+cVm5I2whBt4epg0DibESe9b/G5+aA2WfOIG/qh80WbOUp6nzozfF
- TPtiipjdNnsutVWaZe2ftb9sLzmMNfzJzFJNNe/W1tVa0k1JqmcwvlV89g5Z3YQ/au2j
- 97vEI6A0YOp1QZh6p9jNjE3DNYFoto4TVb/w7cA2e+fhYVRRt8E4p0DmKy97+s6HzPHf
- ZoiA==
-X-Gm-Message-State: AOAM530VjqrTO+/0MVH4OEF5Fp/jnBBIC89Thr9iDyF/V+yAMycCeW53
- p9eN7O4HHe4K4qq5WwLXA1oA55EgsGY08nQlGA2v+R/T3CKoXmwpbZ98S0L9FWH4W3X74aJ+SSz
- eifuXS/1oWW4dEQE=
-X-Received: by 2002:a1c:f314:: with SMTP id q20mr68057wmq.104.1604414095707;
- Tue, 03 Nov 2020 06:34:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzH8Ki+OZRu0zKldRQeSTbtWlJ6LaH0Mb9PhA7MyiLAYbXtj24RrsGQN2ISpmxtBCtWvLI33g==
-X-Received: by 2002:a1c:f314:: with SMTP id q20mr68044wmq.104.1604414095572;
- Tue, 03 Nov 2020 06:34:55 -0800 (PST)
+ bh=TD7SW6oID+mQnZFy+V2Ba30n404JJ+wGVVREK/DvNQg=;
+ b=EoTt7vPRYqdH5ogDbmp58hPXlfXgoJiPZZfCEQD09bErU3aTZPztQgkROgOGB+5voH
+ 7RLU6LCmEEAFvuv2VL6OSnNhIukVSUw2n0AkXx13tXYVMqz1+1z1+FughdmYgt0GraQq
+ a8z1ksTl1Jj/x9nv1/97dg5cs8IBPMx2LQkEsLRWXa2A0JB7zEyEKDlwGH2Lu1VgZ8tB
+ MXew6sNbGuVexD9zfosthET9YTcM3ow634sdw6R7luyE+pmUeBgMnIeVyTb3vw1E3H4o
+ rE+KaqoEBw79V06Envls6bJex5F7+pf79y2mroaDBvXzNsjSYxz+J92tm1SZflTOO5+t
+ uRAQ==
+X-Gm-Message-State: AOAM5305mDp9A199UMY6GhEhu8jUklUdhNTFGVSSwL84h1jq/+54OlDD
+ iBCvZRxaOmp0bzpEX5mNVnam/pFsmKeaw2Bp9Tp20LyEav+hZRXqsvUIt6Z9rPUP1sLA2LVx3RF
+ 7+dYSPDKwy6+7A7w=
+X-Received: by 2002:adf:e8cb:: with SMTP id k11mr26679277wrn.91.1604414131286; 
+ Tue, 03 Nov 2020 06:35:31 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwztaqG09Ip5CpZXK94nMkqYjG1GdMbVOjL/YYa/YfVz66GAWws07A1GrfH10tClGMzPKmsew==
+X-Received: by 2002:adf:e8cb:: with SMTP id k11mr26679259wrn.91.1604414131134; 
+ Tue, 03 Nov 2020 06:35:31 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id s188sm3103699wmf.45.2020.11.03.06.34.54
+ by smtp.gmail.com with ESMTPSA id t1sm25553923wrs.48.2020.11.03.06.35.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 06:34:54 -0800 (PST)
-Date: Tue, 3 Nov 2020 09:34:53 -0500
+ Tue, 03 Nov 2020 06:35:30 -0800 (PST)
+Date: Tue, 3 Nov 2020 09:35:28 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 20/38] vfio: Set IOMMU page size as per host supported page size
-Message-ID: <20201103142306.71782-21-mst@redhat.com>
+Subject: [PULL 34/38] libqtest: add qtest_socket_server()
+Message-ID: <20201103142306.71782-35-mst@redhat.com>
 References: <20201103142306.71782-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201103142306.71782-1-mst@redhat.com>
@@ -86,16 +86,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,50 +109,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- Bharat Bhushan <bbhushan2@marvell.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Eric Auger <eric.auger@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bharat Bhushan <bbhushan2@marvell.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Set IOMMU supported page size mask same as host Linux supported page
-size mask.
+There is a qtest_socket_client() API. Add an equivalent
+qtest_socket_server() API that returns a new UNIX domain socket in the
+listen state. The code for this was already there but only used
+internally in init_socket().
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Message-Id: <20201030180510.747225-9-jean-philippe@linaro.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20201027173528.213464-9-stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/vfio/common.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tests/qtest/libqos/libqtest.h |  8 +++++++
+ tests/qtest/libqtest.c        | 40 ++++++++++++++++++++---------------
+ 2 files changed, 31 insertions(+), 17 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index e18ea2cf91..35895b18a6 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -789,6 +789,14 @@ static void vfio_listener_region_add(MemoryListener *listener,
-                             int128_get64(llend),
-                             iommu_idx);
+diff --git a/tests/qtest/libqos/libqtest.h b/tests/qtest/libqos/libqtest.h
+index 241b5f89fb..699be8c2a2 100644
+--- a/tests/qtest/libqos/libqtest.h
++++ b/tests/qtest/libqos/libqtest.h
+@@ -132,6 +132,14 @@ void qtest_qmp_send(QTestState *s, const char *fmt, ...)
+ void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
+     GCC_FMT_ATTR(2, 3);
  
-+        ret = memory_region_iommu_set_page_size_mask(giommu->iommu,
-+                                                     container->pgsizes,
-+                                                     &err);
-+        if (ret) {
-+            g_free(giommu);
-+            goto fail;
-+        }
++/**
++ * qtest_socket_server:
++ * @socket_path: the UNIX domain socket path
++ *
++ * Create and return a listen socket file descriptor, or abort on failure.
++ */
++int qtest_socket_server(const char *socket_path);
 +
-         ret = memory_region_register_iommu_notifier(section->mr, &giommu->n,
-                                                     &err);
-         if (ret) {
+ /**
+  * qtest_socket_client:
+  * @server_socket_path: the socket server's path
+diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+index ab34075f2b..d652ffc90d 100644
+--- a/tests/qtest/libqtest.c
++++ b/tests/qtest/libqtest.c
+@@ -82,24 +82,8 @@ static void qtest_client_set_rx_handler(QTestState *s, QTestRecvFn recv);
+ 
+ static int init_socket(const char *socket_path)
+ {
+-    struct sockaddr_un addr;
+-    int sock;
+-    int ret;
+-
+-    sock = socket(PF_UNIX, SOCK_STREAM, 0);
+-    g_assert_cmpint(sock, !=, -1);
+-
+-    addr.sun_family = AF_UNIX;
+-    snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", socket_path);
++    int sock = qtest_socket_server(socket_path);
+     qemu_set_cloexec(sock);
+-
+-    do {
+-        ret = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+-    } while (ret == -1 && errno == EINTR);
+-    g_assert_cmpint(ret, !=, -1);
+-    ret = listen(sock, 1);
+-    g_assert_cmpint(ret, !=, -1);
+-
+     return sock;
+ }
+ 
+@@ -638,6 +622,28 @@ QTestState *qtest_create_state_with_qmp_fd(int fd)
+     return qmp_test_state;
+ }
+ 
++int qtest_socket_server(const char *socket_path)
++{
++    struct sockaddr_un addr;
++    int sock;
++    int ret;
++
++    sock = socket(PF_UNIX, SOCK_STREAM, 0);
++    g_assert_cmpint(sock, !=, -1);
++
++    addr.sun_family = AF_UNIX;
++    snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", socket_path);
++
++    do {
++        ret = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
++    } while (ret == -1 && errno == EINTR);
++    g_assert_cmpint(ret, !=, -1);
++    ret = listen(sock, 1);
++    g_assert_cmpint(ret, !=, -1);
++
++    return sock;
++}
++
+ int qtest_socket_client(char *server_socket_path)
+ {
+     struct sockaddr_un serv_addr;
 -- 
 MST
 
