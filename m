@@ -2,106 +2,89 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9DE8C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6D0C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:23:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FE5622400
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:19:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E8D522400
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:23:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JFWpXJvd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FE5622400
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AnROhhVI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E8D522400
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZsTp-0001sH-U7
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 04:19:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59670)
+	id 1kZsWu-00036u-1j
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 04:23:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kZsTE-0001Sr-Op
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:19:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22183)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1kZsTC-0002Br-M6
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 04:19:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604395153;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=R136c/BJX6VgylIuYMnWG77joN+IYdL96vh0aKfuhWo=;
- b=JFWpXJvdoNjDb1Xfd8WHrj4VPtlonwK5zB/Wc2qyYxdAQHAKnbfb7cDmj/xUyWuu7wuTc8
- 3FWwcKPUb+iLx7AXqApJBGrHFtSba6BSW6paU/G3hCeQ6ho/jKhzzgSShfGoYHewWMzaOu
- SeHwR4HqKRiVlEwKx2NmKscmMkfVDGU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-RM-f3bBnNcGPQRqRHGzoMQ-1; Tue, 03 Nov 2020 04:19:09 -0500
-X-MC-Unique: RM-f3bBnNcGPQRqRHGzoMQ-1
-Received: by mail-wm1-f69.google.com with SMTP id u9so1361415wmb.2
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 01:19:09 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1kZsVu-0002ax-Qe; Tue, 03 Nov 2020 04:22:02 -0500
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:32836)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1kZsVp-0003FV-Ca; Tue, 03 Nov 2020 04:22:02 -0500
+Received: by mail-ej1-x644.google.com with SMTP id 7so23125641ejm.0;
+ Tue, 03 Nov 2020 01:21:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=VZGdbd6PfgqXysXvFRLP0E425CHntjnZXgWfm24fL20=;
+ b=AnROhhVIpRbRxbBdNyp2Sa3JNc7EpbAIN5fr/FQFODse2vvrDZOuZt9VRVv7lZqUHK
+ EpmiRXUZgep7PNRd5gHbd+QE+wjeofHpGqbRUoLrnL995iKRbKt2I+TwQZnYTSLEfYwv
+ J6h8Lx+2L4/dLOgDok0ti/cP3nsnd6zTzZ0KaG4tQJ089L/Wmeo2hnUeJj+J8I2Bpo0a
+ Z9k/yUL9MCvQq1Cg7YC2rmz02jEQrDMUMLYumvmLAOlgqE0X6JthfSkZXIeUK3TBxcws
+ Z3U2oCK850eYGIZYij56jigmJT/fENZEeVHLYpRjVqbp8XWX2YnwQ5bGh6uXPHZpz4Kq
+ i/Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=GjJUSF9n3FF0kFsiuz/y3QDO/6bnST/8OXeU/wO8EBY=;
- b=akC2yFcFgnRas5tbe1WojxVEKAKvxpxRD+bBXD2fYDtFxehQa29RdEVZNftHYsqzO1
- Rk1bac1sj7glr9eS8ojXbpcD6rDLY2WKsd4nj1wFrHEOXonLHT1lf8My9CnsG4njm9j+
- rX0xFRjpn8e1ktmjdA9L1tZN0gwu2nTxZ4PrEfnJshVQ2dDZ4lYyEv7vMk1bsMbgxQ4Y
- 1Z08N6iNxQlvQ3/KVlDhhM5UE1aMNeGbrA2SznBuuYO79bZnIOcwlxT6/mSBuT3DDuSi
- WAXSkWOpyvOJKRxS7aGHseFlqQIGv8qSK2vKEXWhiEz+0hOczJAnkqGzW54xkcWz4d1Z
- 55Sg==
-X-Gm-Message-State: AOAM531n5KZmPlPjOq+TsshrIle+L0YMBkrEbjXV8BfgI6AbhWd5dH8I
- cxRu9Lhd3aRszPm2TModgmoH+/FlayKUZkQQJZGJILpCm2CnorIY8oSAamfOUwCZo+e4pIA+wSi
- JJDmwk9tPJIPABeA=
-X-Received: by 2002:adf:e64e:: with SMTP id b14mr24955337wrn.68.1604395148132; 
- Tue, 03 Nov 2020 01:19:08 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwW+y8aL5Yy7BordVoH6KineXkrRj2/5SaT1tXUloa5g52MZPFlpVYSg+PtD/hOBLER8r2GSw==
-X-Received: by 2002:adf:e64e:: with SMTP id b14mr24955314wrn.68.1604395147932; 
- Tue, 03 Nov 2020 01:19:07 -0800 (PST)
-Received: from steredhat (host-79-22-200-33.retail.telecomitalia.it.
- [79.22.200.33])
- by smtp.gmail.com with ESMTPSA id e7sm25755423wrm.6.2020.11.03.01.19.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 01:19:07 -0800 (PST)
-Date: Tue, 3 Nov 2020 10:19:05 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.2 v2] hw/virtio/vhost-backend: Fix Coverity CID
- 1432871
-Message-ID: <20201103091905.uibhqskpq54epzgq@steredhat>
-References: <20201103063541.2463363-1-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=VZGdbd6PfgqXysXvFRLP0E425CHntjnZXgWfm24fL20=;
+ b=oNEX7R6p99CqxsQHSLJ28yA4++jqNeDTOcJpwtsUPwp8diZwKQa+f6I88c3tl6uLar
+ 4HpHZRHvugqshdaQEBn82fgpGAqLZAKUfQf9wCvcr6Oj7hGaY375yHHpN3OqqU/7T5DL
+ rgqYl3QmC/0PiLsvkw/Q0PC1QJGXBn0BIpEwsTAgZdD2dTKk15hqbx9JlL0ApgUxew5V
+ GwaNbN0anTFCIzQTzGsFPMblP+bmIrp65+S5kpxeZDtXbaoU99LwIGfnxOuwz+GBBrJk
+ pNN8nsCAuWk1W/2xxJo1ZjQ9yYBEWFH3f9clg9OW/Ieb3pyw5aGUExpcMyTqeGEMcYX1
+ xOQg==
+X-Gm-Message-State: AOAM531eUmoFU6B5JlY18sjGRyUygdGXzTB1276HD4tufsrU0inUkRs5
+ rUw21P8dYPli3D//pLtrhjbQHdZE5EG7fuYwoCQ=
+X-Google-Smtp-Source: ABdhPJycVQ8+SLiEekkGveLsyb3z0+N2W80JhbqbIsaYvIcAVSl7Ro9cimtgHU5tyZeey0JW6VBphQXMJVetNdoYH0s=
+X-Received: by 2002:a17:907:119e:: with SMTP id
+ uz30mr18801418ejb.125.1604395314766; 
+ Tue, 03 Nov 2020 01:21:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201103063541.2463363-1-philmd@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20201103015228.2250547-1-kuhn.chenqun@huawei.com>
+ <20201103015228.2250547-2-kuhn.chenqun@huawei.com>
+In-Reply-To: <20201103015228.2250547-2-kuhn.chenqun@huawei.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 3 Nov 2020 01:21:43 -0800
+Message-ID: <CAMo8BfK5wDgvzWFsC0WHyztUCiGR0dGnJgJiAVt5aG7nt8PsDw@mail.gmail.com>
+Subject: Re: [PATCH 1/6] target/xtensa: fix uninitialized variable warning
+To: Chen Qun <kuhn.chenqun@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -11
+X-Spam_score: -1.2
+X-Spam_bar: -
+X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.374,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,59 +97,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Euler Robot <euler.robot@huawei.com>, qemu-devel <qemu-devel@nongnu.org>,
+ ganqixin@huawei.com, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 03, 2020 at 07:35:41AM +0100, Philippe Mathieu-Daudé wrote:
->Fix uninitialized value issues reported by Coverity:
+On Mon, Nov 2, 2020 at 5:52 PM Chen Qun <kuhn.chenqun@huawei.com> wrote:
 >
->  Field 'msg.reserved' is uninitialized when calling write().
->
->While the 'struct vhost_msg' does not have a 'reserved' field,
->we still initialize it to have the two parts of the function
->consistent.
->
->Reported-by: Coverity (CID 1432864: UNINIT)
->Fixes: c471ad0e9bd ("vhost_net: device IOTLB support")
->Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->---
->v2: comment 'struct vhost_msg' is also initialized (Peter)
->---
-> hw/virtio/vhost-backend.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+> The compiler cannot determine whether the return values of the xtensa_ope=
+rand_is_register(isa, opc, opnd)
+>  and xtensa_operand_is_visible(isa, opc, opnd) functions are the same.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+It doesn't have to because 1) they definitely are not the same, but
+2) it doesn't matter.
 
->
->diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
->index 88c8ecc9e03..222bbcc62de 100644
->--- a/hw/virtio/vhost-backend.c
->+++ b/hw/virtio/vhost-backend.c
->@@ -257,7 +257,7 @@ static int vhost_kernel_send_device_iotlb_msg(struct vhost_dev *dev,
->                                               struct vhost_iotlb_msg *imsg)
-> {
->     if (dev->backend_cap & (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)) {
->-        struct vhost_msg_v2 msg;
->+        struct vhost_msg_v2 msg = {};
->
->         msg.type = VHOST_IOTLB_MSG_V2;
->         msg.iotlb = *imsg;
->@@ -267,7 +267,7 @@ static int vhost_kernel_send_device_iotlb_msg(struct vhost_dev *dev,
->             return -EFAULT;
->         }
->     } else {
->-        struct vhost_msg msg;
->+        struct vhost_msg msg = {};
->
->         msg.type = VHOST_IOTLB_MSG;
->         msg.iotlb = *imsg;
->-- 
->2.26.2
->
->
+> So,it assumes that 'rf' is not assigned, but it's used.
 
+The assumption is wrong. rf is used under the 'if (register_file)'
+condition and register_file is initialized to NULL and then set
+to something non-NULL based on the value of rf here:
+
+958             if (xtensa_operand_is_register(isa, opc, opnd)) {
+959                 rf =3D xtensa_operand_regfile(isa, opc, opnd);
+960                 register_file =3D dc->config->regfile[rf];
+
+> The compiler showed warning:
+> target/xtensa/translate.c: In function =E2=80=98disas_xtensa_insn=E2=80=
+=99:
+> target/xtensa/translate.c:985:43: warning: =E2=80=98rf=E2=80=99 may be us=
+ed uninitialized in this function [-Wmaybe-uninitialized]
+>   985 |                     arg[vopnd].num_bits =3D xtensa_regfile_num_bi=
+ts(isa, rf);
+>       |                                           ^~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~~
+>
+> Add a default value for 'rf' to prevented the warning.
+
+I don't see it doing default build with gcc 8.3. But then I don't see
+-Wmaybe-uninitialized in the compiler command line either.
+
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> ---
+> Cc: Max Filippov <jcmvbkbc@gmail.com>
+> ---
+>  target/xtensa/translate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+> index 944a157747..eea851bbe7 100644
+> --- a/target/xtensa/translate.c
+> +++ b/target/xtensa/translate.c
+> @@ -953,7 +953,7 @@ static void disas_xtensa_insn(CPUXtensaState *env, Di=
+sasContext *dc)
+>
+>          for (opnd =3D vopnd =3D 0; opnd < opnds; ++opnd) {
+>              void **register_file =3D NULL;
+> -            xtensa_regfile rf;
+> +            xtensa_regfile rf =3D -1;
+
+Please use XTENSA_UNDEFINED instead if you still think this
+is worth changing.
+
+--=20
+Thanks.
+-- Max
 
