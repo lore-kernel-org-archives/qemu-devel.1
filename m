@@ -2,100 +2,86 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C92C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 19:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42FACC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 19:50:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECFB320732
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 19:42:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A870421556
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 19:50:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HJyiUcei"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECFB320732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="dC1csiqK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A870421556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka2CC-0008Rg-0X
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 14:42:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60232)
+	id 1ka2Ju-0002c5-Mc
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 14:50:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1ka2BM-0007ry-G6
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 14:41:28 -0500
-Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:40628)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1ka2BK-0008MM-BF
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 14:41:28 -0500
-Received: by mail-pl1-x62d.google.com with SMTP id j5so9057534plk.7
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 11:41:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9ZcnE0/uMsOY+4a+OUMWobkCPuUgWa58ZPgCxjXvr8g=;
- b=HJyiUceiQBfReKmskgWjFsiKqlV+3+KsetjpSLDl9sOM4pDk51ff6Yx9Z7rgJhRb2t
- f/daZDamx+1+4/sr5xCo79ktgGQHc3a36axv6RBzQGnPsIJ/O0igdPSC4Lz7KgxckAG6
- KrZG6VXJvpeJilWUXfpUMo/oJYvvlINwNxpRquvqshh/iUkKOOS41BC9SEj4QuM0jfCk
- iTl4h6f4WtkaUSBERZcWXnuDZBHw84KtcynXIkTKtShrVXgIo8gRZ0SZDRUt/lJqUYuK
- JtpcE3Ke4lKRb5NCSRtX86nqDkYkPZ80ScC6xp4Y+GESyGoOpm7IwjjpsT52JF/rJ5ef
- +LtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9ZcnE0/uMsOY+4a+OUMWobkCPuUgWa58ZPgCxjXvr8g=;
- b=o9Dxh9mYAv1lj5IE4F77Aoxu/XIsyorFaLg5LUcJZWij1X60dAsP8EkI1pj0Bf5O9X
- sAQeLP54Plmf53VlD/kf32qPiUc3kGH40BfkzE4m7GXFfAbKTtcovaZXcXUDn2QzH9VH
- YDbbX7ih2Gz40YUzMSivuzs9/b0v/6n4Ex4GAgSd5mYzmW2vysxn6qq+sDJ6tRK2Dig3
- kR5fulNgeDLeCJo3GJK0EBG/oa9JCH3HRvqRl2yA9uKW2NP+2G+BUxgDm9VhZAL2Lfsb
- CPaw0XGD6xbjSzaABK2LGraCf4sTrDICnNmpzEl6geh5sg0m147aPJ/oEftW0ahcJEfh
- 45tA==
-X-Gm-Message-State: AOAM533fzQ2usBtMgUfqLt83yC/cPYeAc1C6kwHFqo72zSaTmNZorAZ8
- j0PGqty3OS569J/Vfbd/abcaGkjeKcGeFw==
-X-Google-Smtp-Source: ABdhPJwRF6A8fy0rkVQnZ3En2G7FmWjz83MAyNhCgP9y1cxdOnBKxGAbifZ8YaGKoIJ5uKo2rsIH5A==
-X-Received: by 2002:a17:902:7b94:b029:d6:4fea:ad36 with SMTP id
- w20-20020a1709027b94b02900d64feaad36mr25796831pll.59.1604432484737; 
- Tue, 03 Nov 2020 11:41:24 -0800 (PST)
-Received: from [172.16.1.221] (76-14-210-194.or.wavecable.com. [76.14.210.194])
- by smtp.gmail.com with ESMTPSA id p17sm15917809pgn.28.2020.11.03.11.41.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 03 Nov 2020 11:41:23 -0800 (PST)
-Subject: Re: [PATCH 08/14] target/arm: add MMU stage 1 for Secure EL2
-To: =?UTF-8?Q?R=c3=a9mi_Denis-Courmont?= <remi.denis.courmont@huawei.com>,
- qemu-arm@nongnu.org
-References: <2172054.ElGaqSPkdT@basile.remlab.net>
- <20201102105802.39332-8-remi.denis.courmont@huawei.com>
- <e1bca2e0-d926-02cb-c462-5e9d64a51999@linaro.org>
- <1674144.VLH7GnMWUR@basile.remlab.net>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d91134ea-891f-8ef6-5b17-909508984c1b@linaro.org>
-Date: Tue, 3 Nov 2020 11:41:21 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1ka2I4-0001i6-Lg
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 14:48:24 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:18843)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1ka2I2-0000du-I9
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 14:48:24 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5fa1b4020000>; Tue, 03 Nov 2020 11:48:18 -0800
+Received: from [10.40.101.50] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 3 Nov
+ 2020 19:48:15 +0000
+Subject: Re: [PATCH v1] docs/devel: Add VFIO device migration documentation
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1603950791-27236-1-git-send-email-kwankhede@nvidia.com>
+ <20201029125221.69352b48.cohuck@redhat.com>
+ <9479dffd-e434-e336-6ed8-07fc2edd2453@nvidia.com>
+ <20201029130519.7eb1e704@w520.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <47f8ccea-f75a-dfb7-b646-28d5123b322f@nvidia.com>
+Date: Wed, 4 Nov 2020 01:18:12 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-In-Reply-To: <1674144.VLH7GnMWUR@basile.remlab.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20201029130519.7eb1e704@w520.home>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::62d;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x62d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1604432898; bh=ji99AbAIQdpRsOwWOyGgd5kX/5mpLuIKKFFzUlxRU0U=;
+ h=Subject:To:CC:References:X-Nvconfidentiality:From:Message-ID:Date:
+ User-Agent:MIME-Version:In-Reply-To:Content-Type:Content-Language:
+ Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
+ b=dC1csiqKH5loAd5MAYspbtewEjT29nQPTzZkauHVBmUTf1DNbrtFr618C4qvcsvy+
+ 5kGmf2z8wqD1ULD4ih76N3+VlXb9nBldVGqOL/2hoKvrazaqXPF+kAvgsIFRtpAaKP
+ hDUahkfTB2TwOc9RcGmtH5eAdFWbMP46L31nL3ztcL8tPcYxgx5ZAmHAiuZLvBriIs
+ 7IqMWy5vgLisCqTZf0CYCow35MV2al17XitqdEL7N0sbrWP9eSYSLBZQyKUAMGcpoB
+ 3Bja/o/Ije1HLGBrpXCQvsYiufCOtAgEVtWVxIJdRYxBs/SmD/C3pYjFS6YHHPz3vu
+ FyxjnL+AatFvw==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 14:48:19
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,19 +94,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: mcrossley@nvidia.com, cjia@nvidia.com, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, dnigam@nvidia.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/3/20 10:49 AM, Rémi Denis-Courmont wrote:
-> It could also be argued that E2 and E20_2 should be one and the same. The 
-> regimes are distinct but they cannot coexist. The mode's TLB mode could be 
-> flushed when HCR.E2H is flipped, I guess.
-
-I don't think so, as there are other implications.  E.g. regime_has_2_ranges.
-If we merged these two, then we would have to differentiate them in some other way.
 
 
-r~
+On 10/30/2020 12:35 AM, Alex Williamson wrote:
+> On Thu, 29 Oct 2020 23:11:16 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+
+<snip>
+
+>>>> +System memory dirty pages tracking
+>>>> +----------------------------------
+>>>> +
+>>>> +A ``log_sync`` memory listener callback is added to mark system memory pages
+>>>
+>>> s/is added to mark/marks those/
+>>>    
+>>>> +as dirty which are used for DMA by VFIO device. Dirty pages bitmap is queried
+>>>
+>>> s/by/by the/
+>>> s/Dirty/The dirty/
+>>>    
+>>>> +per container. All pages pinned by vendor driver through vfio_pin_pages()
+>>>
+>>> s/by/by the/
+>>>    
+>>>> +external API have to be marked as dirty during migration. When there are CPU
+>>>> +writes, CPU dirty page tracking can identify dirtied pages, but any page pinned
+>>>> +by vendor driver can also be written by device. There is currently no device
+>>>
+>>> s/by/by the/ (x2)
+>>>    
+>>>> +which has hardware support for dirty page tracking. So all pages which are
+>>>> +pinned by vendor driver are considered as dirty.
+>>>> +Dirty pages are tracked when device is in stop-and-copy phase because if pages
+>>>> +are marked dirty during pre-copy phase and content is transfered from source to
+>>>> +destination, there is no way to know newly dirtied pages from the point they
+>>>> +were copied earlier until device stops. To avoid repeated copy of same content,
+>>>> +pinned pages are marked dirty only during stop-and-copy phase.
+>>
+>>
+>>> Let me take a quick stab at rewriting this paragraph (not sure if I
+>>> understood it correctly):
+>>>
+>>> "Dirty pages are tracked when the device is in the stop-and-copy phase.
+>>> During the pre-copy phase, it is not possible to distinguish a dirty
+>>> page that has been transferred from the source to the destination from
+>>> newly dirtied pages, which would lead to repeated copying of the same
+>>> content. Therefore, pinned pages are only marked dirty during the
+>>> stop-and-copy phase." ?
+>>>    
+>>
+>> I think above rephrase only talks about repeated copying in pre-copy
+>> phase. Used "copied earlier until device stops" to indicate both
+>> pre-copy and stop-and-copy till device stops.
+> 
+> 
+> Now I'm confused, I thought we had abandoned the idea that we can only
+> report pinned pages during stop-and-copy.  Doesn't the device needs to
+> expose its dirty memory footprint during the iterative phase regardless
+> of whether that causes repeat copies?  If QEMU iterates and sees that
+> all memory is still dirty, it may have transferred more data, but it
+> can actually predict if it can achieve its downtime tolerances.  Which
+> is more important, less data transfer or predictability?  Thanks,
+> 
+
+Even if QEMU copies and transfers content of all sys mem pages during 
+pre-copy (worst case with IOMMU backed mdev device when its vendor 
+driver is not smart to pin pages explicitly and all sys mem pages are 
+marked dirty), then also its prediction about downtime tolerance will 
+not be correct, because during stop-and-copy again all pages need to be 
+copied as device can write to any of those pinned pages.
+
+Thanks,
+Kirti
+
 
