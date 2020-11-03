@@ -2,79 +2,98 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C729C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 18:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C8EC388F2
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 18:11:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B11D020757
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 18:11:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB99820757
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 18:11:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMSSx4sz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B11D020757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DqpDjrsl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB99820757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka0mh-0004wK-KX
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 13:11:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41762)
+	id 1ka0mj-00051f-QF
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 13:11:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1ka0lD-0003Zn-5s
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 13:10:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60627)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1ka0lG-0003fX-M7
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 13:10:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52946)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1ka0l9-0004X9-U6
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 13:10:22 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1ka0lE-0004ae-OG
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 13:10:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604427017;
+ s=mimecast20190719; t=1604427023;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PN9ohEEfFZqUQW4QSaTuFkvjgstXm2WAxj+vHJZXGr8=;
- b=fMSSx4sz5RZwTUg++qDFUaBj+yCcF8AncH5h1olD82hBSMKYaVRvvVYVwtZvxq3KmQjwLb
- 4RG3m77wIUcJDb+X32viClQuAI9OMaQ8Ifp6AeMUKzSxv1wEMmIrL5N2tEwqch2Ek6RVyb
- wLalnouGbmVCuNc9o4rAtOgE5Jw5Bl4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-W70IiqFHP4-vlzpf5At4JA-1; Tue, 03 Nov 2020 13:10:13 -0500
-X-MC-Unique: W70IiqFHP4-vlzpf5At4JA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE57FCEC7F;
- Tue,  3 Nov 2020 18:10:11 +0000 (UTC)
-Received: from localhost (ovpn-115-37.ams2.redhat.com [10.36.115.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A5106E70E;
- Tue,  3 Nov 2020 18:09:39 +0000 (UTC)
-Date: Tue, 3 Nov 2020 18:09:38 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: VFIO Migration
-Message-ID: <20201103180938.GF259481@stefanha-x1.localdomain>
-References: <20201102111153.GC42093@stefanha-x1.localdomain>
- <20201102123823.066d156a@w520.home>
- <20201103110324.GA243332@stefanha-x1.localdomain>
- <20201103101305.10254ae4@w520.home>
+ bh=AKwOFgGcymvVNOKEIioVZmLaWhOtgze5Ao/ktMiXOlM=;
+ b=DqpDjrslkiZUcy88VFnWAiG895cAI7mlLiHxVX4QfdN0fgzLGDaI59EFKTccLW1K637uRx
+ p1yL7rW1n+dEGdB0SAx0lpo0Qi7yJjvY6iWWAB4PKbTEs0v2uy48n3mKGHoiQdjsXWwDjC
+ re2WifyDWxL28GRGDTYIOkYwd4dNcog=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-442-yj11hu8HMQamgWw6TfEdhQ-1; Tue, 03 Nov 2020 13:10:22 -0500
+X-MC-Unique: yj11hu8HMQamgWw6TfEdhQ-1
+Received: by mail-wm1-f70.google.com with SMTP id u9so64800wmb.2
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 10:10:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xzfCQh99cGndCB9rfFEpKH/Vq1xIq+5YH799EdIheUE=;
+ b=ImBSuddmLHPy9CJXPj1lsztvVrM3y1DKcONhkATQyz8pq1q52ldkZ2hhG3jDEL1KrV
+ E7fc+wsX/dflpnVCT3/TgjEEa43pKkXfZ+a3MU/d/DSCh8W5JpIPA3XUX1uUw6AjE6Kr
+ QKtApkHLG9O6KQ8T3hzyfjoK2+2wP5ssHOU9P9Xg8RxIS45gyslMRS4ixAg0tBA2Gio1
+ tSHxAO31OInzNbq4UKbNf/Ej366jqM+Z0CvnjbdyfZkXksK77B9Q0xL2V83fAHiEvqZ/
+ ij9akKTiNJhRF+4ES2FYy6fg7BXw7Vh1HG1QYB3qCAa4H67Pe+/nBnZBRREtqfY+GvOr
+ qmqw==
+X-Gm-Message-State: AOAM533lXA41oeH096NvMHsZZYAect0g/rkOIhbyyOTS8/TfWsARQ8fo
+ C1FhX3heIkSRXLVmbgifxV5ISE8q+WTPurBCww/RbvaJb/mvHtOcdOkVMHGRrjp8rlYmUCl+yui
+ NqxKNCSVubJTM1Is=
+X-Received: by 2002:adf:f4c9:: with SMTP id h9mr26409328wrp.332.1604427019744; 
+ Tue, 03 Nov 2020 10:10:19 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzO/7jXpDrrtDzcoSbZUF21MKR9bWW8Jwjv3cVgyGyUKdmFh8CtylP6MPGV0oe8s/2fv6Kiuw==
+X-Received: by 2002:adf:f4c9:: with SMTP id h9mr26409291wrp.332.1604427019418; 
+ Tue, 03 Nov 2020 10:10:19 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id t5sm30098233wrb.21.2020.11.03.10.10.18
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Nov 2020 10:10:18 -0800 (PST)
+Subject: Re: [PULL 5/7] tests.acceptance: adds simple migration test
+To: Cleber Rosa <crosa@redhat.com>
+References: <20190222194146.13102-1-crosa@redhat.com>
+ <20190222194146.13102-6-crosa@redhat.com>
+ <CAP+75-UtiMFdp=ReaH0Vn7OD60hS+ZNsSvJyvVp1948Syn=ZGQ@mail.gmail.com>
+ <20201103152636.GA3140758@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <00d0ee82-6704-6b59-8ae1-fb7b57be7226@redhat.com>
+Date: Tue, 3 Nov 2020 19:10:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201103101305.10254ae4@w520.home>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20201103152636.GA3140758@localhost.localdomain>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="H4SyuGOnfnj3aJqJ"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -83,8 +102,9 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,356 +117,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John G Johnson <john.g.johnson@oracle.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, mtsirkin@redhat.com,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- quintela@redhat.com, Jason Wang <jasowang@redhat.com>, "Zeng,
- Xin" <xin.zeng@intel.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Kirti Wankhede <kwankhede@nvidia.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- Felipe Franciosi <felipe@nutanix.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, Wainer Moschetta <wainersm@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---H4SyuGOnfnj3aJqJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 11/3/20 4:27 PM, Cleber Rosa wrote:
+> On Tue, Nov 03, 2020 at 11:40:30AM +0100, Philippe Mathieu-Daudé wrote:
+>> Hi,
+>>
+>> On Fri, Feb 22, 2019 at 8:42 PM Cleber Rosa <crosa@redhat.com> wrote:
+>>>
+>>> From: Caio Carrara <ccarrara@redhat.com>
+>>>
+>>> This change adds the simplest possible migration test. Beyond the test
+>>> purpose itself it's also useful to exercise the multi virtual machines
+>>> capabilities from base avocado qemu test class.
+>>>
+>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>> Signed-off-by: Caio Carrara <ccarrara@redhat.com>
+>>> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+>>> Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>>> Message-Id: <20190212193855.13223-3-ccarrara@redhat.com>
+>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>> ---
+>>>  tests/acceptance/migration.py | 53 +++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 53 insertions(+)
+>>>  create mode 100644 tests/acceptance/migration.py
+>>>
+>>> diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
+>>> new file mode 100644
+>>> index 0000000000..6115cf6c24
+>>> --- /dev/null
+>>> +++ b/tests/acceptance/migration.py
+>>> @@ -0,0 +1,53 @@
+>>> +# Migration test
+>>> +#
+>>> +# Copyright (c) 2019 Red Hat, Inc.
+>>> +#
+>>> +# Authors:
+>>> +#  Cleber Rosa <crosa@redhat.com>
+>>> +#  Caio Carrara <ccarrara@redhat.com>
+>>> +#
+>>> +# This work is licensed under the terms of the GNU GPL, version 2 or
+>>> +# later.  See the COPYING file in the top-level directory.
+>>> +
+>>> +
+>>> +from avocado_qemu import Test
+>>> +
+>>> +from avocado.utils import network
+>>> +from avocado.utils import wait
+>>> +
+>>> +
+>>> +class Migration(Test):
+>>> +    """
+>>> +    :avocado: enable
+>>> +    """
+>>> +
+>>> +    timeout = 10
+>>> +
+>>> +    @staticmethod
+>>> +    def migration_finished(vm):
+>>> +        return vm.command('query-migrate')['status'] in ('completed', 'failed')
+>>> +
+>>> +    def _get_free_port(self):
+>>> +        port = network.find_free_port()
+>>> +        if port is None:
+>>> +            self.cancel('Failed to find a free port')
+>>> +        return port
+>>
+>> This method doesn't seem to work when running with -j2: 2 tests started
+>> with different arch configurations get the same port... Is this a known issue?
+>>
+> 
+> It's not bullet proof, but it seems to be quite safe... This is what I've tried:
+> 
+>  $ ./tests/venv/bin/avocado run --test-runner=nrunner --nrunner-max-parallel-tasks=10 tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost{,,,,,,,,,,,,,,,,,,,} 
+> JOB ID     : 377957f4a16fbc2c6a6f6d9ae225c61af86bd570
+> JOB LOG    : /home/cleber/avocado/job-results/job-2020-11-03T10.24-377957f/job.log
+>  (02/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (06/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (01/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (05/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (03/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (10/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (07/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (09/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (04/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (08/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: STARTED
+>  (02/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.46 s)
+>  (06/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.60 s)
+>  (01/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.51 s)
+>  (03/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.49 s)
+>  (05/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.52 s)
+>  (10/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.51 s)
+>  (07/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.52 s)
+>  (09/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.53 s)
+>  (04/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.49 s)
+>  (08/20) tests/acceptance/migration.py:Migration.test_migration_with_tcp_localhost: PASS (0.56 s)
+> ...
+> RESULTS    : PASS 20 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+> JOB HTML   : /home/cleber/avocado/job-results/job-2020-11-03T10.24-377957f/results.html
+> JOB TIME   : 3.82 s
 
-On Tue, Nov 03, 2020 at 10:13:05AM -0700, Alex Williamson wrote:
-> On Tue, 3 Nov 2020 11:03:24 +0000
-> Stefan Hajnoczi <stefanha@redhat.com> wrote:
->=20
-> > On Mon, Nov 02, 2020 at 12:38:23PM -0700, Alex Williamson wrote:
-> > >=20
-> > > Cc+ Intel folks as this really bumps into the migration compatibility
-> > > discussion[1][2][3]
-> > >=20
-> > > On Mon, 2 Nov 2020 11:11:53 +0000
-> > > Stefan Hajnoczi <stefanha@redhat.com> wrote:
->=20
-> > > > VFIO Implementation
-> > > > -------------------
-> > > > The following applies both to kernel VFIO/mdev drivers and vfio-use=
-r device
-> > > > backends.
-> > > >=20
-> > > > Devices are instantiated based on a version and/or configuration pa=
-rameters:
-> > > > * ``version=3D1`` - use the device configuration aliased by version=
- 1
-> > > > * ``version=3D2,rx-filter-size=3D64`` - use version 1 and override =
-``rx-filter-size``
-> > > > * ``rx-filter-size=3D0`` - directly set configuration parameters wi=
-thout using a version
-> > > >=20
-> > > > Device creation fails if the version and/or configuration parameter=
-s are not
-> > > > supported.
-> > > >=20
-> > > > There must be a mechanism to query the "latest" configuration for a=
- device
-> > > > model. It may simply report the ``version=3D5`` where 5 is the late=
-st version but
-> > > > it could also report all configuration parameters instead of using =
-a version
-> > > > alias. =20
-> > >=20
-> > > When we talk about "instantiating" a device here, are we referring to
-> > > managing the device on the host or within QEMU via something like
-> > > vfio_realize()?  We create an instance of an mdev on the host via an
-> > > mdev type using operations on the host sysfs.  That mdev type doesn't
-> > > really seem to map to your idea if a device model represented by a UR=
-I.
-> > > How are supported URIs exposed and specified when the device is
-> > > instantiated?
-> > >=20
-> > > Same for device configuration, we might have per device attributes in
-> > > host sysfs defining the configuration of a given mdev device, are the=
-se
-> > > the device configuration values?  It seems like you're referring to
-> > > something much more QEMU centric, but vfio-pci in QEMU handles all
-> > > devices the same, aside from quirks.
-> > >=20
-> > > Likewise, I don't know where versions would be exposed in the current
-> > > vfio interface. =20
-> >=20
-> > "Instantiating" means writing to the mdev "create" sysfs attr. I am not
-> > very familiar with mdev so this could be totally wrong, but I'll try to
-> > define a mapping:
-> >=20
-> > 1. The mdev driver sets up struct
-> >    mdev_parent_opts->supported_type_groups as follows:
-> >=20
-> >   /* Device model URI */
-> >   static ssize_t model_show(struct kobject *kobj,
-> >                             struct device *dev,
-> >                             char *buf)
-> >   {
-> >       return sprintf(buf, "https://vendor-a.com/my-nic\n");
-> >   }
-> >   static MDEV_TYPE_ATTR_RO(model);
-> >=20
-> >   /* Receive Side Scaling (RSS) */
-> >   static ssize_t rss_show(struct kobject *kobj,
-> >                           struct dev *dev,
-> > =09=09=09  char *buf)
-> >   {
-> >       return sprintf(buf, "%d\n", ...->rss);
-> >   }
-> >   static ssize_t rss_store(struct kobject *kobj,
-> >                            struct attribute *attr,
-> > =09=09=09   const char *page,
-> > =09=09=09   size_t count)
-> >   {
-> >       char *p =3D (char *) page;
-> >       unsigned long val =3D simple_strtoul(p, &p, 10);
-> >=20
-> >       ...->rss =3D !!val;
-> >       return count;
-> >   }
-> >   static MDEV_TYPE_ATTR_RW(rss);
-> >=20
-> >   /* Device version */
-> >   static ssize_t version_show(struct kobject *kobj,
-> >                               struct dev *dev,
-> > =09=09=09      char *buf)
-> >   {
-> >       return sprintf(buf, "%u\n", ...->version);
-> >   }
-> >   static ssize_t version_store(struct kobject *kobj,
-> >                                struct attribute *attr,
-> > =09=09=09       const char *page,
-> > =09=09=09       size_t count)
-> >   {
-> >       char *p =3D (char *) page;
-> >       unsigned long val =3D simple_strtoul(p, &p, 10);
-> >=20
-> >       /* Set device configuration parameters to their defaults */
-> >       switch (version) {
-> >       case 1:
-> >           ...->rss =3D false;
-> > =09  ...->version =3D 1;
-> > =09  break;
-> >=20
-> >       case 2:
-> >           ...->rss =3D true;
-> > =09  ...->version =3D 2;
-> > =09  break;
-> >=20
-> >       default:
-> >           return -ENOTSUPP;
-> >       }
-> >=20
-> >       return count;
-> >   }
-> >   static MDEV_TYPE_ATTR_RW(rss);
-> >=20
-> >   static struct attribute *mdev_type_my_nic_attrs[] =3D {
-> >       &mdev_type_attr_model.attr,
-> >       &mdev_type_attr_rss.attr,
-> >       &mdev_type_attr_version.attr,
-> >       NULL,
-> >   };
-> >=20
-> >   static struct attribute_group mdev_type_group_my_nic =3D {
-> >       .name  =3D "my-nic", /* shorthand name */
-> >       .attrs =3D mdev_type_my_nic_attrs,
-> >   };
-> >=20
-> >   struct attribute_group *supported_type_groups[] =3D {
-> >       &mdev_type_group_my_nic,
-> >       NULL,
-> >   };
-> >=20
-> > 2. The userspace tooling enumerates supported device models by reading
-> >    the "model" sysfs attr from each supported type attr group.
->=20
->=20
-> So a given mdev type can only support a single model, model just gives
-> us some independence from the vendor driver association of the mdev
-> type?  I wonder how "model" is really different from the "name"
-> attribute on an mdev type other than being more formalized.
+Thanks for the testing.
 
-Two reasons, neither of them critical:
-1. Short names are more human-friendly than full device model URIs.
-2. I was concerned about escaping characters if the type name is used as
-   a sysfs directory name. "https://qemu.org/devices/e1000" cannot be a
-   path component, it needs to be escaped somehow to avoid the
-   backslashes.
+> If this is about the issue you posted on IRC, it's about s390x and migration instead:
+> 
+> 2020-11-03 10:06:33,124 qmp              L0255 DEBUG| >>> {'execute': 'query-migrate'}
+> 2020-11-03 10:06:33,124 qmp              L0148 DEBUG| <<< {'timestamp': {'seconds': 1604415993, 'microseconds': 124382}, 'event': 'GUEST_PANICKED', 'data': {'action': 'pause', 'info': {'core': 0, 'psw-addr': 0, 'reason': 'disabled-wait', 'psw-mask':
+> 
+> I ran across this on Friday, and will properly report it.
 
-> > 3. Userspace picks the device model it wishes to instantiate and sets
-> >    the "version" sysfs attr and other device configuration parameters a=
-s
-> >    desired.
-> >=20
-> > 4. Userspace instantiates the device by writing to the mdev "create" sy=
-sfs
-> >    attr. If instantiation succeeds then migrating a device state saved
-> >    by the same device model with the same configuration parameters is
-> >    possible.
->=20
->=20
-> These are not feasible semantics, multiple tasks may be instantiating
-> devices simultaneously, we can't lock a sub-hierarchy of sysfs while
-> one process configures features to their liking.  It seems more like
-> these attributes would be read-only to advertise support, but be
-> applied as part of the write to create, ie. we'd append device specific
-> attributes after the uuid string, similar to how we've previously
-> discussed supporting device aggregation.
+Ah I missed that *sigh* thanks.
 
-Thanks for explaining and suggesting a solution.
-
-> >=20
-> > Maybe a cleaner way to structure this is to include the version as part
-> > of the supported type group. So "my-nic" becomes "my-nic-1", "my-nic-2"=
-,
-> > etc. There would still be a "version" sysfs attr but it would be
-> > read-only. Device configuration parameters would only be present if the=
-y
-> > were actually available in that version. For example, "my-nic-1" would
-> > not expose an "rss" sysfs attr because it was introduced in "my-nic-2".
-> > I see pros and cons to both the approach I outlined above and this
-> > alternative, maybe someone more familiar with mdev has a preference?
->=20
->=20
-> How exactly is this different from an mdev type?  An mdev type is
-> supposed to define a software compatible device configuration.  If
-> version 2 is not compatible with version 1, we'd expect a vendor to
-> define a new type.  In practice vendors are often defining new types to
-> indicate the scale of a device, for example with vGPUs types may
-> different in the amount of graphics memory per instance.  The topic of
-> "aggregation" came about as a generic way to describe this within a
-> single type, when for example we might have an untenable number of
-> scaling increments to describe each as a separate type.  Unfortunately
-> "aggregation" is also too generic, "aggregation of what" needs to be
-> more clearly defined.
-
-Yes, this is a 1:1 mapping of device versions to mdev types. Based on
-QEMU's device models I would estimate that devices may have over 100
-versions but less than 1000. Does that sound reasonable?
-
-If having so many mdev types is problematic we can use the multiplexing
-approach that we discussed above with a "version" sysfs attr.
-
-> > > There's also a desire to support the vfio migration interface on
-> > > non-mdev vfio devices.  We don't know yet if those will be separate,
-> > > device specific vfio bus drivers or be integrated into existing
-> > > vfio-pci, but the host device is likely instantiated by binding to a
-> > > driver, so again I don't really understand where you're proposing thi=
-s
-> > > negotiation occurs.  Will management tools be required to create a
-> > > device on-demand to fulfill a migration request or can we manipulate =
-an
-> > > existing device into that desired.  Some management layers embrace th=
-e
-> > > idea of device pools rather than dynamic creation.  Thanks, =20
-> >=20
-> > The concept of device instantiation is natural for mdev and vfio-user,
-> > but not essential.
-> >=20
-> > When dealing with physical devices (even PCI SR-IOV), we don't need to
-> > instantiate them explicitly. Device instances can already exist. As lon=
-g
-> > as we know their device model URI and configuration parameters we can
-> > ensure migration compatibility.
-> >=20
-> > For example, imagine a physical PCI NIC accompanied by a non-mdev VFIO
-> > migration driver. The device model URI and configuration parameter
-> > information can be distributed alongside the VFIO migration driver. It
-> > could be available via modinfo(8), as a separate metadata file, via a
-> > vendor-specific tool, etc.
->=20
->=20
-> I think we want instances of objects to expose their device and
-> configuration through sysfs, we don't want to require userspace to use
-> different methods for different flavors of devices, nor should it be
-> required for someone to remember how a device was instantiated.
-
-Sounds good. The sysfs layout can be the same as for mdev types.
-
-> > Management tools need to match the device model/configuration from the
-> > source device against the destination device. If the destination is
-> > capable of supporting the source's device model/configuration then
-> > migration can proceed safely.
-> >=20
-> > Let's look at the case where we are migration from an older version of =
-a
-> > device to a newer version. On the source we have:
-> >=20
-> >   model =3D https://vendor-a.com/my-nic
-> >=20
-> > On the destination we have:
-> >=20
-> >   model =3D https://vendor-a.com/my-nic
-> >   rss =3D on
-> >=20
-> > The two devices are incompatible because the destination exposes the RS=
-S
-> > feature that is not present on the source. The RSS feature involves
-> > guest-visible hardware interface changes and a change to the device
-> > state representation. It is not safe to migrate!
-> >=20
-> > In this case an extra configuration step is necessary so that the
-> > destination device can accept the device state from the source. The
-> > management tool invokes a vendor-specific tool to put the device into
-> > the right configuration:
-> >=20
-> >   # vendor-tool set-migration-config --device 0000:00:04.0 \
-> >                                      --model https://vendor-a.com/my-ni=
-c
-> >=20
-> > (This tool only succeeds when the device is bound to VFIO but not yet
-> > opened.)
-> >=20
-> > The tool invokes ioctls on the vendor-specific VFIO driver that does tw=
-o
-> > things:
-> > 1. Tells the device to present the old hardware interface without RSS
-> > 2. Uses the old device state representation without RSS support
-> >=20
-> > Does this approach fit?
->=20
->=20
-> Should we not require that any sort of configuration like this occurs
-> through sysfs?  We must be able to create an instance with a specific
-> configuration without using vendor specific tools, therefore in the
-> worse case we should be able to remove and recreate an instance as we
-> desire without invoking vendor specific tools.
-
-Yes, sysfs sounds good.
-
-One thing that is a little ugly is that the version=3D1 device above does
-not have the "rss" configuration parameter and we have no value to set
-on the destination device, which is newer and supports the "rss"
-configuration parameter. It may be necessary to implement a special case
-for disabling configuration parameters like writing an empty string or
-magic string to the "rss" sysfs attr.
-
-Or maybe there would be a standard sysfs attr called "config_params"
-where userspace writes a space-separated list of configuration parameter
-names that are active. Then userspace could omit "rss" from the
-"config_params" sysfs attr to disable it.
-
-Stefan
-
---H4SyuGOnfnj3aJqJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+hnOIACgkQnKSrs4Gr
-c8imuwf/YCZ4/5Wvs3Wq8Zcd4bVHYhb6nBJjax/JwbraKhzUV2SmesUSL/gzB0GE
-pO00AR140Hd10giqTQGhfQIKzKBxp6nlIli5w26lt1XNblFPlDGsW7tfByF3XNeI
-617uOtXr7y1fLO1teRBpAW01KjdU9U4FyY7AfHJnNB24WmdHcxBCqHALGS9x9YKo
-70kapG8G6JaRumaaObiTrVYYUc/wfbWKU3dEt7e/tYu9fa0fF639DdqOci0D6kgd
-gmOv3kJxi93mDd5V24LefiT9p1AUd9cGxZHLZBKwhOMSPmmD3/204TTrKDPiOOc8
-+bpk+0jDNWpWH7uF0Zfe/oroZMEv+w==
-=Ys5A
------END PGP SIGNATURE-----
-
---H4SyuGOnfnj3aJqJ--
+> 
+> Let me know if that helps,
+> - Cleber.
+> 
 
 
