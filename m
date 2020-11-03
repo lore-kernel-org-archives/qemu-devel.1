@@ -2,88 +2,92 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F1FC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B1BC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:33:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 984802072C
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:26:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0D3F206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:33:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JceV6GxR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 984802072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YAwczqSf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0D3F206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZz90-0006VR-KZ
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:26:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40164)
+	id 1kZzFn-0008UP-O0
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:33:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZz8J-0005fn-AB
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:26:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24363)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kZz8G-0003hm-IK
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:26:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604420763;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=+7HRr9BZ61G6W/45KK7ouTft8hIOyWgP/Mhk54efXxw=;
- b=JceV6GxR++OMACY1Yi98HRZSWEQB41vYcmBBbn/AHoWUOf6QwgAOyD0gmK3aetvxHUIgt2
- 8Tyz+jMZbgx4+tvGTnUoz1xgYIKu2KMeLzSJIAp4Diih8xkKRjtr2Z5p3p0VEoxJG5AZpf
- qYrzkD6B3GSD/OGiz0d3lA7Rte6Jy+w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-RF4XpudUN4utJnQQ2nW9rQ-1; Tue, 03 Nov 2020 11:25:58 -0500
-X-MC-Unique: RF4XpudUN4utJnQQ2nW9rQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B22D108E1A5
- for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 16:25:57 +0000 (UTC)
-Received: from redhat.com (ovpn-115-87.ams2.redhat.com [10.36.115.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F48D5C1D0;
- Tue,  3 Nov 2020 16:25:56 +0000 (UTC)
-Date: Tue, 3 Nov 2020 16:25:51 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] qapi, qemu-options: make all parsing visitors parse
- boolean options the same
-Message-ID: <20201103162551.GQ205187@redhat.com>
-References: <20201103161339.447118-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
+ id 1kZzEx-00084c-4f
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:32:59 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41952)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
+ id 1kZzEu-00064f-92
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:32:58 -0500
+Received: by mail-wr1-x442.google.com with SMTP id s9so19192087wro.8
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 08:32:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=5Ka9U8P8h2s/zofWKqtlqy8RjhNIiXxQ9N/LBwqf87U=;
+ b=YAwczqSf43ri6XRhVAT4pa3+jmjwdnJ7SfuZ1H8h8ZJet9ARtUEWO0rxpzQ/0sybIy
+ fgg8rmBgUlgGjtJYML0Pc3E/4S0GqVAqjSUjEuvMif9R6aA8XVzv5GgqPzreivbjiUin
+ 9jJxbtOXfSoZFrs22YLAUK5d2zLIbSRLyfG4T+yi0jdf+U7uye3wc2PZ5cXYtYTx7bUu
+ La+rCYziES+FLraePNRIJ4pZRaYcuizEMXmbHJytL/1FdoBQE1L4DxNhPlAjui2EMxbK
+ zx94EaFVN78mTAxIuiuXBGRYquGzA1cwyIlUNRDAA5EkACGqNFIhpQ2hgbGKnIcVb+HT
+ 0iDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=5Ka9U8P8h2s/zofWKqtlqy8RjhNIiXxQ9N/LBwqf87U=;
+ b=N+C8RGXcM/E5uBalqkOcbZ8kPR9X3ZnZJHb9TbbSNj5gRpNlIvEOcHPjlztssrA8d8
+ GjA5IWJ+GDT5wf8nlSHoKHfQSqnFbEOZSmasT7PxPIDfputTq6z+M1U44wXXTE80Gqnq
+ vrZDXvHPHG8I6CfZ6B6bTYLAyv+/pvboY0EghcnrxhSpSB1ag89OfEdQM+P5upvodp3R
+ K23V9s8EqQr+7TW8MdZIwkY5ffIDbPdQ3F5PjNgbmqIdzWRmdPGh1oMtXSfISZIUwKU5
+ 5OZsLPLpBucMVI1Sm/JwdkDwdqRbh3GZ3UKokLNg35snj27BWEk/X8/EOgb2prxGdNbs
+ rSww==
+X-Gm-Message-State: AOAM5334FEEeEXkz0es8MKZipW7tIhmSrv34Tyzx7lXJGV3I74d3pl3w
+ vw7jaJ7N66a4LmnW/LGIXZ9Xdg==
+X-Google-Smtp-Source: ABdhPJwHhRk+zKuWVcuy/Du9UQsDLErbX21dRH9LFlmT1REwc2Tkr4nhetpzSpqSJWJck/VZuOFFcA==
+X-Received: by 2002:adf:a315:: with SMTP id c21mr2445832wrb.272.1604421174019; 
+ Tue, 03 Nov 2020 08:32:54 -0800 (PST)
+Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
+ by smtp.gmail.com with ESMTPSA id f4sm26777161wrq.54.2020.11.03.08.32.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Nov 2020 08:32:53 -0800 (PST)
+Date: Tue, 3 Nov 2020 17:32:34 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v11 09/10] virtio-iommu: Set supported page size mask
+Message-ID: <20201103163234.GB6723@myrica>
+References: <20201030180510.747225-1-jean-philippe@linaro.org>
+ <20201030180510.747225-10-jean-philippe@linaro.org>
+ <20201102224725.GF20600@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20201103161339.447118-1-pbonzini@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+In-Reply-To: <20201102224725.GF20600@xz-x1>
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=jean-philippe@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,255 +100,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+Cc: mst@redhat.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
+ alex.williamson@redhat.com, pbonzini@redhat.com, bbhushan2@marvell.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 03, 2020 at 11:13:39AM -0500, Paolo Bonzini wrote:
-> OptsVisitor, StringInputVisitor and the keyval visitor have
-> three different ideas of how a human could write the value of
-> a boolean option.  Pay homage to the backwards-compatibility
-> gods and make the new common helper accept all four sets (on/off,
-> true/false, y/n and yes/no), and case-insensitive at that.
+On Mon, Nov 02, 2020 at 05:47:25PM -0500, Peter Xu wrote:
+> On Fri, Oct 30, 2020 at 07:05:09PM +0100, Jean-Philippe Brucker wrote:
+> > From: Bharat Bhushan <bbhushan2@marvell.com>
+> > 
+> > The virtio-iommu device can deal with arbitrary page sizes for virtual
+> > endpoints, but for endpoints assigned with VFIO it must follow the page
+> > granule used by the host IOMMU driver.
+> > 
+> > Implement the interface to set the vIOMMU page size mask, called by VFIO
+> > for each endpoint. We assume that all host IOMMU drivers use the same
+> > page granule (the host page granule). Override the page_size_mask field
+> > in the virtio config space.
 > 
-> Since OptsVisitor is supposed to match qemu-options, adjust
-> it as well.
+> (Nit: Seems slightly mismatched with the code below)
+> 
+> [...]
+> 
+> > +    /*
+> > +     * After the machine is finalized, we can't change the mask anymore. If by
+> > +     * chance the hotplugged device supports the same granule, we can still
+> > +     * accept it. Having a different masks is possible but the guest will use
+> > +     * sub-optimal block sizes, so warn about it.
+> > +     */
+> > +    if (qdev_hotplug) {
+> > +        int new_granule = ctz64(new_mask);
+> > +        int cur_granule = ctz64(cur_mask);
+> > +
+> > +        if (new_granule != cur_granule) {
+> > +            error_setg(errp, "virtio-iommu page mask 0x%"PRIx64
+> > +                       " is incompatible with mask 0x%"PRIx64, cur_mask,
+> > +                       new_mask);
+> > +            return -1;
+> > +        } else if (new_mask != cur_mask) {
+> > +            warn_report("virtio-iommu page mask 0x%"PRIx64
+> > +                        " does not match 0x%"PRIx64, cur_mask, new_mask);
+> 
+> IMHO, new_mask!=cur_mask is ok, as long as it's a superset of reported
+> cur_mask, then it'll still guarantee to work.
+> 
+> Meanwhile, checking against granule seems not safe enough if the guest driver
+> started to use huge pages in iommu pgtables...
 
-FWIW, libvirt does not appear to use true/false or y/n, nor
-ever use uppercase / mixed case.
+As the guest doesn't directly touch the page tables I think it is safe,
+albeit slow. If the host IOMMU driver cannot support one huge page for a
+mapping, then it will use several small pages instead.
 
-IOW this level of back compat may well be overkill.
+> 
+> In summary:
+> 
+>     if (qdev_hotplug) {
+>         if ((new_mask & cur_mask) == cur_mask) {
+>             /* Superset of old mask; we're good.  Keep the old mask since same */
+>             return 0;
 
-I'd particular suggest deprecating case-insensitivity, as
-Yes, YES, yEs feel unlikely to be important or widely used.
+That looks correct, but a bit too restrictive. If we start with
+cur_mask = 0xfffffffffffff000, and we hotplug a VFIO device with
+new_mask = 0x40201000 (4k page, 2M 1G blocks), then this code rejects it
+even though it would work.
 
-Based on libvirt test suite QEMU CLI args, I see primarily on|off,
-with a small amount of yes|no:
+Thanks,
+Jean
 
-3dnowext=on
-3dnow=on
-3dnowprefetch=off
-aarch64=off
-acpi=on
-adjust=on
-adjvtime=on
-aefsi=on
-aen=on
-apft=on
-ap=on
-append=on
-apqci=on
-apqi=on
-assist=on
-ats=off
-ats=on
-avx2=off
-avx=off
-bpb=on
-cache=off
-cache=on
-clflushopt=on
-clwb=on
-cmmnt=on
-cmm=on
-cmp_legacy=on
-compression=off
-compression=on
-core=off
-core=on
-cpl=on
-csske=on
-csum=off
-cte=on
-data=yes
-dedicated=on
-deflate=on
-dfppc=on
-display=on
-ds_cpl=on
-edat2=on
-edat=on
-eim=on
-eoi=off
-eoi=on
-erms=on
-esop=on
-esort=on
-etoken=on
-event_idx=off
-event_idx=on
-f16c=off
-failover=on
-fma=off
-fxsr_opt=off
-fxsr_opt=on
-gl=on
-gs=on
-gso=off
-guest_csum=off
-guest_ecn=off
-guest_tso4=off
-guest_tso6=off
-guest_ufo=off
-hmat=on
-host_ecn=off
-host_tso4=off
-host_tso6=off
-host_ufo=off
-hotplug=off
-hotplug=on
-htm=on
-hugetlb=yes
-hv=off
-hypervisor=on
-iep=on
-info=off
-info=on
-intremap=on
-invtsc=on
-ioeventfd=off
-ioeventfd=on
-iommu=on
-iommu_platform=off
-iommu_platform=on
-iotlb=on
-ipter=on
-kvmclock=off
-kvm=off
-kvm_pv_eoi=off
-kvm_pv_eoi=on
-kvm_pv_unhalt=off
-kvm_pv_unhalt=on
-la57=on
-lahf_lm=on
-legacy=off
-legacy=on
-lm=on
-lock=off
-lock=on
-logappend=off
-logappend=on
-master=off
-master=on
-menu=off
-menu=on
-mepoch=on
-mepochptff=on
-merge=off
-migration=on
-misalignsse=off
-mlock=off
-mlock=on
-mode=on
-modern=off
-mouse=off
-mpx=on
-mq=on
-mrg_rxbuf=off
-msa1=on
-msa2=on
-msa3=on
-msa4=on
-msa5=on
-msa6=on
-msa7=on
-msa8=on
-msa9=on
-msa9_pckmo=on
-msi=on
-msr=on
-multifunction=off
-multifunction=on
-nb=on
-ni=off
-nodeid_msr=on
-npt=on
-nvdimm=on
-oom=off
-oom=on
-opt=on
-osvw=off
-packed=off
-packed=on
-pclmuldq=on
-pclmulqdq=on
-pcommit=on
-pconfig=off
-pdpe1gb=on
-peer=yes
-perfctr_core=on
-perfctr_nb=on
-pku=on
-pmem=yes
-pmu=off
-pmu=on
-ppa15=on
-prealloc=yes
-ramfb=on
-rdrand=off
-rdseed=off
-read=on
-readonly=on
-readonly=on'
-removable=off
-removable=on
-reporting=on
-ri=on
-rw=on
-save=off
-scsi=off
-scsi=on
-sea_esop2=on
-share=no
-share=yes
-smm=on
-ssbd=on
-ss=on
-stckf=off
-sthyi=on
-strict=on
-sve128=on
-sve256=on
-sve384=off
-sve512=on
-sve=on
-te=on
-threads=on
-timestamp=on
-topoext=off
-tsc_adjust=on
-umip=on
-unarmed=on
-unhalt=off
-unhalt=on
-usb=off
-value=on
-vhost=on
-virgl=on
-vme=off
-vmport=off
-vmx=on
-vxeh2=on
-vxeh=on
-vx=on
-vxpdeh=on
-vxpd=on
-wrap=off
-wrap=on
-xsavec=off
-xsaves=on
-zeroes=on
-zpci=on
-
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+>         } else {
+>             /* Guest driver can use any psize in cur_mask, not safe to continue */
+>             error_setg(...);
+>             return -1;
+>         }
+>     }
+> 
+> Maybe we can also work on top too (if this is the only reason to repost,
+> especially if Michael would like to pick this up sooner), so I just raise this
+> up.
+> 
+> Thanks,
+> 
+> -- 
+> Peter Xu
+> 
 
