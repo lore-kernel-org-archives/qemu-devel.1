@@ -2,89 +2,102 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE123C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B77BC388F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:01:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54A0B2080C
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:01:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8356C2236F
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:01:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UDwIFbnK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54A0B2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AHdX+xyT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8356C2236F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZykQ-0004pb-C4
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:01:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60244)
+	id 1kZykS-0004sf-Iv
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:01:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZyjF-0003Qo-VN
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:00:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52077)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZyjC-0002Vm-VW
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:00:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604419209;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=IeBEkZ3rPPd3tykenEV5yTcAv5+AKEtQKdvPy2HzDwc=;
- b=UDwIFbnKW4PhyTv3lJgX1c843B5Q5G3VJiLlTRB1n+y40TG/v65CmqxLzwyqrt/HiUKEVf
- PhqMuIJllAu4VtdW1o7kQq8Nek8No+c6jejsVJE9OOo6602jGsQe0sZVTlogrD3Bd0SWPJ
- QUrmn3xuOg0MYNcPaR7d7/KamQJ10WI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-lwe-oJdYNd2sAYfs9ZcLOg-1; Tue, 03 Nov 2020 11:00:07 -0500
-X-MC-Unique: lwe-oJdYNd2sAYfs9ZcLOg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 487B218BA283
- for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 16:00:06 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
- [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D52F27512A;
- Tue,  3 Nov 2020 16:00:05 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4DA3A1132BD6; Tue,  3 Nov 2020 17:00:04 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] qapi: make all parsing visitors parse boolean options
- the same
-References: <20201103142344.402353-1-pbonzini@redhat.com>
-Date: Tue, 03 Nov 2020 17:00:04 +0100
-In-Reply-To: <20201103142344.402353-1-pbonzini@redhat.com> (Paolo Bonzini's
- message of "Tue, 3 Nov 2020 09:23:44 -0500")
-Message-ID: <871rhajurf.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1)
+ (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
+ id 1kZyK2-0002M1-11
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:34:10 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:14996)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
+ id 1kZyJz-0001EJ-Gi
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:34:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1604417648; x=1635953648;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=ZFmgjHUuJNXRrAu1T34hiTrmmtdxLEyK19w6m80jsqM=;
+ b=AHdX+xyTs7zOyY0WCEgmdGd4swRvnbkmMPywXLunxy7Smkxobt11B8fj
+ /BmjBINGq0L7fOvkWV11335qTVc1ExUgZMNRUFECVXAcaauTdHGJKUSxe
+ R4WPJ4zBU26zE2RnpE1EMSo32LoG3cYBnLeUmjPS5fHzrQAnMDZh4tOXj
+ ygc4LyCnZktN8WKg5uctvhi1DBnqnOfabiKQoal9XyQ5hCZ2RtpNlP689
+ X0wN+tmKhpnC8GQjJMPY7FkROMqfNlvBe7aVuySSaOBp/zsE+xCpJXJ6W
+ lDWXixab1FXcFyVeLygHsDod2akd3SIdBbb43KRbGUeLyeZmxS7HaRJW1 g==;
+IronPort-SDR: zQUOQ8EXw2n0jJUQfR4pi38kHX01lk897GdBiyCYR0m69MhccvcrG8fZb4U4ncT9IAbGaJtqQU
+ jEHJPoCccBnDn+9IiOF+elmS0OVBG96h12GAmAOnf+1yZqQ5zwVecKlOegJay9cjN5Oqaewfw2
+ OaIrlbPsiK/EWxZtbWeUTA/Peu1gL5vYLzI/+qpNqiXV72zXsaEp4xI4r1Afup7uF6CY9g6nu5
+ 6csu66LSFeRMGbkfYXCgmoSZp/sgTbcVXoOUq204GI3pl1ts6hEwNldd61vvRCSJeTjjJPjW0z
+ 3X8=
+X-IronPort-AV: E=Sophos;i="5.77,448,1596470400"; d="scan'208";a="152867479"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 03 Nov 2020 23:33:27 +0800
+IronPort-SDR: 9O+FYCZGVku1hZdqHyQnX0M1F+g/Rb92C+qnYNFtwa60MuqbGKVsrDpCq3BzY0GHuBd9b5M21t
+ GXRKhNjRrzOTxO1vg+2+sX7+vpT/jN27ZeSNBLyZe30sq0MvtEU/Qzc8EtWbCyYTsiTXUIzmUY
+ HnEym5nb3fVTvFHrJDwZ8N0w45b/KQD3ljK/pItc+FrWRoEJzq44gJdzVCoeqDVXVdbX1EQNlF
+ Q49cYS4TDVhfSrZbiXi3thS56lFGdWrVXicIlXcR/To/X6AuKY5Lulue6APDGmvQz7VsjkkJCl
+ 1kJBN9vtBbqHb/XQwQL3fDLg
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Nov 2020 07:19:36 -0800
+IronPort-SDR: Za2g24C+nHDgN/tWucdTFaqAw/MBS4fMm5kT8+p0JSvmU5yzuN3XRCu/LAv9Hx/ulriRHrSfnp
+ O5DRRpEjuq0cw/ZPfOoNENmMGrDeWr0E1cmVgDFVEQAxWbIDFacpcb7qcrce/u4W5D/MmpIZfj
+ EkHD6DyMI7WO0P3afP0ni+8V4GrwSyRmUBalmjwZz2G89WgWypzXSK+LjfnkeXWmJgQp8weFOa
+ 2Vyc6k3NlKUlZmAPv5SODNCygfPIuopbx4vGJdbxkb0kYMsOfyWgDkoKya5O8n1ttHSMdFqLVq
+ YkU=
+WDCIronportException: Internal
+Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.60.113])
+ by uls-op-cesaip01.wdc.com with ESMTP; 03 Nov 2020 07:33:27 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PULL v2 14/19] hw/misc: Add Microchip PolarFire SoC SYSREG module
+ support
+Date: Tue,  3 Nov 2020 07:21:45 -0800
+Message-Id: <20201103152150.2677566-15-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201103152150.2677566-1-alistair.francis@wdc.com>
+References: <20201103152150.2677566-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.154.45;
+ envelope-from=prvs=569a91e0c=alistair.francis@wdc.com;
+ helo=esa6.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 10:33:23
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,217 +110,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+From: Bin Meng <bin.meng@windriver.com>
 
-> OptsVisitor, StringInputVisitor and the keyval visitor have
-> three different ideas of how a human could write the value of
-> a boolean option.  Pay homage to the backwards-compatibility
-> gods and make the new common helper accept all four sets: on/off,
-> true/false, y/n and yes/no.
+This creates a minimum model for Microchip PolarFire SoC SYSREG
+module. It only implements the ENVM_CR register to tell guest
+software that eNVM is running at the configured divider rate.
 
-Mention the match is now case-insensitive?
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 1603863010-15807-7-git-send-email-bmeng.cn@gmail.com
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ include/hw/misc/mchp_pfsoc_sysreg.h | 39 ++++++++++++
+ hw/misc/mchp_pfsoc_sysreg.c         | 99 +++++++++++++++++++++++++++++
+ MAINTAINERS                         |  2 +
+ hw/misc/Kconfig                     |  3 +
+ hw/misc/meson.build                 |  1 +
+ 5 files changed, 144 insertions(+)
+ create mode 100644 include/hw/misc/mchp_pfsoc_sysreg.h
+ create mode 100644 hw/misc/mchp_pfsoc_sysreg.c
 
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  include/qapi/util.h          |  2 ++
->  qapi/opts-visitor.c          | 13 +------------
->  qapi/qapi-util.c             | 23 +++++++++++++++++++++++
->  qapi/qobject-input-visitor.c | 11 +----------
->  qapi/string-input-visitor.c  | 17 +----------------
->  5 files changed, 28 insertions(+), 38 deletions(-)
->
-> diff --git a/include/qapi/util.h b/include/qapi/util.h
-> index bc312e90aa..6178e98e97 100644
-> --- a/include/qapi/util.h
-> +++ b/include/qapi/util.h
-> @@ -19,6 +19,8 @@ typedef struct QEnumLookup {
->  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val);
->  int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
->                      int def, Error **errp);
-> +bool qapi_bool_parse(const char *name, const char *value, bool *obj,
-> +                     Error **errp);
->  
->  int parse_qapi_name(const char *name, bool complete);
->  
-> diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-> index 7781c23a42..9b3a735e6d 100644
-> --- a/qapi/opts-visitor.c
-> +++ b/qapi/opts-visitor.c
-
-Oh no, the options visitor!
-
-> @@ -379,19 +379,8 @@ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
-   /* mimics qemu-option.c::parse_option_bool() */
-
-This comment becomes wrong.
-
-   static bool
-   opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
-   {
-       OptsVisitor *ov = to_ov(v);
-       const QemuOpt *opt;
-
-       opt = lookup_scalar(ov, name, errp);
->      if (!opt) {
->          return false;
->      }
-> -
->      if (opt->str) {
-> -        if (strcmp(opt->str, "on") == 0 ||
-> -            strcmp(opt->str, "yes") == 0 ||
-> -            strcmp(opt->str, "y") == 0) {
-> -            *obj = true;
-> -        } else if (strcmp(opt->str, "off") == 0 ||
-> -            strcmp(opt->str, "no") == 0 ||
-> -            strcmp(opt->str, "n") == 0) {
-> -            *obj = false;
-> -        } else {
-> -            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
-> -                       "on|yes|y|off|no|n");
-> +        if (!qapi_bool_parse(name, opt->str, obj, errp)) {
-
-Exploits lookup_name() ensures name == opt->name.
-
-Obviously true when ov->list_mode == LM_NONE: lookup_name() returns the
-last QemuOpt of that name.
-
-We don't get here when ov->list_mode == LM_TRAVERSED: lookup_name()
-fails.
-
-"Obviously" true when ov->list_mode == LM_IN_PROGRESS: lookup_name()
-returns the next remaining QemuOpt of that name (I think).
-
->              return false;
->          }
->      } else {
-> diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-> index 29a6c98b53..8a98813e42 100644
-> --- a/qapi/qapi-util.c
-> +++ b/qapi/qapi-util.c
-> @@ -13,6 +13,7 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "qemu/ctype.h"
-> +#include "qapi/qmp/qerror.h"
->  
->  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
->  {
-> @@ -40,6 +41,28 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
->      return def;
->  }
->  
-> +bool qapi_bool_parse(const char *name, const char *value, bool *obj, Error **errp)
-> +{
-> +    if (!strcasecmp(value, "on") ||
-> +        !strcasecmp(value, "yes") ||
-> +        !strcasecmp(value, "true") ||
-> +        !strcasecmp(value, "y")) {
-
-I'd prefer breaking the lines before the || operator (Knuth style).
-
-> +        *obj = true;
-> +        return true;
-> +    }
-> +    if (!strcasecmp(value, "off") ||
-> +        !strcasecmp(value, "no") ||
-> +        !strcasecmp(value, "false") ||
-> +        !strcasecmp(value, "n")) {
-> +        *obj = false;
-> +        return true;
-> +    }
-> +
-> +    error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
-> +               "boolean (on/off, yes/no, true/false, y/n)");
-> +    return false;
-
-Baroque.  Not this patch's fault.  I'm half-tempted to deprecate
-everything but 'on' and 'off', case-sensitive.
-
-Recommend to have the error message only mention the preferred form.  I
-like the laconic "'on' or 'off'".  It's really all the user needs to
-know.
-
-You copied the name ?: "null" from the string input visitor.  It's bad
-there (but nobody cares), and it's bad here (where I care).  I think it
-should be left to callers.  See also next hunk.
-
-> +}
-> +
->  /*
->   * Parse a valid QAPI name from @str.
->   * A valid name consists of letters, digits, hyphen and underscore.
-> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-> index 7b184b50a7..183472e5e4 100644
-> --- a/qapi/qobject-input-visitor.c
-> +++ b/qapi/qobject-input-visitor.c
-> @@ -512,16 +512,7 @@ static bool qobject_input_type_bool_keyval(Visitor *v, const char *name,
->          return false;
->      }
->  
-> -    if (!strcmp(str, "on")) {
-> -        *obj = true;
-> -    } else if (!strcmp(str, "off")) {
-> -        *obj = false;
-> -    } else {
-> -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-> -                   full_name(qiv, name), "'on' or 'off'");
-> -        return false;
-> -    }
-> -    return true;
-> +    return qapi_bool_parse(name, str, obj, errp);
-
-Error message regresses from full_name(), which is never null, to name
-?: "null".
-
-Test case:
-
-    $ qemu-storage-daemon --blockdev qcow2,node-name=node0,file.driver=file,file.filename=tmp.qcow2,file.x-check-cache-dropped=xxx
-    qemu-storage-daemon: --blockdev qcow2,node-name=node0,file.driver=file,file.filename=tmp.qcow2,file.x-check-cache-dropped=xxx: Parameter 'file.x-check-cache-dropped' expects 'on' or 'off'
-
-!name happens for ['bool'].  The error message is user-hostile then.  No
-test case, because ['bool'] occurs only in tests/ right now.
-
->  }
->  
->  static bool qobject_input_type_str(Visitor *v, const char *name, char **obj,
-> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-> index 6e53396ea3..ba2697d70f 100644
-> --- a/qapi/string-input-visitor.c
-> +++ b/qapi/string-input-visitor.c
-
-Oh no, the string visitor!
-
-> @@ -332,22 +332,7 @@ static bool parse_type_bool(Visitor *v, const char *name, bool *obj,
->      StringInputVisitor *siv = to_siv(v);
->  
->      assert(siv->lm == LM_NONE);
-> -    if (!strcasecmp(siv->string, "on") ||
-> -        !strcasecmp(siv->string, "yes") ||
-> -        !strcasecmp(siv->string, "true")) {
-> -        *obj = true;
-> -        return true;
-> -    }
-> -    if (!strcasecmp(siv->string, "off") ||
-> -        !strcasecmp(siv->string, "no") ||
-> -        !strcasecmp(siv->string, "false")) {
-> -        *obj = false;
-> -        return true;
-> -    }
-> -
-> -    error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
-> -               "boolean");
-> -    return false;
-> +    return qapi_bool_parse(name, siv->string, obj, errp);
->  }
->  
->  static bool parse_type_str(Visitor *v, const char *name, char **obj,
-
-Puh!
+diff --git a/include/hw/misc/mchp_pfsoc_sysreg.h b/include/hw/misc/mchp_pfsoc_sysreg.h
+new file mode 100644
+index 0000000000..546ba68f6a
+--- /dev/null
++++ b/include/hw/misc/mchp_pfsoc_sysreg.h
+@@ -0,0 +1,39 @@
++/*
++ * Microchip PolarFire SoC SYSREG module emulation
++ *
++ * Copyright (c) 2020 Wind River Systems, Inc.
++ *
++ * Author:
++ *   Bin Meng <bin.meng@windriver.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef MCHP_PFSOC_SYSREG_H
++#define MCHP_PFSOC_SYSREG_H
++
++#define MCHP_PFSOC_SYSREG_REG_SIZE  0x2000
++
++typedef struct MchpPfSoCSysregState {
++    SysBusDevice parent;
++    MemoryRegion sysreg;
++} MchpPfSoCSysregState;
++
++#define TYPE_MCHP_PFSOC_SYSREG "mchp.pfsoc.sysreg"
++
++#define MCHP_PFSOC_SYSREG(obj) \
++    OBJECT_CHECK(MchpPfSoCSysregState, (obj), \
++                 TYPE_MCHP_PFSOC_SYSREG)
++
++#endif /* MCHP_PFSOC_SYSREG_H */
+diff --git a/hw/misc/mchp_pfsoc_sysreg.c b/hw/misc/mchp_pfsoc_sysreg.c
+new file mode 100644
+index 0000000000..248a313345
+--- /dev/null
++++ b/hw/misc/mchp_pfsoc_sysreg.c
+@@ -0,0 +1,99 @@
++/*
++ * Microchip PolarFire SoC SYSREG module emulation
++ *
++ * Copyright (c) 2020 Wind River Systems, Inc.
++ *
++ * Author:
++ *   Bin Meng <bin.meng@windriver.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/bitops.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/misc/mchp_pfsoc_sysreg.h"
++
++#define ENVM_CR         0xb8
++
++static uint64_t mchp_pfsoc_sysreg_read(void *opaque, hwaddr offset,
++                                       unsigned size)
++{
++    uint32_t val = 0;
++
++    switch (offset) {
++    case ENVM_CR:
++        /* Indicate the eNVM is running at the configured divider rate */
++        val = BIT(6);
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: unimplemented device read "
++                      "(size %d, offset 0x%" HWADDR_PRIx ")\n",
++                      __func__, size, offset);
++        break;
++    }
++
++    return val;
++}
++
++static void mchp_pfsoc_sysreg_write(void *opaque, hwaddr offset,
++                                    uint64_t value, unsigned size)
++{
++    qemu_log_mask(LOG_UNIMP, "%s: unimplemented device write "
++                  "(size %d, value 0x%" PRIx64
++                  ", offset 0x%" HWADDR_PRIx ")\n",
++                  __func__, size, value, offset);
++}
++
++static const MemoryRegionOps mchp_pfsoc_sysreg_ops = {
++    .read = mchp_pfsoc_sysreg_read,
++    .write = mchp_pfsoc_sysreg_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++};
++
++static void mchp_pfsoc_sysreg_realize(DeviceState *dev, Error **errp)
++{
++    MchpPfSoCSysregState *s = MCHP_PFSOC_SYSREG(dev);
++
++    memory_region_init_io(&s->sysreg, OBJECT(dev),
++                          &mchp_pfsoc_sysreg_ops, s,
++                          "mchp.pfsoc.sysreg",
++                          MCHP_PFSOC_SYSREG_REG_SIZE);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->sysreg);
++}
++
++static void mchp_pfsoc_sysreg_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->desc = "Microchip PolarFire SoC SYSREG module";
++    dc->realize = mchp_pfsoc_sysreg_realize;
++}
++
++static const TypeInfo mchp_pfsoc_sysreg_info = {
++    .name          = TYPE_MCHP_PFSOC_SYSREG,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(MchpPfSoCSysregState),
++    .class_init    = mchp_pfsoc_sysreg_class_init,
++};
++
++static void mchp_pfsoc_sysreg_register_types(void)
++{
++    type_register_static(&mchp_pfsoc_sysreg_info);
++}
++
++type_init(mchp_pfsoc_sysreg_register_types)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0e597c2989..dd16606bcd 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1329,10 +1329,12 @@ F: hw/riscv/microchip_pfsoc.c
+ F: hw/char/mchp_pfsoc_mmuart.c
+ F: hw/misc/mchp_pfsoc_dmc.c
+ F: hw/misc/mchp_pfsoc_ioscb.c
++F: hw/misc/mchp_pfsoc_sysreg.c
+ F: include/hw/riscv/microchip_pfsoc.h
+ F: include/hw/char/mchp_pfsoc_mmuart.h
+ F: include/hw/misc/mchp_pfsoc_dmc.h
+ F: include/hw/misc/mchp_pfsoc_ioscb.h
++F: include/hw/misc/mchp_pfsoc_sysreg.h
+ 
+ RX Machines
+ -----------
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 4ff01ec4be..dc44dc14f6 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -145,6 +145,9 @@ config MCHP_PFSOC_DMC
+ config MCHP_PFSOC_IOSCB
+     bool
+ 
++config MCHP_PFSOC_SYSREG
++    bool
++
+ config SIFIVE_TEST
+     bool
+ 
+diff --git a/hw/misc/meson.build b/hw/misc/meson.build
+index 770149e47a..1cd48e8a0f 100644
+--- a/hw/misc/meson.build
++++ b/hw/misc/meson.build
+@@ -25,6 +25,7 @@ softmmu_ss.add(when: 'CONFIG_MOS6522', if_true: files('mos6522.c'))
+ # RISC-V devices
+ softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_DMC', if_true: files('mchp_pfsoc_dmc.c'))
+ softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_IOSCB', if_true: files('mchp_pfsoc_ioscb.c'))
++softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_SYSREG', if_true: files('mchp_pfsoc_sysreg.c'))
+ softmmu_ss.add(when: 'CONFIG_SIFIVE_TEST', if_true: files('sifive_test.c'))
+ softmmu_ss.add(when: 'CONFIG_SIFIVE_E_PRCI', if_true: files('sifive_e_prci.c'))
+ softmmu_ss.add(when: 'CONFIG_SIFIVE_U_OTP', if_true: files('sifive_u_otp.c'))
+-- 
+2.28.0
 
 
