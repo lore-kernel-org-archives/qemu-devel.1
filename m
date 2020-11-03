@@ -2,89 +2,97 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E52DC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 18:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60987C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 18:33:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF6FF20786
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 18:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D32782076E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 18:33:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRdR4oP8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF6FF20786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KcQyb3iF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D32782076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka0rw-00071i-Jm
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 13:17:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43048)
+	id 1ka17R-0001En-Rz
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 13:33:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1ka0r2-0006ZA-02
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 13:16:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35728)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1ka0qz-0005Pz-Jn
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 13:16:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604427380;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=5y8wErqzn0H1ikahfKbgz8Zkn2TbU4+UaOo6SKisZMA=;
- b=ZRdR4oP8PL+eVmb481r/l3cdOGlpKJMZKkZjicjdvzEp/iRqeOQbTnl/mCDzME2/1YlY2X
- ub4ohy9i7Fj+lltSDsXOdL56X3oEqE18hSdxRa3/ab1mkW5dZUSA9WMw1RB8OIqPYKofWj
- 8ufSpcXXN0cQW2s8WV/7m8e/DnpKZ8M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-xbrdqk_QNbS_Jg790nHnUw-1; Tue, 03 Nov 2020 13:16:16 -0500
-X-MC-Unique: xbrdqk_QNbS_Jg790nHnUw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97F88185FD8B;
- Tue,  3 Nov 2020 18:16:15 +0000 (UTC)
-Received: from localhost (ovpn-115-37.ams2.redhat.com [10.36.115.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 269B3610F3;
- Tue,  3 Nov 2020 18:16:11 +0000 (UTC)
-Date: Tue, 3 Nov 2020 18:16:10 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: VFIO Migration
-Message-ID: <20201103181610.GG259481@stefanha-x1.localdomain>
-References: <20201102111153.GC42093@stefanha-x1.localdomain>
- <20201103113929.GH205187@redhat.com>
- <20201103150508.GB253848@stefanha-x1.localdomain>
- <20201103152303.GN205187@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1ka16c-0000gg-6d
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 13:32:30 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42142)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1ka16Z-0007HP-QB
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 13:32:29 -0500
+Received: by mail-pf1-x443.google.com with SMTP id x13so14988967pfa.9
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 10:32:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=WyI+wdpZSvkibXURhsE4UtunQSLgk/mfEDbq38QxQDk=;
+ b=KcQyb3iFTdQ05J0LDLh3583K+jexl8NrWpv6TrYdDb9+cQhIh5ONglbtjQSXG9Spsa
+ m9i5N2FoSWxVFxIbnUOoOGlnQPkuEfMWpIReIG2cmkdIDnDz5IQcTKD7xHf8ZwCSOQnf
+ 0/Xo9xLKSs5pWzBw8sWjXHgPBfENyh1hpx+9uCKocOg4ZNHUcXe6inPLNlEa0Cp4giCq
+ Y5dBdSc1m1Y1tFTlEuQuoHEFpr2GswAhuSmJ2jAHU8j0STrJPUurGntavlZ2LFly/aAk
+ /K/Lto2vqErLQJvpPltclFEINbeYJWGTfOraaTe9h0nCc/znoq4DYxCeNruXF8NSaI1U
+ C4dQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WyI+wdpZSvkibXURhsE4UtunQSLgk/mfEDbq38QxQDk=;
+ b=Q3d7C8HpPXBSUOyXrTfll/qyP0xNicOwdHV3QHrjhTWGHJKCpbSBl8sYyaKGbqZGtS
+ +MKi1kWY4fJsiyIfM2TyiGWwsq/GpCFeSzI76zegaQVEvS1TJIHcNs9Mwx8JNZU+iVUq
+ TYyHDHJB1coWAVZY7dr7COm4dEBDof8oCPDe5C33ZD5qeFl1Qnljqp4P6geDDqQ/FRNu
+ b9YPY1crsZhpoQ0JvpAYgw+P/0SLreeuJs8y7ZAOMHmdleT/vJC+xr50oAyYL49teEHJ
+ F92tGddtU2eDX2SBNm7VJJJ2wlFa2BYSKWw3HSsTptVMKHvb5z+LWBJl+WDwQszqebJo
+ Wv9w==
+X-Gm-Message-State: AOAM530iFNpO72kMTUxThNWi8hG5rFrNeEp2c+CCGnpI3iY/xx/sJ2LB
+ zA2oz+Quoh7rz/cJuWuq0KK4nDtxLV34gA==
+X-Google-Smtp-Source: ABdhPJzj0rKZxImQjPfRd+1EgbDxAytTGYFXfy1W3O4I0m7gVvyZiXgaOW5C93OKLhpint40P4X7GQ==
+X-Received: by 2002:a17:90a:468b:: with SMTP id
+ z11mr468720pjf.157.1604428345363; 
+ Tue, 03 Nov 2020 10:32:25 -0800 (PST)
+Received: from [172.16.1.221] (76-14-210-194.or.wavecable.com. [76.14.210.194])
+ by smtp.gmail.com with ESMTPSA id v24sm15882848pgi.91.2020.11.03.10.32.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Nov 2020 10:32:24 -0800 (PST)
+Subject: Re: [PATCH 08/14] target/arm: add MMU stage 1 for Secure EL2
+To: remi.denis.courmont@huawei.com, qemu-arm@nongnu.org
+References: <2172054.ElGaqSPkdT@basile.remlab.net>
+ <20201102105802.39332-8-remi.denis.courmont@huawei.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e1bca2e0-d926-02cb-c462-5e9d64a51999@linaro.org>
+Date: Tue, 3 Nov 2020 10:32:21 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201103152303.GN205187@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="HB4mHL4PVvkpZAgW"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+In-Reply-To: <20201102105802.39332-8-remi.denis.courmont@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,167 +105,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
- quintela@redhat.com, Jason Wang <jasowang@redhat.com>,
- Felipe Franciosi <felipe@nutanix.com>, Kirti Wankhede <kwankhede@nvidia.com>,
- qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---HB4mHL4PVvkpZAgW
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 11/2/20 2:57 AM, remi.denis.courmont@huawei.com wrote:
+> From: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
+> 
+> This adds the MMU indices for EL2 stage 1 in secure mode.
+> 
+> To keep code contained, which is largelly identical between secure and
+> non-secure modes, this patch introduces a secure bit for all new and
+> existing stage 1 translation regimes.
+> 
+> Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
+> ---
+>  target/arm/cpu-param.h     |   2 +-
+>  target/arm/cpu.h           |  22 ++++--
+>  target/arm/helper.c        | 143 ++++++++++++++++++++++++-------------
+>  target/arm/internals.h     |  12 ++++
+>  target/arm/translate-a64.c |   4 ++
+>  5 files changed, 127 insertions(+), 56 deletions(-)
+> 
+> diff --git a/target/arm/cpu-param.h b/target/arm/cpu-param.h
+> index 6321385b46..0db5e37c17 100644
+> --- a/target/arm/cpu-param.h
+> +++ b/target/arm/cpu-param.h
+> @@ -29,6 +29,6 @@
+>  # define TARGET_PAGE_BITS_MIN  10
+>  #endif
+>  
+> -#define NB_MMU_MODES 11
+> +#define NB_MMU_MODES 16
+>  
+>  #endif
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 724b11ee57..3fbb70e273 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2944,6 +2944,9 @@ bool write_cpustate_to_list(ARMCPU *cpu, bool kvm_sync);
+>  #define ARM_MMU_IDX_NOTLB 0x20  /* does not have a TLB */
+>  #define ARM_MMU_IDX_M     0x40  /* M profile */
+>  
+> +/* Meanings of the bits for A profile mmu idx values */
+> +#define ARM_MMU_IDX_A_S      0x8
+> +
+>  /* Meanings of the bits for M profile mmu idx values */
+>  #define ARM_MMU_IDX_M_PRIV   0x1
+>  #define ARM_MMU_IDX_M_NEGPRI 0x2
+> @@ -2967,10 +2970,17 @@ typedef enum ARMMMUIdx {
+>      ARMMMUIdx_E20_2      =  5 | ARM_MMU_IDX_A,
+>      ARMMMUIdx_E20_2_PAN  =  6 | ARM_MMU_IDX_A,
+>  
+> -    ARMMMUIdx_SE10_0     = 7 | ARM_MMU_IDX_A,
+> -    ARMMMUIdx_SE10_1     = 8 | ARM_MMU_IDX_A,
+> -    ARMMMUIdx_SE10_1_PAN = 9 | ARM_MMU_IDX_A,
+> -    ARMMMUIdx_SE3        = 10 | ARM_MMU_IDX_A,
+> +    ARMMMUIdx_SE10_0     = ARMMMUIdx_E10_0 | ARM_MMU_IDX_A_S,
+> +    ARMMMUIdx_SE20_0     = ARMMMUIdx_E20_0 | ARM_MMU_IDX_A_S,
+> +
+> +    ARMMMUIdx_SE10_1     = ARMMMUIdx_E10_1 | ARM_MMU_IDX_A_S,
+> +    ARMMMUIdx_SE10_1_PAN = ARMMMUIdx_E10_1_PAN | ARM_MMU_IDX_A_S,
+> +
+> +    ARMMMUIdx_SE2        = ARMMMUIdx_E2 | ARM_MMU_IDX_A_S,
+> +    ARMMMUIdx_SE20_2     = ARMMMUIdx_E20_2 | ARM_MMU_IDX_A_S,
+> +    ARMMMUIdx_SE20_2_PAN = ARMMMUIdx_E20_2_PAN | ARM_MMU_IDX_A_S,
+> +
+> +    ARMMMUIdx_SE3        = 15 | ARM_MMU_IDX_A,
 
-On Tue, Nov 03, 2020 at 03:23:03PM +0000, Daniel P. Berrang=E9 wrote:
-> On Tue, Nov 03, 2020 at 03:05:08PM +0000, Stefan Hajnoczi wrote:
-> > On Tue, Nov 03, 2020 at 11:39:29AM +0000, Daniel P. Berrang=E9 wrote:
-> > > On Mon, Nov 02, 2020 at 11:11:53AM +0000, Stefan Hajnoczi wrote:
-> > > > Overview
-> > > > --------
-> > > > The purpose of device states is to save the device at a point in ti=
-me and then
-> > > > restore the device back to the saved state later. This is more chal=
-lenging than
-> > > > it first appears.
-> > > >=20
-> > > > The process of saving a device state and loading it later is called
-> > > > *migration*. The state may be loaded by the same device that saved =
-it or by a
-> > > > new instance of the device, possibly running on a different compute=
-r.
-> > > >=20
-> > > > It must be possible to migrate to a newer implementation of the dev=
-ice
-> > > > as well as to an older implementation of the device. This allows us=
-ers
-> > > > to upgrade and roll back their systems.
-> > > >=20
-> > > > Migration can fail if loading the device state is not possible. It =
-should fail
-> > > > early with a clear error message. It must not appear to complete bu=
-t leave the
-> > > > device inoperable due to a migration problem.
-> > >=20
-> > > I think there needs to be an addition requirement.
-> > >=20
-> > >  It must be possible for a management application to query the suppor=
-ted
-> > >  versions, independantly of execution of a migration  operation.
-> > >=20
-> > > This is important to large scale data center / cloud management appli=
-cations
-> > > because before initiating a migration they need to *automatically* se=
-lect
-> > > a target host with high level of confidence that is will be compatibl=
-e with
-> > > the source host.
-> > >=20
-> > > Today QEMU migration compatibility is largely determined by the machi=
-ne
-> > > type version. Apps can query the supported machine types for host to
-> > > check whether it is compatible. Similarly they will query CPU model
-> > > features to check compatiblity.
-> > >=20
-> > > Validation and error checking at time of migration is of course still
-> > > required, but the goal should be that an mgmt application will *NEVER=
-*
-> > > hit these errors because they will have pre-selected a host that is
-> > > known to be compatible based on reported versions that are supported.
-> >=20
-> > Okay. What do you think of the following?
-> >=20
-> >   [
-> >     {
-> >       "model": "https://qemu.org/devices/e1000e",
-> >       "params": [
-> >         "rss",
-> > =09...more configuration parameters...
-> >       ],
-> >       "versions": [
-> >         {
-> > =09  "name": "1",
-> > =09  "params": [],
-> > =09},
-> > =09{
-> > =09  "name": "2",
-> > =09  "params": ["rss=3Don"],
-> > =09},
-> > =09...more versions...
-> >       ]
-> >     },
-> >     ...more device models...
-> >   ]
-> >=20
-> > The management tool can generate the configuration parameter list by
-> > expanding a version into its params.
-> >=20
-> > Configuration parameter types and input ranges need more thought. For
-> > example, version 1 of the device might not have rx-table-size (it's
-> > effectively 0). Version 2 introduces rx-table-size and sets it to 32.
-> > Version 3 raises the value to 64. In addition, the user can set a custo=
-m
-> > value like rx-table-size=3D48. I haven't defined the rules for this yet=
-,
-> > but it's clear there needs to be a way to extend configuration
-> > parameters.
-> >=20
-> > To check migration compatibility:
-> > 1. Verify that the device model URL matches the JSON data[n].model
-> >    field.
-> > 2. For every configuration parameter name from the source device,
-> >    check that it is contained within the JSON data[n].params list.
->=20
-> I'm not convinced that this makes sense. A matching set of parameter
-> names + values does not imply that the migration data stream is
-> actually compatible.
->=20
-> ie implementations may need to change the internal migration data
-> stream to fix bugs, without adding/removing a config parameter.
-> The migration version string alone expresses data stream compatibility.
+Hum.  So, we're adding 4 new mmu_idx, and increasing the mmu_idx count by 5.
+The unused index would be 7 -- no non-secure el3.
 
-This is not the approach described in this document. The point of this
-approach is precisely that migration is known to be safe when the device
-model URI and configuration parameters match on source and destination.
+Is it worth reversing the S bit to NS, so that index 15 becomes the one that is
+unused, and so we don't actually have to add it to NB_MMU_MODES?
 
-Changes to the guest-visible hardware interface and/or device state
-representation always require a new configuration parameter under this
-approach.
+> @@ -3649,7 +3655,7 @@ static void ats1h_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>  static CPAccessResult at_s1e2_access(CPUARMState *env, const ARMCPRegInfo *ri,
+>                                       bool isread)
+>  {
+> -    if (arm_current_el(env) == 3 && !(env->cp15.scr_el3 & SCR_NS)) {
+> +    if (arm_current_el(env) == 3 && !(env->cp15.scr_el3 & (SCR_NS|SCR_EEL2))) {
 
-> This is similar to how 2 QEMU command lines can have identical set
-> of configuration parameters, aside from the machine type version,
-> and thus be migration *incompatible.
+This seems to belong to a different patch?
 
-That is not possible under this approach.
+> +        if (arm_is_secure_below_el3(env))
+> +            mask <<= ARM_MMU_IDX_A_S;
 
-> Basically the version string should be considered an opaque blob
-> that expresses compatibility on its own.
+Braces.
 
-The version string is not directly part of the migration compatibility
-check under this approach. It's is simply an alias for a list of
-configuration parameters.
+>      if (raw_read(env, ri) != value) {
+> -        tlb_flush_by_mmuidx(cs,
+> -                            ARMMMUIdxBit_E10_1 |
+> -                            ARMMMUIdxBit_E10_1_PAN |
+> -                            ARMMMUIdxBit_E10_0);
+> +        uint16_t mask = ARMMMUIdxBit_E10_1 |
+> +                        ARMMMUIdxBit_E10_1_PAN |
+> +                        ARMMMUIdxBit_E10_0;
+> +
+> +        if (arm_is_secure_below_el3(env))
+> +            mask <<= ARM_MMU_IDX_A_S;
 
-Stefan
+Again.  This appears to be an existing bug with SEL1?  Perhaps it should be
+split to a separate patch.
 
---HB4mHL4PVvkpZAgW
-Content-Type: application/pgp-signature; name="signature.asc"
+>      if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
+> -        return ARMMMUIdxBit_E20_2 |
+> +        mask = ARMMMUIdxBit_E20_2 |
+>                 ARMMMUIdxBit_E20_2_PAN |
+>                 ARMMMUIdxBit_E20_0;
+> -    } else if (arm_is_secure_below_el3(env)) {
+> -        return ARMMMUIdxBit_SE10_1 |
+> -               ARMMMUIdxBit_SE10_1_PAN |
+> -               ARMMMUIdxBit_SE10_0;
+>      } else {
+> -        return ARMMMUIdxBit_E10_1 |
+> +        mask = ARMMMUIdxBit_E10_1 |
+>                 ARMMMUIdxBit_E10_1_PAN |
+>                 ARMMMUIdxBit_E10_0;
+>      }
+> +
+> +    if (arm_is_secure_below_el3(env)) {
+> +        mask <<= ARM_MMU_IDX_A_S;
+> +    }
 
------BEGIN PGP SIGNATURE-----
+Likewise.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+hnmoACgkQnKSrs4Gr
-c8j4iwf/W/tycfiuJvar6lxbKzKcuGdiAfIApuS6MK5IWC3pRJtFotuPMe8l9Bg5
-KZSihpF+1iMDXaHZkEfAYAk5x6GPN3KiRZSxzo66NHbqJ0berpfYkbeHYUHu2HsM
-QtlH1VjmwEJ0ww75ErgSbs0dbgoCdn24Tdi4PLReol1B0QBSA1AjixdVJ9nqcUGi
-sls1eMJx9JjjggG3XXPuzb4Y5hviPfZuhV/gCsbBIrdojBaWXo9y7pleFKBBGsfE
-eMAKdqkwxX9VDJyf2wCieuE12ihhm9S+O42oKpXmCcttMY3oC4iViwMo/819VNcI
-tAMVJGdJeCzOFoCz/YFnTFxG2KGm7Q==
-=6qrk
------END PGP SIGNATURE-----
+The rest of the patch looks mechanically correct.
 
---HB4mHL4PVvkpZAgW--
 
+r~
 
