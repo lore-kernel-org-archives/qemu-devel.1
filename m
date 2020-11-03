@@ -2,85 +2,88 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C516C388F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DA77C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:54:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8691F20786
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:52:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90F7320786
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:54:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QvK0kp6Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8691F20786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qcagc8MD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F7320786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZycA-0003M1-J1
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:52:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48594)
+	id 1kZydQ-000590-Jy
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:54:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kZyDS-0000pt-SU
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:27:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30676)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kZyDP-0007Ow-N3
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:27:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604417238;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=m8Z76YkFndCKXfmICdrTuHcPQ4+kdhOB48dxkWsImBs=;
- b=QvK0kp6QAh3t3r8Tqkq9fKOG4fqd8MWTvFLRXcm9e8GzoIX3b7h9+oOC5/yKYkjGCibaUT
- GEqpsh/xyiIkUBlumh86OWyO6JvAKNNGQjpjaJO7wQmcyUG2zX+4KjaHpehM7KnsqOqP7B
- 00fC8isoH1OUh6TgFKIUY7cZziZp+rk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-556-sKv6t3SIPj-26a-_VPJAHg-1; Tue, 03 Nov 2020 10:27:15 -0500
-X-MC-Unique: sKv6t3SIPj-26a-_VPJAHg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E7E41006CAB;
- Tue,  3 Nov 2020 15:27:14 +0000 (UTC)
-Received: from merkur.redhat.com (ovpn-113-164.ams2.redhat.com [10.36.113.164])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 581AA6EF70;
- Tue,  3 Nov 2020 15:27:13 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 6/6] block/vvfat: Fix bad printf format specifiers
-Date: Tue,  3 Nov 2020 16:26:58 +0100
-Message-Id: <20201103152658.119563-7-kwolf@redhat.com>
-In-Reply-To: <20201103152658.119563-1-kwolf@redhat.com>
-References: <20201103152658.119563-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kZycV-00044o-Ma
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:53:16 -0500
+Received: from mail-il1-x12c.google.com ([2607:f8b0:4864:20::12c]:42840)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kZycU-0008IA-2Y
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:53:15 -0500
+Received: by mail-il1-x12c.google.com with SMTP id g15so1796399ilc.9
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 07:53:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=iFz6AsDSw1gcUlBXxfxLgIu9Ln5wNr38zIYH1L4kx68=;
+ b=Qcagc8MD2q0+SJgTXGvC261nsIjfh3mqKXImPSldOPDIVOYe/BrkCO4RStaRruuzPx
+ gnMqYGgDHGk1o05QuZEFhWnrLdqpRORh6Y/tinkaDXhzIF0tLYxK9pg7RnBJYHwOzKoL
+ 8+D+SU/xb75RTSe+nbwPSfT15KLxmAs6Hbrljvuv0HZO/7C9fdNDPPsBFP+LgJWQJD00
+ UIVf1+lqIRB7nioI2BrP3VatVS6gWHaYWwBIh3tgwIibWKGw72sNQ60crIhXTJlnVMSR
+ DXhck2kc3cC9CHaZtqj1EKbH/YybzEgHqeqOUTqefoYWnFXsAuhH8ZVXN6j4eOtJ8ek3
+ 8Z9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=iFz6AsDSw1gcUlBXxfxLgIu9Ln5wNr38zIYH1L4kx68=;
+ b=s6GE+2qUzIwA0MphIrYVyAXm2vxsKtaoVHicV3j2LHGR/DKrpvnKBhmLzRtKMzSnOo
+ PmAY+FxFzNw8ojQUdiTL+eyNM/HPq3szxnfu8XcDDYGYwQqJjGnw6G2C0iw6tqQSbv72
+ WIAs+6kSAHIBioQGgh1zEiK/Vl6uNEvfsz0du4Oapbh9TY/WvlyscGPOmrqsYvOnG2lw
+ QCuasQ/brlWV/pEtpAJ3Wk84d7wSuSDWPlYqBzN9UeonkynGcS12kDK0QaEq/m5mUB5F
+ gKWQRoom3yKUM6okHiz3cN/tsRiv0BTe2ZIpyb0ImQksA4t6WsOS4JuAWrXVzmE/yH00
+ 2f+w==
+X-Gm-Message-State: AOAM5304y6NPPHIp1IrGec4Pv/x5hM7MPxmeMp1ozxJfSop8Hm+7gLKD
+ P8PIXWgjKXoFbYV0+Qv+lT5Fm1urPMRPT3H0Rfc=
+X-Google-Smtp-Source: ABdhPJxwwtuVB0rEnmzzIQfOfouQVRKK31YzbwGHfnamn3dlK331kef3PouQ5U2JG752USn9dbCsE2t4Z1QiG2j/Svo=
+X-Received: by 2002:a92:c5ce:: with SMTP id s14mr15488414ilt.40.1604418792306; 
+ Tue, 03 Nov 2020 07:53:12 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20201023151619.3175155-1-alistair.francis@wdc.com>
+ <20201023151619.3175155-13-alistair.francis@wdc.com>
+ <CAFEAcA9MEG_g_YTFdnfjAp6U9zwqKmQWD8UnPYwbGj0c7WnOUg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9MEG_g_YTFdnfjAp6U9zwqKmQWD8UnPYwbGj0c7WnOUg@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 3 Nov 2020 07:41:15 -0800
+Message-ID: <CAKmqyKP5b+3QN91BV8sZ8+diTGmJ5SMQJJLPi_jsENQCX_6O4g@mail.gmail.com>
+Subject: Re: [PULL 12/12] hw/misc/sifive_u_otp: Add backend drive support
+To: Green Wan <green.wan@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::12c;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x12c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,82 +96,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: AlexChen <alex.chen@huawei.com>
+On Mon, Nov 2, 2020 at 9:49 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 23 Oct 2020 at 16:27, Alistair Francis <alistair.francis@wdc.com> wrote:
+> >
+> > From: Green Wan <green.wan@sifive.com>
+> >
+> > Add '-drive' support to OTP device. Allow users to assign a raw file
+> > as OTP image.
+>
+> Hi; Coverity reports some issues with this code (CID 1435959,
+> CID 1435960, CID 1435961). They're all basically the same thing:
+> in read, write and reset functions this code calls blk_pread()
+> or blk_pwrite() but doesn't check the return value, so if the
+> underlying file operation fails then the guest will be
+> returned garbage data or have its write thrown away without
+> either the guest or the user being warned about that.
 
-We should use printf format specifier "%u" instead of "%d" for
-argument of type "unsigned int".
-In addition, fix two error format problems found by checkpatch.pl:
-ERROR: space required after that ',' (ctx:VxV)
-+        fprintf(stderr,"%s attributes=0x%02x begin=%u size=%d\n",
-                       ^
-ERROR: line over 90 characters
-+        fprintf(stderr, "%d, %s (%u, %d)\n", i, commit->path ? commit->path : "(null)", commit->param.rename.cluster, commit->action);
+Green Wan are you able to send a patch to check the error value?
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Alex Chen <alex.chen@huawei.com>
-Message-Id: <5FA12620.6030705@huawei.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/vvfat.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Alistair
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 5abb90e7c7..54807f82ca 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1437,7 +1437,7 @@ static void print_direntry(const direntry_t* direntry)
-         for(i=0;i<11;i++)
-             ADD_CHAR(direntry->name[i]);
-         buffer[j] = 0;
--        fprintf(stderr,"%s attributes=0x%02x begin=%d size=%d\n",
-+        fprintf(stderr, "%s attributes=0x%02x begin=%u size=%u\n",
-                 buffer,
-                 direntry->attributes,
-                 begin_of_direntry(direntry),le32_to_cpu(direntry->size));
-@@ -1446,7 +1446,7 @@ static void print_direntry(const direntry_t* direntry)
- 
- static void print_mapping(const mapping_t* mapping)
- {
--    fprintf(stderr, "mapping (%p): begin, end = %d, %d, dir_index = %d, "
-+    fprintf(stderr, "mapping (%p): begin, end = %u, %u, dir_index = %u, "
-         "first_mapping_index = %d, name = %s, mode = 0x%x, " ,
-         mapping, mapping->begin, mapping->end, mapping->dir_index,
-         mapping->first_mapping_index, mapping->path, mapping->mode);
-@@ -1454,7 +1454,7 @@ static void print_mapping(const mapping_t* mapping)
-     if (mapping->mode & MODE_DIRECTORY)
-         fprintf(stderr, "parent_mapping_index = %d, first_dir_index = %d\n", mapping->info.dir.parent_mapping_index, mapping->info.dir.first_dir_index);
-     else
--        fprintf(stderr, "offset = %d\n", mapping->info.file.offset);
-+        fprintf(stderr, "offset = %u\n", mapping->info.file.offset);
- }
- #endif
- 
-@@ -1588,7 +1588,7 @@ typedef struct commit_t {
- static void clear_commits(BDRVVVFATState* s)
- {
-     int i;
--DLOG(fprintf(stderr, "clear_commits (%d commits)\n", s->commits.next));
-+DLOG(fprintf(stderr, "clear_commits (%u commits)\n", s->commits.next));
-     for (i = 0; i < s->commits.next; i++) {
-         commit_t* commit = array_get(&(s->commits), i);
-         assert(commit->path || commit->action == ACTION_WRITEOUT);
-@@ -2648,7 +2648,9 @@ static int handle_renames_and_mkdirs(BDRVVVFATState* s)
-     fprintf(stderr, "handle_renames\n");
-     for (i = 0; i < s->commits.next; i++) {
-         commit_t* commit = array_get(&(s->commits), i);
--        fprintf(stderr, "%d, %s (%d, %d)\n", i, commit->path ? commit->path : "(null)", commit->param.rename.cluster, commit->action);
-+        fprintf(stderr, "%d, %s (%u, %d)\n", i,
-+                commit->path ? commit->path : "(null)",
-+                commit->param.rename.cluster, commit->action);
-     }
- #endif
- 
--- 
-2.28.0
-
+>
+> > @@ -54,6 +57,16 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
+> >          if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
+> >              (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
+> >              (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
+> > +
+> > +            /* read from backend */
+> > +            if (s->blk) {
+> > +                int32_t buf;
+> > +
+> > +                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
+> > +                          SIFIVE_U_OTP_FUSE_WORD);
+> > +                return buf;
+> > +            }
+> > +
+> >              return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
+> >          } else {
+> >              return 0xff;
+> > @@ -145,6 +158,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
+> >              /* write bit data */
+> >              SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
+> >
+> > +            /* write to backend */
+> > +            if (s->blk) {
+> > +                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD,
+> > +                           &s->fuse[s->pa], SIFIVE_U_OTP_FUSE_WORD, 0);
+> > +            }
+> > +
+> >              /* update written bit */
+> >              SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
+> >          }
+> > @@ -168,16 +187,48 @@ static const MemoryRegionOps sifive_u_otp_ops = {
+>
+> >  static void sifive_u_otp_reset(DeviceState *dev)
+> > @@ -191,6 +242,20 @@ static void sifive_u_otp_reset(DeviceState *dev)
+> >      s->fuse[SIFIVE_U_OTP_SERIAL_ADDR] = s->serial;
+> >      s->fuse[SIFIVE_U_OTP_SERIAL_ADDR + 1] = ~(s->serial);
+> >
+> > +    if (s->blk) {
+> > +        /* Put serial number to backend as well*/
+> > +        uint32_t serial_data;
+> > +        int index = SIFIVE_U_OTP_SERIAL_ADDR;
+> > +
+> > +        serial_data = s->serial;
+> > +        blk_pwrite(s->blk, index * SIFIVE_U_OTP_FUSE_WORD,
+> > +                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
+> > +
+> > +        serial_data = ~(s->serial);
+> > +        blk_pwrite(s->blk, (index + 1) * SIFIVE_U_OTP_FUSE_WORD,
+> > +                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
+> > +    }
+> > +
+> >      /* Initialize write-once map */
+> >      memset(s->fuse_wo, 0x00, sizeof(s->fuse_wo));
+> >  }
+> > --
+> > 2.28.0
+>
+> thanks
+> -- PMM
 
