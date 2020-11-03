@@ -2,111 +2,87 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18821C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:29:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F10C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:31:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2B4522277
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:29:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D7E220731
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:31:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c8yGwEm1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2B4522277
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gxxx86d9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D7E220731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZpp4-000796-Qb
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 01:29:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52858)
+	id 1kZpr6-0000Am-Mo
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 01:31:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZpnF-0005Uf-Gn
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:27:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56414)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZpnC-0000c0-PL
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:27:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604384862;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=k3uNit64wra+1gEQyVBaBES7oo1xDoWHmAXkdcsfpNw=;
- b=c8yGwEm1TRBYmP4Ec3i6p5GeAS2IanXlAwWsQQ1CHs7p+ZueBqI8D3QjWOXtuBRCiJ2mMa
- 2UkSXi+4EsVZXziYisaO5YfC40LOJafuxrHza/mrOtwraZ9rT8fd2ooFfnBvESOvJYBtKs
- K8KXRRL1AMms/sklDv7fO/KK92qZc1Y=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-CAwxFaXlOPifYVgzSXpAXQ-1; Tue, 03 Nov 2020 01:27:40 -0500
-X-MC-Unique: CAwxFaXlOPifYVgzSXpAXQ-1
-Received: by mail-wm1-f71.google.com with SMTP id u9so1277475wmb.2
- for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 22:27:40 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kZppk-00084E-CN
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:30:20 -0500
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:35009)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kZppi-0001JM-9N
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:30:20 -0500
+Received: by mail-yb1-xb44.google.com with SMTP id m188so13909468ybf.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Nov 2020 22:30:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=JwQh73Em+CdqYJYjPPGRsUopwH1ts2iUbpIDE/BTE3s=;
+ b=Gxxx86d9icF+g0sNbO2juVQK4TIAxVCVtPkknLpkB671N/LxwYHN5WDE2MJViwd+ey
+ /S7rbsMhHMgT4tRWPZBuavMOmsKUWe0QD0RvFJypiEBOGnroyaGdqu+TtF/wfuP1NV8u
+ fgjnoZDzKUJ3CxOhoZwfcV5qPB3GU2QgrwNHPMbZRAMe3+SSfEkwSTneo98k6XllfoHE
+ 28DUuGW9ancJzMG6cjSbf87H8xrEzWUyK7uAVdpSHZJuHIXVy7ZxFwhfN4ODk40nmVsd
+ /mIOBdeX2qOmglOyt+Y+/545YC46T1i7SMBgwHwzSRcCJfM5gC9FxdPi5Pr+9lY+tyPL
+ bn6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=k3uNit64wra+1gEQyVBaBES7oo1xDoWHmAXkdcsfpNw=;
- b=LctOqTsARxlL0RGvtCLEIFkoibzA1zW1zcQm3BGZJXrHlMkm2lEwrV+muid7dDPjaz
- 8/3+AFyMjH0ARcwfoVZ0rgcgq96Rn9y8gFp3rI1jimzGcG0hezEHiAkmcR16W0TqDZmC
- IylkP/ULO3Yha/FVkKbJ59UNXRGW3Fsby5hxW0tKd5fCC0MlIdC1k66CHZjmZDIyXo5Q
- ++1nZHMDaWER0YZQhrqyn+VCgQm7YLJI6cTWAPwKm8F9J6mPMAKwFXcfvgux+/EUreVF
- segEIZ0Znw0GXnmm2T+Kn1ldBYsFp6BPxoIPXfcJV8Xlv8Y5hqZeCemKPh9WCMesdANB
- cIQw==
-X-Gm-Message-State: AOAM5329030izf3M42XVXHua0+I60Okbj7ZThgvxR+vbfoJ7oAnQkrTS
- AOGgw4ClkoPtmKA3YW+mLHhMhwhRtWEW+TgXv6K3dAaKfP2BA7nE6L4ovICQoN5HqvqY9FVbYQS
- tjvkWA1PncjHQRxU=
-X-Received: by 2002:adf:ef0d:: with SMTP id e13mr23999530wro.24.1604384859554; 
- Mon, 02 Nov 2020 22:27:39 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwYbCpehghVmABXxd/+Z9skk+2HT80U/QfCa9RtbnK2PNQiQTY7A+zksnU67sylHrnlynVYuA==
-X-Received: by 2002:adf:ef0d:: with SMTP id e13mr23999489wro.24.1604384859314; 
- Mon, 02 Nov 2020 22:27:39 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id b5sm24113137wrs.97.2020.11.02.22.27.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Nov 2020 22:27:38 -0800 (PST)
-Subject: Re: [PATCH-for-5.2? 2/5] tests/acceptance: Restore MIPS Malta
- multicore tests
-To: "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-References: <20201102144245.2134077-1-philmd@redhat.com>
- <20201102144245.2134077-3-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e196ae4b-7d47-8ec3-6b04-f7cab0628547@redhat.com>
-Date: Tue, 3 Nov 2020 07:27:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=JwQh73Em+CdqYJYjPPGRsUopwH1ts2iUbpIDE/BTE3s=;
+ b=iTCOsfZu7EP/kOYtdAANaokmcJo3WxLHTgsbr3N4uFyQXYcNgcFLHcfjHwkIVdJMWo
+ ps4A69brCnoN0YiN4/1DCCWU2wIvIsRljDWstdev/Z3bNYDa5PL7xlE22/7eajpDGiiL
+ ioBtqMZFjUtMqXEtn+h1kBbshTd71nzkrzoRIumtj0qnLVZEw34Ac4hNe9RJaSWN4UDT
+ ItDG+SaTVxyYepfCKtvfyCm2t36wQfp4VqAi9EGuTJpaLBP7qG4V0tGNbpPdNKzXy88p
+ OCiItgUMP310SNMZ9QxSRerXmoDG/vfUIUejL/Ab/dKm52fF8eVNZbrUi1kQSCaUsic2
+ PFRg==
+X-Gm-Message-State: AOAM530wvBfu2yXSZ2WkFzv6ud6G1e1ype/GPu0yVcziieKXZv/SThkD
+ UvFoIjygJFl3BxFFesdczs9PndjrDbTV1bW5Xm0=
+X-Google-Smtp-Source: ABdhPJxmzFOZSJOC6CuYY0dLAAY1JxUnfmPtZgz/dLdZ2UUil5Y5PfEHP3+2FQGdhvSvtG0FJuiSoSjDNS3hI+Yeg+A=
+X-Received: by 2002:a25:4113:: with SMTP id o19mr25862179yba.314.1604385017433; 
+ Mon, 02 Nov 2020 22:30:17 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201102144245.2134077-3-philmd@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <1603959941-9689-1-git-send-email-bmeng.cn@gmail.com>
+ <20201030051920-mutt-send-email-mst@kernel.org>
+ <CAEUhbmV+t06o7RjhfHiCS2P6UZLm9dra+ev_eX-qRahoyx8HJA@mail.gmail.com>
+In-Reply-To: <CAEUhbmV+t06o7RjhfHiCS2P6UZLm9dra+ev_eX-qRahoyx8HJA@mail.gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Tue, 3 Nov 2020 14:30:06 +0800
+Message-ID: <CAEUhbmXniMgCzEUPgYGF-TXYHH46N_6poCsVCQstWj8DErnzXA@mail.gmail.com>
+Subject: Re: [PATCH] hw/9pfs: virtio-9p: Ensure config space is a multiple of
+ 4 bytes
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b44;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -120,53 +96,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Fabien Chouteau <chouteau@adacore.com>, Aurelien Jarno <aurelien@aurel32.net>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- Antony Pavlov <antonynpavlov@gmail.com>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/2/20 3:42 PM, Philippe Mathieu-Daudé wrote:
-> Since 42a052333a6 ("hw/misc/mips_cpc: Start vCPU when powered on")
-> the multicore support of the MIPS Malta board has been fixed.
-> 
-> This reverts commit 61bbce96fe4c8e3a2b7df5a67ba7dc6ba418e54b.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  tests/acceptance/machine_mips_malta.py | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/tests/acceptance/machine_mips_malta.py b/tests/acceptance/machine_mips_malta.py
-> index 7c9a4ee4d2d..eea046141d6 100644
-> --- a/tests/acceptance/machine_mips_malta.py
-> +++ b/tests/acceptance/machine_mips_malta.py
-> @@ -100,7 +100,6 @@ def test_mips_malta_i6400_framebuffer_logo_1core(self):
->          """
->          self.do_test_i6400_framebuffer_logo(1)
->  
-> -    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
->      def test_mips_malta_i6400_framebuffer_logo_7cores(self):
->          """
->          :avocado: tags=arch:mips64el
-> @@ -110,7 +109,6 @@ def test_mips_malta_i6400_framebuffer_logo_7cores(self):
->          """
->          self.do_test_i6400_framebuffer_logo(7)
->  
-> -    @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
->      def test_mips_malta_i6400_framebuffer_logo_8cores(self):
+On Tue, Nov 3, 2020 at 2:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> Hi Michael,
+>
+> On Fri, Oct 30, 2020 at 5:29 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Thu, Oct 29, 2020 at 04:25:41PM +0800, Bin Meng wrote:
+> > > From: Bin Meng <bin.meng@windriver.com>
+> > >
+> > > At present the virtio device config space access is handled by the
+> > > virtio_config_readX() and virtio_config_writeX() APIs. They perform
+> > > a sanity check on the result of address plus size against the config
+> > > space size before the access occurs.
+> > >
+> > > For unaligned access, the last converted naturally aligned access
+> > > will fail the sanity check on 9pfs. For example, with a mount_tag
+> > > `p9fs`, if guest software tries to read the mount_tag via a 4 byte
+> > > read at the mount_tag offset which is not 4 byte aligned, the read
+> > > result will be `p9\377\377`, which is wrong.
+> > >
+> > > This changes the size of device config space to be a multiple of 4
+> > > bytes so that correct result can be returned in all circumstances.
+> > >
+> > > Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> >
+> >
+> >
+> > The patch is ok, but I'd like to clarify the commit log.
+>
+> Thanks for the review.
+>
+> >
+> > If I understand correctly, what happens is:
+> > - tag is set to a value that is not a multiple of 4 bytes
+>
+> It's not about the mount_tag value, but the length of the mount_tag is 4.
+>
+> > - guest attempts to read the last 4 bytes of the tag
+>
+> Yep. So the config space of a 9pfs looks like the following:
+>
+> offset: 0x14, size: 2 bytes indicating the length of the following mount_tag
+> offset: 0x16, size: value of (offset 0x14).
+>
+> When a 4-byte mount_tag is given, guest software is subject to read 4
+> bytes (value read from offset 0x14) at offset 0x16.
+>
+> > - access returns -1
+> >
+>
+> The access will be split into 2 accesses, either by hardware or
+> software. On RISC-V such unaligned access is emulated by M-mode
+> firmware. On ARM I believe it's supported by the CPU. So the first
+> converted aligned access is to read 4 byte at 0x14 and the second
+> converted aligned access is to read 4 byte at 0x16, and drop the bytes
 
-And this still doesn't work... :(
-https://gitlab.com/philmd/qemu/-/jobs/826406235#L218
+Oops, typo. The 2nd access happens at offset 0x18
 
+> that are not needed, assemble the remaining bytes and return the
+> result to the guest software. The second aligned access will fail the
+> sanity check and return -1, but not the first access, hence the result
+> will be `p9\377\377`.
+>
+> >
+> > What I find confusing in the above description:
+> > - reference to unaligned access - I don't think these
+> >   are legal or allowed by QEMU
+> > - reference to `p9\377\377` - I think returned value will be -1
+> >
+
+Regards,
+Bin
 
