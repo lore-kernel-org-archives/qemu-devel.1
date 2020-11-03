@@ -2,74 +2,67 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 189DCC00A89
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 094B9C00A89
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:49:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D9C72071A
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:43:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D9C72071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 891532074F
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:49:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 891532074F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZlMG-0007rJ-J6
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 20:43:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56102)
+	id 1kZlRT-0000mV-Cx
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 20:48:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kZlIx-00061c-RF
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 20:40:13 -0500
-Resent-Date: Mon, 02 Nov 2020 20:40:11 -0500
-Resent-Message-Id: <E1kZlIx-00061c-RF@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21711)
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1kZlQK-0000Dh-FW; Mon, 02 Nov 2020 20:47:49 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:2123)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kZlIt-0000Bx-1r
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 20:40:09 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1604367597; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=SSjlGEnXILYNqVRLW5HkpwLHeb/oCxhnKzMXeaAfEMpCapeWRDKc4SeQswgkScWSqrRpjIsUTMe2YER13nH/uyKVkRlm8QLFdmY8YQ1FUCkB28QlIuH3yyacFQ1ouFpa+UtkAvgNk4A9FmCmP8owZAb0pteL37IDmRHZ6gl1jrA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1604367597;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=N4ZUdB4C4tgkK3jahXjxgj62ewILkwxxCbAcWC9QiFU=; 
- b=k01UzbhMxfTdKqa3IxI4CqfYmiKcmMv3BAfynpINTtVwgMmrwgjmwjtGkMfr/XVegfaq9YbYSdPeHuy5lZu2XE3nitVwcSmt7bnWlYL8hY8EJsWGrNfqPsoGqCY+dK4ozYleXIBqBSexarO3ypZz5moCfIXht8A52sVnY0EbJcQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1604367596809611.3154870424092;
- Mon, 2 Nov 2020 17:39:56 -0800 (PST)
-Subject: Re: [PULL v2 00/12] qemu-ga patch queue for soft-freeze
-Message-ID: <160436759568.24079.18254630704724154210@66eaa9a8a123>
-In-Reply-To: <20201103011134.887744-1-michael.roth@amd.com>
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1kZlQA-0001DD-Rz; Mon, 02 Nov 2020 20:47:47 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CQCMg5wS9z71pH;
+ Tue,  3 Nov 2020 09:47:27 +0800 (CST)
+Received: from [10.174.186.67] (10.174.186.67) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 3 Nov 2020 09:47:21 +0800
+Subject: Re: [RFC PATCH v2 05/13] hw: add compat machines for 5.3
+To: Andrew Jones <drjones@redhat.com>
+References: <20201020131440.1090-1-fangying1@huawei.com>
+ <20201020131440.1090-6-fangying1@huawei.com>
+ <20201029170813.n7kst474zrh24m2t@kamzik.brq.redhat.com>
+From: Ying Fang <fangying1@huawei.com>
+Message-ID: <8c61d85f-5144-ae75-67a3-aaae1783a350@huawei.com>
+Date: Tue, 3 Nov 2020 09:47:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: michael.roth@amd.com
-Date: Mon, 2 Nov 2020 17:39:56 -0800 (PST)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 20:40:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_BL_SPAMCOP_NET=1.347,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20201029170813.n7kst474zrh24m2t@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.186.67]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=fangying1@huawei.com;
+ helo=szxga07-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 20:47:30
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,117 +75,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, shannon.zhaosl@gmail.com,
+ qemu-arm@nongnu.org, alistair.francis@wdc.com, imammedo@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTEwMzAxMTEzNC44ODc3
-NDQtMS1taWNoYWVsLnJvdGhAYW1kLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAxMTAzMDExMTM0Ljg4
-Nzc0NC0xLW1pY2hhZWwucm90aEBhbWQuY29tClN1YmplY3Q6IFtQVUxMIHYyIDAwLzEyXSBxZW11
-LWdhIHBhdGNoIHF1ZXVlIGZvciBzb2Z0LWZyZWV6ZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
-PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
-YW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3Rh
-ZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMTEwMjIwMjcxMC4yMjI0NjkxLTEtZjRidWdAYW1z
-YXQub3JnIC0+IHBhdGNoZXcvMjAyMDExMDIyMDI3MTAuMjIyNDY5MS0xLWY0YnVnQGFtc2F0Lm9y
-ZwogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAxMTAyMjAzNjA5LjIyMjgzMDktMS1w
-aGlsbWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAxMTAyMjAzNjA5LjIyMjgzMDktMS1waGls
-bWRAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAxMTAzMDExMTM0
-Ljg4Nzc0NC0xLW1pY2hhZWwucm90aEBhbWQuY29tIC0+IHBhdGNoZXcvMjAyMDExMDMwMTExMzQu
-ODg3NzQ0LTEtbWljaGFlbC5yb3RoQGFtZC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwoxMzRmNjY0IHFnYTogYWRkIHNzaC1nZXQtYXV0aG9yaXplZC1rZXlzCjlmNWU2NDIgbWVz
-b246IG1pbm9yIHNpbXBsaWZpY2F0aW9uCjQ0NWU0YzQgcWdhOiBhZGQgKnJlc2V0IGFyZ3VtZW50
-IHRvIHNzaC1hZGQtYXV0aG9yaXplZC1rZXlzCjdhYjJkZWYgcWdhOiBhZGQgc3NoLXthZGQscmVt
-b3ZlfS1hdXRob3JpemVkLWtleXMKYjEzNzgzNiBnbGliLWNvbXBhdDogYWRkIGdfdW5peF9nZXRf
-cGFzc3dkX2VudHJ5X3FlbXUoKQpiZjEwNDFhIHFnYTogYWRkIGltcGxlbWVudGF0aW9uIG9mIGd1
-ZXN0LWdldC1kaXNrcyBmb3IgV2luZG93cwo3OGJjNjkwIHFnYTogYWRkIGltcGxlbWVudGF0aW9u
-IG9mIGd1ZXN0LWdldC1kaXNrcyBmb3IgTGludXgKZGU2MDQyNiBxZ2E6IGFkZCBjb21tYW5kIGd1
-ZXN0LWdldC1kaXNrcwplOGRjMDMxIHFnYTogRmxhdHRlbiBzaW1wbGUgdW5pb24gR3Vlc3REZXZp
-Y2VJZAphNzg4NjNmIHFnYS13aW46IEZpeCBndWVzdC1nZXQtZGV2aWNlcyBlcnJvciBBUEkgdmlv
-bGF0aW9ucwozZDMyNTNmIHFnYTogVXNlIGNvbW1vbiB0aW1lIGVuY29kaW5nIGZvciBndWVzdC1n
-ZXQtZGV2aWNlcyAnZHJpdmVyLWRhdGUnCjE5NjVmYWMgcWdhOiBSZW5hbWUgZ3Vlc3QtZ2V0LWRl
-dmljZXMgcmV0dXJuIG1lbWJlciAnYWRkcmVzcycgdG8gJ2lkJwoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KMS8xMiBDaGVja2luZyBjb21taXQgMTk2NWZhYzU2OWQxIChxZ2E6IFJlbmFtZSBndWVzdC1n
-ZXQtZGV2aWNlcyByZXR1cm4gbWVtYmVyICdhZGRyZXNzJyB0byAnaWQnKQoyLzEyIENoZWNraW5n
-IGNvbW1pdCAzZDMyNTNmMzY5NWMgKHFnYTogVXNlIGNvbW1vbiB0aW1lIGVuY29kaW5nIGZvciBn
-dWVzdC1nZXQtZGV2aWNlcyAnZHJpdmVyLWRhdGUnKQozLzEyIENoZWNraW5nIGNvbW1pdCBhNzg4
-NjNmOGE4MzMgKHFnYS13aW46IEZpeCBndWVzdC1nZXQtZGV2aWNlcyBlcnJvciBBUEkgdmlvbGF0
-aW9ucykKNC8xMiBDaGVja2luZyBjb21taXQgZThkYzAzMTY3ZDUzIChxZ2E6IEZsYXR0ZW4gc2lt
-cGxlIHVuaW9uIEd1ZXN0RGV2aWNlSWQpCjUvMTIgQ2hlY2tpbmcgY29tbWl0IGRlNjA0MjZhNzQ0
-ZiAocWdhOiBhZGQgY29tbWFuZCBndWVzdC1nZXQtZGlza3MpCjYvMTIgQ2hlY2tpbmcgY29tbWl0
-IDc4YmM2OTAwMTUxNSAocWdhOiBhZGQgaW1wbGVtZW50YXRpb24gb2YgZ3Vlc3QtZ2V0LWRpc2tz
-IGZvciBMaW51eCkKNy8xMiBDaGVja2luZyBjb21taXQgYmYxMDQxYTg2OGFmIChxZ2E6IGFkZCBp
-bXBsZW1lbnRhdGlvbiBvZiBndWVzdC1nZXQtZGlza3MgZm9yIFdpbmRvd3MpCjgvMTIgQ2hlY2tp
-bmcgY29tbWl0IGIxMzc4MzYyOTcxZiAoZ2xpYi1jb21wYXQ6IGFkZCBnX3VuaXhfZ2V0X3Bhc3N3
-ZF9lbnRyeV9xZW11KCkpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyog
-b24gYSBzZXBhcmF0ZSBsaW5lCiM0MjogRklMRTogaW5jbHVkZS9nbGliLWNvbXBhdC5oOjgxOgor
-LyogTm90ZTogVGhlIGZhbGxiYWNrIGltcGxlbWVudGF0aW9uIGlzIG5vdCBNVC1zYWZlLCBhbmQg
-aXQgcmV0dXJucyBhIGNvcHkgb2YKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWls
-aW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojNDU6IEZJTEU6IGluY2x1ZGUvZ2xpYi1jb21wYXQu
-aDo4NDoKKyAqIEdMaWIgQVBJIHN1YnN0aXR1dGlvbi4gKi8KCnRvdGFsOiAwIGVycm9ycywgMiB3
-YXJuaW5ncywgMzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgo5LzEyIENoZWNraW5nIGNvbW1pdCA3YWIyZGVmNzY4ZTggKHFnYTogYWRkIHNzaC17
-YWRkLHJlbW92ZX0tYXV0aG9yaXplZC1rZXlzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMjogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogVXNlIGdfYXNzZXJ0IG9yIGdfYXNzZXJ0X25vdF9yZWFj
-aGVkCiM2OTogRklMRTogcWdhL2NvbW1hbmRzLXBvc2l4LXNzaC5jOjMzOgorICAgIGdfYXNzZXJ0
-X2NtcGludChyZXQsID09LCAwKTsKCkVSUk9SOiBVc2UgZ19hc3NlcnQgb3IgZ19hc3NlcnRfbm90
-X3JlYWNoZWQKIzMzMDogRklMRTogcWdhL2NvbW1hbmRzLXBvc2l4LXNzaC5jOjI5NDoKKyAgICBn
-X2Fzc2VydF9jbXBpbnQocmV0LCA9PSwgMCk7CgpFUlJPUjogVXNlIGdfYXNzZXJ0IG9yIGdfYXNz
-ZXJ0X25vdF9yZWFjaGVkCiMzMzU6IEZJTEU6IHFnYS9jb21tYW5kcy1wb3NpeC1zc2guYzoyOTk6
-CisgICAgZ19hc3NlcnRfbm9fZXJyb3IoZXJyKTsKCkVSUk9SOiBVc2UgZ19hc3NlcnQgb3IgZ19h
-c3NlcnRfbm90X3JlYWNoZWQKIzM0NzogRklMRTogcWdhL2NvbW1hbmRzLXBvc2l4LXNzaC5jOjMx
-MToKKyAgICBnX2Fzc2VydF9ub19lcnJvcihlcnIpOwoKRVJST1I6IFVzZSBnX2Fzc2VydCBvciBn
-X2Fzc2VydF9ub3RfcmVhY2hlZAojMzQ5OiBGSUxFOiBxZ2EvY29tbWFuZHMtcG9zaXgtc3NoLmM6
-MzEzOgorICAgIGdfYXNzZXJ0X2NtcHN0cihjb250ZW50cywgPT0sIGV4cGVjdGVkKTsKCkVSUk9S
-OiBVc2UgZ19hc3NlcnQgb3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzM4NjogRklMRTogcWdhL2Nv
-bW1hbmRzLXBvc2l4LXNzaC5jOjM1MDoKKyAgICBnX2Fzc2VydF9udWxsKGVycik7CgpFUlJPUjog
-VXNlIGdfYXNzZXJ0IG9yIGdfYXNzZXJ0X25vdF9yZWFjaGVkCiMzOTI6IEZJTEU6IHFnYS9jb21t
-YW5kcy1wb3NpeC1zc2guYzozNTY6CisgICAgZ19hc3NlcnRfbnVsbChlcnIpOwoKRVJST1I6IFVz
-ZSBnX2Fzc2VydCBvciBnX2Fzc2VydF9ub3RfcmVhY2hlZAojNDEzOiBGSUxFOiBxZ2EvY29tbWFu
-ZHMtcG9zaXgtc3NoLmM6Mzc3OgorICAgIGdfYXNzZXJ0X251bGwoZXJyKTsKCkVSUk9SOiBVc2Ug
-Z19hc3NlcnQgb3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzQxODogRklMRTogcWdhL2NvbW1hbmRz
-LXBvc2l4LXNzaC5jOjM4MjoKKyAgICBnX2Fzc2VydF9udWxsKGVycik7Cgp0b3RhbDogOSBlcnJv
-cnMsIDEgd2FybmluZ3MsIDQ3OSBsaW5lcyBjaGVja2VkCgpQYXRjaCA5LzEyIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgoxMC8xMiBDaGVja2luZyBjb21taXQgNDQ1ZTRjNGZmODdkIChxZ2E6
-IGFkZCAqcmVzZXQgYXJndW1lbnQgdG8gc3NoLWFkZC1hdXRob3JpemVkLWtleXMpCkVSUk9SOiBV
-c2UgZ19hc3NlcnQgb3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzk2OiBGSUxFOiBxZ2EvY29tbWFu
-ZHMtcG9zaXgtc3NoLmM6MzgxOgorICAgIGdfYXNzZXJ0X251bGwoZXJyKTsKCkVSUk9SOiBVc2Ug
-Z19hc3NlcnQgb3IgZ19hc3NlcnRfbm90X3JlYWNoZWQKIzEwNjogRklMRTogcWdhL2NvbW1hbmRz
-LXBvc2l4LXNzaC5jOjM5MToKKyAgICBnX2Fzc2VydF9udWxsKGVycik7CgpFUlJPUjogVXNlIGdf
-YXNzZXJ0IG9yIGdfYXNzZXJ0X25vdF9yZWFjaGVkCiMxMTU6IEZJTEU6IHFnYS9jb21tYW5kcy1w
-b3NpeC1zc2guYzo0MDA6CisgICAgZ19hc3NlcnRfbnVsbChlcnIpOwoKdG90YWw6IDMgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCAxMjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTAvMTIgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCjExLzEyIENoZWNraW5nIGNvbW1pdCA5ZjVlNjQyNGRiYTQgKG1lc29u
-OiBtaW5vciBzaW1wbGlmaWNhdGlvbikKMTIvMTIgQ2hlY2tpbmcgY29tbWl0IDEzNGY2NjQ0M2Fl
-MCAocWdhOiBhZGQgc3NoLWdldC1hdXRob3JpemVkLWtleXMpCkVSUk9SOiBzcGFjZSBwcm9oaWJp
-dGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzYwOiBG
-SUxFOiBxZ2EvY29tbWFuZHMtcG9zaXgtc3NoLmM6MzA5OgorICAgIHJldHVybiBnX3N0ZWFsX3Bv
-aW50ZXIgKCZyZXQpOwoKRVJST1I6IFVzZSBnX2Fzc2VydCBvciBnX2Fzc2VydF9ub3RfcmVhY2hl
-ZAojODQ6IEZJTEU6IHFnYS9jb21tYW5kcy1wb3NpeC1zc2guYzo0ODQ6CisgICAgZ19hc3NlcnRf
-bnVsbChlcnIpOwoKRVJST1I6IFVzZSBnX2Fzc2VydCBvciBnX2Fzc2VydF9ub3RfcmVhY2hlZAoj
-OTE6IEZJTEU6IHFnYS9jb21tYW5kcy1wb3NpeC1zc2guYzo0OTE6CisgICAgZ19hc3NlcnRfY21w
-aW50KGxlbiwgPT0sIDIpOwoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMzggbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggMTIvMTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAxMTAzMDExMTM0
-Ljg4Nzc0NC0xLW1pY2hhZWwucm90aEBhbWQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+
+
+On 10/30/2020 1:08 AM, Andrew Jones wrote:
+> On Tue, Oct 20, 2020 at 09:14:32PM +0800, Ying Fang wrote:
+>> Add 5.2 machine types for arm/i440fx/q35/s390x/spapr.
+>        ^ 5.3
+
+Thanks. Will fix, careless spelling mistake.
+
+> 
+> Thanks,
+> drew
+> 
+>>
+>> Signed-off-by: Ying Fang <fangying1@huawei.com>
+>> ---
+>>   hw/arm/virt.c              |  9 ++++++++-
+>>   hw/core/machine.c          |  3 +++
+>>   hw/i386/pc.c               |  3 +++
+>>   hw/i386/pc_piix.c          | 15 ++++++++++++++-
+>>   hw/i386/pc_q35.c           | 14 +++++++++++++-
+>>   hw/ppc/spapr.c             | 15 +++++++++++++--
+>>   hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
+>>   include/hw/boards.h        |  3 +++
+>>   include/hw/i386/pc.h       |  3 +++
+>>   9 files changed, 73 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index ba902b53ba..ff8a14439e 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -2665,10 +2665,17 @@ static void machvirt_machine_init(void)
+>>   }
+>>   type_init(machvirt_machine_init);
+>>   
+>> +static void virt_machine_5_3_options(MachineClass *mc)
+>> +{
+>> +}
+>> +DEFINE_VIRT_MACHINE_AS_LATEST(5, 3)
+>> +
+>>   static void virt_machine_5_2_options(MachineClass *mc)
+>>   {
+>> +    virt_machine_5_3_options(mc);
+>> +    compat_props_add(mc->compat_props, hw_compat_5_2, hw_compat_5_2_len);
+>>   }
+>> -DEFINE_VIRT_MACHINE_AS_LATEST(5, 2)
+>> +DEFINE_VIRT_MACHINE(5, 2)
+>>   
+>>   static void virt_machine_5_1_options(MachineClass *mc)
+>>   {
+>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+>> index 7e2f4ec08e..6dc77699a9 100644
+>> --- a/hw/core/machine.c
+>> +++ b/hw/core/machine.c
+>> @@ -28,6 +28,9 @@
+>>   #include "hw/mem/nvdimm.h"
+>>   #include "migration/vmstate.h"
+>>   
+>> +GlobalProperty hw_compat_5_2[] = { };
+>> +const size_t hw_compat_5_2_len = G_N_ELEMENTS(hw_compat_5_2);
+>> +
+>>   GlobalProperty hw_compat_5_1[] = {
+>>       { "vhost-scsi", "num_queues", "1"},
+>>       { "vhost-user-blk", "num-queues", "1"},
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index e87be5d29a..eaa046ff5d 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -97,6 +97,9 @@
+>>   #include "trace.h"
+>>   #include CONFIG_DEVICES
+>>   
+>> +GlobalProperty pc_compat_5_2[] = { };
+>> +const size_t pc_compat_5_2_len = G_N_ELEMENTS(pc_compat_5_2);
+>> +
+>>   GlobalProperty pc_compat_5_1[] = {
+>>       { "ICH9-LPC", "x-smi-cpu-hotplug", "off" },
+>>   };
+>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>> index 3c2ae0612b..01254090ce 100644
+>> --- a/hw/i386/pc_piix.c
+>> +++ b/hw/i386/pc_piix.c
+>> @@ -426,7 +426,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>>       machine_class_allow_dynamic_sysbus_dev(m, TYPE_VMBUS_BRIDGE);
+>>   }
+>>   
+>> -static void pc_i440fx_5_2_machine_options(MachineClass *m)
+>> +static void pc_i440fx_5_3_machine_options(MachineClass *m)
+>>   {
+>>       PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>>       pc_i440fx_machine_options(m);
+>> @@ -435,6 +435,19 @@ static void pc_i440fx_5_2_machine_options(MachineClass *m)
+>>       pcmc->default_cpu_version = 1;
+>>   }
+>>   
+>> +DEFINE_I440FX_MACHINE(v5_3, "pc-i440fx-5.3", NULL,
+>> +                      pc_i440fx_5_3_machine_options);
+>> +
+>> +static void pc_i440fx_5_2_machine_options(MachineClass *m)
+>> +{
+>> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>> +    pc_i440fx_machine_options(m);
+>> +    m->alias = NULL;
+>> +    m->is_default = false;
+>> +    compat_props_add(m->compat_props, hw_compat_5_2, hw_compat_5_2_len);
+>> +    compat_props_add(m->compat_props, pc_compat_5_2, pc_compat_5_2_len);
+>> +}
+>> +
+>>   DEFINE_I440FX_MACHINE(v5_2, "pc-i440fx-5.2", NULL,
+>>                         pc_i440fx_5_2_machine_options);
+>>   
+>> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+>> index a3f4959c43..dd14803edb 100644
+>> --- a/hw/i386/pc_q35.c
+>> +++ b/hw/i386/pc_q35.c
+>> @@ -344,7 +344,7 @@ static void pc_q35_machine_options(MachineClass *m)
+>>       m->max_cpus = 288;
+>>   }
+>>   
+>> -static void pc_q35_5_2_machine_options(MachineClass *m)
+>> +static void pc_q35_5_3_machine_options(MachineClass *m)
+>>   {
+>>       PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>>       pc_q35_machine_options(m);
+>> @@ -352,6 +352,18 @@ static void pc_q35_5_2_machine_options(MachineClass *m)
+>>       pcmc->default_cpu_version = 1;
+>>   }
+>>   
+>> +DEFINE_Q35_MACHINE(v5_3, "pc-q35-5.3", NULL,
+>> +                   pc_q35_5_3_machine_options);
+>> +
+>> +static void pc_q35_5_2_machine_options(MachineClass *m)
+>> +{
+>> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>> +    pc_q35_machine_options(m);
+>> +    m->alias = NULL;
+>> +    compat_props_add(m->compat_props, hw_compat_5_2, hw_compat_5_2_len);
+>> +    compat_props_add(m->compat_props, pc_compat_5_2, pc_compat_5_2_len);
+>> +}
+>> +
+>>   DEFINE_Q35_MACHINE(v5_2, "pc-q35-5.2", NULL,
+>>                      pc_q35_5_2_machine_options);
+>>   
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 2db810f73a..c292a3edd9 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -4511,15 +4511,26 @@ static void spapr_machine_latest_class_options(MachineClass *mc)
+>>       }                                                                \
+>>       type_init(spapr_machine_register_##suffix)
+>>   
+>> +/*
+>> + * pseries-5.3
+>> + */
+>> +static void spapr_machine_5_3_class_options(MachineClass *mc)
+>> +{
+>> +    /* Defaults for the latest behaviour inherited from the base class */
+>> +}
+>> +
+>> +DEFINE_SPAPR_MACHINE(5_3, "5.3", true);
+>> +
+>>   /*
+>>    * pseries-5.2
+>>    */
+>>   static void spapr_machine_5_2_class_options(MachineClass *mc)
+>>   {
+>> -    /* Defaults for the latest behaviour inherited from the base class */
+>> +    spapr_machine_5_3_class_options(mc);
+>> +    compat_props_add(mc->compat_props, hw_compat_5_2, hw_compat_5_2_len);
+>>   }
+>>   
+>> -DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
+>> +DEFINE_SPAPR_MACHINE(5_2, "5.2", false);
+>>   
+>>   /*
+>>    * pseries-5.1
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index 28266a3a35..bde084e13d 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -789,14 +789,26 @@ bool css_migration_enabled(void)
+>>       }                                                                         \
+>>       type_init(ccw_machine_register_##suffix)
+>>   
+>> +static void ccw_machine_5_3_instance_options(MachineState *machine)
+>> +{
+>> +}
+>> +
+>> +static void ccw_machine_5_3_class_options(MachineClass *mc)
+>> +{
+>> +}
+>> +DEFINE_CCW_MACHINE(5_3, "5.3", true);
+>> +
+>>   static void ccw_machine_5_2_instance_options(MachineState *machine)
+>>   {
+>> +    ccw_machine_5_3_instance_options(machine);
+>>   }
+>>   
+>>   static void ccw_machine_5_2_class_options(MachineClass *mc)
+>>   {
+>> +    ccw_machine_5_3_class_options(mc);
+>> +    compat_props_add(mc->compat_props, hw_compat_5_2, hw_compat_5_2_len);
+>>   }
+>> -DEFINE_CCW_MACHINE(5_2, "5.2", true);
+>> +DEFINE_CCW_MACHINE(5_2, "5.2", false);
+>>   
+>>   static void ccw_machine_5_1_instance_options(MachineState *machine)
+>>   {
+>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>> index bf53e8a16e..f631c1799d 100644
+>> --- a/include/hw/boards.h
+>> +++ b/include/hw/boards.h
+>> @@ -311,6 +311,9 @@ struct MachineState {
+>>       } \
+>>       type_init(machine_initfn##_register_types)
+>>   
+>> +extern GlobalProperty hw_compat_5_2[];
+>> +extern const size_t hw_compat_5_2_len;
+>> +
+>>   extern GlobalProperty hw_compat_5_1[];
+>>   extern const size_t hw_compat_5_1_len;
+>>   
+>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>> index 84639d0ebc..6f1531ed14 100644
+>> --- a/include/hw/i386/pc.h
+>> +++ b/include/hw/i386/pc.h
+>> @@ -190,6 +190,9 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
+>>   void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>>                          const CPUArchIdList *apic_ids, GArray *entry);
+>>   
+>> +extern GlobalProperty pc_compat_5_2[];
+>> +extern const size_t pc_compat_5_2_len;
+>> +
+>>   extern GlobalProperty pc_compat_5_1[];
+>>   extern const size_t pc_compat_5_1_len;
+>>   
+>> -- 
+>> 2.23.0
+>>
+>>
+> 
+> .
+> 
 
