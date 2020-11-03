@@ -2,54 +2,55 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C40FC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0477C4742C
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63BFE223BD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:43:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63BFE223BD
+	by mail.kernel.org (Postfix) with ESMTPS id 2886B223BD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 09:54:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2886B223BD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZsqz-0004PZ-AI
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 04:43:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37754)
+	id 1kZt1H-0008H6-43
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 04:54:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kZsqP-0003us-NT; Tue, 03 Nov 2020 04:43:13 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2500)
+ (Exim 4.90_1) (envelope-from <changzihao1@huawei.com>)
+ id 1kZpZW-00009a-Iy
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:13:34 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2431)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kZsqN-0002FL-2Z; Tue, 03 Nov 2020 04:43:13 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CQPwR3Rr4zhfdN;
- Tue,  3 Nov 2020 17:43:03 +0800 (CST)
-Received: from [10.174.187.138] (10.174.187.138) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 3 Nov 2020 17:42:56 +0800
-Message-ID: <5FA12620.6030705@huawei.com>
-Date: Tue, 3 Nov 2020 17:42:56 +0800
-From: AlexChen <alex.chen@huawei.com>
-User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
- rv:17.0) Gecko/20130509 Thunderbird/17.0.6
+ (Exim 4.90_1) (envelope-from <changzihao1@huawei.com>)
+ id 1kZpZT-0004DV-2a
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:13:34 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CQKGC0v8DzLmc9;
+ Tue,  3 Nov 2020 14:13:07 +0800 (CST)
+Received: from DESKTOP-F1615D3.china.huawei.com (10.174.186.85) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 3 Nov 2020 14:13:02 +0800
+From: Zihao Chang <changzihao1@huawei.com>
+To: <pbonzini@redhat.com>, <fam@euphon.net>
+Subject: [PATCH] scsi: allow user to set werror as report
+Date: Tue, 3 Nov 2020 14:12:40 +0800
+Message-ID: <20201103061240.1364-1-changzihao1@huawei.com>
+X-Mailer: git-send-email 2.22.0.windows.1
 MIME-Version: 1.0
-To: Kevin Wolf <kwolf@redhat.com>, <mreitz@redhat.com>
-Subject: [PATCH V2] block/vvfat: Fix bad printf format specifiers
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.138]
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.186.85]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191; envelope-from=alex.chen@huawei.com;
- helo=szxga05-in.huawei.com
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=changzihao1@huawei.com; helo=szxga05-in.huawei.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 20:52:53
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -41
@@ -59,6 +60,7 @@ X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Tue, 03 Nov 2020 04:53:44 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,78 +72,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU <qemu-devel@nongnu.org>,
- qemu-block@nongnu.org, zhang.zhanghailiang@huawei.com
+Cc: changzihao1@huawei.com, qemu-devel@nongnu.org, xiexiangyou@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We should use printf format specifier "%u" instead of "%d" for
-argument of type "unsigned int".
-In addition, fix two error format problems found by checkpatch.pl:
-ERROR: space required after that ',' (ctx:VxV)
-+        fprintf(stderr,"%s attributes=0x%02x begin=%u size=%d\n",
-                       ^
-ERROR: line over 90 characters
-+        fprintf(stderr, "%d, %s (%u, %d)\n", i, commit->path ? commit->path : "(null)", commit->param.rename.cluster, commit->action);
+'enospc' is the default for -drive, but qemu allows user to set
+drive option werror. If werror of scsi-generic is set to 'report'
+by user, qemu will not allow vm to start.
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Alex Chen <alex.chen@huawei.com>
+This patch allow user to set werror as 'report' for scsi-generic.
+
+Signed-off-by: Zihao Chang <changzihao1@huawei.com>
 ---
- block/vvfat.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ hw/scsi/scsi-generic.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 5abb90e7c7..54807f82ca 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1437,7 +1437,7 @@ static void print_direntry(const direntry_t* direntry)
-         for(i=0;i<11;i++)
-             ADD_CHAR(direntry->name[i]);
-         buffer[j] = 0;
--        fprintf(stderr,"%s attributes=0x%02x begin=%d size=%d\n",
-+        fprintf(stderr, "%s attributes=0x%02x begin=%u size=%u\n",
-                 buffer,
-                 direntry->attributes,
-                 begin_of_direntry(direntry),le32_to_cpu(direntry->size));
-@@ -1446,7 +1446,7 @@ static void print_direntry(const direntry_t* direntry)
-
- static void print_mapping(const mapping_t* mapping)
- {
--    fprintf(stderr, "mapping (%p): begin, end = %d, %d, dir_index = %d, "
-+    fprintf(stderr, "mapping (%p): begin, end = %u, %u, dir_index = %u, "
-         "first_mapping_index = %d, name = %s, mode = 0x%x, " ,
-         mapping, mapping->begin, mapping->end, mapping->dir_index,
-         mapping->first_mapping_index, mapping->path, mapping->mode);
-@@ -1454,7 +1454,7 @@ static void print_mapping(const mapping_t* mapping)
-     if (mapping->mode & MODE_DIRECTORY)
-         fprintf(stderr, "parent_mapping_index = %d, first_dir_index = %d\n", mapping->info.dir.parent_mapping_index, mapping->info.dir.first_dir_index);
-     else
--        fprintf(stderr, "offset = %d\n", mapping->info.file.offset);
-+        fprintf(stderr, "offset = %u\n", mapping->info.file.offset);
- }
- #endif
-
-@@ -1588,7 +1588,7 @@ typedef struct commit_t {
- static void clear_commits(BDRVVVFATState* s)
- {
-     int i;
--DLOG(fprintf(stderr, "clear_commits (%d commits)\n", s->commits.next));
-+DLOG(fprintf(stderr, "clear_commits (%u commits)\n", s->commits.next));
-     for (i = 0; i < s->commits.next; i++) {
-         commit_t* commit = array_get(&(s->commits), i);
-         assert(commit->path || commit->action == ACTION_WRITEOUT);
-@@ -2648,7 +2648,9 @@ static int handle_renames_and_mkdirs(BDRVVVFATState* s)
-     fprintf(stderr, "handle_renames\n");
-     for (i = 0; i < s->commits.next; i++) {
-         commit_t* commit = array_get(&(s->commits), i);
--        fprintf(stderr, "%d, %s (%d, %d)\n", i, commit->path ? commit->path : "(null)", commit->param.rename.cluster, commit->action);
-+        fprintf(stderr, "%d, %s (%u, %d)\n", i,
-+                commit->path ? commit->path : "(null)",
-+                commit->param.rename.cluster, commit->action);
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index 2cb23ca891..2730e37d63 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -664,7 +664,8 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
+         return;
      }
- #endif
-
+ 
+-    if (blk_get_on_error(s->conf.blk, 0) != BLOCKDEV_ON_ERROR_ENOSPC) {
++    if (blk_get_on_error(s->conf.blk, 0) != BLOCKDEV_ON_ERROR_ENOSPC &&
++        blk_get_on_error(s->conf.blk, 0) != BLOCKDEV_ON_ERROR_REPORT) {
+         error_setg(errp, "Device doesn't support drive option werror");
+         return;
+     }
 -- 
-2.19.1
+2.28.0
+
 
