@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D38FCC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D7EC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:43:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F2E520780
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:42:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1688020780
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:43:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kVzY1glR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F2E520780
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fgtl1ViN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1688020780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZySS-00076L-C0
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:42:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51446)
+	id 1kZySu-0008Ei-1B
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:43:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
- id 1kZyJV-0001bk-QM
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:33:37 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:15001)
+ id 1kZyJU-0001Y6-1w
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:33:36 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:15005)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
- id 1kZyJT-0001FT-9g
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:33:37 -0500
+ id 1kZyJS-0001Fa-7G
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:33:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1604417615; x=1635953615;
+ t=1604417614; x=1635953614;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=P/qi2faPiuz4u3dNR7xsZrZ/3Jx9//l1Rlurl6tn9Fs=;
- b=kVzY1glR6niliEgvRbYYw4QShcT0fFDczLReBkK+3qspM4MQpMtCDXjO
- dLZ3PWQFknRhVSgcIO1vxxndP0wI1FSw5h+qz6hkh0ekAqCHuQmA6Q2Fx
- voy9MRqTLYZr/FXt7FI896VObL9A6a1+h2fxXUz2crZE+ya+RbU48ADpP
- 5xctLae6d7AAjY/7GnrqtRXbf0Ove/7i4gVH8wj5JH+0c0ofgDOhLXNRH
- Xe2utxEr+5QvO8T3pQjZZ1R0d9KF7Hhng3+a+moHqFrJw8MgxfKmLfhyL
- nZvzrpzQlUh1+lhs4KBzLDOrajVvrYhkMCch2Lt4OgUjK4xESq5aec+vy w==;
-IronPort-SDR: OZw60kG9GYna+v6CHCfKy/GbKnd/H9dTwJ/00fXhdl4OkFHF3KvKRf5+mFaNy28M5fM9y1GmIG
- FuXFsUvrzkVbmgFWQcIGzWcm0ab9+og7r/1HvtCsb1QwcDVIWXeeD4A5ogYOsR3arvRyZlmT8Z
- kz8uEhN0Jp0aWYgwkgRe+t4WYDTWAZuOZcRp+S3/UWPAYUuBn2HH8iOUmfbY8eHtlTcL4dG17D
- KjnJaFfunoCbvgO3XOG1AeAA9ycPD1BYj8pMhauVukEVaiiODETZdwUQRtNbMmecg3jgUCFaU4
- xiE=
-X-IronPort-AV: E=Sophos;i="5.77,448,1596470400"; d="scan'208";a="152867467"
+ bh=Jn6EIm9hdrR24DW8Li1I2eFglThg87rXwX+el8u4/zc=;
+ b=fgtl1ViNkjzT8jsEWwJM1eSKGbOVs732DKUiCK2ZtaE7e7LKsVPyCqhi
+ ynVLkWzMJquwhADegQb7L/q4d63+e0fEhYWVljNRZX0O04qnlTckWI+Ft
+ DbeL/Nz67GeKzCdg0KecVuVSbjibQ2emah7G4jH4ASIOD8xkacxAMH+J1
+ tfydbFqpHtYN1G67Wt4rrvhtipQQpCDe/XtUdC0HfqjEd6J9deHvNqZmh
+ 6MmQneAregiZQsj4qFumjnnpQAcdTj2AMEYJ8Kdqil9n73FX2b5flknwk
+ dklcOyYiyTxXQu21SUx2ngPli7vE5DKvnOmLgYxm5xm0SOPGiHPXKOV/x w==;
+IronPort-SDR: fotZ8E+Bm2vFOBh0wL1SWluda+y1UkvzH2O6++kCJzE2+kVFSIFUSZlGpdGX7s3R/wOpzEYk/W
+ vvtPG4N1Tpy1cX8Ygas/4DftdUOL/go/a+a1NdKDJurlglLuhrXqDArsRqaLHIZ1fuU+jy+yrq
+ eA7NveVoDKDMD+/oPLI8ttx3GJUYE810yovHB4dTMRsmwyYjFIS6NSfdNqpyIFkY63hKv54ojX
+ 8wuEu/W1OCIith1LxRtYx6eLgyE7qvbW/QargzVAjkO03sf972iSbXPXKCRUeQvIl68UC2rSwt
+ 5LQ=
+X-IronPort-AV: E=Sophos;i="5.77,448,1596470400"; d="scan'208";a="152867462"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 03 Nov 2020 23:33:26 +0800
-IronPort-SDR: ZXtY/2v6NJZDOxh2ijgPdRyq/v5hl1nETuIT4v/D9w9aGAGI91oJsp3Y5asl6RdMVaGiyXy/9a
- q4H+XTV1bD8cn7/MGE0tJPOtQ99kUP1b9fot1ERdV7tycNbxZIeI3Cllfbw7U0YCho/NEyRjcD
- 8Zy1Ci/Y14Wh5su0RXD4qu/6tyDoHk40skRe6YrA9EdfbTe50wrN1nSNodcBKAl455EuLmLIQc
- DeB/oDInv8OKM/cuk3BpF4tfvrdEsayhtNDCH2MSVGSL3zFiwZSxUaYCXi7yTizdvTu2cWesq7
- i1Rrc8yYZvPVTeuN1B1y+IqZ
+ by ob1.hgst.iphmx.com with ESMTP; 03 Nov 2020 23:33:25 +0800
+IronPort-SDR: QKBdmz0z6xZQ/vOmvbyehrLFyEiWfhtJoRkZKjX5v+jCyGwlZmVUbM2aZ4yfoPazV0wZu4xiMK
+ ozX3TmR4dMwaPqVdKY8FyBLZ3BBMnLb+KSb2mXs2WpawO5zqjJauuOgyW8nu5rDAd1ik1IZy/j
+ iAEMzzCEU199hvAPkX7UdtazKw2mtztovpPD+6suxmk9NYhqFYxIBOFYHNrwYsxajUShp9IjBG
+ y7VNkIqUXjo+QkZvyGhmgyaW+HnHwdGvGq7k41gDmgYCQMJbJhhqQOnpgHNvF4hZrrx3+U6/DM
+ EXPwiyhu4UlKBNJCg9nbKVXi
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  03 Nov 2020 07:19:34 -0800
-IronPort-SDR: PW7nqYWDT0F28ke6svIt4DO2TqMISCY+uaoR8H72EcY6scWscudid+HQl/cZs7JSsS2SAWRV2s
- vyVmHBW5jr8jV2WPcyfYN4tX9KYFCR9sBE4ZcImMdjM6GDv09W6VHYs5LIbzUCtPkYNscRhANy
- /wGr65hJcABWP8prOd7TuwQ3yH7sqJoEjBeykGM4Lw0s2mzvrjRzz46IvUoOtCaHvcoBrhaIrq
- iN1znbBYKd2FToORlovEJanF9NqKZ917/8FTpDpSuJ8dTypOs6OjyGKpv7U7JvgQiWZIV/RbKp
- eVQ=
+IronPort-SDR: ZK7gctL0dnWybucKtYOqNrSZ6WiEGpaezGj2sEQOZSrsgfpe3YGQONjHu+rThg8rB1VTf1bwhp
+ eyGZJ9bkEctGRkgv/OavfQbgPp+vcIddv7ns7dP8k4ZweT4z50brZ34On+jLvGh7LM3iJRswLk
+ fbtEEOB8PUjqt1jHJdoxlTaYsbsv2S+FgdIoeTS4iWaPZWx8lwPQ7a5Ihea1plJ19y3nsweHM0
+ CBOZEjuHbf2DNiQnNWABBgUR0VJP2xkPrKbbbyNkZEUvqd3rOFCQRKJUShka9BNx73ByosRhvO
+ G9I=
 WDCIronportException: Internal
 Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.60.113])
@@ -77,10 +77,9 @@ Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL v2 09/19] hw/riscv: microchip_pfsoc: Document where to look at
- the SoC memory maps
-Date: Tue,  3 Nov 2020 07:21:40 -0800
-Message-Id: <20201103152150.2677566-10-alistair.francis@wdc.com>
+Subject: [PULL v2 07/19] target/riscv: Add V extension state description
+Date: Tue,  3 Nov 2020 07:21:38 -0800
+Message-Id: <20201103152150.2677566-8-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201103152150.2677566-1-alistair.francis@wdc.com>
 References: <20201103152150.2677566-1-alistair.francis@wdc.com>
@@ -110,56 +109,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Yifei Jiang <jiangyifei@huawei.com>, Yipeng Yin <yinyipeng1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+From: Yifei Jiang <jiangyifei@huawei.com>
 
-It is not easy to find out the memory map for a specific component
-in the PolarFire SoC as the information is scattered in different
-documents. Add some comments so that people can know where to get
-such information from the Microchip website.
+In the case of supporting V extension, add V extension description
+to vmstate_riscv_cpu.
 
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 1603863010-15807-2-git-send-email-bmeng.cn@gmail.com
+Message-id: 20201026115530.304-6-jiangyifei@huawei.com
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/microchip_pfsoc.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ target/riscv/machine.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-index 4627179cd3..6aac8497fc 100644
---- a/hw/riscv/microchip_pfsoc.c
-+++ b/hw/riscv/microchip_pfsoc.c
-@@ -66,6 +66,24 @@
- /* GEM version */
- #define GEM_REVISION    0x0107010c
+diff --git a/target/riscv/machine.c b/target/riscv/machine.c
+index ae60050898..44d4015bd6 100644
+--- a/target/riscv/machine.c
++++ b/target/riscv/machine.c
+@@ -76,6 +76,30 @@ static bool hyper_needed(void *opaque)
+     return riscv_has_ext(env, RVH);
+ }
  
-+/*
-+ * The complete description of the whole PolarFire SoC memory map is scattered
-+ * in different documents. There are several places to look at for memory maps:
-+ *
-+ * 1 Chapter 11 "MSS Memory Map", in the doc "UG0880: PolarFire SoC FPGA
-+ *   Microprocessor Subsystem (MSS) User Guide", which can be downloaded from
-+ *   https://www.microsemi.com/document-portal/doc_download/
-+ *   1244570-ug0880-polarfire-soc-fpga-microprocessor-subsystem-mss-user-guide,
-+ *   describes the whole picture of the PolarFire SoC memory map.
-+ *
-+ * 2 A zip file for PolarFire soC memory map, which can be downloaded from
-+ *   https://www.microsemi.com/document-portal/doc_download/
-+ *   1244581-polarfire-soc-register-map, contains the following 2 major parts:
-+ *   - Register Map/PF_SoC_RegMap_V1_1/pfsoc_regmap.htm
-+ *     describes the complete integrated peripherals memory map
-+ *   - Register Map/PF_SoC_RegMap_V1_1/MPFS250T/mpfs250t_ioscb_memmap_dri.htm
-+ *     describes the complete IOSCB modules memory maps
-+ */
- static const struct MemmapEntry {
-     hwaddr base;
-     hwaddr size;
++static bool vector_needed(void *opaque)
++{
++    RISCVCPU *cpu = opaque;
++    CPURISCVState *env = &cpu->env;
++
++    return riscv_has_ext(env, RVV);
++}
++
++static const VMStateDescription vmstate_vector = {
++    .name = "cpu/vector",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = vector_needed,
++    .fields = (VMStateField[]) {
++            VMSTATE_UINT64_ARRAY(env.vreg, RISCVCPU, 32 * RV_VLEN_MAX / 64),
++            VMSTATE_UINTTL(env.vxrm, RISCVCPU),
++            VMSTATE_UINTTL(env.vxsat, RISCVCPU),
++            VMSTATE_UINTTL(env.vl, RISCVCPU),
++            VMSTATE_UINTTL(env.vstart, RISCVCPU),
++            VMSTATE_UINTTL(env.vtype, RISCVCPU),
++            VMSTATE_END_OF_LIST()
++        }
++};
++
+ static const VMStateDescription vmstate_hyper = {
+     .name = "cpu/hyper",
+     .version_id = 1,
+@@ -166,6 +190,7 @@ const VMStateDescription vmstate_riscv_cpu = {
+     .subsections = (const VMStateDescription * []) {
+         &vmstate_pmp,
+         &vmstate_hyper,
++        &vmstate_vector,
+         NULL
+     }
+ };
 -- 
 2.28.0
 
