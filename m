@@ -2,102 +2,163 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CED25C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D62D6C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:11:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FFB822243
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:06:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0077A206CA
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:11:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBFNZUsr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FFB822243
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="e1ecgjUG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0077A206CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZv5W-00085w-RP
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:06:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44868)
+	id 1kZv9j-0002Ie-Iw
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:11:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZv3z-0007F7-Ry
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:05:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34698)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZv3x-0002zG-5X
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:05:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604405119;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Hjjlk+YJUvL+3++ntw9sC1iOXQ24d5fobxPDvHR+w9I=;
- b=QBFNZUsr061xbDcOMplM2+HnfOejFsq6Zwp8nhhu8a0hau77QSdWFRDuDH83QhKKHLS+Xj
- 9n1PhK5y9Bpg+eFwKje80wjlSRt2Z+taP4XfdRJEQEaVqIVwcUbsJdE6eEikOPmcyv99P+
- q4vYi4dBD3QiUgJtLkBI7BoNZA2GnIw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-537-0oejOqMjOSWZDMUzLAADhg-1; Tue, 03 Nov 2020 07:05:17 -0500
-X-MC-Unique: 0oejOqMjOSWZDMUzLAADhg-1
-Received: by mail-wr1-f70.google.com with SMTP id q15so7739353wrw.8
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 04:05:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Hjjlk+YJUvL+3++ntw9sC1iOXQ24d5fobxPDvHR+w9I=;
- b=IVJjx5h1hLEOhSAWMY4t2fHT2lRYxN8k3VIFb6DktQQL0KKtwkePXOBarH2OujCau4
- QAby6qqTFsjnydWTORuYnMEAfihVA1ZElttTCRzEWYge7+DwQnttShyd05KBr9UHjnqn
- zM/CtZxtHnMquJy4nOA9mELhe9e4CoTH/eEbxuPtv3TXLJV2IY/ONI5a4DrYOUQsd+AW
- 0eoeXR2QJAunpUxxFtYxKLugjE47Ddl+L/CT4fsnKslrP2Ler4gT6gHfoscFFwH3HedN
- eATIvpzdcqDpHoQ73zO2OR6npcnD2Anl6Vs0c7TtViq79bVPmn4cPaL+qUElKbRYacsd
- 9P9Q==
-X-Gm-Message-State: AOAM533oFuYE4rGJb9DaLx38QtYMvrjl/8FAOzh84k2vho49yUP8z8xQ
- iSnZgxwDDIi9ru4yboheH2WnUZHLimsPctoK8DaRu3++E/+7SFFaUQxns36E/PkxjsCUV0fs9gJ
- h50CWK/CSqIXWdpk=
-X-Received: by 2002:adf:df02:: with SMTP id y2mr27642051wrl.403.1604405116503; 
- Tue, 03 Nov 2020 04:05:16 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxICMcecKCoVhHgnO6IOJP+eBvtkSoc9Vavg2oNhmYbIZ7NsjQbcradu5Dl1vkNmoIdNYBvbA==
-X-Received: by 2002:adf:df02:: with SMTP id y2mr27642023wrl.403.1604405116299; 
- Tue, 03 Nov 2020 04:05:16 -0800 (PST)
-Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id m126sm1878959wmm.0.2020.11.03.04.05.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 04:05:15 -0800 (PST)
-Date: Tue, 3 Nov 2020 07:05:08 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Bin Meng <bmeng.cn@gmail.com>
-Subject: Re: [PATCH] hw/9pfs: virtio-9p: Ensure config space is a multiple of
- 4 bytes
-Message-ID: <20201103065732-mutt-send-email-mst@kernel.org>
-References: <1603959941-9689-1-git-send-email-bmeng.cn@gmail.com>
- <20201030051920-mutt-send-email-mst@kernel.org>
- <CAEUhbmV+t06o7RjhfHiCS2P6UZLm9dra+ev_eX-qRahoyx8HJA@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1kZv7S-0001EY-P6; Tue, 03 Nov 2020 07:08:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33986
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1kZv7Q-0004Jw-Fc; Tue, 03 Nov 2020 07:08:58 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0A3C39V4062096; Tue, 3 Nov 2020 07:08:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=HdYeU+n7J/aDKowAxXjtdzHGK1+piv/qurENMFXjbgI=;
+ b=e1ecgjUG+ULQ9H9NveDY2Vw36KXNUY4pLAANYJKnLjkq6qM6BIYaRTN9wjkFhd2R9aFU
+ 1OwkjWGcWZE+687hvzsJldv28wuoUXR98ivbTX+VwKlqnbyVwP4+fkMWcbh1NOeSd9zw
+ SA4ySsL8d8OcRQfGhuQy/L3jB9r7wJ9tbBztl3VGVrCl9huoGr5acKOh2V6dzmjvaUaU
+ Ukw2UzOgeconDv45YuW4I/MvD6w9zxBjhSlgxL6SN4aZEZ8UVt8VNS8TFAyxJKNhuhv5
+ FfKryDLHkvml0CUcfpSWZzW3P+uoACwf+3jpJYYIl9raWJf04MR2SabmKoqUt+erd4bv 9g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 34jwj186v5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 03 Nov 2020 07:08:52 -0500
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A3C5PkF072052;
+ Tue, 3 Nov 2020 07:08:52 -0500
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 34jwj186u3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 03 Nov 2020 07:08:52 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A3C6hY9018680;
+ Tue, 3 Nov 2020 12:08:50 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma02fra.de.ibm.com with ESMTP id 34j6j40v8g-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 03 Nov 2020 12:08:50 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0A3C8lJr8127124
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 3 Nov 2020 12:08:47 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 50C2711C058;
+ Tue,  3 Nov 2020 12:08:47 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0246111C04C;
+ Tue,  3 Nov 2020 12:08:47 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.32.69])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue,  3 Nov 2020 12:08:46 +0000 (GMT)
+Subject: Re: [PATCH] s390-bios: Skip writing iplb location to low core for ccw
+ ipl
+To: Thomas Huth <thuth@redhat.com>
+References: <20201030122823.347140-1-borntraeger@de.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <934ed905-3f90-d1e4-a40e-f88c50b7c305@de.ibm.com>
+Date: Tue, 3 Nov 2020 13:08:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <CAEUhbmV+t06o7RjhfHiCS2P6UZLm9dra+ev_eX-qRahoyx8HJA@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20201030122823.347140-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312, 18.0.737
+ definitions=2020-11-03_08:2020-11-03,
+ 2020-11-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 mlxlogscore=747 mlxscore=0 clxscore=1015
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011030079
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 06:23:44
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,148 +171,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Cornelia Huck <cohuck@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 03, 2020 at 02:26:10PM +0800, Bin Meng wrote:
-> Hi Michael,
+On 30.10.20 13:28, Christian Borntraeger wrote:
+> From: "Jason J. Herne" <jjherne@linux.ibm.com>
 > 
-> On Fri, Oct 30, 2020 at 5:29 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Thu, Oct 29, 2020 at 04:25:41PM +0800, Bin Meng wrote:
-> > > From: Bin Meng <bin.meng@windriver.com>
-> > >
-> > > At present the virtio device config space access is handled by the
-> > > virtio_config_readX() and virtio_config_writeX() APIs. They perform
-> > > a sanity check on the result of address plus size against the config
-> > > space size before the access occurs.
-> > >
-> > > For unaligned access, the last converted naturally aligned access
-> > > will fail the sanity check on 9pfs. For example, with a mount_tag
-> > > `p9fs`, if guest software tries to read the mount_tag via a 4 byte
-> > > read at the mount_tag offset which is not 4 byte aligned, the read
-> > > result will be `p9\377\377`, which is wrong.
-> > >
-> > > This changes the size of device config space to be a multiple of 4
-> > > bytes so that correct result can be returned in all circumstances.
-> > >
-> > > Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> >
-> >
-> >
-> > The patch is ok, but I'd like to clarify the commit log.
+> The architecture states that the iplb location is only written to low
+> core for list directed ipl and not for traditional ccw ipl. If we don't
+> skip this then operating systems that load by reading into low core
+> memory may fail to start.
 > 
-> Thanks for the review.
+> We should also not write the iplb pointer for network boot as it might
+> overwrite content that we got via network.
 > 
-> >
-> > If I understand correctly, what happens is:
-> > - tag is set to a value that is not a multiple of 4 bytes
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Fixes: 9bfc04f9ef68 ("pc-bios: s390x: Save iplb location in lowcore")
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+FWIW, this fixes the vfio-ccw IPL for some non Linux binaries.
+> ---
+>  pc-bios/s390-ccw/main.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> It's not about the mount_tag value, but the length of the mount_tag is 4.
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index 43c792cf9509..fc4bfaa45529 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -43,7 +43,9 @@ void write_subsystem_identification(void)
+>  
+>  void write_iplb_location(void)
+>  {
+> -    lowcore->ptr_iplb = ptr2u32(&iplb);
+> +    if (cutype == CU_TYPE_VIRTIO && virtio_get_device_type() != VIRTIO_ID_NET) {
+> +        lowcore->ptr_iplb = ptr2u32(&iplb);
+> +    }
+>  }
+>  
+>  unsigned int get_loadparm_index(void)
 > 
-> > - guest attempts to read the last 4 bytes of the tag
-> 
-> Yep. So the config space of a 9pfs looks like the following:
-> 
-> offset: 0x14, size: 2 bytes indicating the length of the following mount_tag
-> offset: 0x16, size: value of (offset 0x14).
-> 
-> When a 4-byte mount_tag is given, guest software is subject to read 4
-> bytes (value read from offset 0x14) at offset 0x16.
-
-
-Well looking at Linux guest code:
-
-
-static inline void __virtio_cread_many(struct virtio_device *vdev,
-                                       unsigned int offset,
-                                       void *buf, size_t count, size_t bytes)
-{
-        u32 old, gen = vdev->config->generation ?
-                vdev->config->generation(vdev) : 0;
-        int i;  
-                                   
-        might_sleep();             
-        do {
-                old = gen;
-
-                for (i = 0; i < count; i++)
-                        vdev->config->get(vdev, offset + bytes * i,
-                                          buf + i * bytes, bytes);
-        
-                gen = vdev->config->generation ?
-                        vdev->config->generation(vdev) : 0;
-        } while (gen != old);
-}
-        
-
-
-static inline void virtio_cread_bytes(struct virtio_device *vdev,
-                                      unsigned int offset,
-                                      void *buf, size_t len) 
-{           
-        __virtio_cread_many(vdev, offset, buf, len, 1);
-}
-
-and:
-
-
-        virtio_cread_bytes(vdev, offsetof(struct virtio_9p_config, tag),
-                           tag, tag_len);
-
-
-
-So guest is doing multiple 1-byte reads.
-
-
-Spec actually says:
-	For device configuration access, the driver MUST use 8-bit wide accesses for 8-bit wide fields, 16-bit wide
-
-	and aligned accesses for 16-bit wide fields and 32-bit wide and aligned accesses for 32-bit and 64-bit wide
-
-	fields. For 64-bit fields, the driver MAY access each of the high and low 32-bit parts of the field independently.
-
-9p was never standardized, but the linux header at least lists it as
-follows:
-
-struct virtio_9p_config {
-        /* length of the tag name */
-        __virtio16 tag_len;
-        /* non-NULL terminated tag name */
-        __u8 tag[0];
-} __attribute__((packed));
-
-In that sense tag is an 8 byte field.
-
-So which guest reads tag using a 32 bit read, and why?
-
-
-
-> > - access returns -1
-> >
-> 
-> The access will be split into 2 accesses, either by hardware or
-> software. On RISC-V such unaligned access is emulated by M-mode
-> firmware. On ARM I believe it's supported by the CPU. So the first
-> converted aligned access is to read 4 byte at 0x14 and the second
-> converted aligned access is to read 4 byte at 0x16, and drop the bytes
-> that are not needed, assemble the remaining bytes and return the
-> result to the guest software. The second aligned access will fail the
-> sanity check and return -1, but not the first access, hence the result
-> will be `p9\377\377`.
-> 
-> >
-> > What I find confusing in the above description:
-> > - reference to unaligned access - I don't think these
-> >   are legal or allowed by QEMU
-> > - reference to `p9\377\377` - I think returned value will be -1
-> >
-> 
-> Regards,
-> Bin
-
 
