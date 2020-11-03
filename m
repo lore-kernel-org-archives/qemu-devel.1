@@ -2,89 +2,76 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F85AC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D10A0C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:13:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E295722370
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:12:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XHZC0M3T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E295722370
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4834B206CB
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:13:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4834B206CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZyum-0006bP-31
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:12:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58436)
+	id 1kZyvt-0007dM-9P
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:13:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kZycp-0004Tq-A1
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:53:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21413)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kZycm-0008O3-1U
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:53:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604418806;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dvogv/zGwg3nacSEYlK24KMhbxoTlaXr3ZZ8FhJ1LHQ=;
- b=XHZC0M3TAOKwFPv9TMylao7d+dOndZ1O6fAXnf7nKnR4x2SL9h9koDWGZMa/dRJPlvuRwi
- Ei+NzoWyshLxuja6w8Jp+Lr4i9kkTeJjbHwInNerW9oMI6WrNpnPfMBYQopysEFJ4/TtFb
- VOv/wEOkmrcsi21z+UJSQP55x59qw50=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-6jKc1TDtNtm-OdrEABJEiw-1; Tue, 03 Nov 2020 10:53:18 -0500
-X-MC-Unique: 6jKc1TDtNtm-OdrEABJEiw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0A6064155;
- Tue,  3 Nov 2020 15:53:17 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.195.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BB055B4B6;
- Tue,  3 Nov 2020 15:53:15 +0000 (UTC)
-Subject: Re: [PATCH v2] qcow2: Document and enforce the QCowL2Meta invariants
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <20201007161323.4667-1-berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b1af7494-15da-cd1f-1bd3-fb9480608a4e@redhat.com>
-Date: Tue, 3 Nov 2020 16:53:13 +0100
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kZyjd-0003rU-A8
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:00:37 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:56657)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kZyjb-0002nH-0u
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:00:36 -0500
+Received: from [192.168.100.1] ([82.252.154.198]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N79ly-1kHHez3ZAS-017Xvk; Tue, 03 Nov 2020 17:00:22 +0100
+Subject: Re: [PULL 1/1] linux-user: Support futex_time64
+To: Alistair Francis <alistair23@gmail.com>
+References: <20200330102945.2388294-1-laurent@vivier.eu>
+ <20200330102945.2388294-2-laurent@vivier.eu>
+ <CAFEAcA97s+jiZxH+ObdFeFgs7-Wub6XjZvJFmL2s4voRrny38Q@mail.gmail.com>
+ <a1fd7792-b7fa-6e86-4a24-b53fb7ecac0f@vivier.eu>
+ <CAKmqyKN81bBXtJei7ch3CFLqjsnyiVfZOmYuTEL68a=i7JNPOQ@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <7a26a668-cd6f-8d7c-5c35-fd15ad74a92b@vivier.eu>
+Date: Tue, 3 Nov 2020 17:00:20 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201007161323.4667-1-berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAKmqyKN81bBXtJei7ch3CFLqjsnyiVfZOmYuTEL68a=i7JNPOQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:V41d/CAQjXa1gTTnAsUYQLYUTxZeE6qYUjP4pBez7X5esxaeRVT
+ xiMZmYwASw5Xqgb0VOYkMnHoWVjTRxJ4DiFbdjnutVE63ukip7IHoqN5XxFHQ4hpj4+f9Nj
+ vfCOsJXm1yqogah18Iey8MF5vYRt5dMyg6m8/SAjNKT23OE4Kpx0EfkJQDa6MYFsBZItqtJ
+ NK6j9NFfvJoSlL8NknWiA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:iV2aHCzfgck=:Tfuia/BPoryqlphOrdCCfQ
+ gHJR3e+/IoVC6zMlwKigVM7xMa03W96s1K5yTCAF7tE2iqOxL1zUWB1keflN0MmxiR86L0Cl7
+ r0uUgO16oRk3SuTsMo33S6h39f14A2t9NwvSXDqhjhfBWIFNm3vsE526S03SXqLhB/MfxT65K
+ kXZ1aHcxU46bY9gxBtB/dust46eEMXHmNQD22itVNgiL67Ra6cBGSfI345qc205y/Cn/EO/gb
+ WC40/czECuUxNJyG2YFD8VgpUGxnqEpL9rW0Z3RVlgaKJJE+pLUAgoq4y/l2WOvTqWZFCJyOn
+ 6MuAHDVkm1PQpil0uiANH4t0UZmqKHakcGVATD5QGHBsLrl4FUQ7VOH/UQAdtAhBNCGR1NmB+
+ In+vUq++A3zHyXQ/CX1tIS2saCnmk4amzc6BIa5I6VfYvHIEPT1EUDqj2MTq/m8TJWyDMav7e
+ GQAHU/KdVg==
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 11:00:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,58 +84,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07.10.20 18:13, Alberto Garcia wrote:
-> The QCowL2Meta structure is used to store information about a part of
-> a write request that touches clusters that need changes in their L2
-> entries. This happens with newly-allocated clusters or subclusters.
+Le 03/11/2020 à 16:40, Alistair Francis a écrit :
+> On Mon, Nov 2, 2020 at 11:29 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> Le 02/11/2020 à 19:15, Peter Maydell a écrit :
+>>> On Mon, 30 Mar 2020 at 11:31, Laurent Vivier <laurent@vivier.eu> wrote:
+>>>>
+>>>> From: Alistair Francis <alistair.francis@wdc.com>
+>>>>
+>>>> Add support for host and target futex_time64. If futex_time64 exists on
+>>>> the host we try that first before falling back to the standard futex
+>>>> syscall.
+>>>
+>>> Hi; I dunno why Coverity's only just noticed this, but in
+>>> CID 1432339 it points out:
+>>>
+>>>> +#if defined(TARGET_NR_futex_time64)
+>>>> +static int do_futex_time64(target_ulong uaddr, int op, int val, target_ulong timeout,
+>>>> +                           target_ulong uaddr2, int val3)
+>>>> +{
+>>>> +    struct timespec ts, *pts;
+>>>> +    int base_op;
+>>>> +
+>>>> +    /* ??? We assume FUTEX_* constants are the same on both host
+>>>> +       and target.  */
+>>>> +#ifdef FUTEX_CMD_MASK
+>>>> +    base_op = op & FUTEX_CMD_MASK;
+>>>> +#else
+>>>> +    base_op = op;
+>>>> +#endif
+>>>> +    switch (base_op) {
+>>>> +    case FUTEX_WAIT:
+>>>> +    case FUTEX_WAIT_BITSET:
+>>>> +        if (timeout) {
+>>>> +            pts = &ts;
+>>>> +            target_to_host_timespec64(pts, timeout);
+>>>
+>>> ...that here we call target_to_host_timespec64(), which can
+>>> fail with -TARGET_EFAULT, but (unlike all the other times we call
+>>> the function) we aren't checking its return value.
+>>> Is there missing error handling code here ?
+>>>
+>>
+>> I think the code is like that because this is a cut&paste of function
+>> do_futex() witl "s/timespec/timespec64/".
+>>
+>> And yes I think we should check for the return value.
+>> I'm going to fix that.
 > 
-> This structure has changed a bit since it was first created and its
-> current documentation is not quite up-to-date.
-> 
-> A write request can span a region consisting of a combination of
-> clusters of different types, and qcow2_alloc_host_offset() can
-> repeatedly call handle_copied() and handle_alloc() to add more
-> clusters to the mix as long as they all are contiguous on the image
-> file.
-> 
-> Because of this a write request has a list of QCowL2Meta structures,
-> one for each part of the request that needs changes in the L2
-> metadata.
-> 
-> Each one of them spans nb_clusters and has two copy-on-write regions
-> located immediately before and after the middle region touched by that
-> part of the write request. Even when those regions themselves are
-> empty their offsets must be correct because they are used to know the
-> location of the middle region.
-> 
-> This was not always the case but it is not a problem anymore
-> because the only two places where QCowL2Meta structures are created
-> (calculate_l2_meta() and qcow2_co_truncate()) ensure that the
-> copy-on-write regions are correctly defined, and so do assertions like
-> the ones in perform_cow().
-> 
-> The conditional initialization of the 'written_to' variable is
-> therefore unnecessary and is removed by this patch.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2.h         | 19 +++++++++++--------
->  block/qcow2-cluster.c |  5 +++--
->  block/qcow2.c         | 19 +++++++++++++++----
->  3 files changed, 29 insertions(+), 14 deletions(-)
+> Thanks! Let me know if you want me to do it and I can send a patch instead.
+>
 
-Thanks, applied to my block branch:
+If you have time, please do.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
+Thanks
+Laurent
 
 
