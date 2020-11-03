@@ -2,88 +2,98 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0E7C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24117C388F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:32:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F3A820735
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:32:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A7C120735
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:32:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aekwXRqe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F3A820735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oWKZAxyN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A7C120735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZvU6-0006Pu-BP
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:32:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49846)
+	id 1kZvUd-0006mD-JQ
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:32:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kZvTE-000538-27
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:31:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33419)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kZvTC-0003b6-3K
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:31:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604406685;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PGnvEjPJJ0VdjKm9RCFITqBUBKzCvnEc/uGDBjoYwKo=;
- b=aekwXRqe+zR3gKO6sIiHlI/8I+YX9Tj2cfKiMH+IDsUm4zi3Hd9kQAUe2OHrztiwrKSUGw
- JRj3549QI4CbGuy62QHPKqvjROp0RJyxd3MkMlU8rN/aboFVKgGKcyUpexMluc0HGdNetc
- LycqNqnvJLxQKEOLjSUBbZvvSvHlYNo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-q-uE3CtpPIaUOzrn2y10sA-1; Tue, 03 Nov 2020 07:31:23 -0500
-X-MC-Unique: q-uE3CtpPIaUOzrn2y10sA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 895A78030B0;
- Tue,  3 Nov 2020 12:31:22 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F01EF1002D48;
- Tue,  3 Nov 2020 12:31:17 +0000 (UTC)
-Date: Tue, 3 Nov 2020 13:31:16 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 16/20] nvdimm: Remove unnecessary prefix from error message
-Message-ID: <20201103133116.38f36be9@redhat.com>
-In-Reply-To: <20201030202131.796967-17-ehabkost@redhat.com>
-References: <20201030202131.796967-1-ehabkost@redhat.com>
- <20201030202131.796967-17-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kZvQX-0001rg-NN
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:28:41 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37467)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kZvQV-0002Ym-OL
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:28:41 -0500
+Received: by mail-wm1-x344.google.com with SMTP id c16so12596806wmd.2
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 04:28:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=uhGC4Lj3O7Y3kXbKqJhAKXme8iI+ZV4oZWNulwIo7Co=;
+ b=oWKZAxyN5AqFwDOo+4bn/xdrkY3D1IM3JpJp9T1WOuIpY7P5BJTbYRusZZZtsIv6w6
+ 5suzdkGN606JmM+aXCSOsEVyk9Odoj14KkFu5O15gsr8CstSiC5AtthmAyTgdblrAoUW
+ IUc2Olwu5ihX+8wIMugN4LnnHPVuZ4hSltIPihu6POvMtKX93z/4VBvVybTlT7wIX6sj
+ 9s1mkibS/n8KXTjaMS0u9f7q37hz1iUQn8BWClWFv5222Cf5/jK7T5DS0WW62cegA2hb
+ hTfGOAWAAOJoUlKqUL9YDNSvCpE30jlD2/Sdio3gTeiXA/6+MbjuSP9eOjIHLlQU0Ay9
+ HHAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uhGC4Lj3O7Y3kXbKqJhAKXme8iI+ZV4oZWNulwIo7Co=;
+ b=JdBWyUt5VxVxGVDSh55AZvT3kA21Nogglb3/D7fgDwo7OXVwas4zioBq0BzbpULjI4
+ ecKvgeOKUytBOTDXLyYx+c3uabOd3rPFk40zrx0TTRjRxqBh2SIvz/Sw5w80Oj4wTpqh
+ O1QhMrFTGhL85ZJLA4b0d65gZdjSguCaYpMbK2WbXHkcaGdSRdAevSrUs8dRNie2zTYh
+ sNvd9o86rKoB7q+NgIAcCLy3AmBuBvZY+oEVcpOw37LCR5IBCRmiaqEQv0jaljzcmSg5
+ DSzD+q7WZ2nQXV1zbKxBHNfCnzCPngzT1MCyBAkBnrQW4cLfGF5V28I2hzYVd1ejcPpd
+ EVwA==
+X-Gm-Message-State: AOAM5319tgsIruSRMLakhbkawYgKhYrEc/GeCBIRkIy2KI+WEm1eqpD3
+ VGG2TCYM+j3IZFjdssT1fTn3sOcJO9Q=
+X-Google-Smtp-Source: ABdhPJxECmHwIJ7TsKJg11F3W+yIsPidMpxZCtF+qM4IPBR3jd+Rql+ABL/AB8BA1ZDV/NVpqfpPgg==
+X-Received: by 2002:a1c:b402:: with SMTP id d2mr3539355wmf.128.1604406509795; 
+ Tue, 03 Nov 2020 04:28:29 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id m126sm1946534wmm.0.2020.11.03.04.28.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Nov 2020 04:28:28 -0800 (PST)
+Subject: Re: [PATCH] hw/intc: Fix incorrect calculation of core in
+ liointc_read() and liointc_write()
+To: AlexChen <alex.chen@huawei.com>, chenhc@lemote.com, jiaxun.yang@flygoat.com
+References: <5FA12391.8090400@huawei.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a4915556-bc78-a8c4-c887-f53ed14251b6@amsat.org>
+Date: Tue, 3 Nov 2020 13:28:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <5FA12391.8090400@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,56 +106,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: zhengchuan@huawei.com, QEMU <qemu-devel@nongnu.org>,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 30 Oct 2020 16:21:27 -0400
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> object_property_parse() will add a
->   "Property '<TYPE>.<PROP>' can't take value '<VALUE>'"
-> prefix automatically for us.
+On 11/3/20 10:32 AM, AlexChen wrote:
+> According to the loongson spec
+> (http://www.loongson.cn/uploadfile/cpu/3B1500/Loongson_3B1500_cpu_user_1.pdf)
+> and the macro definition(#define R_PERCORE_ISR(x) (0x40 + 0x8 * x)), we know
+> that the ISR size of per CORE is 8, so here we need to divide
+> (addr - R_PERCORE_ISR(0)) by 8, not 4.
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Alex Chen <alex.chen@huawei.com>
 > ---
-> Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->  hw/mem/nvdimm.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> index e1574bc07c..b9a99d58ed 100644
-> --- a/hw/mem/nvdimm.c
-> +++ b/hw/mem/nvdimm.c
-> @@ -56,8 +56,7 @@ static void nvdimm_set_label_size(Object *obj, Visitor *v, const char *name,
->          return;
->      }
->      if (value < MIN_NAMESPACE_LABEL_SIZE) {
-> -        error_setg(errp, "Property '%s.%s' (0x%" PRIx64 ") is required"
-> -                   " at least 0x%lx", object_get_typename(obj), name, value,
-> +        error_setg(errp, "label size should be at least 0x%lx",
->                     MIN_NAMESPACE_LABEL_SIZE);
->          return;
->      }
-> @@ -89,8 +88,7 @@ static void nvdimm_set_uuid(Object *obj, Visitor *v, const char *name,
->      }
->  
->      if (qemu_uuid_parse(value, &nvdimm->uuid) != 0) {
-> -        error_setg(errp, "Property '%s.%s' has invalid value",
-> -                   object_get_typename(obj), name);
-> +        error_setg(errp, "invalid UUID");
->      }
->  
->      g_free(value);
+>  hw/intc/loongson_liointc.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
+For a model added in 2020, its code style is a bit
+disappointing (leading to that kind of hidden bugs).
+I'm even surprised it passed the review process.
+
+Thanks for the fix.
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
