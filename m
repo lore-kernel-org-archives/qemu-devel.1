@@ -2,119 +2,90 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFCB3C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:55:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26335C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1DBE22277
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:55:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CA4B206D5
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 06:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="aWXvyflg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1DBE22277
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZG+98PpE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CA4B206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZqDm-0004ac-UI
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 01:55:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57198)
+	id 1kZqFA-0005aX-KQ
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 01:56:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57532)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kZqCt-00048m-LK
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:54:15 -0500
-Received: from mail-eopbgr770087.outbound.protection.outlook.com
- ([40.107.77.87]:27714 helo=NAM02-SN1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kZqCq-0007pp-Sc
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:54:14 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MRHan91zCRr4RydwzmRQkchjeF+gWArJwVwAf1j0M5l8iihrYdPkcdyFs1bK8lhJH2xziisjCQ4CftZhE0nzYgiIotOqNiEnF/Q15MjdQQOtPbozIdXLRTT8+b+indbXZunplv+Tvkp/orj0+ODEWF7uDivbIZdQWe288Nr8omP0+GQymDiINPQltSsotCR9oTTlldRDMAY89IX36LtJ7bxJcaOzsaLhqDBeIrTcEmlZXKm1bzOxktEnMvXjqvIhxD5llK6wiokcHn3Mn2e6oTi7NizIvVQE+Qj21ywmS4msoeH381gGubtok1kO+Meq20MO1LJlg9dfIirffYwSKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5IJpHmVLirMNyUvFFySSlundHVJNgBwjxEJTeOhFFa4=;
- b=APtvgADsqycIi0UX0fuW0PT7//cXJm65P1vg90OnEXYqAbpiXkXnr0xG4HkmNGjvSr29PQy+VQC1XoUwGdFm5vIkMIAP52/5K7NYv+WZg9kBB/isaDdQanEpTpqDgl6KGabctYNUL2+LMoVGT8DV0kXfTC/an/wft9x2jY9OdIalJApnWPWTuccJK5po6clstlmvIPWfl5+3v7W6Rmc8GWq7bc8udqHxBo8wuwChOr9EucRZj2DSeSIY4YIlQlGLPR5WfKOo6/L/coMUsl4RdWivHZrcUbdxt2dan7OyPaHQYG79c28aP27HmMD9K8+OPeGXtniQVliHD+Y/jciGzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
- dkim=pass header.d=xilinx.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5IJpHmVLirMNyUvFFySSlundHVJNgBwjxEJTeOhFFa4=;
- b=aWXvyflgtUqSLFcokpHOtThHc3qDqVGXyf/usvKPG+yBpODe7Xw2msp04Iyqm/gZZ9X7Df6YF0Eu/75GnrhAe1puQeXDzlgrFs+K7i5c5rsL7tBBdm8eKCr1U5xYOInx+8DIAOKRR7pBLToSZiSTwtMKuzVyzA6NuRBwXxi8cKA=
-Received: from BY5PR02MB6772.namprd02.prod.outlook.com (2603:10b6:a03:206::11)
- by BY5PR02MB7027.namprd02.prod.outlook.com (2603:10b6:a03:23e::9)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.27; Tue, 3 Nov
- 2020 06:54:08 +0000
-Received: from BY5PR02MB6772.namprd02.prod.outlook.com
- ([fe80::75ed:4271:263b:fd15]) by BY5PR02MB6772.namprd02.prod.outlook.com
- ([fe80::75ed:4271:263b:fd15%3]) with mapi id 15.20.3499.030; Tue, 3 Nov 2020
- 06:54:08 +0000
-From: Sai Pavan Boddu <saipava@xilinx.com>
-To: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH for-5.2] tcg: Remove assert from set_jmp_reset_offset
-Thread-Topic: [PATCH for-5.2] tcg: Remove assert from set_jmp_reset_offset
-Thread-Index: AQHWsZL8R88o8YrzuUu+dOk+p0JFcam1+H3g
-Date: Tue, 3 Nov 2020 06:54:08 +0000
-Message-ID: <BY5PR02MB6772BEBDCEA5EB01D6A48784CA110@BY5PR02MB6772.namprd02.prod.outlook.com>
-References: <20201103033947.94157-1-richard.henderson@linaro.org>
-In-Reply-To: <20201103033947.94157-1-richard.henderson@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-TNEF-Correlator: 
-authentication-results: linaro.org; dkim=none (message not signed)
- header.d=none;linaro.org; dmarc=none action=none header.from=xilinx.com;
-x-originating-ip: [149.199.50.128]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 2feb92ad-18b1-4176-0896-08d87fc54361
-x-ms-traffictypediagnostic: BY5PR02MB7027:
-x-microsoft-antispam-prvs: <BY5PR02MB7027145BC9F5874140B1F376CA110@BY5PR02MB7027.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:751;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: k0IIQ+qqLVgrBElEz2IUw5sTEujM38ZtBXuueCMbsm8S5xdNELheWUm3J8rcko6bkB0TH/Dh7r7GrQP76XhsaCjrdKNCzr4jl+xCEFHOzrdLpqu7gE65HSaX1IOFUGNZyg/lqB5oShPlUNAL83kawAV2SWy3AgODwlVBdtJBM4Ko6LFD9Scrb7+psNR0oI8eeLxRT9+WFgnjohV8pgzfP2kZXRFlTvBPGZqMRh+mE3b2iWbbGkAschfHTGGQApuCB0/KLzDrv9/oxAK13rmJc2GTGSM15iZHQElwBFBKo8X5pif7kmlVpzwXAsHuQN/cPl8uicnRQaLA1+iRuBhi6A==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BY5PR02MB6772.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(396003)(136003)(376002)(346002)(39860400002)(5660300002)(71200400001)(8936002)(26005)(86362001)(83380400001)(52536014)(8676002)(478600001)(2906002)(7696005)(186003)(66446008)(33656002)(66556008)(316002)(66476007)(64756008)(76116006)(9686003)(55016002)(66946007)(110136005)(53546011)(6506007);
- DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata: dVmR1Icw5Og+963E9odAxTMlpkrAUUPxnmeDLql9WNwqPcN5lTJcLB+uEHgsKenRG6U3aQvXL2+7wrsrA5wqCzmqKuopKuAEkwTWVrvJbKf5Y57M0SwaPu8fKi8YTeNxR0NPIYA3Y1I/y2FBZBYkGUssrmOrbppX5pdPpqHOSKnKxE1tfyVHC7q2XrblQLObnSKFhg1XshyOuG8ivxH+VCOnB23TDZ9wTETC1goetvI+5sP/4YbmFVssHfnYKBIsN/mZvocJbkgyL+9PLKhKcSTrjmzbJtrEYSFHhDldh1H3AoLuNbDNcvwia+TLfRRIBbWrspmFdmDe+lvaTNXFnZ2JFsojKMstCZBcipaKgqkz11Ty/DjDWJWtItltdeDv+E6b5nOxAxl8LPImdXF+/xst/dESyuh/SGWfywWo1XEv5Pev9u0fBZcv1bC4sdWuOk1JN69oO/VgUJD6fxlQE6jcCWxIg/uBZ3eEtWJBaOCEcG02yc3dyBU7Qzvs12HwBVq50eo4Jq3INxNo/ZBbC+C3lZXdJHewERHL2Qwou4aBgcggRIioEg0I6mYWSRFqOU2W78oBcyWJYXUj86HMeNCtNJq1vfBIarvRoKwqzC22JI2zPls7EAmgSCqR71tCneErY23h7XXZfeP4UoTGmg==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kZqEL-00056O-H5
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:55:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29570)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kZqEI-0008LR-T0
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 01:55:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604386539;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ig7J4QjrPhueH7/znaB6mKYdLZg/u7kuqbIzcbyVVbw=;
+ b=ZG+98PpEDog/cpKQbbiiXSLrUttoP4qr4tedp/WoIAlBjoe8HQJJptcOYhE/GqXZYIuQ70
+ 3b1m7EPAfj2xw3kUUj8fauOhzL0LkkqunRvHGObjhDXsb9Li+FNsU7nyHJrSzFSF66HZef
+ 2nGi+xkHenlRy6ap+VZCt0tt4Jkkmu8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-540-jL4pO3YbO7udgRQIG7LMEA-1; Tue, 03 Nov 2020 01:55:38 -0500
+X-MC-Unique: jL4pO3YbO7udgRQIG7LMEA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF21F8030AE;
+ Tue,  3 Nov 2020 06:55:36 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-233.ams2.redhat.com [10.36.112.233])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EF24C6EF59;
+ Tue,  3 Nov 2020 06:55:31 +0000 (UTC)
+Subject: Re: [PATCH-for-5.2] hw/mips: Remove the 'r4k' machine
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20201102102631.2058219-1-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e96d9497-cb8e-a86e-8e90-826a29f6710b@redhat.com>
+Date: Tue, 3 Nov 2020 07:55:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR02MB6772.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2feb92ad-18b1-4176-0896-08d87fc54361
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Nov 2020 06:54:08.7268 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cHq+rPvYZ8hECuseALdStPJe/hrrnz9Ogs8wzzcvUv057YK80c1GY8uwr5IVF2EkraBRmk0yTHLAdvtQL2oJeQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR02MB7027
-Received-SPF: pass client-ip=40.107.77.87; envelope-from=saipava@xilinx.com;
- helo=NAM02-SN1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:54:10
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201102102631.2058219-1-f4bug@amsat.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,67 +98,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: libvir-list@redhat.com, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard
-
-> -----Original Message-----
-> From: Richard Henderson <richard.henderson@linaro.org>
-> Sent: Tuesday, November 3, 2020 9:10 AM
-> To: qemu-devel@nongnu.org
-> Cc: Sai Pavan Boddu <saipava@xilinx.com>
-> Subject: [PATCH for-5.2] tcg: Remove assert from set_jmp_reset_offset
->=20
-> The range check done here is done later, more appropriately, at the end o=
-f
-> tcg_gen_code.  There, a failing range check results in a returned error c=
-ode,
-> which causes the TB to be restarted at half the size.
->=20
-> Reported-by: Sai Pavan Boddu <saipava@xilinx.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 02/11/2020 11.26, Philippe Mathieu-Daudé wrote:
+> We deprecated the support for the 'r4k' machine for the 5.0 release
+> (commit d32dc61421), which means that our deprecation policy allows
+> us to drop it in release 5.2. Remove the code.
+> 
+> To repeat the rationale from the deprecation note:
+> - this virtual machine has no specification
+> - the Linux kernel dropped support for it 10 years ago
+> 
+> Users are recommended to use the Malta board instead.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->=20
-> Sai, would you try this against your failing testcase?
-[Sai Pavan Boddu] Thanks, this patch fixes the test. Thanks for the support=
-.
+>  docs/system/deprecated.rst                    |   2 +-
+>  .../devices/mips-softmmu-common.mak           |   1 -
+>  hw/mips/r4k.c                                 | 318 ------------------
+>  MAINTAINERS                                   |   6 -
+>  hw/mips/Kconfig                               |  13 -
+>  hw/mips/meson.build                           |   1 -
+>  6 files changed, 1 insertion(+), 340 deletions(-)
+>  delete mode 100644 hw/mips/r4k.c
+> 
+> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+> index 0ebce37a191..0e83ea2ca0a 100644
+> --- a/docs/system/deprecated.rst
+> +++ b/docs/system/deprecated.rst
+> @@ -327,7 +327,7 @@ The 'scsi-disk' device is deprecated. Users should use 'scsi-hd' or
+>  System emulator machines
+>  ------------------------
+>  
+> -mips ``r4k`` platform (since 5.0)
+> +mips ``r4k`` platform (removed in 5.2)
+>  '''''''''''''''''''''''''''''''''
 
+You should move the paragraph to the "Recently removed features" section
+instead.
 
-Tested-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-
-
-Regards,
-Sai Pavan
->=20
->=20
-> r~
->=20
-> ---
->  tcg/tcg.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->=20
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index f49f1a7f35..43c6cf8f52 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -335,10 +335,11 @@ static bool tcg_resolve_relocs(TCGContext *s)
->=20
->  static void set_jmp_reset_offset(TCGContext *s, int which)  {
-> -    size_t off =3D tcg_current_code_size(s);
-> -    s->tb_jmp_reset_offset[which] =3D off;
-> -    /* Make sure that we didn't overflow the stored offset.  */
-> -    assert(s->tb_jmp_reset_offset[which] =3D=3D off);
-> +    /*
-> +     * We will check for overflow at the end of the opcode loop in
-> +     * tcg_gen_code, where we bound tcg_current_code_size to UINT16_MAX.
-> +     */
-> +    s->tb_jmp_reset_offset[which] =3D tcg_current_code_size(s);
->  }
->=20
->  #include "tcg-target.c.inc"
-> --
-> 2.25.1
+ Thomas
 
 
