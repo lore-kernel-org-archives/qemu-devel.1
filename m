@@ -2,100 +2,100 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61842C63697
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:35:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AA68C56202
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:36:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0405C223AC
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:35:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 163E422370
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 14:36:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Awxldl+q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0405C223AC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SnfW6DLz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 163E422370
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZxPf-00057A-2B
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 09:35:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32786)
+	id 1kZxPl-0005D0-V5
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 09:36:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxO2-0003WT-8h
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:34:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23796)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxO5-0003Xt-MP
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:34:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58446)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxNz-0006FS-8p
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:34:13 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kZxO3-0006GM-Cr
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:34:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604414049;
+ s=mimecast20190719; t=1604414052;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=ZjBMEEWvb1WrIiRrAnczzL8c6+117vVUqiPWdnq/tag=;
- b=Awxldl+qPupJwIOBKsi6MuzW0Lq9KgjzHZ6qhA/GQiA3rH5bLhi4sQB3TvnVB2zKAzrQ3F
- tbSIK3e3nZO30OIF64rk5axvDOb2Hr3fADZiCyKMmb9/QPIQLboPHqawmXfvFzTTvnPkmF
- 7YjPSpeRQtZTBbBLXNlsm/2llxtZGFE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-WOGG1x_mNOmOS4-b1c4WOw-1; Tue, 03 Nov 2020 09:34:05 -0500
-X-MC-Unique: WOGG1x_mNOmOS4-b1c4WOw-1
-Received: by mail-wm1-f72.google.com with SMTP id e15so2701436wme.4
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 06:34:05 -0800 (PST)
+ in-reply-to:in-reply-to:references:references;
+ bh=h0heXC8AZt7eXzCvDvOmqsibMEQ+v+zzRIJ+pXZVz+w=;
+ b=SnfW6DLzimiboYFpkHbCwITNlOfKh8+5ERITX0755I9IgkRws58AiLo8Yx72paXhz3D4oX
+ x3r4LLhQ0TXDSRnLyna10erGIzI9xw3lIYxphjF1oM1ssV6DonDEqzcdbEzTXIOAWSM5Zi
+ snyX7PaPIiWlNmdvVtszojVhHj97Stw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-_hUDd3AXN1e7QxLnm-C4AA-1; Tue, 03 Nov 2020 09:34:09 -0500
+X-MC-Unique: _hUDd3AXN1e7QxLnm-C4AA-1
+Received: by mail-wr1-f72.google.com with SMTP id f11so7870378wro.15
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 06:34:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition:content-transfer-encoding;
- bh=ZjBMEEWvb1WrIiRrAnczzL8c6+117vVUqiPWdnq/tag=;
- b=GiJ3HFmO8ei+WGa8s66XazdjjnyTTRScsm8xq0NBEVjGU+sitnv4LLBJdGYuEmB7/w
- o83xhFGivwEbKoA/WEcwGmWQth3noo33CtO6YWsje/k1G9uTlrBv1jOiVku+whH7DauT
- rRhRL2lQoEeqBQkELTgenzZqGnkV38LTJRb/GRtWQt6AJxOcNVT2Efabfpeo9flH2zJm
- J/7I9sJDKsb3zl3TEVQPz4RTejqAZDKeTLY8QVspPwUDL+Xst8stkVNWZiX9DFTAOdI8
- kJx8fWOnpirj3Dbc0IwRIfJZu1fVFFSZJnRXMUQbfKGpgwo8/7kn7TGjgCAuL8GlQX+c
- WzFw==
-X-Gm-Message-State: AOAM533nhRZ2ScF14zetuI9lrcDpYCRcVTFW7NUq+7eK8hSqRKO1Uyau
- jjMS3Aus3jRxSEiesEzc2to30JT3YApAxcWuDwQnbf1SYIvub8CvLghJ8hvqJoaxXHPHvB0o7zs
- xX8zFvKcMj8yOmQA=
-X-Received: by 2002:a7b:c24b:: with SMTP id b11mr18062wmj.109.1604414043755;
- Tue, 03 Nov 2020 06:34:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy2TZ07e3VptLUmqde/fcMvX83HGZL+tu8JOqGsvA+kle5ro08ZJPXIuQ0EOYxSUUfkxgGf7w==
-X-Received: by 2002:a7b:c24b:: with SMTP id b11mr18044wmj.109.1604414043534;
- Tue, 03 Nov 2020 06:34:03 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=h0heXC8AZt7eXzCvDvOmqsibMEQ+v+zzRIJ+pXZVz+w=;
+ b=SdzXda0yLqNEhi9OsaySQKa1JrOOrYV+B9M4MfaThmb5qBpAK/zn+EorJgkPkzheqW
+ GPoAefsDQ1870Uz2Qv7ZkrdSmNVHXM4aOIz5W7Xwl54MsxsEiwXoVIPtskaOSkTESdl6
+ u42WNvWhjP/Cxd3zB0sA+TIaWKWEvm7R1whsGSKjv3zsozY4uoD08KZ3jOnv1FUqbo8O
+ vaAUHWPEC4a7aC+i3GjJhK39nx8mHcHJRIWNRdBJ7UjETsGjmgmeSLWPIJ8xz0AXxb/9
+ z9vEQdJlDB0O/iPDjO8Faf/FTDJhpRv5wYh/YJ7NNmq2DIzlQDH0FfxE+O4F+Nx4QXFP
+ nlRg==
+X-Gm-Message-State: AOAM530Snesd+FYWPqutElTHjcqmO45k7BhmFKR8kuW4cT0ijYc2YAvY
+ R7y10K1LrYZRjzY19kqF3PEkpE9vl/+z3/5M5efC3xevb58Cve9AMAmHaSgKMF9C06yb2asYn5i
+ wq9UR0UJiB9ECay8=
+X-Received: by 2002:a5d:67ca:: with SMTP id n10mr26149443wrw.209.1604414046431; 
+ Tue, 03 Nov 2020 06:34:06 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyL3QmS3gSzmsOlZWcKr3WuwGKkkucHBx4sWePpFOv7fJXEKOGm8xa6ko1a1zBFjiLMGZN2nw==
+X-Received: by 2002:a5d:67ca:: with SMTP id n10mr26149419wrw.209.1604414046255; 
+ Tue, 03 Nov 2020 06:34:06 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id t1sm25549183wrs.48.2020.11.03.06.34.00
+ by smtp.gmail.com with ESMTPSA id n4sm3083662wmi.32.2020.11.03.06.34.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 06:34:02 -0800 (PST)
-Date: Tue, 3 Nov 2020 09:33:59 -0500
+ Tue, 03 Nov 2020 06:34:05 -0800 (PST)
+Date: Tue, 3 Nov 2020 09:34:03 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/38] pc,pci,vhost,virtio: fixes
-Message-ID: <20201103142306.71782-1-mst@redhat.com>
+Subject: [PULL 01/38] pc: comment style fixup
+Message-ID: <20201103142306.71782-2-mst@redhat.com>
+References: <20201103142306.71782-1-mst@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <20201103142306.71782-1-mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,129 +109,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit c7a7a877b716cf14848f1fd5c754d293e2f8d852:
-
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20201102' into staging (2020-11-03 10:38:05 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to cf0bdd0a703911f80fc645dec97f17c4415af267:
-
-  vhost-user-blk-test: fix races by using fd passing (2020-11-03 09:19:12 -0500)
-
-----------------------------------------------------------------
-pc,pci,vhost,virtio: fixes
-
-Lots of fixes all over the place.
-virtio-mem and virtio-iommu patches are kind of fixes but
-it seems better to just make them behave sanely than
-try to educate users about the limitations ...
+Fix up checkpatch comment style warnings.
 
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Chen Qun <kuhn.chenqun@huawei.com>
+---
+ hw/i386/pc.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-----------------------------------------------------------------
-Bharat Bhushan (7):
-      virtio-iommu: Add memory notifiers for map/unmap
-      virtio-iommu: Call memory notifiers in attach/detach
-      virtio-iommu: Add replay() memory region callback
-      virtio-iommu: Add notify_flag_changed() memory region callback
-      memory: Add interface to set iommu page size mask
-      vfio: Set IOMMU page size as per host supported page size
-      virtio-iommu: Set supported page size mask
-
-Cindy Lu (2):
-      vhost-vdpa: Add qemu_close in vhost_vdpa_cleanup
-      net: Add vhost-vdpa in show_netdevs()
-
-Coiby Xu (1):
-      test: new qTest case to test the vhost-user-blk-server
-
-David Hildenbrand (6):
-      virtio-mem: Make sure "addr" is always multiples of the block size
-      virtio-mem: Make sure "usable_region_size" is always multiples of the block size
-      virtio-mem: Probe THP size to determine default block size
-      memory-device: Support big alignment requirements
-      memory-device: Add get_min_alignment() callback
-      virito-mem: Implement get_min_alignment()
-
-Jean-Philippe Brucker (3):
-      virtio-iommu: Fix virtio_iommu_mr()
-      virtio-iommu: Store memory region in endpoint struct
-      vfio: Don't issue full 2^64 unmap
-
-Jin Yu (1):
-      vhost-blk: set features before setting inflight feature
-
-Michael S. Tsirkin (1):
-      pc: comment style fixup
-
-Philippe Mathieu-Daudé (2):
-      hw/virtio/vhost-backend: Fix Coverity CID 1432871
-      hw/smbios: Fix leaked fd in save_opt_one() error path
-
-Stefan Hajnoczi (12):
-      Revert "vhost-blk: set features before setting inflight feature"
-      libvhost-user: follow QEMU comment style
-      configure: introduce --enable-vhost-user-blk-server
-      block/export: make vhost-user-blk config space little-endian
-      block/export: fix vhost-user-blk get_config() information leak
-      contrib/vhost-user-blk: fix get_config() information leak
-      tests/qtest: add multi-queue test case to vhost-user-blk-test
-      libqtest: add qtest_socket_server()
-      vhost-user-blk-test: rename destroy_drive() to destroy_file()
-      vhost-user-blk-test: close fork child file descriptors
-      vhost-user-blk-test: drop unused return value
-      vhost-user-blk-test: fix races by using fd passing
-
-Xinhao Zhang (3):
-      hw/acpi : Don't use '#' flag of printf format
-      hw/acpi : add space before the open parenthesis '('
-      hw/acpi : add spaces around operator
-
- configure                               |  15 +
- contrib/libvhost-user/libvhost-user.h   |  15 +-
- include/exec/memory.h                   |  38 ++
- include/hw/mem/memory-device.h          |  10 +
- include/hw/virtio/vhost.h               |   2 +-
- tests/qtest/libqos/libqtest.h           |  25 +
- tests/qtest/libqos/vhost-user-blk.h     |  48 ++
- block/export/export.c                   |   4 +-
- block/export/vhost-user-blk-server.c    |  28 +-
- contrib/vhost-user-blk/vhost-user-blk.c |   2 +
- hw/acpi/core.c                          |   2 +-
- hw/acpi/nvdimm.c                        |  20 +-
- hw/acpi/pcihp.c                         |   2 +-
- hw/block/vhost-user-blk.c               |   2 +-
- hw/i386/pc.c                            |   9 +-
- hw/mem/memory-device.c                  |  20 +-
- hw/smbios/smbios.c                      |   4 +-
- hw/vfio/common.c                        |  19 +
- hw/virtio/vhost-backend.c               |   4 +-
- hw/virtio/vhost.c                       |   8 +-
- hw/virtio/virtio-iommu.c                | 205 +++++++-
- hw/virtio/virtio-mem-pci.c              |   7 +
- hw/virtio/virtio-mem.c                  | 113 ++++-
- net/net.c                               |   3 +
- net/vhost-vdpa.c                        |   4 +
- softmmu/memory.c                        |  13 +
- tests/qtest/libqos/vhost-user-blk.c     | 129 +++++
- tests/qtest/libqtest.c                  |  76 ++-
- tests/qtest/vhost-user-blk-test.c       | 843 ++++++++++++++++++++++++++++++++
- block/export/meson.build                |   2 +-
- hw/virtio/trace-events                  |   6 +
- tests/qtest/libqos/meson.build          |   1 +
- tests/qtest/meson.build                 |   2 +
- util/meson.build                        |   2 +-
- 34 files changed, 1606 insertions(+), 77 deletions(-)
- create mode 100644 tests/qtest/libqos/vhost-user-blk.h
- create mode 100644 tests/qtest/libqos/vhost-user-blk.c
- create mode 100644 tests/qtest/vhost-user-blk-test.c
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 5e6c0023e0..17b514d1da 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1149,10 +1149,11 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+             error_report("couldn't create HPET device");
+             exit(1);
+         }
+-        /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
+-            * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
+-            * IRQ8 and IRQ2.
+-            */
++        /*
++         * For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7 and
++         * earlier, use IRQ2 for compat. Otherwise, use IRQ16~23, IRQ8 and
++         * IRQ2.
++         */
+         uint8_t compat = object_property_get_uint(OBJECT(hpet),
+                 HPET_INTCAP, NULL);
+         if (!compat) {
+-- 
+MST
 
 
