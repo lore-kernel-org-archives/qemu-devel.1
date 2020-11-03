@@ -2,78 +2,78 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF28C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 215A0C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:36:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A51F922226
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:34:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6744C20735
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:36:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9kgtXGd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A51F922226
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KYOhIRVJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6744C20735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZvWF-0000cy-IL
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:34:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49428)
+	id 1kZvY2-0002Qp-0H
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:36:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kZvQr-0002Gh-JI
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:29:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58859)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kZvX1-0001T0-2Y
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:35:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36364)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kZvQq-0002ex-0P
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:29:01 -0500
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kZvWz-0004zt-EZ
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:35:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604406538;
+ s=mimecast20190719; t=1604406920;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BgnYb9jZ4Y0pn4uRTimL5tj4nliA7vXQm7F6JeerKow=;
- b=K9kgtXGdubol+A7CcC47iL2sps7eb3zd2XusAyg4miOeVQa5crngZKVYCrwshLkuR6qID0
- pS7JNYwdgxuLuQEhOJWGJG4r6DRgEINgzDXYAq2/eTxf17JQxeK1ppC3Cvo9tqcFT4MLCB
- 5a/NCJ1n2YOT5LPgIC7cYtjtxxdFtS8=
+ bh=7Z8bYR8NkrRy52Ez2iKDxd/EFx6JL8EJiyg/bZ+I110=;
+ b=KYOhIRVJ6H393zYbGj+pXsXWEdS+wZrtOviOPvxHVUc0dKvuVILZasxpd9raXidS36NFjK
+ AzBDHrsmyatWRBeZ/+eek4dqk4GCsl6eoxRz2ugRM/RcqUPTvSDsSeBE24ix2KYZ9Q+Bpb
+ FnICLgadj8vPONb1N5b4d749oBsBjR8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-K6nRQIEdMoqIi3U3c9za9A-1; Tue, 03 Nov 2020 07:28:57 -0500
-X-MC-Unique: K6nRQIEdMoqIi3U3c9za9A-1
+ us-mta-465-djL612qyP0aYskUNo-vQ2Q-1; Tue, 03 Nov 2020 07:35:17 -0500
+X-MC-Unique: djL612qyP0aYskUNo-vQ2Q-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCC0B1009E26;
- Tue,  3 Nov 2020 12:28:55 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6FB625B4D4;
- Tue,  3 Nov 2020 12:28:50 +0000 (UTC)
-Date: Tue, 3 Nov 2020 13:28:48 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Xinhao Zhang <zhangxinhao1@huawei.com>
-Subject: Re: [PATCH 3/3] hw/acpi : add spaces around operator
-Message-ID: <20201103132848.0872850d@redhat.com>
-In-Reply-To: <20201103102634.273021-3-zhangxinhao1@huawei.com>
-References: <20201103102634.273021-1-zhangxinhao1@huawei.com>
- <20201103102634.273021-3-zhangxinhao1@huawei.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 815D88030B1;
+ Tue,  3 Nov 2020 12:35:15 +0000 (UTC)
+Received: from gondolin (ovpn-114-68.ams2.redhat.com [10.36.114.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2260F5B4D4;
+ Tue,  3 Nov 2020 12:35:13 +0000 (UTC)
+Date: Tue, 3 Nov 2020 13:35:10 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] s390-bios: Skip writing iplb location to low core for
+ ccw ipl
+Message-ID: <20201103133510.1f1f1467.cohuck@redhat.com>
+In-Reply-To: <8e5e3e03-f25b-4d69-a2bd-42c46a675c04@redhat.com>
+References: <20201030122823.347140-1-borntraeger@de.ibm.com>
+ <8e5e3e03-f25b-4d69-a2bd-42c46a675c04@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,38 +96,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xiaoguangrong.eric@gmail.com, mst@redhat.com, qemu-trivial@nongnu.org,
- qemu-devel@nongnu.org, alex.chen@huawei.com, dengkai1@huawei.com
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Janosch Frank <frankja@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 3 Nov 2020 18:26:34 +0800
-Xinhao Zhang <zhangxinhao1@huawei.com> wrote:
+On Tue, 3 Nov 2020 13:32:47 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-> Fix code style. Operator needs spaces both sides.
+> On 30/10/2020 13.28, Christian Borntraeger wrote:
+> > From: "Jason J. Herne" <jjherne@linux.ibm.com>
+> > 
+> > The architecture states that the iplb location is only written to low
+> > core for list directed ipl and not for traditional ccw ipl. If we don't
+> > skip this then operating systems that load by reading into low core
+> > memory may fail to start.  
 > 
-> Signed-off-by: Xinhao Zhang <zhangxinhao1@huawei.com>
-> Signed-off-by: Kai Deng <dengkai1@huawei.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/acpi/pcihp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Just double-checking: But doing write_subsystem_identification()
+> unconditionally is ok, right?
 > 
-> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> index 32ae8b2c0a..17c32e0ffd 100644
-> --- a/hw/acpi/pcihp.c
-> +++ b/hw/acpi/pcihp.c
-> @@ -400,7 +400,7 @@ void acpi_pcihp_init(Object *owner, AcpiPciHpState *s, PCIBus *root_bus,
->      s->io_len = ACPI_PCIHP_SIZE;
->      s->io_base = ACPI_PCIHP_ADDR;
->  
-> -    s->root= root_bus;
-> +    s->root = root_bus;
->      s->legacy_piix = !bridges_enabled;
->  
->      memory_region_init_io(&s->io, owner, &acpi_pcihp_io_ops, s,
+> > We should also not write the iplb pointer for network boot as it might
+> > overwrite content that we got via network.  
+> 
+> FWIW, write_iplb_location() is already just a dummy function in netmain.c,
+> so this should not have been an issue in the network bootloader, I hope.
+> 
+> > Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> > Fixes: 9bfc04f9ef68 ("pc-bios: s390x: Save iplb location in lowcore")
+> > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> > ---
+> >  pc-bios/s390-ccw/main.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> > index 43c792cf9509..fc4bfaa45529 100644
+> > --- a/pc-bios/s390-ccw/main.c
+> > +++ b/pc-bios/s390-ccw/main.c
+> > @@ -43,7 +43,9 @@ void write_subsystem_identification(void)
+> >  
+> >  void write_iplb_location(void)
+> >  {
+> > -    lowcore->ptr_iplb = ptr2u32(&iplb);
+> > +    if (cutype == CU_TYPE_VIRTIO && virtio_get_device_type() != VIRTIO_ID_NET) {
+> > +        lowcore->ptr_iplb = ptr2u32(&iplb);
+> > +    }
+> >  }  
+> 
+> Acked-by: Thomas Huth <thuth@redhat.com>
+> 
+> Christian, Cornelia, could you please pick up the patch? I'm not sure
+> whether I can do another PR this week for the RC...
+
+Will do, I have other things as well anyway.
 
 
