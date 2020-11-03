@@ -2,78 +2,77 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9766C388F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 081C0C388F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:38:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05E09208B6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:36:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8ED6C22243
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 12:38:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YZyNTNlL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E09208B6
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5oFxNZt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ED6C22243
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZvYP-0002rc-0N
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:36:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49710)
+	id 1kZvZd-0004Mr-H9
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 07:38:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kZvSJ-00044N-MX
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:30:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42679)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kZvXh-0002Zj-3S
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:36:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59270)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kZvSH-0003EN-KW
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:30:31 -0500
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kZvXf-0005J0-Ee
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 07:36:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604406629;
+ s=mimecast20190719; t=1604406962;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zvlTrtKCbUUqX04j5vchgIGuywzZHvanTd77JlGCRWw=;
- b=YZyNTNlLKdOQ4Gu4F5FG84lhIIHXuu8Ok0V66l8fsDaMmb8JznqPdRu+/oMTjkCi8d0Opd
- t2NqWjkhMy2C38MvxRB0z5bW8O98C4WXh4o2uDPLOgR7WRBBk1J51rOruzMcXElyWHjkxB
- 3vpNdz5flXPAeQwUmSVJ+tz5z5/9vGo=
+ bh=5wezGc+X3eOi0wPhPfSs1dnesInncz+sm/prCm0AH0s=;
+ b=Y5oFxNZt0XviJ1xiG7N2oVLo1+SM9CL1P8oRTI+7E6Ic1d6sLp9WOIrIg65FwXblHOrHcF
+ cCK7qotrZC+QQu+qeAAnB/+M76ys0U0D8wSrMzYXKrT9trxM15bXZtFf9Mj3q6bJ/3Pyc4
+ Kq0cSC1WyX2PG2Gk9tu4AP0wwaGGAe4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-9zls6QyIPEarTyTORyB--g-1; Tue, 03 Nov 2020 07:30:27 -0500
-X-MC-Unique: 9zls6QyIPEarTyTORyB--g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-587-ji8TD7qvNqat0UAqB5250A-1; Tue, 03 Nov 2020 07:36:00 -0500
+X-MC-Unique: ji8TD7qvNqat0UAqB5250A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82F47100746B
- for <qemu-devel@nongnu.org>; Tue,  3 Nov 2020 12:30:26 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 534365B4D4;
- Tue,  3 Nov 2020 12:30:25 +0000 (UTC)
-Date: Tue, 3 Nov 2020 13:30:23 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 10/20] memfd: Remove unnecessary prefix from error message
-Message-ID: <20201103133023.6d7a5241@redhat.com>
-In-Reply-To: <20201030202131.796967-11-ehabkost@redhat.com>
-References: <20201030202131.796967-1-ehabkost@redhat.com>
- <20201030202131.796967-11-ehabkost@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7641087951F;
+ Tue,  3 Nov 2020 12:35:59 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8DF421E94;
+ Tue,  3 Nov 2020 12:35:58 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id E6FB716E18; Tue,  3 Nov 2020 13:35:57 +0100 (CET)
+Date: Tue, 3 Nov 2020 13:35:57 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Ding Hui <dinghui@sangfor.com.cn>
+Subject: Re: [PATCH] vnc: fix resource leak when websocket channel error
+Message-ID: <20201103123557.aqc3klcvyhr4tbn4@sirius.home.kraxel.org>
+References: <20201029032241.11040-1-dinghui@sangfor.com.cn>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20201029032241.11040-1-dinghui@sangfor.com.cn>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,43 +95,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 30 Oct 2020 16:21:21 -0400
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Thu, Oct 29, 2020 at 11:22:41AM +0800, Ding Hui wrote:
+> When we connect to vnc by websocket channel, and disconnect
+> (maybe by some network exception) before handshake,
+> qemu will left CLOSE_WAIT socket and never close it
 
-> object_property_parse() will add a
->   "Property '<TYPE>.<PROP>' can't take value '<VALUE>'"
-> prefix automatically for us.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Added to fixes queue.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->  backends/hostmem-memfd.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-> index e5626d4330..05cf743fe8 100644
-> --- a/backends/hostmem-memfd.c
-> +++ b/backends/hostmem-memfd.c
-> @@ -87,8 +87,7 @@ memfd_backend_set_hugetlbsize(Object *obj, Visitor *v, const char *name,
->          return;
->      }
->      if (!value) {
-> -        error_setg(errp, "Property '%s.%s' doesn't take value '%" PRIu64 "'",
-> -                   object_get_typename(obj), name, value);
-> +        error_setg(errp, "hugetlbsize can't be zero");
->          return;
->      }
->      m->hugetlbsize = value;
+thanks,
+  Gerd
 
 
