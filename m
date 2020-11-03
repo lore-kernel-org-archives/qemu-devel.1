@@ -2,88 +2,92 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C34C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A969DC388F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:33:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9279422370
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:33:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4418221D91
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 17:33:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IgTa3Qxq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9279422370
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sv5Gj0GL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4418221D91
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka0B5-0003KE-Ig
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 12:33:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60540)
+	id 1ka0BA-0003XV-8R
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 12:33:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1ka09z-0001Zm-Hk
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 12:31:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30382)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1ka09v-0007cY-Cp
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 12:31:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604424708;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AV6uN+96HsV282QBlLAmU6Oh19cDXX/t/5p7UE0egcw=;
- b=IgTa3QxqchmwkSZ7MDP2UL0E9ggtNFOAMqnUwlIabx6tPj2vuoDfJTg0WfRdzU35cRKPhK
- kReofRMrWNCvOf66caeiNPnbHY5HPdq+H/2fONbtJffqTguM2N/XuS+RV+8jNdUVpFQ54c
- LFfBo86KHK2svHPEPSv1WNEBkosxNPw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-545-7KVERFg5Nzycv7rvcmA8CA-1; Tue, 03 Nov 2020 12:31:43 -0500
-X-MC-Unique: 7KVERFg5Nzycv7rvcmA8CA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8794F8049FE;
- Tue,  3 Nov 2020 17:31:42 +0000 (UTC)
-Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C5E705C5DE;
- Tue,  3 Nov 2020 17:31:35 +0000 (UTC)
-Date: Tue, 3 Nov 2020 10:31:35 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Subject: Re: VFIO Migration
-Message-ID: <20201103103135.7da0a9c5@w520.home>
-In-Reply-To: <20201103153356.GO205187@redhat.com>
-References: <20201102111153.GC42093@stefanha-x1.localdomain>
- <ly5z6m79c0.fsf@redhat.com> <20201103153356.GO205187@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ka09t-0001X1-Vj; Tue, 03 Nov 2020 12:31:50 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:38102)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ka09r-0007cJ-If; Tue, 03 Nov 2020 12:31:49 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id n18so19387260wrs.5;
+ Tue, 03 Nov 2020 09:31:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=uQkw/fFXtZYbLMzJPqkh+QCHUXnq5WFrEui1LRbfpqI=;
+ b=sv5Gj0GLdzO4O8/BIPAF4HxFnkVs/u0Piw3qfNbC1bUj8DVBhx+3FO/pA63T7fi/Ts
+ cynJaIMn76K28Asi4axqPYTr7cIQeQBs06bGKz15vUKMTFVmbfmVQcHDSG4fUBUKko31
+ GDweZlwKuiqXMhe91x7LAv7q0iKz1QGvJ49biZ3WVfK4gi/XYFI1o9EA3b6mriXnye5Z
+ Nlo49YrcETeBxgg8XuexHxLT8Gt0pRFz6xa8q+ZVLD2EOyt2w+ZeSSFke8E99EEhOUHQ
+ /C6sKx1+IeUBRjm5gZ6SR7C/6D0IabvToj9s054s8FVH+ec2ZdBERbLNWXkxggK5Lyte
+ aeiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=uQkw/fFXtZYbLMzJPqkh+QCHUXnq5WFrEui1LRbfpqI=;
+ b=VZ4dsJlxgptd0ILCsYwo+pPiCa8SytLsBy5p5Cwg3B/JSYYpmt0v2cQlKOQ0n5rev6
+ UeFU87stdi1rKqxaSuAWg7GNaLrdgGfxuQRV+4uqeuMMzwYOXG5n0ipAFXuWod9gh2jh
+ a5rFKRufwrtvqV6oIEoP55L20aNgjy87FFDo83l7hEcR7kTG1DLQEdiLBsG6pzfhBwPq
+ Oi+hVTcIHbMRTBRkuG+kZMOHFp/Ad3WLkjrylaZCn+70/3qAJyLCFORS8StxdDDcF3uC
+ HZjL999O9v4j5k4tmQWc8ymY95y1hjQ/RW8UW1pVbpr2HXm5CXpW8YamnvWnyOppx7fa
+ wbyA==
+X-Gm-Message-State: AOAM533Ow57hffYLOKyCQcmYpBtzfE5eM2v203VYKwOvd9HDIdBoXrYg
+ 8RR++K3sEYWIqskYRvCmqqeQz0DxXAI=
+X-Google-Smtp-Source: ABdhPJyb3uYkPL4Kq/qc0e4nfle7YTIQ90dWfB0G70y/L5ZtN2EqhL+EgH76dc2CXh1YtNB5QspA1g==
+X-Received: by 2002:adf:ed49:: with SMTP id u9mr26589912wro.88.1604424705483; 
+ Tue, 03 Nov 2020 09:31:45 -0800 (PST)
+Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id h62sm28205976wrh.82.2020.11.03.09.31.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Nov 2020 09:31:44 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 3/6] hw/mips/boston: Fix Lesser GPL version number
+Date: Tue,  3 Nov 2020 18:31:24 +0100
+Message-Id: <20201103173127.2704256-4-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201103173127.2704256-1-f4bug@amsat.org>
+References: <20201103173127.2704256-1-f4bug@amsat.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=alex.williamson@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,162 +100,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
- quintela@redhat.com, Jason Wang <jasowang@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Kirti Wankhede <kwankhede@nvidia.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-block@nongnu.org, Paul Burton <paulburton@kernel.org>,
+ libvir-list@redhat.com, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Chetan Pant <chetan4windows@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 3 Nov 2020 15:33:56 +0000
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+From: Chetan Pant <chetan4windows@gmail.com>
 
-> On Tue, Nov 03, 2020 at 04:23:43PM +0100, Christophe de Dinechin wrote:
-> >=20
-> > On 2020-11-02 at 12:11 CET, Stefan Hajnoczi wrote... =20
-> > > There is discussion about VFIO migration in the "Re: Out-of-Process
-> > > Device Emulation session at KVM Forum 2020" thread. The current statu=
-s
-> > > is that Kirti proposed a VFIO device region type for saving and loadi=
-ng
-> > > device state. There is currently no guidance on migrating between
-> > > different device versions or device implementations from different
-> > > vendors. This is known to be non-trivial and raised discussion about
-> > > whether it should really be handled by VFIO or centralized in QEMU.
-> > >
-> > > Below is a document that describes how to ensure migration compatibil=
-ity
-> > > in VFIO. It does not require changes to the VFIO migration interface.=
- It
-> > > can be used for both VFIO/mdev kernel devices and vfio-user devices.
-> > >
-> > > The idea is that the device state blob is opaque to the VMM but the s=
-ame
-> > > level of migration compatibility that exists today is still available=
-.
-> > >
-> > > I hope this will help us reach consensus and let us discuss specifics=
-.
-> > >
-> > > If you followed the previous discussion, I changed the approach from
-> > > sending a magic constant in the device state blob to identifying devi=
-ce
-> > > models by URIs. Therefore the device state structure does not need to=
- be
-> > > defined here - the critical information for ensuring device migration
-> > > compatibility is the device model and configuration defined below.
-> > >
-> > > Stefan
-> > > ---
-> > > VFIO Migration
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > This document describes how to save and load VFIO device states. Savi=
-ng a
-> > > device state produces a snapshot of a VFIO device's state that can be=
- loaded
-> > > again at a later point in time to resume the device from the snapshot=
-.
-> > >
-> > > The data representation of the device state is outside the scope of t=
-his
-> > > document.
-> > >
-> > > Overview
-> > > --------
-> > > The purpose of device states is to save the device at a point in time=
- and then
-> > > restore the device back to the saved state later. This is more challe=
-nging than
-> > > it first appears.
-> > >
-> > > The process of saving a device state and loading it later is called
-> > > *migration*. The state may be loaded by the same device that saved it=
- or by a
-> > > new instance of the device, possibly running on a different computer.
-> > >
-> > > It must be possible to migrate to a newer implementation of the devic=
-e
-> > > as well as to an older implementation of the device. This allows user=
-s
-> > > to upgrade and roll back their systems.
-> > >
-> > > Migration can fail if loading the device state is not possible. It sh=
-ould fail
-> > > early with a clear error message. It must not appear to complete but =
-leave the
-> > > device inoperable due to a migration problem.
-> > >
-> > > The rest of this document describes how these requirements can be met=
-.
-> > >
-> > > Device Models
-> > > -------------
-> > > Devices have a *hardware interface* consisting of hardware registers,
-> > > interrupts, and so on.
-> > >
-> > > The hardware interface together with the device state representation =
-is called
-> > > a *device model*. Device models can be assigned URIs such as
-> > > https://qemu.org/devices/e1000e to uniquely identify them. =20
-> >=20
-> > Like others, I think we should either
-> >=20
-> > a) Give a relatively strong requirement regarding what is at the URL in
-> > question, e.g. docs, maybe even a machine-readable schema describing
-> > configuration and state for the device. Leaving the option "there can b=
-e
-> > nothing here" is IMO asking for trouble.
-> >=20
-> > b) simply call that a unique ID, and then either drop the https: entire=
-ly or
-> > use something else, like pci:// or, to be more specific, vfio://
-> >=20
-> > I'd favor option (b) for a different practical reason. URLs are subject=
- to
-> > redirection and other mishaps. For example, using https:// begs the que=
-stion
-> > whether
-> > https://qemu.org/devices/e1000e and
-> > https://www.qemu.org/devices/e1000e
-> > should be treated as the same device. I believe that your intent is tha=
-t
-> > they shouldn't, but if the qemu web server redirects to www, and someon=
-e
-> > wants to copy-paste their web browser's URL bar to the command line, th=
-ey'd
-> > get the wrong one. =20
->=20
-> That's not a real world problem IMHO, because neither of these URLs
-> ever need resolve to a real webpage, and thus not need to be cut +
-> paste from a browser.
->=20
-> They are simply expressing a resource identifier using a URI as a
-> convenient format. This is the same as an XML namespace using a URI,
-> and rarely, if ever, resolving to any actual web page.
->=20
-> This is a good thing, because if you say there needs to be a real page
-> there, then it creates a pile of corporate beaurocracy for contributors.
-> I can freely create a URI under https://redhat.com for purposes of being
-> a identifier, but I cannot get any content published there without jumpin=
-g
-> through many tedious corporate approvals and stand a good chance of being
-> rejected.
->=20
-> If we're truely treating the URIs as an opaque string, we don't especiall=
-y
-> need to define any rules other than to say it should be under a domain th=
-at
-> you have authority over either directly, or via membership of a project
-> that delegates. We can suggest "https" since seeing "http" is a red flag
-> for many people these days.
+There is no "version 2" of the "Lesser" General Public License.
+It is either "GPL version 2.0" or "Lesser GPL version 2.1".
+This patch replaces all occurrences of "Lesser GPL version 2" with
+"Lesser GPL version 2.1" in comment section.
 
-Hmm, an opaque string, sort of like the existing "name" attribute we
-have now where Christophe quoted some examples in his message.  Thanks,
+Signed-off-by: Chetan Pant <chetan4windows@gmail.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20201023122633.19466-1-chetan4windows@gmail.com>
+[PMD: Added hw/mips/ prefix in subject]
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/hw/pci-host/xilinx-pcie.h | 2 +-
+ hw/core/loader-fit.c              | 2 +-
+ hw/mips/boston.c                  | 2 +-
+ hw/pci-host/xilinx-pcie.c         | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-Alex
+diff --git a/include/hw/pci-host/xilinx-pcie.h b/include/hw/pci-host/xilinx-pcie.h
+index f079e50db44..89be88d87fd 100644
+--- a/include/hw/pci-host/xilinx-pcie.h
++++ b/include/hw/pci-host/xilinx-pcie.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
+index c465921b8f7..b7c7b3ba94d 100644
+--- a/hw/core/loader-fit.c
++++ b/hw/core/loader-fit.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index 74c18edbb34..3356d7a6814 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+index 3b321421b66..38d5901a454 100644
+--- a/hw/pci-host/xilinx-pcie.c
++++ b/hw/pci-host/xilinx-pcie.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- 
+2.26.2
 
 
