@@ -2,99 +2,75 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7361CC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9600BC388F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:40:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4E2020756
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:38:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ltYxb5E6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4E2020756
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F50820780
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:40:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F50820780
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZyOO-00015j-VD
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:38:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51242)
+	id 1kZyPn-0002FT-JX
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:40:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
- id 1kZyJN-0001JB-C3
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:33:29 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:14996)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kZy6n-0008TW-CS; Tue, 03 Nov 2020 10:20:29 -0500
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:33105)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=569a91e0c=alistair.francis@wdc.com>)
- id 1kZyJK-0001EJ-U4
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:33:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1604417607; x=1635953607;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=WvesQhO5wv+7mElyU2TyDpctqU+vtAbEhVaxXit1ZlI=;
- b=ltYxb5E6ycvy8H8DqUtH0sNvVewV+vKnSjsewkQBjOUsrnmM/XMFxUbF
- MqtJyLXaEPcM6KqxBnBDH0J75LD/tVpzjOQXmmJZBXH9KfcyQJfE0Q8Oq
- 76wPNJNz98U4TCxCetoepWj1snlRDG/68GmAOoXLs7FcncN2w+yLeL3zx
- Eu/u1lsyKl3FLOOqaWvycxbUre48KktT80bkrI7VkV4oA+s5M3EZfbc3d
- A3SaOY71Qz1cQDMZauyGmwek++7I0bSvV+46+cPf+OBUB6otSaQQyEdtc
- EbAKPWsMlqtNnYaE9TFA2SHcKb2msmbM/uGaO61iZ6pmTIa2hgfbwZTIU Q==;
-IronPort-SDR: Dp/pyhz+KIhKI89OqM/wwafSqwxGnJZzowmwk+z0y/piW3PQclStLLJcBeaQSk0OkzTLOu35xg
- waxWLsRDHrxeWTiBbmRKivKABaKj7e1phUGmV8lY67UD2Sgrp8h3/11U29TWVZgO6dJxfEpTvI
- iP6ekD+3gw+V8XidDXPLrP+/thP0/+5z6HMQgOHz2tYCo6rlj0tPS93wONxa1P7ZexCdbfs0eq
- Ie02ffFEMsCA0qchX9z/gE84Spf9pPj4tIvZWWvWE9rpJkhQNff2HEq3byAwRR2l3e5yLtKGDS
- Aq0=
-X-IronPort-AV: E=Sophos;i="5.77,448,1596470400"; d="scan'208";a="152867446"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 03 Nov 2020 23:33:23 +0800
-IronPort-SDR: oNwDi+1MW9IRHHH75lEr4sSHz53Qto9meNvCGMDAb5HAq5hRrSiS4CV6+YQy6LAcSwZP3MTioc
- joTVTrMRAzavzNkW/SJilfMcpO6IwYMl3sYkHCZI6eujpk6sfpC1kmbUd3b2TadlowiMDBg82S
- mWfY9y/7mOAU10hC5zKwTHtCTftcdrWrt0YllT9xwbatxQGsBoJApt/U/RLPszbKJpZSgU7u/g
- 7c5fsypEQ711lDKyV/IBG6TnntgfvKSFYUgNm2mEiOIH+zRUGNOVf4grrRtT+Mi76+kz4YOW7L
- T06H2jFLRG8SZh+nC7G1Hx2k
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 03 Nov 2020 07:19:32 -0800
-IronPort-SDR: 6P2GDwOaJzozGLPCffmG47ucJ64M427jLUljmP+nEhP2FLPH7xSihCbz0mRY7i9Re0L0XnFQW/
- AiiEvUTsOpHhhwsJXCFKc7Eb19KwF91eh2hql4mxv4bPdy4aoog40E9IDbzFWy7LwU6hRkQSq1
- QfTsOHX454NY3J3+DEzlPHcxwsXUYRMJArUYxSTFkaGV7d2LEdKJjahXoPXTv8PvS9SkDVCffu
- D+suphar6b4wXYywkh3UaX2ccIHXQenoKgpiZjy+fr8iz1mjLL9/dmJt+YwOh3weGfDuDLQywE
- V5g=
-WDCIronportException: Internal
-Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.60.113])
- by uls-op-cesaip01.wdc.com with ESMTP; 03 Nov 2020 07:33:24 -0800
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [PULL v2 00/19] riscv-to-apply queue
-Date: Tue,  3 Nov 2020 07:21:31 -0800
-Message-Id: <20201103152150.2677566-1-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kZy6l-0004oj-DF; Tue, 03 Nov 2020 10:20:28 -0500
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.31])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 96E1170AD9E5;
+ Tue,  3 Nov 2020 16:20:21 +0100 (CET)
+Received: from kaod.org (37.59.142.106) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 3 Nov 2020
+ 16:20:20 +0100
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-106R00676fa5dfd-81d2-436e-be0f-e09593a718aa,
+ C161C3821E84BD2E3FFA4C47F5A99552FEBD76C4) smtp.auth=groug@kaod.org
+Date: Tue, 3 Nov 2020 16:20:19 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.2 0/4] misc: Trivial format string fixes
+Message-ID: <20201103162019.299112a8@bahia.lan>
+In-Reply-To: <e2ae5627-a55d-909b-8591-f7c0400cd57c@redhat.com>
+References: <20201103112558.2554390-1-philmd@redhat.com>
+ <64132d34-dbd9-03ee-6f11-a6908df025bf@linux.vnet.ibm.com>
+ <ddd49883-7c97-966b-1f62-52f39f4952ad@linux.vnet.ibm.com>
+ <e2ae5627-a55d-909b-8591-f7c0400cd57c@redhat.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.45;
- envelope-from=prvs=569a91e0c=alistair.francis@wdc.com;
- helo=esa6.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 10:33:23
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [37.59.142.106]
+X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 1d10889f-4740-489f-bf45-207aef5475a7
+X-Ovh-Tracer-Id: 8445656676419869173
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedruddtfedgjeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeevlefhtddufffhieevhefhleegleelgfetffetkedugeehjeffgfehhfefueduffenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepuggrvhhiugesghhisghsohhnrdgurhhophgsvggrrhdrihgurdgruh
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 10:20:23
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_BL_SPAMCOP_NET=1.347,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,88 +83,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ qemu-devel@nongnu.org, Dov Murik <dovmurik@linux.vnet.ibm.com>,
+ qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan
+ Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 83851c7c60c90e9fb6a23ff48076387a77bc33cd:
+On Tue, 3 Nov 2020 15:28:11 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-  Merge remote-tracking branch 'remotes/mdroth/tags/qga-pull-2020-10-27-v3-tag' into staging (2020-11-03 12:47:58 +0000)
+> On 11/3/20 3:03 PM, Dov Murik wrote:
+> >=20
+> > On 03/11/2020 15:58, Dov Murik wrote:
+> >> On 03/11/2020 13:25, Philippe Mathieu-Daud=C3=A9 wrote:
+> >>> IIUC qemu-trivial@ doesn't queue patches during freeze,
+> >>>
+> >>> so it might be easier if patches are queued by respective
+> >>>
+> >>> subsystem maintainers.
+> >>>
+> >>>
+> >>>
+> >>> Philippe Mathieu-Daud=C3=A9 (4):
+> >>>
+> >>> =C2=A0=C2=A0 hw/display/cirrus_vga: Remove debugging code commented o=
+ut
+> >>>
+> >>> =C2=A0=C2=A0 hw/display/cirrus_vga: Fix hexadecimal format string spe=
+cifier
+> >>>
+> >>> =C2=A0=C2=A0 hw/ppc/spapr_tpm_proxy: Fix hexadecimal format string sp=
+ecifier
+> >>>
+> >>> =C2=A0=C2=A0 migration/ram: Fix hexadecimal format string specifier
+> >>>
+> >>>
+> >>>
+> >>> =C2=A0 hw/display/cirrus_vga.c | 20 +-------------------
+> >>>
+> >>> =C2=A0 migration/ram.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 2 +-
+> >>>
+> >>> =C2=A0 hw/ppc/trace-events=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
+> >>>
+> >>> =C2=A0 3 files changed, 3 insertions(+), 21 deletions(-)
+> >>>
+> >>>
+> >>>
+> >>
+> >>
+> >> There's at least one more easy fix:
+> >>
+> >> hw/misc/trace-events:106:mos6522_get_next_irq_time(uint16_t latch,
+> >> int64_t d, int64_t delta) "latch=3D%d counter=3D0x%"PRId64 "
+> >> delta_next=3D0x%"PRId64
+>=20
+> Indeed.
+>=20
+> >>
+> >> but I have no idea how to test this.
+> >>
+> >> -Dov
+> >>
+> >=20
+> > ... and one more in hw/usb/u2f-passthru.c:348 :
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("%s: Bad writte=
+n size (req 0x%zu, val 0x%zd)",
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TYPE_U2F_PASSTHRU, size=
+of(host_packet), written);
+>=20
+> 'written' is signed, so this format looks correct...
+>=20
 
-are available in the Git repository at:
+Irrespective of the sign, u and d shouldn't be used behind 0x=20
 
-  git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20201103
+> >=20
+> > Again, I have no idea how to test/trigger these areas in the code.
+> >=20
+> > -Dov
+> >=20
+>=20
+>=20
 
-for you to fetch changes up to 422819776101520cb56658ee5facf926526cf870:
-
-  target/riscv/csr.c : add space before the open parenthesis '(' (2020-11-03 07:17:23 -0800)
-
-----------------------------------------------------------------
-This series adds support for migration to RISC-V QEMU and expands the
-Microchip PFSoC to allow unmodified HSS and Linux boots.
-
-----------------------------------------------------------------
-Anup Patel (2):
-      hw/riscv: sifive_u: Allow passing custom DTB
-      hw/riscv: virt: Allow passing custom DTB
-
-Bin Meng (10):
-      hw/riscv: microchip_pfsoc: Document where to look at the SoC memory maps
-      hw/misc: Add Microchip PolarFire SoC DDR Memory Controller support
-      hw/riscv: microchip_pfsoc: Connect DDR memory controller modules
-      hw/misc: Add Microchip PolarFire SoC IOSCB module support
-      hw/riscv: microchip_pfsoc: Connect the IOSCB module
-      hw/misc: Add Microchip PolarFire SoC SYSREG module support
-      hw/riscv: microchip_pfsoc: Connect the SYSREG module
-      hw/riscv: microchip_pfsoc: Map the reserved memory at address 0
-      hw/riscv: microchip_pfsoc: Correct DDR memory map
-      hw/riscv: microchip_pfsoc: Hook the I2C1 controller
-
-Xinhao Zhang (1):
-      target/riscv/csr.c : add space before the open parenthesis '('
-
-Yifei Jiang (6):
-      target/riscv: Merge m/vsstatus and m/vsstatush into one uint64_t unit
-      target/riscv: Add basic vmstate description of CPU
-      target/riscv: Add PMP state description
-      target/riscv: Add H extension state description
-      target/riscv: Add V extension state description
-      target/riscv: Add sifive_plic vmstate
-
- include/hw/intc/sifive_plic.h       |   1 +
- include/hw/misc/mchp_pfsoc_dmc.h    |  56 +++++++++
- include/hw/misc/mchp_pfsoc_ioscb.h  |  50 ++++++++
- include/hw/misc/mchp_pfsoc_sysreg.h |  39 ++++++
- include/hw/riscv/microchip_pfsoc.h  |  18 ++-
- target/riscv/cpu.h                  |  24 ++--
- target/riscv/cpu_bits.h             |  19 +--
- target/riscv/internals.h            |   4 +
- target/riscv/pmp.h                  |   2 +
- hw/intc/sifive_plic.c               |  26 +++-
- hw/misc/mchp_pfsoc_dmc.c            | 216 ++++++++++++++++++++++++++++++++
- hw/misc/mchp_pfsoc_ioscb.c          | 242 ++++++++++++++++++++++++++++++++++++
- hw/misc/mchp_pfsoc_sysreg.c         |  99 +++++++++++++++
- hw/riscv/microchip_pfsoc.c          | 125 ++++++++++++++++---
- hw/riscv/sifive_u.c                 |  28 +++--
- hw/riscv/virt.c                     |  27 ++--
- target/riscv/cpu.c                  |  16 +--
- target/riscv/cpu_helper.c           |  35 ++----
- target/riscv/csr.c                  |  20 +--
- target/riscv/machine.c              | 196 +++++++++++++++++++++++++++++
- target/riscv/op_helper.c            |  11 +-
- target/riscv/pmp.c                  |  29 +++--
- MAINTAINERS                         |   6 +
- hw/misc/Kconfig                     |   9 ++
- hw/misc/meson.build                 |   3 +
- hw/riscv/Kconfig                    |   3 +
- target/riscv/meson.build            |   3 +-
- 27 files changed, 1180 insertions(+), 127 deletions(-)
- create mode 100644 include/hw/misc/mchp_pfsoc_dmc.h
- create mode 100644 include/hw/misc/mchp_pfsoc_ioscb.h
- create mode 100644 include/hw/misc/mchp_pfsoc_sysreg.h
- create mode 100644 hw/misc/mchp_pfsoc_dmc.c
- create mode 100644 hw/misc/mchp_pfsoc_ioscb.c
- create mode 100644 hw/misc/mchp_pfsoc_sysreg.c
- create mode 100644 target/riscv/machine.c
 
