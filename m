@@ -2,99 +2,96 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A0F3C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8CA2C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:24:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E175E223C7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1137E22370
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 15:24:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uldos1Do"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E175E223C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YI3qhroW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1137E22370
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZyAW-0003s4-Rw
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:24:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38320)
+	id 1kZyAc-00044o-09
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 10:24:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kZxgq-000408-CB
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:53:42 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35704)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kZxgo-0004EV-Gd
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 09:53:39 -0500
-Received: by mail-wr1-x443.google.com with SMTP id n15so18924464wrq.2
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 06:53:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Abd1JDvWKvwvWMwVFtuk3o19dYdiYvo//0MeZhwCziU=;
- b=Uldos1DoFe3eLZMbgm9IbbxQbIk92ehGA95WC8RzaFGcBvQ/v1K4zFoG+GFaAyZiOH
- CUJNBq6ElY9xTDjEwjQw7Zl4JLRC19uMQlomDJOPmrkDyL++KBiWFLZ0Bldoqn6FXVTx
- S4ignYVVCpIYFFy6T74S482wHyBuyGl46iQ7527gEWy+WxMtdBg0Wf8oGvJBXT4s5GZr
- m/Whj4oqj9Ru4mAf6VPno5m6WhpTrur7JxBbEGYQcTgbVGYXV2Yl0t06dMPPAV3IIyo3
- 4p/9f2TkpHLkXo61WjIuv4Xl/bxC7pBJTanqro0MeTdIG+6VW0LZIdKm+qw1at6hpayg
- lhXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Abd1JDvWKvwvWMwVFtuk3o19dYdiYvo//0MeZhwCziU=;
- b=jGSt41a+LvihSr4b+PIr5+iMws6r9bCaQxADwwKP+nXDwmfaDtvR1WGdlskBNBte5I
- V/QoE/7Is41IquJaB6MdyTnz32ZPJYwdSra7fUCnIlgLq7FuYQ/KIngHqET1IfAro6Fb
- Mq0Z5EfBUKobAKDlTwIakhT7toLTNwlJWexDwRDsXYx1ttg9Mvlp+T9eNdxZVLTS3yFJ
- wTHqxBm8KnTJyZicjShJ3eT64w6UboAZyGeU58fUb3U20c1njB8qphv4TdH6TUdfaAxT
- JH9AcBM5fMnem4vDTVavT3uIyMyLq1rl/oZ0+Cyf5wbtv+P8SA2cCGO9TfUjBK81ppPP
- JTwA==
-X-Gm-Message-State: AOAM531tYLI/QMx+npZWQUZo6wzRaarS0hFM8Ne9eZoUDtcPCVhBovDp
- uig7hJFsqXKo4UU6sOH9MLo=
-X-Google-Smtp-Source: ABdhPJyNKVGySGYQXYESwLio+JBHRUiiv+W1PJATDZBCXkVF4SAD/2S+nwgoNe0TYl6jAeMA1Vv3lQ==
-X-Received: by 2002:adf:9e48:: with SMTP id v8mr15677585wre.55.1604415216316; 
- Tue, 03 Nov 2020 06:53:36 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id v12sm27452269wro.72.2020.11.03.06.53.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 03 Nov 2020 06:53:35 -0800 (PST)
-Subject: Re: [PATCH V16 1/6] target/mips: Fix PageMask with variable page size
-To: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <1604053541-27822-1-git-send-email-chenhc@lemote.com>
- <1604053541-27822-2-git-send-email-chenhc@lemote.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7fdb67f6-edf6-4fe9-6e3b-f2817a3a06f3@amsat.org>
-Date: Tue, 3 Nov 2020 15:53:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZy8N-0001mD-Nr
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:22:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38041)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kZy8I-0005R3-Jn
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 10:22:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604416918;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1535lTPYDr0w41/hF1/zYUrcunKb1JN/pb0dtQR5l68=;
+ b=YI3qhroWNb/oC9mu7HIoevV1FH0XsnV+Cn7dJMkeyF2Cx6gyTlJR1DBjH9e3VKZ+SGru6U
+ PRFQ5xWSA1FiA9AH53WlLtk39YOWKyirSjXg+QS6cllFtzTAICHp+sbOV1OaCA5CdcDjfx
+ p6Cju5UBgj8lFltYPXchuEXTOFC+w48=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-QHT2zNfrO8uvWCVHZGo-4w-1; Tue, 03 Nov 2020 10:21:57 -0500
+X-MC-Unique: QHT2zNfrO8uvWCVHZGo-4w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 084A65F9C5;
+ Tue,  3 Nov 2020 15:21:56 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
+ [10.36.112.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D4F016EF46;
+ Tue,  3 Nov 2020 15:21:49 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 599AA1132BD6; Tue,  3 Nov 2020 16:21:48 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH v2 09/11] char-socket: Fix qemu_chr_socket_address() for
+ abstract sockets
+References: <20201102094422.173975-1-armbru@redhat.com>
+ <20201102094422.173975-10-armbru@redhat.com>
+ <9f594cfb-2138-c12d-f6f7-6a4653e78087@redhat.com>
+ <87r1pbosxn.fsf@dusky.pond.sub.org>
+ <20201103131733.GL205187@redhat.com>
+Date: Tue, 03 Nov 2020 16:21:48 +0100
+In-Reply-To: <20201103131733.GL205187@redhat.com> ("Daniel P. =?utf-8?Q?Be?=
+ =?utf-8?Q?rrang=C3=A9=22's?=
+ message of "Tue, 3 Nov 2020 13:17:33 +0000")
+Message-ID: <87r1pajwj7.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <1604053541-27822-2-git-send-email-chenhc@lemote.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,101 +104,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhc@lemote.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, zxq_yx_007@163.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/30/20 11:25 AM, Huacai Chen wrote:
-> From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> 
-> Our current code assumed the target page size is always 4k
-> when handling PageMask and VPN2, however, variable page size
-> was just added to mips target and that's no longer true.
-> 
-> Fixes: ee3863b9d414 ("target/mips: Support variable page size")
-> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> ---
->  target/mips/cp0_helper.c | 36 +++++++++++++++++++++++++++++-------
->  target/mips/cpu.h        |  1 +
->  2 files changed, 30 insertions(+), 7 deletions(-)
-> 
-> diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-> index 12143ac..d90ddd9 100644
-> --- a/target/mips/cp0_helper.c
-> +++ b/target/mips/cp0_helper.c
-> @@ -892,13 +892,31 @@ void helper_mtc0_memorymapid(CPUMIPSState *env, target_ulong arg1)
->  
->  void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask)
->  {
-> -    uint64_t mask = arg1 >> (TARGET_PAGE_BITS + 1);
-> -    if (!(env->insn_flags & ISA_MIPS32R6) || (arg1 == ~0) ||
-> -        (mask == 0x0000 || mask == 0x0003 || mask == 0x000F ||
-> -         mask == 0x003F || mask == 0x00FF || mask == 0x03FF ||
-> -         mask == 0x0FFF || mask == 0x3FFF || mask == 0xFFFF)) {
-> -        env->CP0_PageMask = arg1 & (0x1FFFFFFF & (TARGET_PAGE_MASK << 1));
-> +    unsigned long mask;
-> +    int maskbits;
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+
+> On Tue, Nov 03, 2020 at 07:28:20AM +0100, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>>=20
+>> > On 11/2/20 3:44 AM, Markus Armbruster wrote:
+>> >> Commit 776b97d360 "qemu-sockets: add abstract UNIX domain socket
+>> >> support" neglected to update qemu_chr_socket_address().  It shows
+>> >> shows neither @abstract nor @tight.  Fix that.
+>> >>=20
+>> >> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> >> ---
+>> >>  chardev/char-socket.c | 10 +++++++++-
+>> >>  1 file changed, 9 insertions(+), 1 deletion(-)
+>> >>=20
+>> >> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+>> >> index 1ee5a8c295..dc1cf86ecf 100644
+>> >> --- a/chardev/char-socket.c
+>> >> +++ b/chardev/char-socket.c
+>> >> @@ -443,10 +443,18 @@ static char *qemu_chr_socket_address(SocketChar=
+dev *s, const char *prefix)
+>> >>                                 s->is_listen ? ",server" : "");
+>> >>          break;
+>> >>      case SOCKET_ADDRESS_TYPE_UNIX:
+>> >> -        return g_strdup_printf("%sunix:%s%s", prefix,
+>> >> +    {
+>> >> +        UnixSocketAddress *sa =3D &s->addr->u.q_unix;
+>> >> +
+>> >> +        return g_strdup_printf("%sunix:%s%s%s%s", prefix,
+>> >>                                 s->addr->u.q_unix.path,
+>> >> +                               sa->has_abstract && sa->abstract
+>> >> +                               ? ",abstract" : "",
+>> >> +                               sa->has_tight && sa->tight
+>> >> +                               ? ",tight" : "",
+>> >>                                 s->is_listen ? ",server" : "");
+>> >
+>> > Gets modified again in 11/11, so I can accept this as a strict
+>> > improvement, even if it is not the final form.
+>>=20
+>> You're right, PATCH 11's change is better done here already.  Will tidy
+>> up if I need to respin for some other reason.
+>
+> I can squash in the following part of patch 11:
+>
+> @@ -444,14 +444,20 @@ static char *qemu_chr_socket_address(SocketChardev =
+*s, const char *prefix)
+>          break;
+>      case SOCKET_ADDRESS_TYPE_UNIX:
+>      {
+> +        const char *tight =3D "", *abstract =3D "";
+>          UnixSocketAddress *sa =3D &s->addr->u.q_unix;
+>
+> -        return g_strdup_printf("%sunix:%s%s%s%s", prefix,
+> -                               s->addr->u.q_unix.path,
+> -                               sa->has_abstract && sa->abstract
+> -                               ? ",abstract" : "",
+> -                               sa->has_tight && sa->tight
+> -                               ? ",tight" : "",
+> +#ifdef CONFIG_LINUX
+> +        if (sa->has_abstract && sa->abstract) {
+> +            abstract =3D ",abstract";
+> +            if (sa->has_tight && sa->tight) {
+> +                tight =3D ",tight";
+> +            }
+> +        }
+> +#endif
 > +
-> +    if (env->insn_flags & ISA_MIPS32R6) {
-> +        return;
-> +    }
-> +    /* Don't care MASKX as we don't support 1KB page */
-> +    mask = extract32((uint32_t)arg1, CP0PM_MASK, 16);
-> +    maskbits = find_first_zero_bit(&mask, 32);
-> +
-> +    /* Ensure no more set bit after first zero */
-> +    if (mask >> maskbits) {
-> +        goto invalid;
-> +    }
-> +    /* We don't support VTLB entry smaller than target page */
-> +    if ((maskbits + 12) < TARGET_PAGE_BITS) {
-> +        goto invalid;
+> +        return g_strdup_printf("%sunix:%s%s%s%s", prefix, sa->path,
+> +                               abstract, tight,
+>                                 s->is_listen ? ",server" : "");
+>          break;
 >      }
-> +    env->CP0_PageMask = mask << CP0PM_MASK;
-> +
-> +    return;
-> +
-> +invalid:
-> +    /* When invalid, set to default target page size. */
-> +    env->CP0_PageMask = (~TARGET_PAGE_MASK >> 12) << CP0PM_MASK;
->  }
+>
+> but leaving out the CONFIG_LINUX ifdef until Patch 11
 
-I was going to queue this patch for 5.2-rc1, but it fails all
-I6400 tests...
+Appreciated!
 
-  Linux version 4.7.0-rc1-dirty (root@2e66df87a9ff) (gcc version 6.3.0
-20170516 (Debian 6.3.0-18) ) #1 SMP Sat Feb 1 18:38:13 UTC 2020
-  GCRs appear to have been moved (expected them at 0x1fbf8000)!
-  earlycon: uart8250 at I/O port 0x3f8 (options '38400n8')
-  bootconsole [uart8250] enabled
-  MIPS CPS SMP unable to proceed without a CM
-  CPU0 revision is: 0001a900 (MIPS I6400)
-  FPU revision is: 20f30300
-  MSA revision is: 00000300
-  MIPS: machine is mti,malta
-  Software DMA cache coherency enabled
-  Determined physical RAM map:
-  memory: 0000000008000000 @ 0000000000000000 (usable)
-  Zone ranges:
-  DMA      [mem 0x0000000000000000-0x0000000000ffffff]
-  DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
-  Normal   empty
-  Movable zone start for each node
-  Early memory node ranges
-  node   0: [mem 0x0000000000000000-0x0000000007ffffff]
-  Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
-  Primary instruction cache 64kB, VIPT, 4-way, linesize 64 bytes.
-  Primary data cache 64kB, 4-way, VIPT, no aliases, linesize 64 bytes
-  percpu: Embedded 5 pages/cpu @980000000107c000 s29664 r8192 d44064 u81920
-  Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 8163
-  Kernel command line: clocksource=GIC console=tty0 console=ttyS0
-  PID hash table entries: 512 (order: -2, 4096 bytes)
-  Dentry cache hash table entries: 16384 (order: 3, 131072 bytes)
-  Inode-cache hash table entries: 8192 (order: 2, 65536 bytes)
-  Kernel panic - not syncing: MMU doesn't support PAGE_SIZE=0x4000
 
