@@ -2,82 +2,82 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6796BC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:47:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FCFC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:49:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B54CC20735
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:47:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3640D20735
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 16:49:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aJzECGZn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B54CC20735
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a58+dNRG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3640D20735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZzTH-0003aB-Mo
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:47:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46682)
+	id 1kZzUh-0005fF-B3
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 11:49:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZzS2-0001qu-Qh
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:46:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48285)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZzRv-0001d2-Qq
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:46:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25762)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZzS0-0002lS-PE
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:46:30 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kZzRt-0002jC-DU
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 11:46:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604421987;
+ s=mimecast20190719; t=1604421980;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CroNXPd2gZDwwm/Aroq093pym2LY55n4rUoIP5cgYXI=;
- b=aJzECGZn0Zizd0HmihfidsSRCU6x6xqeIzll2ztKV4Amr7IRUYVS/kK3tbINlWBwFTN8zF
- HvBowytlwVZ3EGFUs1qB4x/MpdbWI2NdU+M4yj6yhGJpbcMiztH91RqXg+EvcU46AU1OSf
- ovFwHUCxxR85kLoyAR0kVmRK4MeWir0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-VdAbGIPUOPWrvvJkGtMAQw-1; Tue, 03 Nov 2020 11:46:25 -0500
-X-MC-Unique: VdAbGIPUOPWrvvJkGtMAQw-1
-Received: by mail-wm1-f72.google.com with SMTP id t21so2822112wmt.8
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 08:46:25 -0800 (PST)
+ bh=GSfukc0geywNkqucbqnh5BnXZLygA+nz7IBN65XXjA4=;
+ b=a58+dNRG4GzmSTFhgi4pmLvJMzA1hknOwE6MUR7dyQJv22RpF5c63Ee7+cn0dI4dEAY3Ku
+ MDHb+X/+htLavMtipNRIRtr2ZpsRM6lFlhOUir9HvXTrBwnbpkJEX2Jwgf3oPBFW8DppfR
+ qWo8IV7nrc2Vx/AoX8BxCXN3LLd+fNQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-146-7RvxRFVOPvy-CEpM6oqIDQ-1; Tue, 03 Nov 2020 11:46:19 -0500
+X-MC-Unique: 7RvxRFVOPvy-CEpM6oqIDQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 3so2353850wms.9
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 08:46:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=CroNXPd2gZDwwm/Aroq093pym2LY55n4rUoIP5cgYXI=;
- b=hzA9Uv9saQYzNnFjQgS7RC6CgGXCBkad+o1VgmABTpHtZyeXXLCYQAbQmekS6Y3Bg6
- tD7/vjbyakwpAkHd92wjc+3vkXoeNk8aShfKQz08mKvfGYNmfCzQU3Nt7PMZorffaJ4i
- Y+9nIU5BHrLU8wWsQhdzUpBlgDr7Kg4GarAxmzFwpOAeTIgMSzErcJ4xmR9OemoTxhn5
- 56slunG+eeEyxbqG6TTvtlYqRC3E2zpuFoJ+8c2cpkeQHDkGlMltJ1/r5b+5rC/I/OZD
- 4QTyWUOoxL3mz4XkdNCpIPzuiFB/h7xDyIq3DL1nJyY5JphubBwsUav42RSmjs9y9IvX
- Nkcg==
-X-Gm-Message-State: AOAM5321HWR1sfWHTWBUn+9Q9vfONi98i+7DtAhw18e4U+8V/7ztonLI
- enZjdFz6dHNrzH7mZIu+m/P2oe2sk7X6x1FoKSeB+UGFAF2YdG/NtRuX5eSW7LLZ3tse6+svWBw
- 1Imh9W0oSx0ayd3w=
-X-Received: by 2002:adf:e7c1:: with SMTP id e1mr28767680wrn.247.1604421982841; 
- Tue, 03 Nov 2020 08:46:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw2ZlS+BkjSa7zJ+xfr2nDukbgPkksfGuXINcmoJLEcuQsYKoz8xWpxskJWCFCT9eJhzPwZ3w==
-X-Received: by 2002:adf:e7c1:: with SMTP id e1mr28767654wrn.247.1604421982696; 
- Tue, 03 Nov 2020 08:46:22 -0800 (PST)
+ bh=GSfukc0geywNkqucbqnh5BnXZLygA+nz7IBN65XXjA4=;
+ b=J+XEGA80q0I8y26e0+sf8/aAb2ZrsiUzL8itqyeNXCrbwPAEj9xtyaDWMufpal3D8K
+ UcuH34EfXv27hjCavx1vcjW/KAk4zaCcwa8whtYt8W3ldAmbYN+k3Lfbi1jP5Le6P1U/
+ JAxqzQidr/0Rl7q23W3A+wZjwvUOu3fLE+NK8SpC6ZhJsgq9ZH7zR1jSPnbdPFS79x1O
+ szqwD0xh/Ey7TAVKV9VHIu19cp974kr5eHMuQaDPXiWGRD4dEWp7t3Pm/CMLhFygEMjV
+ UWYJPOX48JFIHKHRW2zPqgPjZ3xNBrSRS8Jc/u16RdBGUUIMgYVZjYarJiKCHuDTWQD6
+ QBCg==
+X-Gm-Message-State: AOAM532EYaQEDrLT+RCTQYOSB9bRX8+u/4GzepqeI4St5g/vlfP/OA9D
+ muQmqW3k7UHHAFEsvYLqvQfO5qti3N4xylEZDmGnv4HzEfTkb1WWk317MHHFDjGDxbZSd9kv/WD
+ +/1qQsqKVmr0e/PA=
+X-Received: by 2002:adf:bd86:: with SMTP id l6mr28038812wrh.205.1604421977581; 
+ Tue, 03 Nov 2020 08:46:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyPkY319mzWnh+5kjLkFCs/q7NcLnkCzxot5CVDqaQkEz2hlpQZVVaFpLgHucsUomMtZvvLCA==
+X-Received: by 2002:adf:bd86:: with SMTP id l6mr28038793wrh.205.1604421977447; 
+ Tue, 03 Nov 2020 08:46:17 -0800 (PST)
 Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id z10sm19185941wrp.2.2020.11.03.08.46.21
+ by smtp.gmail.com with ESMTPSA id c64sm167809wmd.41.2020.11.03.08.46.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 08:46:22 -0800 (PST)
+ Tue, 03 Nov 2020 08:46:16 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 3/3] travis-ci: Remove the --without-default-devices
- job
-Date: Tue,  3 Nov 2020 17:46:04 +0100
-Message-Id: <20201103164604.2692357-4-philmd@redhat.com>
+Subject: [PATCH-for-5.2 2/3] gitlab-ci: Add a job to cover the
+ --without-default-devices config
+Date: Tue,  3 Nov 2020 17:46:03 +0100
+Message-Id: <20201103164604.2692357-3-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201103164604.2692357-1-philmd@redhat.com>
 References: <20201103164604.2692357-1-philmd@redhat.com>
@@ -126,33 +126,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We replicated the --without-default-devices job on GitLab-CI
-in the previous commit. We can now remove it from Travis-CI.
+We test './configure --without-default-devices' since commit
+20885b5b169 (".travis.yml: test that no-default-device builds
+do not regress") in Travis-CI.
+
+As we prefer to use GitLab-CI, add the equivalent job there.
+
+One minor difference: the GitLab Ubuntu docker image has the
+Xen devel packages installed. As it is automatically selected,
+we need to disable it with the --disable-xen option, else the
+build fails:
+
+  /usr/bin/ld: libcommon.fa.p/hw_xen_xen-legacy-backend.c.o: in function `xen_be_register_common':
+  hw/xen/xen-legacy-backend.c:754: undefined reference to `xen_9pfs_ops'
+  /usr/bin/ld: libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x8): undefined reference to `local_ops'
+  /usr/bin/ld: libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x20): undefined reference to `synth_ops'
+  /usr/bin/ld: libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x38): undefined reference to `proxy_ops'
+  collect2: error: ld returned 1 exit status
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- .travis.yml | 8 --------
- 1 file changed, 8 deletions(-)
+ .gitlab-ci.yml | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/.travis.yml b/.travis.yml
-index a3d78171cab..15d92291358 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -224,14 +224,6 @@ jobs:
-         - ${SRC_DIR}/scripts/travis/coverage-summary.sh
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 3b15ae5c302..6ee098ec53c 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -262,6 +262,17 @@ build-user-plugins:
+     MAKE_CHECK_ARGS: check-tcg
+   timeout: 1h 30m
  
- 
--    # We manually include builds which we disable "make check" for
--    - name: "GCC without-default-devices (softmmu)"
--      env:
--        - CONFIG="--without-default-devices --disable-user"
--        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
--        - TEST_CMD=""
--
--
-     # We don't need to exercise every backend with every front-end
-     - name: "GCC trace log,simple,syslog (user)"
-       env:
++build-system-ubuntu-without-default-devices:
++  <<: *native_build_job_definition
++  variables:
++    IMAGE: ubuntu2004
++    CONFIGURE_ARGS: --without-default-devices --disable-user --disable-xen --disable-tools --disable-docs
++    MAKE_CHECK_ARGS: check-build
++  artifacts:
++    expire_in: 2 days
++    paths:
++      - build
++
+ build-clang:
+   <<: *native_build_job_definition
+   variables:
 -- 
 2.26.2
 
