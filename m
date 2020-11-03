@@ -2,91 +2,108 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB646C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 20:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A1EC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 20:32:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5073221556
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 20:29:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A988521556
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 20:32:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ARU18EPH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5073221556
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PaFtiWAB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A988521556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka2vd-0007PX-9H
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 15:29:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41090)
+	id 1ka2yz-0001Ip-N7
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 15:32:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1ka2uZ-0006XA-ES
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 15:28:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26779)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1ka2yB-0000tC-0x
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 15:31:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22519)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1ka2uW-0005hr-Md
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 15:28:10 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1ka2y9-00066r-Aq
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 15:31:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604435287;
+ s=mimecast20190719; t=1604435512;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=//EwluFxECYvddt8H5V2R2oqW8PUpEfuJCRVinHXjYM=;
- b=ARU18EPH+mldFtB69GKrrhwVWp0ujnOi47Ytwy1Hp0GW6De2se8opj9tKEePmikSVnn2yU
- YBSd2STUqKYphhjr2QpXi9PjNrrBHs1OnMbO/ixv6nj8k7jJ9DgwCpWlZ7RwzOUtTP4Atk
- TuEc44retL0uTw4MY/pF7tTGZboa+s8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-sCX-1tH-P_6nTcARDEj7GQ-1; Tue, 03 Nov 2020 15:28:05 -0500
-X-MC-Unique: sCX-1tH-P_6nTcARDEj7GQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 234511007469;
- Tue,  3 Nov 2020 20:28:04 +0000 (UTC)
-Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2B26219D61;
- Tue,  3 Nov 2020 20:28:01 +0000 (UTC)
-Date: Tue, 3 Nov 2020 13:27:58 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v1] docs/devel: Add VFIO device migration documentation
-Message-ID: <20201103132758.04b18f5c@w520.home>
-In-Reply-To: <47f8ccea-f75a-dfb7-b646-28d5123b322f@nvidia.com>
-References: <1603950791-27236-1-git-send-email-kwankhede@nvidia.com>
- <20201029125221.69352b48.cohuck@redhat.com>
- <9479dffd-e434-e336-6ed8-07fc2edd2453@nvidia.com>
- <20201029130519.7eb1e704@w520.home>
- <47f8ccea-f75a-dfb7-b646-28d5123b322f@nvidia.com>
+ bh=W2xoQMtcZ45M2FDoabAb+oIuMsPmr+LIxDstfsaLsQQ=;
+ b=PaFtiWABs/hju6rEiVxiwFwvi8p0nxvCyqd6C+UnXMW6h9Ui7sudt53kCUL5m6hNcBdJjP
+ ADhzP26AYryahEj0+EJcZgag9AFIDo7LsBoTtcAJBhUb8VuWcIc0d2dAqJzJlISc7PFSsL
+ /85ec3wJIOi51sZevWxlXXD9vih4GyA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-9KP-yz5jP3efZO8WAF4xNQ-1; Tue, 03 Nov 2020 15:31:50 -0500
+X-MC-Unique: 9KP-yz5jP3efZO8WAF4xNQ-1
+Received: by mail-wm1-f71.google.com with SMTP id c204so241032wmd.5
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 12:31:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=W2xoQMtcZ45M2FDoabAb+oIuMsPmr+LIxDstfsaLsQQ=;
+ b=R7egUmCXMWOwNb/F7o9QX2aN0LaRM3peAknagwx3JjtmC/ImEUCYmal0PECM4G6Hbb
+ Ow63FkpQnKPXsvC2gp3hvJo/+PanPKFQV6A6YMEhsfybURmd67+X0QHGrx3d5WKKQiZz
+ gCuAjhF0g77mbDCbyPqWpIfjoaSfNEbdHC5i3a2IGuU1AY3p66sI5dTEHZ6nHepqOacY
+ 7XdFl34xlgCqQuuSBK52LoqZ88OB0TcTUhXj/11IOerm7wrpVopIX05VShgFH9s3M7Bf
+ CgXyWcIOrQvoB3KWbUpw3fYvTtnlVi65NDqJ4v7UTBkjR3ipqu8mdYN9sgXCAYA9vP1y
+ cIeg==
+X-Gm-Message-State: AOAM533GnbDt6xiKYVuKS8dllI0TcE0S0ehSQ6bl73uzDsGvTT03Mdbn
+ g9Yy61Vw+g7clYtE56mF3KcFSKWim2v6R3cPs3XBwJ1ucFbbV4Kkv0UUWJPqBJQBL/e7DG5Sjz3
+ C08lx6f58U9xzlF4=
+X-Received: by 2002:adf:e892:: with SMTP id d18mr29946479wrm.103.1604435509316; 
+ Tue, 03 Nov 2020 12:31:49 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz5Kal2Q2BqN2crCt7Phj5MtwdE1YSjlg+L4Ckbm8BNES6hH2qy/addHtnYSbGKkq4WxUWSBQ==
+X-Received: by 2002:adf:e892:: with SMTP id d18mr29946459wrm.103.1604435509125; 
+ Tue, 03 Nov 2020 12:31:49 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id x10sm26462274wrp.62.2020.11.03.12.31.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Nov 2020 12:31:48 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 09/36] 9p: simplify source file selection
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+References: <1566284395-30287-1-git-send-email-pbonzini@redhat.com>
+ <1566284395-30287-10-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ab9a47b9-8ac5-c8f1-b035-b8b812551b3b@redhat.com>
+Date: Tue, 3 Nov 2020 21:31:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <1566284395-30287-10-git-send-email-pbonzini@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124;
- envelope-from=alex.williamson@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,99 +116,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mcrossley@nvidia.com, cjia@nvidia.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, dnigam@nvidia.com, philmd@redhat.com
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Cornelia Huck <cohuck@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 4 Nov 2020 01:18:12 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+Hi Paolo,
 
-> On 10/30/2020 12:35 AM, Alex Williamson wrote:
-> > On Thu, 29 Oct 2020 23:11:16 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
+On 8/20/19 8:59 AM, Paolo Bonzini wrote:
+> Express the complex conditions in Kconfig rather than Makefiles, since Kconfig
+> is better suited at expressing dependencies and detecting contradictions.
 > 
-> <snip>
+> Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  Kconfig.host        | 1 +
+>  fsdev/Makefile.objs | 2 +-
+>  hw/9pfs/Kconfig     | 5 +++++
+>  3 files changed, 7 insertions(+), 1 deletion(-)
 > 
-> >>>> +System memory dirty pages tracking
-> >>>> +----------------------------------
-> >>>> +
-> >>>> +A ``log_sync`` memory listener callback is added to mark system memory pages  
-> >>>
-> >>> s/is added to mark/marks those/
-> >>>      
-> >>>> +as dirty which are used for DMA by VFIO device. Dirty pages bitmap is queried  
-> >>>
-> >>> s/by/by the/
-> >>> s/Dirty/The dirty/
-> >>>      
-> >>>> +per container. All pages pinned by vendor driver through vfio_pin_pages()  
-> >>>
-> >>> s/by/by the/
-> >>>      
-> >>>> +external API have to be marked as dirty during migration. When there are CPU
-> >>>> +writes, CPU dirty page tracking can identify dirtied pages, but any page pinned
-> >>>> +by vendor driver can also be written by device. There is currently no device  
-> >>>
-> >>> s/by/by the/ (x2)
-> >>>      
-> >>>> +which has hardware support for dirty page tracking. So all pages which are
-> >>>> +pinned by vendor driver are considered as dirty.
-> >>>> +Dirty pages are tracked when device is in stop-and-copy phase because if pages
-> >>>> +are marked dirty during pre-copy phase and content is transfered from source to
-> >>>> +destination, there is no way to know newly dirtied pages from the point they
-> >>>> +were copied earlier until device stops. To avoid repeated copy of same content,
-> >>>> +pinned pages are marked dirty only during stop-and-copy phase.  
-> >>
-> >>  
-> >>> Let me take a quick stab at rewriting this paragraph (not sure if I
-> >>> understood it correctly):
-> >>>
-> >>> "Dirty pages are tracked when the device is in the stop-and-copy phase.
-> >>> During the pre-copy phase, it is not possible to distinguish a dirty
-> >>> page that has been transferred from the source to the destination from
-> >>> newly dirtied pages, which would lead to repeated copying of the same
-> >>> content. Therefore, pinned pages are only marked dirty during the
-> >>> stop-and-copy phase." ?
-> >>>      
-> >>
-> >> I think above rephrase only talks about repeated copying in pre-copy
-> >> phase. Used "copied earlier until device stops" to indicate both
-> >> pre-copy and stop-and-copy till device stops.  
-> > 
-> > 
-> > Now I'm confused, I thought we had abandoned the idea that we can only
-> > report pinned pages during stop-and-copy.  Doesn't the device needs to
-> > expose its dirty memory footprint during the iterative phase regardless
-> > of whether that causes repeat copies?  If QEMU iterates and sees that
-> > all memory is still dirty, it may have transferred more data, but it
-> > can actually predict if it can achieve its downtime tolerances.  Which
-> > is more important, less data transfer or predictability?  Thanks,
-> >   
-> 
-> Even if QEMU copies and transfers content of all sys mem pages during 
-> pre-copy (worst case with IOMMU backed mdev device when its vendor 
-> driver is not smart to pin pages explicitly and all sys mem pages are 
-> marked dirty), then also its prediction about downtime tolerance will 
-> not be correct, because during stop-and-copy again all pages need to be 
-> copied as device can write to any of those pinned pages.
+> diff --git a/Kconfig.host b/Kconfig.host
+> index aec9536..bb6e116 100644
+> --- a/Kconfig.host
+> +++ b/Kconfig.host
+> @@ -28,6 +28,7 @@ config VHOST_USER
+>  
+>  config XEN
+>      bool
+> +    select FSDEV_9P if VIRTFS
 
-I think you're only reiterating my point.  If QEMU copies all of guest
-memory during the iterative phase and each time it sees that all memory
-is dirty, such as if CPUs or devices (including assigned devices) are
-dirtying pages as fast as it copies them (or continuously marks them
-dirty), then QEMU can predict that downtime will require copying all
-pages.  If instead devices don't mark dirty pages until the VM is
-stopped, then QEMU might iterate through memory copy and predict a short
-downtime because not much memory is dirty, only to be surprised that
-all of memory is suddenly dirty.  At that point it's too late, the VM
-is already stopped, the predicted short downtime takes far longer than
-expected.  This is exactly why we made the kernel interface mark pinned
-pages persistently dirty when it was proposed that we only report
-pinned pages once.  Thanks,
+There is something odd with CONFIG_XEN, as it is used
+to select accelerator and hardware.
 
-Alex
+>  
+>  config VIRTFS
+>      bool
+> diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+> index 24bbb3e..42cd70c 100644
+> --- a/fsdev/Makefile.objs
+> +++ b/fsdev/Makefile.objs
+> @@ -1,6 +1,6 @@
+>  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+>  # only pull in the actual 9p backend if we also enabled virtio or xen.
+> -ifeq ($(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_9P),$(CONFIG_XEN))),y)
+> +ifeq ($(CONFIG_FSDEV_9P),y)
+>  common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+>  else
+>  common-obj-y = qemu-fsdev-dummy.o
+> diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
+> index 8c5032c..3ae5749 100644
+> --- a/hw/9pfs/Kconfig
+> +++ b/hw/9pfs/Kconfig
+> @@ -1,4 +1,9 @@
+> +config FSDEV_9P
+> +    bool
+> +    depends on VIRTFS
+
+Using "depends on VIRTFS && 9PFS" instead helps to
+reduce the link failure using --without-default-devices.
+
+> +
+>  config VIRTIO_9P
+>      bool
+>      default y
+>      depends on VIRTFS && VIRTIO
+> +    select FSDEV_9P
+
+Here I used "depends on FSDEV_9P && VIRTIO" but this
+doesn't look right...
+
+Is it possible to include "config-devices.h" in
+hw/xen/xen-legacy-backend.c to use CONFIG_9PFS?
+
+xen_be_register_common() unconditionally calls:
+
+  xen_be_register("9pfs", &xen_9pfs_ops);
+
+As I have no much idea about Xen & 9pfs, I'm a bit
+lost here (regarding the dependencies order).
+
+Thanks,
+
+Phil.
 
 
