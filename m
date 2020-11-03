@@ -2,113 +2,114 @@ Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0724C00A89
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B742EC55178
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:16:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DE3820870
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:16:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40A3F22243
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 01:16:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="rQljEs4I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DE3820870
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="EyQ8vyNo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40A3F22243
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZkw6-0008P9-AU
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 20:16:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50940)
+	id 1kZkwB-0000Ch-9x
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 20:16:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Michael.Roth@amd.com>)
- id 1kZksX-0006c1-JX
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 20:12:53 -0500
-Received: from mail-mw2nam10on2058.outbound.protection.outlook.com
- ([40.107.94.58]:64832 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
+ id 1kZkso-0006mU-W5
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 20:13:11 -0500
+Received: from mail-mw2nam10on2055.outbound.protection.outlook.com
+ ([40.107.94.55]:25952 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Michael.Roth@amd.com>)
- id 1kZksW-0005WU-2S
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 20:12:53 -0500
+ id 1kZksn-0005Yp-95
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 20:13:10 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NTqY3kRWKh2Dgh5mBuLPfTGsWMsD48ATck8O2qQsa2c5xIRV8mTXqsxiSGb/vlRIhHc7vZeI7xdS0ZUToIr51TLa7oOnHrP/EtVLumPr2FqZ1s0bXHn/faHAP0miTo1as9a29b7mhF+IeOzkiHaltvV9GNpfZ6BH8whj7An1AzzThfyVt7e/XN0jsAX0P4UqQaUVicnZui7LoU8u1ngpldnA7ONWZIQ5wj9FpCOiHkpEpgJUaESz0LfDYnaRCZDusxoXW4HWzN0YC6aSRyCkdLZ/SsPvgZDCJHMmPpvgeADDrxqTTx/jvDBvIc80CLHCSCqjCiLiegSI9pMocF0Xgw==
+ b=OFlNtRSW1pELxC7OHNHZoPXB+FoiG9pCz/2iar1vGFLLh8b7AEisvVxpNdzAPOIe/EGHJHolXY/NJy4fT21AceHjiw8NIV2rtuSOSEUAT6McThytDIRUrg/a31Ek85nDD7ar1tWGoZCYOjsGKxCGe+8XeoWCqgyAnpVS7hOunVwV6ubwvyPNc1cHg+8k0ynH1fGfWdEuyroeEVBUlBwRUbbsYsK/fgfR2Ei7I5U+vdD6XcgQB2KG9/aocT30SYitKVKDG8o+7kwz3GvW1FAsuAiibOI7AOEyr4GGuqjSSE/MTkxxdFvHIxCgCDKsBSAA2Q1eXjNUFmKS1fGKA+7WNg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T8O8TEJqM9sAjKrgZxD2Qze0Mz6pcAyVSjw/Ml6CHMk=;
- b=PxHLEw8a7v01EP75fQB+gFUWaGUiFYQirn0MayZDz2HeAiTM/NmJ7taAWGvlhoQO6RzeIVnvhE99mCWZWXkOiotSNWVZWGIwpMfU11PP8kg7gupYS4VCbaHFhO0xoLfwpJLJ4rwPBwAgfqBs8ndSMH28lrRXs2E0qch9CLqEnYPSNjycnocwVufmI6sk7bTTSIbrLCbF4Gb8WB99//RwdI8EuR/SS6bX0dFT3IUbVp3yqas8ms1SLZhfZmup55W3onwc4Huo7tIlPcSFfGxrZtgKGyc/mo/0qD0r3YLMaqiEX+yWK7Uz2Mgf6mQZLTc8Tocl8vQDKTMT4QG/Q6eH7Q==
+ bh=OE2J8ejvlIA4aWrHVkoErkL61tROkH+vRjXCeNj3n7A=;
+ b=I8hp3bk+dHZzpO18qV7BAS24+5PQP5awVGJeW3xIKeufVTKBViZO9kIbJoODAxdpm+T2Ej5sc/osVGCN3DOXpLdsFjnslhN+sonixt/6UhOqYc5RrvCWj7AbgsWXmWSC33UWSwtb4KfzMo/DJCNkuuKzWHWWB6CBXbqgBzlNNbHC0Az2lambVgYxTN6XOxrfWOtL4gjLNEIqsTzTArmuzD31X6hkKWLk+qfP+IK3xr7rNhrWMwc4aQrx8+nr4BwgDVVgSnaDK5j6BRe0hvmbMa7+ldU6NP3VowhDpxfBteRN2CcWYh8pa6jiDWfdn5QlrkvkgNX1KnWX7Nbhe6XyBg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T8O8TEJqM9sAjKrgZxD2Qze0Mz6pcAyVSjw/Ml6CHMk=;
- b=rQljEs4IpQD2cUiY6OyDPpHNrXzMScfVthK8ETbCQ4c+gvjvnQDjCJC1IVShatlwRyRHU6jrr0Zl9ti8WhsPQ/MUjw3owFEMQEHEv3Jm6B/NcaRS7s+wvZG6mkW/VNVPnLdIyWq6HHJeWpvt0uUpZkMBlAopZC/B8ydNrsLeN2M=
+ bh=OE2J8ejvlIA4aWrHVkoErkL61tROkH+vRjXCeNj3n7A=;
+ b=EyQ8vyNoYQWyDpKP0oJH2OquX1ynpwQsmqR9MQFOCiRk2PUnhouif4kdreNF+frnJinwrbtAVY5Dsm64EDgAiQYVH9oq/fPe8iILTcCrMyqpHNNgtbPhMYrUj2iHAqjRr6AlgVBvDeK2L014+dXQE8mhprE55tZktmlJ2V7DLNM=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
  by CH2PR12MB5001.namprd12.prod.outlook.com (2603:10b6:610:61::18)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.27; Tue, 3 Nov
- 2020 01:12:24 +0000
+ 2020 01:12:38 +0000
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::f428:769b:3e9:8300]) by CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::f428:769b:3e9:8300%5]) with mapi id 15.20.3499.030; Tue, 3 Nov 2020
- 01:12:24 +0000
+ 01:12:38 +0000
 From: Michael Roth <michael.roth@amd.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 02/12] qga: Use common time encoding for guest-get-devices
- 'driver-date'
-Date: Mon,  2 Nov 2020 19:11:24 -0600
-Message-Id: <20201103011134.887744-3-michael.roth@amd.com>
+Subject: [PULL v2 07/12] qga: add implementation of guest-get-disks for Windows
+Date: Mon,  2 Nov 2020 19:11:29 -0600
+Message-Id: <20201103011134.887744-8-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201103011134.887744-1-michael.roth@amd.com>
 References: <20201103011134.887744-1-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [165.204.77.11]
-X-ClientProxiedBy: SA9PR13CA0226.namprd13.prod.outlook.com
- (2603:10b6:806:25::21) To CH2PR12MB4133.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN4PR0801CA0001.namprd08.prod.outlook.com
+ (2603:10b6:803:29::11) To CH2PR12MB4133.namprd12.prod.outlook.com
  (2603:10b6:610:7a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from localhost (165.204.77.11) by
- SA9PR13CA0226.namprd13.prod.outlook.com (2603:10b6:806:25::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3541.10 via Frontend Transport; Tue, 3 Nov 2020 01:12:23 +0000
+ SN4PR0801CA0001.namprd08.prod.outlook.com (2603:10b6:803:29::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
+ Transport; Tue, 3 Nov 2020 01:12:38 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: b64cbae6-7eaf-4652-f9f6-08d87f958598
+X-MS-Office365-Filtering-Correlation-Id: b7aac0bd-af8b-4a47-84fd-08d87f958e03
 X-MS-TrafficTypeDiagnostic: CH2PR12MB5001:
-X-Microsoft-Antispam-PRVS: <CH2PR12MB50015C99BEDCF20AE4077F2895110@CH2PR12MB5001.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:60;
+X-Microsoft-Antispam-PRVS: <CH2PR12MB50019BE97A075576F553303495110@CH2PR12MB5001.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:125;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EV0LKqNhghtYIgFCL4mbqB8Pd7dr+lnZXOC7ksfVqhljxs8M3K5ANO1FW+55oimE0C+IEMYIBsPB2FaGjOWAbucm9LMOEo3uYXw3ST5Fk1h0oG6CUfNPmXDQaqHFBMqqJtlRtXrB/701EBMf/47SOYdutHWHDI02oj/VVx3fHlzlRtc6hGGm/RQkXWRggMZe13gPXOg+YEksrsH+CFAQD0XTDOoCsQZkQnNxjxsayEqvMo9PwH8ngnSPx6LLLCSvK/sETUhokK/c55kI1+2fZRiTwZr/xwDfJ23zgJbpvSbC7P9SS/3lnmdygywgD54vsHR1shB7sRxn5EjPaECnpQ==
+X-Microsoft-Antispam-Message-Info: kRO5KFRcCbynh4n7k7JyMPY4alPucktAUgm41AFwdHlOqVgZReJj3Xj+1cS4K/ofZ7230QRGUleAqFQvbp/VIuhg7rvwBRYiNT8W1zq/e8DRuTYYWKvYxbortK6dH+myMKmP+LgqXL0RLF3S/O1imGIQqybMv1CL9z8QZGVVrb+14jSMaD4SrWSXGYDKNBbvsRCmOD8PM6CxKWyeqTrIowyiuA+zF7NzK76VKAZhCj4wqw1smOaX+afo0P7v7XUabW9zYerKYIzIDvhejEr0ES70QUNtWWQWkf/4DZLmaftEcRJ6H8nAQQ7FJMBX4bypPJthQjPnQlOzNQ3VdZEQfA==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:CH2PR12MB4133.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(39860400002)(136003)(376002)(346002)(396003)(26005)(44832011)(66556008)(66476007)(66946007)(8936002)(86362001)(6486002)(83380400001)(4326008)(36756003)(54906003)(2906002)(8676002)(5660300002)(52116002)(478600001)(186003)(316002)(6916009)(1076003)(16526019)(2616005)(956004)(6496006);
+ SFS:(4636009)(366004)(39860400002)(136003)(376002)(346002)(396003)(26005)(44832011)(66556008)(66476007)(66946007)(8936002)(86362001)(6486002)(6666004)(83380400001)(4326008)(36756003)(2906002)(8676002)(5660300002)(52116002)(478600001)(186003)(316002)(6916009)(1076003)(16526019)(2616005)(956004)(6496006);
  DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: HsVhfMtcvLbJZySQE5nw7C14PvDjhXCyG/96Bv3FG8H/oWRa7azCiB7BeAysStwkYuXJqBmulPuVQuTfBf2GO5v5b5quN9rOE7e9O2TQ1uYGI8AwCN1Nl5WO+Qf72AoP/ChBfQ7bs8Jkn1qGw0jFLHAv3bSBAIrDoKPeZEDy/d5gIMmC6adMNhwfrrSJlssBc+HFB2oKe+EogZHUiFh0ods+PcfYMquLe0x8xXxV24rQEzETYJoHzM4DoS3R1dss+VnCnvRAbPdEpNszAzBmivJvsCDOE5l6jPZDklfCLLQA/FFIOe3nsorUA6sdi4/BVSP5N/12MOg7c8qtdtgK1zb6AewrNhK2c17g1Owm/169Xr+CyOHbVtFR/jAIpMOZEXNWDnZuHi5fQB1dPk8KYawhje5WMXF0JuBIhOgfmPL/IOk/ck0irxR6Svwi5edf0uAchqc5uTScENxI8FuxSP/6zaFMwEom1qUl2pI5I7sOJAcfRBdxaiRDjv9p+j+AUNf0y7pi1+AGGgSYVAdJNvVL2+arOo2C/vgJEwezkE2DSyrPRRWoThSQTqyf7HEf+t70+GLSV7MK0+fWA2K1EK1f8xutYKsRG78VcG4AKR3UmMk8qcjvSNYcZJQ+MneTEFsTb+iUSkgJyNMSPLoduw==
+X-MS-Exchange-AntiSpam-MessageData: +D/ubJtEsraa+sq1FrE+vYdXzUvlT04uSUMbX17dnGl0ux9QPWMnXZE0n/EPrkbGBbDjBDuAWx+c6l++igHZ7jDJvpLnU0/+OHcvozX30ue+3m50tvTTNcPSXmzfEbryyC+Ov+J6wxzzISQYiMsRK8U5pfUGhlCFWB1OLAW0ENHDutglxHFs/PQgXkKQFpmKtuJmVUNfitWcgr7Yk7cQw2D+0hBUKkckSCcBXnquikPAKaxtZQSeDoo9oEhueGERGjY957pi007bUrWhKo7ASm4I8L3LoNhtYPcJS+Ug+hy+Ji6C4kXGyOn+ptT30UNzuxIkT9POfv7hiXMQcp/daDnjOR69Pev+jvp1ddnBHY1O6OQFBN/NkFHQSQLLtqXyQ2ofoCXVOg1iGStVNqhLCsq4Bua9U3bebEA2h2d1yzzaE6p2Be26cWC4juZV5QkZSFa5UtyZZ/3EMNTXwz8ITCF0JjXuF0XUhTqiry+EuHn7p0CdI5/tKts7LQfxG7PESxAQapBHiLZOYj6iwzGsgSmRYw3b0Hg10yM2C4xIYNrW3iX4vkczUbSgz0kdCIZdE48FRR8YfKaijxTZcvl3AYP2JAE8CwkgTLZPjlKQWYB+U13Onjf5fj2j+U8GE41U4uvgQiIu2I2cL+S5xl64xw==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b64cbae6-7eaf-4652-f9f6-08d87f958598
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7aac0bd-af8b-4a47-84fd-08d87f958e03
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2020 01:12:24.3435 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2020 01:12:38.4744 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sYnXiv8rogEWI+xD1gy5DolQOXBHrJFbW4BK5BgGmJUTJRElzfi6tyDq9CS0ObtdjmbtxKj2mjO0Q7dnnTv1Cg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: aLScvA6wPkZnOG9QLV0GVurHgtuZhEMTk9OByaTexs37LGbHfu4S5qpTg0221bJOmKAt7Aacl+WdTg9q62umLQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB5001
-Received-SPF: none client-ip=40.107.94.58; envelope-from=Michael.Roth@amd.com;
+Received-SPF: none client-ip=40.107.94.55; envelope-from=Michael.Roth@amd.com;
  helo=NAM10-MW2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 20:12:23
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 20:12:53
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -8
 X-Spam_score: -0.9
@@ -129,105 +130,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Markus Armbruster <armbru@redhat.com>
+From: Tomáš Golembiovský <tgolembi@redhat.com>
 
-guest-get-devices returns 'driver-date' as string in the format
-YYYY-MM-DD.  Goes back to recent commit 2e4211cee4 "qga: add command
-guest-get-devices for reporting VirtIO devices".
+The command lists all the physical disk drives. Unlike for Linux
+partitions and virtual volumes are not listed.
 
-We should avoid use of multiple encodings for the same kind of data.
-Especially string encodings.  Change it to return nanoseconds since
-the epoch, like guest-get-time does.
+Example output:
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+{
+  "return": [
+    {
+      "name": "\\\\.\\PhysicalDrive0",
+      "partition": false,
+      "address": {
+        "serial": "QM00001",
+        "bus-type": "sata",
+        ...
+      },
+      "dependents": []
+    }
+  ]
+}
+
+Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- qga/commands-win32.c | 19 +++++++++++--------
- qga/qapi-schema.json |  4 ++--
- 2 files changed, 13 insertions(+), 10 deletions(-)
+ qga/commands-win32.c | 107 ++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 101 insertions(+), 6 deletions(-)
 
 diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 879b02b6c3..b01616a992 100644
+index f7bdd5a8b5..300b87c859 100644
 --- a/qga/commands-win32.c
 +++ b/qga/commands-win32.c
-@@ -1641,6 +1641,12 @@ out:
-     return head;
+@@ -979,6 +979,101 @@ out:
+     return list;
  }
  
-+static int64_t filetime_to_ns(const FILETIME *tf)
++GuestDiskInfoList *qmp_guest_get_disks(Error **errp)
 +{
-+    return ((((int64_t)tf->dwHighDateTime << 32) | tf->dwLowDateTime)
-+            - W32_FT_OFFSET) * 100;
++    ERRP_GUARD();
++    GuestDiskInfoList *new = NULL, *ret = NULL;
++    HDEVINFO dev_info;
++    SP_DEVICE_INTERFACE_DATA dev_iface_data;
++    int i;
++
++    dev_info = SetupDiGetClassDevs(&GUID_DEVINTERFACE_DISK, 0, 0,
++        DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
++    if (dev_info == INVALID_HANDLE_VALUE) {
++        error_setg_win32(errp, GetLastError(), "failed to get device tree");
++        return NULL;
++    }
++
++    g_debug("enumerating devices");
++    dev_iface_data.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
++    for (i = 0;
++        SetupDiEnumDeviceInterfaces(dev_info, NULL, &GUID_DEVINTERFACE_DISK,
++            i, &dev_iface_data);
++        i++) {
++        GuestDiskAddress *address = NULL;
++        GuestDiskInfo *disk = NULL;
++        Error *local_err = NULL;
++        g_autofree PSP_DEVICE_INTERFACE_DETAIL_DATA
++            pdev_iface_detail_data = NULL;
++        STORAGE_DEVICE_NUMBER sdn;
++        HANDLE dev_file;
++        DWORD size = 0;
++        BOOL result;
++        int attempt;
++
++        g_debug("  getting device path");
++        for (attempt = 0, result = FALSE; attempt < 2 && !result; attempt++) {
++            result = SetupDiGetDeviceInterfaceDetail(dev_info,
++                &dev_iface_data, pdev_iface_detail_data, size, &size, NULL);
++            if (result) {
++                break;
++            }
++            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
++                pdev_iface_detail_data = g_realloc(pdev_iface_detail_data,
++                    size);
++                pdev_iface_detail_data->cbSize =
++                    sizeof(*pdev_iface_detail_data);
++            } else {
++                g_debug("failed to get device interface details");
++                break;
++            }
++        }
++        if (!result) {
++            g_debug("skipping device");
++            continue;
++        }
++
++        g_debug("  device: %s", pdev_iface_detail_data->DevicePath);
++        dev_file = CreateFile(pdev_iface_detail_data->DevicePath, 0,
++            FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
++        if (!DeviceIoControl(dev_file, IOCTL_STORAGE_GET_DEVICE_NUMBER,
++                NULL, 0, &sdn, sizeof(sdn), &size, NULL)) {
++            CloseHandle(dev_file);
++            debug_error("failed to get storage device number");
++            continue;
++        }
++        CloseHandle(dev_file);
++
++        disk = g_new0(GuestDiskInfo, 1);
++        disk->name = g_strdup_printf("\\\\.\\PhysicalDrive%lu",
++            sdn.DeviceNumber);
++
++        g_debug("  number: %lu", sdn.DeviceNumber);
++        address = g_malloc0(sizeof(GuestDiskAddress));
++        address->has_dev = true;
++        address->dev = g_strdup(disk->name);
++        get_single_disk_info(sdn.DeviceNumber, address, &local_err);
++        if (local_err) {
++            g_debug("failed to get disk info: %s",
++                error_get_pretty(local_err));
++            error_free(local_err);
++            qapi_free_GuestDiskAddress(address);
++            address = NULL;
++        } else {
++            disk->address = address;
++            disk->has_address = true;
++        }
++
++        new = g_malloc0(sizeof(GuestDiskInfoList));
++        new->value = disk;
++        new->next = ret;
++        ret = new;
++    }
++
++    SetupDiDestroyDeviceInfoList(dev_info);
++    return ret;
 +}
 +
- int64_t qmp_guest_get_time(Error **errp)
- {
-     SYSTEMTIME ts = {0};
-@@ -1657,8 +1663,7 @@ int64_t qmp_guest_get_time(Error **errp)
-         return -1;
-     }
+ #else
  
--    return ((((int64_t)tf.dwHighDateTime << 32) | tf.dwLowDateTime)
--                - W32_FT_OFFSET) * 100;
-+    return filetime_to_ns(&tf);
+ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+@@ -986,6 +1081,12 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
+     return NULL;
  }
  
- void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
-@@ -2363,7 +2368,6 @@ GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
-     slog("enumerating devices");
-     for (i = 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); i++) {
-         bool skip = true;
--        SYSTEMTIME utc_date;
-         g_autofree LPWSTR name = NULL;
-         g_autofree LPFILETIME date = NULL;
-         g_autofree LPWSTR version = NULL;
-@@ -2434,13 +2438,12 @@ GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
-             slog("failed to get driver date");
-             continue;
-         }
--        FileTimeToSystemTime(date, &utc_date);
--        device->driver_date = g_strdup_printf("%04d-%02d-%02d",
--            utc_date.wYear, utc_date.wMonth, utc_date.wDay);
-+        device->driver_date = filetime_to_ns(date);
-         device->has_driver_date = true;
++GuestDiskInfoList *qmp_guest_get_disks(Error **errp)
++{
++    error_setg(errp, QERR_UNSUPPORTED);
++    return NULL;
++}
++
+ #endif /* CONFIG_QGA_NTDDSCSI */
  
--        slog("driver: %s\ndriver version: %s,%s\n", device->driver_name,
--            device->driver_date, device->driver_version);
-+        slog("driver: %s\ndriver version: %" PRId64 ",%s\n",
-+             device->driver_name, device->driver_date,
-+             device->driver_version);
-         item = g_new0(GuestDeviceInfoList, 1);
-         item->value = g_steal_pointer(&device);
-         if (!cur_item) {
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index f2c81cda2b..c7bfb8bf6a 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -1282,7 +1282,7 @@
- # @GuestDeviceInfo:
- #
- # @driver-name: name of the associated driver
--# @driver-date: driver release date in format YYYY-MM-DD
-+# @driver-date: driver release date, in nanoseconds since the epoch
- # @driver-version: driver version
- # @id: device ID
- #
-@@ -1291,7 +1291,7 @@
- { 'struct': 'GuestDeviceInfo',
-   'data': {
-       'driver-name': 'str',
--      '*driver-date': 'str',
-+      '*driver-date': 'int',
-       '*driver-version': 'str',
-       '*id': 'GuestDeviceId'
-   } }
+ static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
+@@ -2458,9 +2559,3 @@ GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
+     }
+     return head;
+ }
+-
+-GuestDiskInfoList *qmp_guest_get_disks(Error **errp)
+-{
+-    error_setg(errp, QERR_UNSUPPORTED);
+-    return NULL;
+-}
 -- 
 2.25.1
 
