@@ -2,89 +2,88 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE3CC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC4AC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:23:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9189208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:22:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 793EF223C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:23:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+eGyYLQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9189208C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YIigWXop"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 793EF223C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaHoC-0007c0-Ro
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 07:22:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37056)
+	id 1kaHp9-000063-8o
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 07:23:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kaHnS-0006kN-PO
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:21:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57510)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfW-0007es-HZ
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51360)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kaHnR-0000Ry-8P
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:21:50 -0500
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfS-0007pg-Ei
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604492507;
+ s=mimecast20190719; t=1604492013;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=M8mS/EXTnXJdGhLS3FPJht81xZVYb0CoJGI6hPwEEdg=;
- b=E+eGyYLQfB45ljckF21hFUuYfeQimNaAP9dT9AThOBS2/tvbBKMKR/JsJHO+0lQrBWT5Sk
- 8c66Yvd8JyWLA6QzlP+DcxwctkR8AQloa64t0bqDWeJyb7d8t1aTvUISRBNjNySgfaecDV
- wNEvYu4VSxM1uC+W136B2LspOgijVZM=
+ bh=qEs2RXZrN1CnST8I+xCmdo3dwGb0aHMQN6lPH3PEaDQ=;
+ b=YIigWXopGJF7y8RqnD3uIbatoAa9+UYv/9QCgzNA8ujA8eYqiZJVjHRoo6BbwpjG/ovzjZ
+ GLTC35iVgHjD50iVwcYW6ICdDH/3ylrJvce5mJ5zfnf9/zat7mgtTsntojkfELS99qs6P6
+ ljxeIlh+kF43ZIWadYk4eNOANu/y03c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-GSQSYqxWNJCfeYNcsngUyQ-1; Wed, 04 Nov 2020 07:21:46 -0500
-X-MC-Unique: GSQSYqxWNJCfeYNcsngUyQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-357-kQoT9Nk_Oc6uDhe3LyyBrg-1; Wed, 04 Nov 2020 07:13:31 -0500
+X-MC-Unique: kQoT9Nk_Oc6uDhe3LyyBrg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9111464081
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 12:21:45 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
- [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 605C410074EA;
- Wed,  4 Nov 2020 12:21:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id DCA971132BD6; Wed,  4 Nov 2020 13:21:43 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH for-5.2 2/4] qemu-option: move help handling to
- get_opt_name_value
-References: <20201103151452.416784-1-pbonzini@redhat.com>
- <20201103151452.416784-3-pbonzini@redhat.com>
-Date: Wed, 04 Nov 2020 13:21:43 +0100
-In-Reply-To: <20201103151452.416784-3-pbonzini@redhat.com> (Paolo Bonzini's
- message of "Tue, 3 Nov 2020 10:14:50 -0500")
-Message-ID: <87blgdz50o.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7F3D64165;
+ Wed,  4 Nov 2020 12:13:30 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 28F58194B0;
+ Wed,  4 Nov 2020 12:13:27 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 813D49C90; Wed,  4 Nov 2020 13:13:21 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 6/8] dev-serial: add always-plugged property to ensure USB
+ device is always attached
+Date: Wed,  4 Nov 2020 13:13:19 +0100
+Message-Id: <20201104121321.7772-7-kraxel@redhat.com>
+In-Reply-To: <20201104121321.7772-1-kraxel@redhat.com>
+References: <20201104121321.7772-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,45 +97,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-> Right now, help options are parsed normally and then checked
-> specially in opt_validate---but only if coming from
-> qemu_opts_parse or qemu_opts_parse_noisily, not if coming
-> from qemu_opt_set.
->
-> Instead, move the check from opt_validate to the common workhorses
-> of qemu_opts_parse and qemu_opts_parse_noisily, opts_do_parse and
-> get_opt_name_value.
->
-> This will come in handy in a subsequent patch, which will
-> raise a warning for "-object memory-backend-ram,share"
-> ("flag" option with no =on/=off part) but not for
-> "-object memory-backend-ram,help".
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Some operating systems will generate a new device ID when a USB device is unplugged
+and then replugged into the USB. If this is done whilst switching between multiple
+applications over a virtual serial port, the change of device ID requires going
+back into the OS/application to locate the new device accordingly.
 
-I'm afraid this fails my smoke test:
+Add a new always-plugged property that if specified will ensure that the device
+always remains attached to the USB regardless of the state of the backend
+chardev.
 
-    $ o=`sed -n '/HAS_ARG,/s/DEF("\([^"]*\)".*/\1/p' qemu-options.hx`
-    $ for i in $o; do echo "= $i"; upstream-qemu -$i help -version; done 2>&1 | egrep -v 'QEMU emulator|Copyright'
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Message-id: 20201027150456.24606-7-mark.cave-ayland@ilande.co.uk
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/dev-serial.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-Many output differences.  False positives due to help printing lists in
-random order.  Arbitrarily picked true positive:
-
-    $ upstream-qemu -msg help
-    msg options:
-      guest-name=<bool (on/off)> - Prepends guest name for error messages but only if -name guest is set otherwise option is ignored
-
-      timestamp=<bool (on/off)>
-    $ echo $?
-    1
-
-regresses to silent failure.
+diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+index 92c35615eb13..b9e308dca198 100644
+--- a/hw/usb/dev-serial.c
++++ b/hw/usb/dev-serial.c
+@@ -97,6 +97,7 @@ struct USBSerialState {
+     uint8_t event_chr;
+     uint8_t error_chr;
+     uint8_t event_trigger;
++    bool always_plugged;
+     QEMUSerialSetParams params;
+     int latency;        /* ms */
+     CharBackend cs;
+@@ -516,12 +517,12 @@ static void usb_serial_event(void *opaque, QEMUChrEvent event)
+         s->event_trigger |= FTDI_BI;
+         break;
+     case CHR_EVENT_OPENED:
+-        if (!s->dev.attached) {
++        if (!s->always_plugged && !s->dev.attached) {
+             usb_device_attach(&s->dev, &error_abort);
+         }
+         break;
+     case CHR_EVENT_CLOSED:
+-        if (s->dev.attached) {
++        if (!s->always_plugged && s->dev.attached) {
+             usb_device_detach(&s->dev);
+         }
+         break;
+@@ -556,7 +557,8 @@ static void usb_serial_realize(USBDevice *dev, Error **errp)
+                              usb_serial_event, NULL, s, NULL, true);
+     usb_serial_handle_reset(dev);
+ 
+-    if (qemu_chr_fe_backend_open(&s->cs) && !dev->attached) {
++    if ((s->always_plugged || qemu_chr_fe_backend_open(&s->cs)) &&
++        !dev->attached) {
+         usb_device_attach(dev, &error_abort);
+     }
+     s->intr = usb_ep_get(dev, USB_TOKEN_IN, 1);
+@@ -584,6 +586,7 @@ static const VMStateDescription vmstate_usb_serial = {
+ 
+ static Property serial_properties[] = {
+     DEFINE_PROP_CHR("chardev", USBSerialState, cs),
++    DEFINE_PROP_BOOL("always-plugged", USBSerialState, always_plugged, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+-- 
+2.27.0
 
 
