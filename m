@@ -2,99 +2,61 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE14C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 13:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB5C1C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 13:41:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A35DF20867
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 13:34:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YWaNZ/8E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A35DF20867
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 084AE20867
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 13:41:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 084AE20867
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaIw1-0005BI-Gr
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 08:34:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56670)
+	id 1kaJ2C-0007vd-VB
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 08:41:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kaIuu-0004LJ-Ff
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 08:33:36 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:42562)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kaIus-0001oU-BI
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 08:33:35 -0500
-Received: by mail-wr1-x436.google.com with SMTP id w14so22024524wrs.9
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 05:33:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=wUiCCIMAuUYCmfpZIW1GfPTOZevOoYArgDwtxa2M1J8=;
- b=YWaNZ/8ERlcybsDuGJx5rhdMRiS7JIEbz4P8sI8bY2RpsScyYSK2tEPm5EM1U5xQsj
- 2B2THr+oQpVwatGby0WetyexfADulFThrOaeDDW5u0llsGf9m45HX/rAL56u33icCl7x
- vcbwV8QxBXYMCXDumHVqfsSUsjVziQ2z6TPQGFw9LZcPilliXBMNdkhBtSrYNS4qwlv4
- ne7dthuqgzDcy053JXtKVv5F2H9D1c/rkOk8iVok171qUIsijDNkqQV07TFOECfGD2/6
- Jt4Xqo45xERzckOsm2u0UTGVCdf75mSO+bRs6DtUW/XJxgnaheDItE15LRAuYwSoZm+U
- CEtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wUiCCIMAuUYCmfpZIW1GfPTOZevOoYArgDwtxa2M1J8=;
- b=PzWLH6rjsMhtwx8FX1bvYaYEXn9w6Q9Pqur8dLvy6MiIQer17P3bBTgVk/eTnoIlvU
- AyuGV/wdnPBky/7nuShqU61JTgFLiCpjloAE2at/QYfrqlGuQ0JlGDwYe0Vq/kRn1ahN
- GZjj3tCKnlYRhIw5rf8CJ8mFNgtuFtwzMf2odDMesTjm4DFMvUcmSQUGgXj3c6X5wNyt
- aYyThMKJXHCWMV5PS2cUUXhz/Ig5EkP820T3mYfqUrw+KKUiLlsQzCN7JkDzLDI2HL4X
- 6lSI5WF7zZEyGjYPJyLi/XWFN4ECtwj1pKFqDazDsta9xg9OL6Foq5DeZZyLzY48+1YP
- J43w==
-X-Gm-Message-State: AOAM532pNMdAmX9it6WUioQPPhq7u1GB5RDrX3YGCKKyc4EjGUqWRjHa
- SWzCMvhCvBIYiTBfEINC30U=
-X-Google-Smtp-Source: ABdhPJw+yDpfjIyqjOFmSVgtnAd4UFCz/KY44h4Q5pJUjgUJrhJwjXRIR0/O4wyTLcCze7I+zpc4YQ==
-X-Received: by 2002:adf:c101:: with SMTP id r1mr30801406wre.87.1604496812716; 
- Wed, 04 Nov 2020 05:33:32 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id f17sm2650368wrm.27.2020.11.04.05.33.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Nov 2020 05:33:31 -0800 (PST)
-Subject: Re: [PATCH 2/3] tests: remove "bc" from package listing
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-References: <20201104131924.593522-1-berrange@redhat.com>
- <20201104131924.593522-3-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a4fc628b-72b1-e29e-2cee-102ce779a08a@amsat.org>
-Date: Wed, 4 Nov 2020 14:33:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <zhangxinhao1@huawei.com>)
+ id 1kaJ0k-0006xF-IB; Wed, 04 Nov 2020 08:39:40 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2504)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhangxinhao1@huawei.com>)
+ id 1kaJ0c-0002iN-GF; Wed, 04 Nov 2020 08:39:35 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CR76H58CBzhg5H;
+ Wed,  4 Nov 2020 21:39:03 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Wed, 4 Nov 2020
+ 21:38:59 +0800
+From: Xinhao Zhang <zhangxinhao1@huawei.com>
+To: <qemu-devel@nongnu.org>, <xen-devel@lists.xenproject.org>
+Subject: [PATCH] hw/xen: Don't use '#' flag of printf format
+Date: Wed, 4 Nov 2020 21:37:09 +0800
+Message-ID: <20201104133709.3326630-1-zhangxinhao1@huawei.com>
+X-Mailer: git-send-email 2.29.0-rc1
 MIME-Version: 1.0
-In-Reply-To: <20201104131924.593522-3-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x436.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=zhangxinhao1@huawei.com; helo=szxga05-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 08:39:07
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,43 +69,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: sstabellini@kernel.org, paul@xen.org, qemu-trivial@nongnu.org,
+ alex.chen@huawei.com, anthony.perard@citrix.com, dengkai1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/20 2:19 PM, Daniel P. Berrangé wrote:
-> There is no sign of 'bc' being used by any tests in the tree.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> ---
->  scripts/coverity-scan/coverity-scan.docker         | 1 -
->  tests/docker/dockerfiles/debian10.docker           | 1 -
->  tests/docker/dockerfiles/fedora-win32-cross.docker | 1 -
->  tests/docker/dockerfiles/fedora-win64-cross.docker | 1 -
->  tests/docker/dockerfiles/fedora.docker             | 1 -
->  5 files changed, 5 deletions(-)
+Fix code style. Don't use '#' flag of printf format ('%#') in
+format strings, use '0x' prefix instead
 
-I added it to be able to rebuild easily the blobs consumed
-by our tests:
+Signed-off-by: Xinhao Zhang <zhangxinhao1@huawei.com>
+Signed-off-by: Kai Deng <dengkai1@huawei.com>
+---
+ hw/xen/xen_pt.c             | 10 +++++-----
+ hw/xen/xen_pt_config_init.c |  6 +++---
+ hw/xen/xen_pt_msi.c         | 16 ++++++++--------
+ 3 files changed, 16 insertions(+), 16 deletions(-)
 
-commit 1bbf2d010fc0e5f0a9c5e1967368c44bc64e086a
-Author: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Date:   Mon Mar 16 17:21:28 2020 +0000
+diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+index 6d359ee486..a5f3dd590c 100644
+--- a/hw/xen/xen_pt.c
++++ b/hw/xen/xen_pt.c
+@@ -489,7 +489,7 @@ static int xen_pt_register_regions(XenPCIPassthroughState *s, uint16_t *cmd)
+         pci_register_bar(&s->dev, i, type, &s->bar[i]);
+ 
+         XEN_PT_LOG(&s->dev, "IO region %i registered (size=0x%08"PRIx64
+-                   " base_addr=0x%08"PRIx64" type: %#x)\n",
++                   " base_addr=0x%08"PRIx64" type: 0x%x)\n",
+                    i, r->size, r->base_addr, type);
+     }
+ 
+@@ -578,7 +578,7 @@ static void xen_pt_check_bar_overlap(PCIBus *bus, PCIDevice *d, void *opaque)
+         if (ranges_overlap(arg->addr, arg->size, r->addr, r->size)) {
+             XEN_PT_WARN(&s->dev,
+                         "Overlapped to device [%02x:%02x.%d] Region: %i"
+-                        " (addr: %#"FMT_PCIBUS", len: %#"FMT_PCIBUS")\n",
++                        " (addr: 0x%"FMT_PCIBUS", len: 0x%"FMT_PCIBUS")\n",
+                         pci_bus_num(bus), PCI_SLOT(d->devfn),
+                         PCI_FUNC(d->devfn), i, r->addr, r->size);
+             arg->rc = true;
+@@ -618,8 +618,8 @@ static void xen_pt_region_update(XenPCIPassthroughState *s,
+     pci_for_each_device(pci_get_bus(d), pci_dev_bus_num(d),
+                         xen_pt_check_bar_overlap, &args);
+     if (args.rc) {
+-        XEN_PT_WARN(d, "Region: %d (addr: %#"FMT_PCIBUS
+-                    ", len: %#"FMT_PCIBUS") is overlapped.\n",
++        XEN_PT_WARN(d, "Region: %d (addr: 0x%"FMT_PCIBUS
++                    ", len: 0x%"FMT_PCIBUS") is overlapped.\n",
+                     bar, sec->offset_within_address_space,
+                     int128_get64(sec->size));
+     }
+@@ -786,7 +786,7 @@ static void xen_pt_realize(PCIDevice *d, Error **errp)
+ 
+     /* register real device */
+     XEN_PT_LOG(d, "Assigning real physical device %02x:%02x.%d"
+-               " to devfn %#x\n",
++               " to devfn 0x%x\n",
+                s->hostaddr.bus, s->hostaddr.slot, s->hostaddr.function,
+                s->dev.devfn);
+ 
+diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
+index c8724cc7c8..c5c4e943a8 100644
+--- a/hw/xen/xen_pt_config_init.c
++++ b/hw/xen/xen_pt_config_init.c
+@@ -1622,7 +1622,7 @@ static int xen_pt_pcie_size_init(XenPCIPassthroughState *s,
+         case PCI_EXP_TYPE_PCIE_BRIDGE:
+         case PCI_EXP_TYPE_RC_EC:
+         default:
+-            XEN_PT_ERR(d, "Unsupported device/port type %#x.\n", type);
++            XEN_PT_ERR(d, "Unsupported device/port type 0x%x.\n", type);
+             return -1;
+         }
+     }
+@@ -1645,11 +1645,11 @@ static int xen_pt_pcie_size_init(XenPCIPassthroughState *s,
+         case PCI_EXP_TYPE_PCIE_BRIDGE:
+         case PCI_EXP_TYPE_RC_EC:
+         default:
+-            XEN_PT_ERR(d, "Unsupported device/port type %#x.\n", type);
++            XEN_PT_ERR(d, "Unsupported device/port type 0x%x.\n", type);
+             return -1;
+         }
+     } else {
+-        XEN_PT_ERR(d, "Unsupported capability version %#x.\n", version);
++        XEN_PT_ERR(d, "Unsupported capability version 0x%x.\n", version);
+         return -1;
+     }
+ 
+diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
+index fb4b887b92..b71563f98a 100644
+--- a/hw/xen/xen_pt_msi.c
++++ b/hw/xen/xen_pt_msi.c
+@@ -123,7 +123,7 @@ static int msi_msix_setup(XenPCIPassthroughState *s,
+             *ppirq = XEN_PT_UNASSIGNED_PIRQ;
+         } else {
+             XEN_PT_LOG(&s->dev, "requested pirq %d for MSI%s"
+-                       " (vec: %#x, entry: %#x)\n",
++                       " (vec: 0x%x, entry: 0x%x)\n",
+                        *ppirq, is_msix ? "-X" : "", gvec, msix_entry);
+         }
+     }
+@@ -142,7 +142,7 @@ static int msi_msix_setup(XenPCIPassthroughState *s,
+                                      msix_entry, table_base);
+         if (rc) {
+             XEN_PT_ERR(&s->dev,
+-                       "Mapping of MSI%s (err: %i, vec: %#x, entry %#x)\n",
++                       "Mapping of MSI%s (err: %i, vec: 0x%x, entry 0x%x)\n",
+                        is_msix ? "-X" : "", errno, gvec, msix_entry);
+             return rc;
+         }
+@@ -165,8 +165,8 @@ static int msi_msix_update(XenPCIPassthroughState *s,
+     int rc = 0;
+     uint64_t table_addr = 0;
+ 
+-    XEN_PT_LOG(d, "Updating MSI%s with pirq %d gvec %#x gflags %#x"
+-               " (entry: %#x)\n",
++    XEN_PT_LOG(d, "Updating MSI%s with pirq %d gvec 0x%x gflags 0x%x"
++               " (entry: 0x%x)\n",
+                is_msix ? "-X" : "", pirq, gvec, gflags, msix_entry);
+ 
+     if (is_msix) {
+@@ -208,11 +208,11 @@ static int msi_msix_disable(XenPCIPassthroughState *s,
+     }
+ 
+     if (is_binded) {
+-        XEN_PT_LOG(d, "Unbind MSI%s with pirq %d, gvec %#x\n",
++        XEN_PT_LOG(d, "Unbind MSI%s with pirq %d, gvec 0x%x\n",
+                    is_msix ? "-X" : "", pirq, gvec);
+         rc = xc_domain_unbind_msi_irq(xen_xc, xen_domid, gvec, pirq, gflags);
+         if (rc) {
+-            XEN_PT_ERR(d, "Unbinding of MSI%s failed. (err: %d, pirq: %d, gvec: %#x)\n",
++            XEN_PT_ERR(d, "Unbinding of MSI%s failed. (err: %d, pirq: %d, gvec: 0x%x)\n",
+                        is_msix ? "-X" : "", errno, pirq, gvec);
+             return rc;
+         }
+@@ -539,7 +539,7 @@ int xen_pt_msix_init(XenPCIPassthroughState *s, uint32_t base)
+     }
+ 
+     if (id != PCI_CAP_ID_MSIX) {
+-        XEN_PT_ERR(d, "Invalid id %#x base %#x\n", id, base);
++        XEN_PT_ERR(d, "Invalid id 0x%x base 0x%x\n", id, base);
+         return -1;
+     }
+ 
+@@ -582,7 +582,7 @@ int xen_pt_msix_init(XenPCIPassthroughState *s, uint32_t base)
+         XEN_PT_ERR(d, "Can't open /dev/mem: %s\n", strerror(errno));
+         goto error_out;
+     }
+-    XEN_PT_LOG(d, "table_off = %#x, total_entries = %d\n",
++    XEN_PT_LOG(d, "table_off = 0x%x, total_entries = %d\n",
+                table_off, total_entries);
+     msix->table_offset_adjust = table_off & 0x0fff;
+     msix->phys_iomem_base =
+-- 
+2.29.0-rc1
 
-    tests/docker: Install tools to cross-debug and build Linux kernels
-
-    We often run Linux kernels to test QEMU. We sometimes need
-    to build them manually to use non-default features. We only
-    miss the tiny 'bc' tool.
-
-    The ncurses library is helpful to run 'make menuconfig'.
-
-    Finally, gdb-multiarch allow us to debug a TCG guest when its
-    architecture is different than the host.
-
-I think this is related to the question of what we can include
-to the repository for testing... If we can not add binary and
-don't have how to produce them, it becomes complicated.
 
