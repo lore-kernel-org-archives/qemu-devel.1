@@ -2,85 +2,103 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32150C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 22:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 770DCC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 22:47:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B31920825
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 22:41:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B31920825
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C8564207BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 22:47:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eJ6+LFqr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8564207BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaRTS-0004Bb-VY
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 17:41:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39792)
+	id 1kaRZL-0006RK-Q5
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 17:47:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaRSX-0003dc-Pz
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 17:40:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36304)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaRSV-00062m-Uf
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 17:40:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kaRST-0006q1-OT
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 22:40:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B7E122E802E
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 22:40:49 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaRXi-0004xY-6X
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 17:46:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23034)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaRXb-0006sj-HN
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 17:46:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604529964;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=24FmUnLIzP+vDSOj2F56RQ+qN8x50NQXrQbZyJTmU88=;
+ b=eJ6+LFqrfJfgwARAkzkuUesoaqjpC7iShxDZ+ogmE4eWHT01jrCPXJIu+LmQP6hbFpQWP1
+ 5gGbvMc7JCTUNdiyekPV2wH6Gud9YSBbn2uPaReq450dazcrYUkdBCQV3nHukxYTxPI5eV
+ YfTHhIhECPap/yjcaiPPpZHks+4cu10=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-594-61d3l7e4ML2QXPT14SCztA-1; Wed, 04 Nov 2020 17:46:02 -0500
+X-MC-Unique: 61d3l7e4ML2QXPT14SCztA-1
+Received: by mail-wr1-f69.google.com with SMTP id p12so21103wrx.3
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 14:46:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=24FmUnLIzP+vDSOj2F56RQ+qN8x50NQXrQbZyJTmU88=;
+ b=qaP6kGvhYPzgqQDjRf0jKEbHtSdYjUG2lT0HqDeY132apSO/tPdomTyjbY2v41aSXJ
+ VOyTv0sagvm7tzWPsAL7CVCUNaRa+88ji2a8637DWEQvyOx1M4JhUF1Ieos7hokjIC4s
+ /FJTmcbzhDGrP1NQPxNyWrY6MUTZflDeTaOK9kAaSG54MGGthpk3CyC8eYopN+9634bD
+ OFAy4Qp6GKDqHTku3IVIf2nPDQqVQSW+f/8qY2WVbha/+/e8ifsCmvji+/zdf2ywyXJx
+ use2tPqM0IzFRbr3R23tQ01PlZdd/kibwIuk1Vo7sRrp9surnyfFFaRwjFP6NTrTYpac
+ h7ow==
+X-Gm-Message-State: AOAM530nnbeFht+6uKBeFpg3Fc8o77tzxHgy4xXsxkhi0vegZmiiyKw1
+ 0jY5tq5B3tefYIIeNPvWPc1atjD6gFKJuCINE555brLrkZrkGShGxWbHgikdxiemJX//YchN3Fz
+ 9Tu7Cc0InUFv6k8s=
+X-Received: by 2002:a5d:4103:: with SMTP id l3mr251229wrp.260.1604529960850;
+ Wed, 04 Nov 2020 14:46:00 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzsB1CwTjAuRp9LB6ibH6rwQe9xug/tkKhYeenQuRGINZh1nANevjZEX4duQgYi4kiuFRuF2w==
+X-Received: by 2002:a5d:4103:: with SMTP id l3mr251208wrp.260.1604529960648;
+ Wed, 04 Nov 2020 14:46:00 -0800 (PST)
+Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id t12sm4969439wrm.25.2020.11.04.14.45.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Nov 2020 14:45:59 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 0/9] gitlab-ci: Allow forks to skip some build jobs
+Date: Wed,  4 Nov 2020 23:45:49 +0100
+Message-Id: <20201104224558.3384595-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Nov 2020 22:34:35 -0000
-From: John Snow <1893667@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=fedora; sourcepackage=qemu; component=None;
- status=Unknown; importance=Unknown; assignee=None; 
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jnsnow ngompa13
-X-Launchpad-Bug-Reporter: Neal Gompa (ngompa13)
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <159888546236.27779.1997908478541755158.malonedeb@soybean.canonical.com>
-Message-Id: <160452927609.13286.10839590188936997723.malone@gac.canonical.com>
-Subject: [Bug 1893667] Re: Btrfs commands don't work when using user-space
- emulation of other architectures
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 613d68da6be6709bd16f0c0bab37cdfea22b626b
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 17:35:34
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,83 +107,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1893667 <1893667@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Laurent, I am assuming that the commits here:
-https://gitlab.com/qemu-project/qemu/-/commits/master?utf8=3D%E2%9C%93&sear=
-ch=3DFilip+Bozuta
+Hi,=0D
+=0D
+2 months ago GitLab added time limit to their free CI offer [1].=0D
+This series provide developers with the possibility to not run=0D
+all jobs. By default all jobs are started, but we can disable=0D
+a subset of them.=0D
+=0D
+I think this should be the other way around (enable features one=0D
+wants to test, with a default to the "all" keyword), but I didn't=0D
+want to disrupt the current workflow.=0D
+=0D
+I'm not sure supporting both ("SKIP_BUILD=3D3Dall INCLUDE_BUILD=3D3Dsystem"=
+)=0D
+options is easy to implement, or to maintain (unlikely).=0D
+=0D
+In the next iteration I'll add the possibility to use a project-=0D
+wide environment variable [2] to set the default set of enabled /=0D
+disabled features a fork is interested in. User will still be=0D
+able to overload using git-push on the command line. A friendly=0D
+way to use this feature is with git aliases [3]:=0D
+=0D
+ $ git config alias.pushci_system \=0D
+    'push -o ci.variable=3D3D"SKIP_BUILD=3D3Duser"'=0D
+ $ git config alias.pushci_debian \=0D
+    'push -o ci.variable=3D3D"SKIP_BUILD=3D3Dcentos,fedora,ubuntu"'=0D
+=0D
+Then you can run the jobs based on Debian images (only) using:=0D
+=0D
+ $ git pushci_debian gitlab_repo my_branch_for_debian=0D
+=0D
+Or run all system-mode emulation jobs only using:=0D
+=0D
+  $ git pushci_system my_gitlab_repo branch_with_system_feature=0D
+=0D
+Comments welcomed!=0D
+=0D
+Regards,=0D
+=0D
+Phil.=0D
+=0D
+[1] https://about.gitlab.com/releases/2020/09/01/ci-minutes-update-free-use=
+rs/=0D
+[2] https://docs.gitlab.com/ee/ci/variables/README.html#create-a-custom-var=
+ia=3D=0D
+ble-in-the-ui=0D
+[3] https://docs.gitlab.com/ee/user/project/push_options.html#useful-git-al=
+ia=3D=0D
+ses=0D
+=0D
+Philippe Mathieu-Daud=3DC3=3DA9 (9):=0D
+  gitlab-ci: Replace YAML anchors by extends (cross_system_build_job)=0D
+  gitlab-ci: Replace YAML anchors by extends (native_build_job)=0D
+  gitlab-ci: Replace YAML anchors by extends (native_test_job)=0D
+  gitlab-ci: Replace YAML anchors by extends (acceptance_test_job)=0D
+  gitlab-ci: Rename acceptance_test_job -> integration_test_job=0D
+  gitlab-ci: Extract common job definition as 'cross_common_job'=0D
+  gitlab-ci: Extract common job definition as 'native_common_job'=0D
+  gitlab-ci: Add rules to skip building cross-jobs=0D
+  gitlab-ci: Add rules to skip building/testing native jobs=0D
+=0D
+ .gitlab-ci.d/crossbuilds.yml |  57 +++++++++++--------=0D
+ .gitlab-ci.yml               | 104 +++++++++++++++++++++--------------=0D
+ 2 files changed, 98 insertions(+), 63 deletions(-)=0D
+=0D
+--=3D20=0D
+2.26.2=0D
+=0D
 
-are sufficient to mark this issue as Fix Committed. It looks like the
-Downstream bug tracker for Fedora has marked the related bug as CLOSED
-ERRATA already.
-
-If I'm wrong, please reopen.
-
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
-
-** Changed in: qemu
-       Status: Fix Committed =3D> In Progress
-
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1893667
-
-Title:
-  Btrfs commands don't work when using user-space emulation of other
-  architectures
-
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Fedora:
-  Unknown
-
-Bug description:
-  Description of problem:
-  When doing cross-arch builds with mock, it uses qemu-user-static under th=
-e hood, and qemu-user-static lacks support for Btrfs ioctls to emulate so t=
-hat btrfs(8) commands work correctly.
-
-  This is especially important for being able to do cross-arch image
-  builds.
-
-  How reproducible:
-  Always (on Fedora 33 with qemu-5.1.0-2.fc33)
-
-  Steps to Reproduce:
-
-  $ sudo dnf install mock qemu-user-static wget
-  $ sudo usermod -a -G mock $USER
-  $ newgrp mock
-  $ mock --root fedora-rawhide-armhfp --install btrfs-progs util-linux
-  $ mock --root fedora-rawhide-armhfp --chroot 'rm -f foo.img && dd if=3D/d=
-ev/zero of=3Dfoo.img bs=3D1G count=3D1 && losetup /dev/loop9 foo.img &&  mk=
-fs.btrfs /dev/loop9 && mkdir /foo && mount /dev/loop9 /foo && btrfs subvol =
-create /foo/subvol && umount /foo && losetup -d /dev/loop9'
-
-  =
-
-  Actual results:
-  Fails with errors like "ERROR: cannot create subvolume: Function not impl=
-emented"
-
-  Expected results:
-  Succeeds and creates subvolumes properly.
-
-  Additional info:
-  There is a patch series from a few days ago to add support for many btrfs=
- ioctls which could fix this...
-
-  https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg05594.html
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1893667/+subscriptions
 
