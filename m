@@ -2,86 +2,100 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EC6C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 19:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53AF1C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 19:03:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A44EC206D9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 19:03:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1884206D9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 19:03:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KfeTF//5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A44EC206D9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TdqkMUuw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1884206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaO3g-0000J2-Lp
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 14:03:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54352)
+	id 1kaO3y-0000ps-KP
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 14:03:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kaNro-0006yC-II
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:50:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39487)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNmW-0006Oi-8v
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:45:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47405)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kaNrl-0003ID-Lx
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:50:44 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNmU-0002Lk-Fb
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:45:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604515840;
+ s=mimecast20190719; t=1604515513;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4mFGR9qy2fPmEW+a+pO2hn+avbdKBU3HYBKr3s0M4TM=;
- b=KfeTF//5UswmFQGoNn0eaqYjD7KT2JRj/c53wfD6HpWMsaY8OLNkiy+u+K8YMZKipHoDog
- xv7MZLMha3kMA0i7qz7jZhyv5AcwjtmjTugruv0oSCVKE3i1sT+fsVFtpMvrYHh+vxEANU
- HKCoMAZiH5rnFXrxwcGa5OtGs8RwUIo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-ccYHiIkgOPeTkbNKPo3p0g-1; Wed, 04 Nov 2020 13:50:38 -0500
-X-MC-Unique: ccYHiIkgOPeTkbNKPo3p0g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9BD41019624;
- Wed,  4 Nov 2020 18:50:37 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.207.23])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A9EC25578A;
- Wed,  4 Nov 2020 18:50:34 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
+ bh=kxx7KBtrm7vYLNNi8ILRStjcIKIqdM/KqZjCc2FDurE=;
+ b=TdqkMUuwHa3BSofhcpwNkMHW+2L3g84agcwxrfxRK9OaqqHPtedilpKxOf3fujiWEn2xp/
+ 25AKQ5B6zU3NVxOn1FZH7M6ZjPAlUaVX7AhBZnI1kIUis4GmEl2VR2zfDlFjuhOQDZS1RV
+ Gt9FQXx4P1gSucvNVfSsl3sIZx5xK6g=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-e6qEdUAWNMelND6yoi6pnQ-1; Wed, 04 Nov 2020 13:41:49 -0500
+X-MC-Unique: e6qEdUAWNMelND6yoi6pnQ-1
+Received: by mail-wr1-f70.google.com with SMTP id w3so7464224wrt.11
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 10:41:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=kxx7KBtrm7vYLNNi8ILRStjcIKIqdM/KqZjCc2FDurE=;
+ b=TvnFwjqRG2X0szWqq3I0tX1lZfeEwzVHb73RRWfzMxTsVlsNO457P4oVzixEUi79DJ
+ v1nQkGkQeIne7pqPCTDWKWFVz9JPBgFaUw70FOYESyzBjAaAQ8ymbOQ2I3ULwqY3gSuP
+ wbh1UFE2CbeSs9jz8LIXLC1wW3XdwPodjm3wH5mmxWO1wtRgotO0atcdstta9h9cJ1ha
+ KDVWZFDG5qBwDoP153imaPOctXyIB4LSaXJfGH+0WjBoG07VoDgBJHAtQtSl1bboxKUJ
+ XlE8KUx3e0B0449cKchzqWD9b4e5U4tC7D78OViITq6E4vorB2ojFEdiqTnPMhuEuW7m
+ ZVew==
+X-Gm-Message-State: AOAM530jEr9CnnG/dtU1zp12nR4pnGnFOvkbL1RRCygY3RZ+x9TD3zzg
+ z5jTjbZ4gBAeUvd9pwlxdFNbYFY6+Ic9nMKc7sqDdudUARHBoPkgfG+AI7RkFL0ACyIldR7l/d7
+ I/u2zVxlcEqY7Kxg=
+X-Received: by 2002:a5d:4a4b:: with SMTP id v11mr4991421wrs.364.1604515308323; 
+ Wed, 04 Nov 2020 10:41:48 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzfwnDOViGTq5wQ3OuZ0qzf8RSJNybaKD314ntar/NDYKJx3NbK1KJRPQZKq/HvZaRGWJAgEA==
+X-Received: by 2002:a5d:4a4b:: with SMTP id v11mr4991398wrs.364.1604515308126; 
+ Wed, 04 Nov 2020 10:41:48 -0800 (PST)
+Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
+ by smtp.gmail.com with ESMTPSA id e25sm4060413wrc.76.2020.11.04.10.41.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Nov 2020 10:41:47 -0800 (PST)
+Date: Wed, 4 Nov 2020 13:41:45 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] iotests: rewrite iotest 240 in python
-Date: Wed,  4 Nov 2020 20:50:25 +0200
-Message-Id: <20201104185025.434703-3-mlevitsk@redhat.com>
-In-Reply-To: <20201104185025.434703-1-mlevitsk@redhat.com>
-References: <20201104185025.434703-1-mlevitsk@redhat.com>
+Subject: [PULL v3 10/31] hw/acpi : add spaces around operator
+Message-ID: <20201104184040.285057-11-mst@redhat.com>
+References: <20201104184040.285057-1-mst@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201104184040.285057-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlevitsk@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,377 +109,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>, Kai Deng <dengkai1@huawei.com>,
+ Xinhao Zhang <zhangxinhao1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The recent changes that brought RCU delayed device deletion,
-broke few tests and this test breakage went unnoticed.
+From: Xinhao Zhang <zhangxinhao1@huawei.com>
 
-Fix this test by rewriting it in python
-(which allows to wait for DEVICE_DELETED events before continuing).
+Fix code style. Operator needs spaces both sides.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Xinhao Zhang <zhangxinhao1@huawei.com>
+Signed-off-by: Kai Deng <dengkai1@huawei.com>
+Message-Id: <20201103102634.273021-3-zhangxinhao1@huawei.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/qemu-iotests/240     | 219 +++++++++++++++----------------------
- tests/qemu-iotests/240.out |  76 +++++++------
- 2 files changed, 130 insertions(+), 165 deletions(-)
+ hw/acpi/pcihp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/240 b/tests/qemu-iotests/240
-index 8b4337b58d..c0f71f0461 100755
---- a/tests/qemu-iotests/240
-+++ b/tests/qemu-iotests/240
-@@ -1,5 +1,5 @@
--#!/usr/bin/env bash
--#
-+#!/usr/bin/env python3
-+
- # Test hot plugging and unplugging with iothreads
- #
- # Copyright (C) 2019 Igalia, S.L.
-@@ -17,133 +17,90 @@
- #
- # You should have received a copy of the GNU General Public License
- # along with this program.  If not, see <http://www.gnu.org/licenses/>.
--#
+diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+index 32ae8b2c0a..17c32e0ffd 100644
+--- a/hw/acpi/pcihp.c
++++ b/hw/acpi/pcihp.c
+@@ -400,7 +400,7 @@ void acpi_pcihp_init(Object *owner, AcpiPciHpState *s, PCIBus *root_bus,
+     s->io_len = ACPI_PCIHP_SIZE;
+     s->io_base = ACPI_PCIHP_ADDR;
  
--# creator
--owner=berto@igalia.com
--
--seq=`basename $0`
--echo "QA output created by $seq"
--
--status=1	# failure is the default!
--
--_cleanup()
--{
--    rm -f "$SOCK_DIR/nbd"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.filter
--
--_supported_fmt generic
--_supported_proto generic
--
--do_run_qemu()
--{
--    echo Testing: "$@"
--    $QEMU -nographic -qmp stdio -serial none "$@"
--    echo
--}
--
--# Remove QMP events from (pretty-printed) output. Doesn't handle
--# nested dicts correctly, but we don't get any of those in this test.
--_filter_qmp_events()
--{
--    tr '\n' '\t' | sed -e \
--	's/{\s*"timestamp":\s*{[^}]*},\s*"event":[^,}]*\(,\s*"data":\s*{[^}]*}\)\?\s*}\s*//g' \
--	| tr '\t' '\n'
--}
--
--run_qemu()
--{
--    do_run_qemu "$@" 2>&1 | _filter_qmp | _filter_qmp_events
--}
--
--case "$QEMU_DEFAULT_MACHINE" in
--  s390-ccw-virtio)
--      virtio_scsi=virtio-scsi-ccw
--      ;;
--  *)
--      virtio_scsi=virtio-scsi-pci
--      ;;
--esac
--
--echo
--echo === Unplug a SCSI disk and then plug it again ===
--echo
--
--run_qemu <<EOF
--{ "execute": "qmp_capabilities" }
--{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "read-zeroes": true, "node-name": "hd0"}}
--{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${virtio_scsi}", "iothread": "iothread0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
--{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
--{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
--{ "execute": "device_del", "arguments": {"id": "scsi0"}}
--{ "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
--{ "execute": "quit"}
--EOF
--
--echo
--echo === Attach two SCSI disks using the same block device and the same iothread ===
--echo
--
--run_qemu <<EOF
--{ "execute": "qmp_capabilities" }
--{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "read-zeroes": true, "node-name": "hd0", "read-only": true}}
--{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${virtio_scsi}", "iothread": "iothread0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi-hd1", "driver": "scsi-hd", "drive": "hd0"}}
--{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
--{ "execute": "device_del", "arguments": {"id": "scsi-hd1"}}
--{ "execute": "device_del", "arguments": {"id": "scsi0"}}
--{ "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
--{ "execute": "quit"}
--EOF
--
--echo
--echo === Attach two SCSI disks using the same block device but different iothreads ===
--echo
--
--run_qemu <<EOF
--{ "execute": "qmp_capabilities" }
--{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "read-zeroes": true, "node-name": "hd0", "read-only": true}}
--{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
--{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread1"}}
--{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${virtio_scsi}", "iothread": "iothread0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi1", "driver": "${virtio_scsi}", "iothread": "iothread1"}}
--{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0", "bus": "scsi0.0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi-hd1", "driver": "scsi-hd", "drive": "hd0", "bus": "scsi1.0"}}
--{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi-hd1", "driver": "scsi-hd", "drive": "hd0", "bus": "scsi1.0"}}
--{ "execute": "device_del", "arguments": {"id": "scsi-hd1"}}
--{ "execute": "device_del", "arguments": {"id": "scsi0"}}
--{ "execute": "device_del", "arguments": {"id": "scsi1"}}
--{ "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
--{ "execute": "quit"}
--EOF
--
--echo
--echo === Attach a SCSI disks using the same block device as a NBD server ===
--echo
--
--run_qemu <<EOF
--{ "execute": "qmp_capabilities" }
--{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "read-zeroes": true, "node-name": "hd0", "read-only": true}}
--{ "execute": "nbd-server-start", "arguments": {"addr":{"type":"unix","data":{"path":"$SOCK_DIR/nbd"}}}}
--{ "execute": "nbd-server-add", "arguments": {"device":"hd0"}}
--{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${virtio_scsi}", "iothread": "iothread0"}}
--{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0", "bus": "scsi0.0"}}
--{ "execute": "quit"}
--EOF
--
--# success, all done
--echo "*** done"
--rm -f $seq.full
--status=0
-+import iotests
-+import os
-+
-+nbd_sock = iotests.file_path('nbd.sock', base_dir=iotests.sock_dir)
-+
-+class TestCase(iotests.QMPTestCase):
-+    test_driver = "null-co"
-+
-+    def required_drivers(self):
-+        return [self.test_driver]
-+
-+    @iotests.skip_if_unsupported(required_drivers)
-+    def setUp(self):
-+        self.vm = iotests.VM()
-+        self.vm.launch()
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+
-+    def test1(self):
-+        iotests.log('==Unplug a SCSI disk and then plug it again==')
-+        self.vm.qmp_log('blockdev-add', driver='null-co', read_zeroes=True, node_name='hd0')
-+        self.vm.qmp_log('object-add', qom_type='iothread', id="iothread0")
-+        self.vm.qmp_log('device_add', id='scsi0', driver=iotests.get_virtio_scsi_device(), iothread='iothread0', filters=[iotests.filter_qmp_virtio_scsi])
-+        self.vm.qmp_log('device_add', id='scsi-hd0', driver='scsi-hd', drive='hd0')
-+        self.vm.qmp_log('device_del', id='scsi-hd0')
-+        self.vm.event_wait('DEVICE_DELETED')
-+        self.vm.qmp_log('device_add', id='scsi-hd0', driver='scsi-hd', drive='hd0')
-+        self.vm.qmp_log('device_del', id='scsi-hd0')
-+        self.vm.event_wait('DEVICE_DELETED')
-+        self.vm.qmp_log('blockdev-del', node_name='hd0')
-+
-+    def test2(self):
-+        iotests.log('==Attach two SCSI disks using the same block device and the same iothread==')
-+        self.vm.qmp_log('blockdev-add', driver='null-co', read_zeroes=True, node_name='hd0', read_only=True)
-+        self.vm.qmp_log('object-add', qom_type='iothread', id="iothread0")
-+        self.vm.qmp_log('device_add', id='scsi0', driver=iotests.get_virtio_scsi_device(), iothread='iothread0', filters=[iotests.filter_qmp_virtio_scsi])
-+
-+        self.vm.qmp_log('device_add', id='scsi-hd0', driver='scsi-hd', drive='hd0')
-+        self.vm.qmp_log('device_add', id='scsi-hd1', driver='scsi-hd', drive='hd0')
-+        self.vm.qmp_log('device_del', id='scsi-hd0')
-+        self.vm.event_wait('DEVICE_DELETED')
-+        self.vm.qmp_log('device_del', id='scsi-hd1')
-+        self.vm.event_wait('DEVICE_DELETED')
-+        self.vm.qmp_log('blockdev-del', node_name='hd0')
-+
-+    def test3(self):
-+        iotests.log('==Attach two SCSI disks using the same block device but different iothreads==')
-+
-+        self.vm.qmp_log('blockdev-add', driver='null-co', read_zeroes=True, node_name='hd0', read_only=True)
-+
-+        self.vm.qmp_log('object-add', qom_type='iothread', id="iothread0")
-+        self.vm.qmp_log('object-add', qom_type='iothread', id="iothread1")
-+
-+        self.vm.qmp_log('device_add', id='scsi0', driver=iotests.get_virtio_scsi_device(), iothread='iothread0', filters=[iotests.filter_qmp_virtio_scsi])
-+        self.vm.qmp_log('device_add', id='scsi1', driver=iotests.get_virtio_scsi_device(), iothread='iothread1', filters=[iotests.filter_qmp_virtio_scsi])
-+
-+        self.vm.qmp_log('device_add', id='scsi-hd0', driver='scsi-hd', drive='hd0', bus="scsi0.0")
-+        self.vm.qmp_log('device_add', id='scsi-hd1', driver='scsi-hd', drive='hd0', bus="scsi1.0")
-+
-+        self.vm.qmp_log('device_del', id='scsi-hd0')
-+        self.vm.event_wait('DEVICE_DELETED')
-+        self.vm.qmp_log('device_add', id='scsi-hd1', driver='scsi-hd', drive='hd0', bus="scsi1.0")
-+
-+        self.vm.qmp_log('device_del', id='scsi-hd1')
-+        self.vm.event_wait('DEVICE_DELETED')
-+        self.vm.qmp_log('blockdev-del', node_name='hd0')
-+
-+    def test4(self):
-+        iotests.log('==Attach a SCSI disks using the same block device as a NBD server==')
-+
-+        self.vm.qmp_log('blockdev-add', driver='null-co', read_zeroes=True, node_name='hd0', read_only=True)
-+
-+        self.vm.qmp_log('nbd-server-start',
-+                        filters=[iotests.filter_qmp_testfiles],
-+                        addr={'type':'unix', 'data':{'path':nbd_sock}})
-+
-+        self.vm.qmp_log('nbd-server-add', device='hd0')
-+
-+        self.vm.qmp_log('object-add', qom_type='iothread', id="iothread0")
-+        self.vm.qmp_log('device_add', id='scsi0', driver=iotests.get_virtio_scsi_device(), iothread='iothread0', filters=[iotests.filter_qmp_virtio_scsi])
-+        self.vm.qmp_log('device_add', id='scsi-hd0', driver='scsi-hd', drive='hd0')
-+
-+if __name__ == '__main__':
-+    iotests.activate_logging()
-+    iotests.main()
-diff --git a/tests/qemu-iotests/240.out b/tests/qemu-iotests/240.out
-index d00df50297..e0982831ae 100644
---- a/tests/qemu-iotests/240.out
-+++ b/tests/qemu-iotests/240.out
-@@ -1,67 +1,75 @@
--QA output created by 240
--
--=== Unplug a SCSI disk and then plug it again ===
--
--Testing:
--QMP_VERSION
--{"return": {}}
-+==Unplug a SCSI disk and then plug it again==
-+{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0", "read-zeroes": true}}
- {"return": {}}
-+{"execute": "object-add", "arguments": {"id": "iothread0", "qom-type": "iothread"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"driver": "virtio-scsi", "id": "scsi0", "iothread": "iothread0"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"drive": "hd0", "driver": "scsi-hd", "id": "scsi-hd0"}}
- {"return": {}}
-+{"execute": "device_del", "arguments": {"id": "scsi-hd0"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"drive": "hd0", "driver": "scsi-hd", "id": "scsi-hd0"}}
- {"return": {}}
-+{"execute": "device_del", "arguments": {"id": "scsi-hd0"}}
- {"return": {}}
-+{"execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
- {"return": {}}
-+==Attach two SCSI disks using the same block device and the same iothread==
-+{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0", "read-only": true, "read-zeroes": true}}
- {"return": {}}
-+{"execute": "object-add", "arguments": {"id": "iothread0", "qom-type": "iothread"}}
- {"return": {}}
--
--=== Attach two SCSI disks using the same block device and the same iothread ===
--
--Testing:
--QMP_VERSION
--{"return": {}}
-+{"execute": "device_add", "arguments": {"driver": "virtio-scsi", "id": "scsi0", "iothread": "iothread0"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"drive": "hd0", "driver": "scsi-hd", "id": "scsi-hd0"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"drive": "hd0", "driver": "scsi-hd", "id": "scsi-hd1"}}
- {"return": {}}
-+{"execute": "device_del", "arguments": {"id": "scsi-hd0"}}
- {"return": {}}
-+{"execute": "device_del", "arguments": {"id": "scsi-hd1"}}
- {"return": {}}
-+{"execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
- {"return": {}}
-+==Attach two SCSI disks using the same block device but different iothreads==
-+{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0", "read-only": true, "read-zeroes": true}}
- {"return": {}}
-+{"execute": "object-add", "arguments": {"id": "iothread0", "qom-type": "iothread"}}
- {"return": {}}
-+{"execute": "object-add", "arguments": {"id": "iothread1", "qom-type": "iothread"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"driver": "virtio-scsi", "id": "scsi0", "iothread": "iothread0"}}
- {"return": {}}
--
--=== Attach two SCSI disks using the same block device but different iothreads ===
--
--Testing:
--QMP_VERSION
--{"return": {}}
--{"return": {}}
--{"return": {}}
--{"return": {}}
--{"return": {}}
-+{"execute": "device_add", "arguments": {"driver": "virtio-scsi", "id": "scsi1", "iothread": "iothread1"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"bus": "scsi0.0", "drive": "hd0", "driver": "scsi-hd", "id": "scsi-hd0"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"bus": "scsi1.0", "drive": "hd0", "driver": "scsi-hd", "id": "scsi-hd1"}}
- {"error": {"class": "GenericError", "desc": "Cannot change iothread of active block backend"}}
-+{"execute": "device_del", "arguments": {"id": "scsi-hd0"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"bus": "scsi1.0", "drive": "hd0", "driver": "scsi-hd", "id": "scsi-hd1"}}
- {"return": {}}
-+{"execute": "device_del", "arguments": {"id": "scsi-hd1"}}
- {"return": {}}
-+{"execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
- {"return": {}}
-+==Attach a SCSI disks using the same block device as a NBD server==
-+{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0", "read-only": true, "read-zeroes": true}}
- {"return": {}}
-+{"execute": "nbd-server-start", "arguments": {"addr": {"data": {"path": "SOCK_DIR/PID-nbd.sock"}, "type": "unix"}}}
- {"return": {}}
-+{"execute": "nbd-server-add", "arguments": {"device": "hd0"}}
- {"return": {}}
--
--=== Attach a SCSI disks using the same block device as a NBD server ===
--
--Testing:
--QMP_VERSION
--{"return": {}}
--{"return": {}}
--{"return": {}}
--{"return": {}}
-+{"execute": "object-add", "arguments": {"id": "iothread0", "qom-type": "iothread"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"driver": "virtio-scsi", "id": "scsi0", "iothread": "iothread0"}}
- {"return": {}}
-+{"execute": "device_add", "arguments": {"drive": "hd0", "driver": "scsi-hd", "id": "scsi-hd0"}}
- {"return": {}}
--{"return": {}}
--*** done
-+....
-+----------------------------------------------------------------------
-+Ran 4 tests
-+
-+OK
+-    s->root= root_bus;
++    s->root = root_bus;
+     s->legacy_piix = !bridges_enabled;
+ 
+     memory_region_init_io(&s->io, owner, &acpi_pcihp_io_ops, s,
 -- 
-2.26.2
+MST
 
 
