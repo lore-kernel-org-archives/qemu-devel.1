@@ -2,93 +2,72 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2679C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 02:50:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F5FC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 03:05:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 148EA2236F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 02:50:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H2E2Yv7/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 148EA2236F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 324462236F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 03:05:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 324462236F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka8sk-0008Ho-1G
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 21:50:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58720)
+	id 1ka97O-0003X6-8a
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 22:05:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1ka8ro-0007oY-4W
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 21:49:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41945)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1ka8rj-0003gX-Nl
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 21:49:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604458177;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JuHKpx6igcSueLfvDTw4ZVsDWSY+pVFG8HmNO4Bdxow=;
- b=H2E2Yv7/b8dhNNml4KFxPiXKsSjjqfP6bPE7FVLjQdPrtX275t8dfBvtSJ+aqLxORAQeEC
- RwCBYaR9CPyx2yaUJTsV2djJLaiwK9NudH+HJ+b4fqk+fmavRTvycN/e1t/wojTONj9iEy
- qEnwASDr2hB0rcimPzYW8LfScIwdU3I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-PeSt_EJrNw-RFGKrcVo70A-1; Tue, 03 Nov 2020 21:49:34 -0500
-X-MC-Unique: PeSt_EJrNw-RFGKrcVo70A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B583803F42;
- Wed,  4 Nov 2020 02:49:33 +0000 (UTC)
-Received: from [10.72.13.133] (ovpn-13-133.pek2.redhat.com [10.72.13.133])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A0395D9CC;
- Wed,  4 Nov 2020 02:49:27 +0000 (UTC)
-Subject: Re: [RFC PATCH 1/6] net: Added SetSteeringEBPF method for
- NetClientState.
-To: Andrew Melnychenko <andrew@daynix.com>, mst@redhat.com
-References: <20201102185115.7425-1-andrew@daynix.com>
- <20201102185115.7425-2-andrew@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <b94d69ef-8067-9bc9-aaae-2bca88e5d9ba@redhat.com>
-Date: Wed, 4 Nov 2020 10:49:26 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1ka95h-0002dz-GS; Tue, 03 Nov 2020 22:04:05 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2114)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1ka95e-0005nQ-Az; Tue, 03 Nov 2020 22:04:04 -0500
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.54])
+ by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CQs1869Ydz51rd;
+ Wed,  4 Nov 2020 11:03:40 +0800 (CST)
+Received: from DGGEMM424-HUB.china.huawei.com (10.1.198.41) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Wed, 4 Nov 2020 11:03:43 +0800
+Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.225]) by
+ dggemm424-hub.china.huawei.com ([10.1.198.41]) with mapi id 14.03.0487.000;
+ Wed, 4 Nov 2020 11:03:34 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Subject: RE: [PATCH 1/6] target/xtensa: fix uninitialized variable warning
+Thread-Topic: [PATCH 1/6] target/xtensa: fix uninitialized variable warning
+Thread-Index: AQHWsYQKtNCTbaRXh0S8iybx28woy6m1nFiAgACrZUA=
+Date: Wed, 4 Nov 2020 03:03:34 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83BA2AD13@dggemm531-mbx.china.huawei.com>
+References: <20201103015228.2250547-1-kuhn.chenqun@huawei.com>
+ <20201103015228.2250547-2-kuhn.chenqun@huawei.com>
+ <CAMo8BfK5wDgvzWFsC0WHyztUCiGR0dGnJgJiAVt5aG7nt8PsDw@mail.gmail.com>
+In-Reply-To: <CAMo8BfK5wDgvzWFsC0WHyztUCiGR0dGnJgJiAVt5aG7nt8PsDw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.185.149]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20201102185115.7425-2-andrew@daynix.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.188;
+ envelope-from=kuhn.chenqun@huawei.com; helo=szxga02-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:03:47
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,171 +81,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com, yuri.benditovich@daynix.com, qemu-devel@nongnu.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Euler Robot <euler.robot@huawei.com>, qemu-devel <qemu-devel@nongnu.org>,
+ ganqixin <ganqixin@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020/11/3 上午2:51, Andrew Melnychenko wrote:
-> From: Andrew <andrew@daynix.com>
->
-> For now, that method supported only by Linux TAP.
-> Linux TAP uses TUNSETSTEERINGEBPF ioctl.
-> TUNSETSTEERINGBPF was added 3 years ago.
-> Qemu checks if it was defined before using.
->
-> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
-> ---
->   include/net/net.h |  2 ++
->   net/tap-bsd.c     |  5 +++++
->   net/tap-linux.c   | 19 +++++++++++++++++++
->   net/tap-solaris.c |  5 +++++
->   net/tap-stub.c    |  5 +++++
->   net/tap.c         |  9 +++++++++
->   net/tap_int.h     |  1 +
->   7 files changed, 46 insertions(+)
->
-> diff --git a/include/net/net.h b/include/net/net.h
-> index 897b2d7595..d8a41fb010 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -60,6 +60,7 @@ typedef int (SetVnetBE)(NetClientState *, bool);
->   typedef struct SocketReadState SocketReadState;
->   typedef void (SocketReadStateFinalize)(SocketReadState *rs);
->   typedef void (NetAnnounce)(NetClientState *);
-> +typedef bool (SetSteeringEBPF)(NetClientState *, int);
->   
->   typedef struct NetClientInfo {
->       NetClientDriver type;
-> @@ -81,6 +82,7 @@ typedef struct NetClientInfo {
->       SetVnetLE *set_vnet_le;
->       SetVnetBE *set_vnet_be;
->       NetAnnounce *announce;
-> +    SetSteeringEBPF *set_steering_ebpf;
->   } NetClientInfo;
->   
->   struct NetClientState {
-> diff --git a/net/tap-bsd.c b/net/tap-bsd.c
-> index 77aaf674b1..4f64f31e98 100644
-> --- a/net/tap-bsd.c
-> +++ b/net/tap-bsd.c
-> @@ -259,3 +259,8 @@ int tap_fd_get_ifname(int fd, char *ifname)
->   {
->       return -1;
->   }
-> +
-> +int tap_fd_set_steering_ebpf(int fd, int prog_fd)
-> +{
-> +    return -1;
-> +}
-> diff --git a/net/tap-linux.c b/net/tap-linux.c
-> index b0635e9e32..196373019f 100644
-> --- a/net/tap-linux.c
-> +++ b/net/tap-linux.c
-> @@ -31,6 +31,7 @@
->   
->   #include <net/if.h>
->   #include <sys/ioctl.h>
-> +#include <linux/if_tun.h> /* TUNSETSTEERINGEBPF */
->   
->   #include "qapi/error.h"
->   #include "qemu/error-report.h"
-> @@ -316,3 +317,21 @@ int tap_fd_get_ifname(int fd, char *ifname)
->       pstrcpy(ifname, sizeof(ifr.ifr_name), ifr.ifr_name);
->       return 0;
->   }
-> +
-> +int tap_fd_set_steering_ebpf(int fd, int prog_fd)
-> +{
-> +#ifdef TUNSETSTEERINGEBPF
-
-
-I'm not sure how much this can help.
-
-But looking at tap-linux.h, I wonder do we need to pull TUN/TAP uapi 
-headers.
-
-Thanks
-
-
-> +    if (ioctl(fd, TUNSETSTEERINGEBPF, (void *) &prog_fd) != 0) {
-> +        error_report("Issue while setting TUNSETSTEERINGEBPF:"
-> +                    " %s with fd: %d, prog_fd: %d",
-> +                    strerror(errno), fd, prog_fd);
-> +
-> +       return -1;
-> +    }
-> +
-> +    return 0;
-> +#else
-> +    error_report("TUNSETSTEERINGEBPF is not supported");
-> +    return -1;
-> +#endif
-> +}
-> diff --git a/net/tap-solaris.c b/net/tap-solaris.c
-> index 0475a58207..d85224242b 100644
-> --- a/net/tap-solaris.c
-> +++ b/net/tap-solaris.c
-> @@ -255,3 +255,8 @@ int tap_fd_get_ifname(int fd, char *ifname)
->   {
->       return -1;
->   }
-> +
-> +int tap_fd_set_steering_ebpf(int fd, int prog_fd)
-> +{
-> +    return -1;
-> +}
-> diff --git a/net/tap-stub.c b/net/tap-stub.c
-> index de525a2e69..a0fa25804b 100644
-> --- a/net/tap-stub.c
-> +++ b/net/tap-stub.c
-> @@ -85,3 +85,8 @@ int tap_fd_get_ifname(int fd, char *ifname)
->   {
->       return -1;
->   }
-> +
-> +int tap_fd_set_steering_ebpf(int fd, int prog_fd)
-> +{
-> +    return -1;
-> +}
-> diff --git a/net/tap.c b/net/tap.c
-> index c46ff66184..81f50017bd 100644
-> --- a/net/tap.c
-> +++ b/net/tap.c
-> @@ -337,6 +337,14 @@ static void tap_poll(NetClientState *nc, bool enable)
->       tap_write_poll(s, enable);
->   }
->   
-> +static bool tap_set_steering_ebpf(NetClientState *nc, int prog_fd)
-> +{
-> +    TAPState *s = DO_UPCAST(TAPState, nc, nc);
-> +    assert(nc->info->type == NET_CLIENT_DRIVER_TAP);
-> +
-> +    return tap_fd_set_steering_ebpf(s->fd, prog_fd) == 0;
-> +}
-> +
->   int tap_get_fd(NetClientState *nc)
->   {
->       TAPState *s = DO_UPCAST(TAPState, nc, nc);
-> @@ -362,6 +370,7 @@ static NetClientInfo net_tap_info = {
->       .set_vnet_hdr_len = tap_set_vnet_hdr_len,
->       .set_vnet_le = tap_set_vnet_le,
->       .set_vnet_be = tap_set_vnet_be,
-> +    .set_steering_ebpf = tap_set_steering_ebpf,
->   };
->   
->   static TAPState *net_tap_fd_init(NetClientState *peer,
-> diff --git a/net/tap_int.h b/net/tap_int.h
-> index 225a49ea48..547f8a5a28 100644
-> --- a/net/tap_int.h
-> +++ b/net/tap_int.h
-> @@ -44,5 +44,6 @@ int tap_fd_set_vnet_be(int fd, int vnet_is_be);
->   int tap_fd_enable(int fd);
->   int tap_fd_disable(int fd);
->   int tap_fd_get_ifname(int fd, char *ifname);
-> +int tap_fd_set_steering_ebpf(int fd, int prog_fd);
->   
->   #endif /* NET_TAP_INT_H */
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNYXggRmlsaXBwb3YgW21haWx0
+bzpqY212YmtiY0BnbWFpbC5jb21dDQo+IFNlbnQ6IFR1ZXNkYXksIE5vdmVtYmVyIDMsIDIwMjAg
+NToyMiBQTQ0KPiBUbzogQ2hlbnF1biAoa3VobikgPGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPg0K
+PiBDYzogcWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3JnPjsgUUVNVSBUcml2aWFsDQo+
+IDxxZW11LXRyaXZpYWxAbm9uZ251Lm9yZz47IFpoYW5naGFpbGlhbmcNCj4gPHpoYW5nLnpoYW5n
+aGFpbGlhbmdAaHVhd2VpLmNvbT47IGdhbnFpeGluIDxnYW5xaXhpbkBodWF3ZWkuY29tPjsgRXVs
+ZXINCj4gUm9ib3QgPGV1bGVyLnJvYm90QGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFU
+Q0ggMS82XSB0YXJnZXQveHRlbnNhOiBmaXggdW5pbml0aWFsaXplZCB2YXJpYWJsZSB3YXJuaW5n
+DQo+IA0KPiBPbiBNb24sIE5vdiAyLCAyMDIwIGF0IDU6NTIgUE0gQ2hlbiBRdW4gPGt1aG4uY2hl
+bnF1bkBodWF3ZWkuY29tPg0KPiB3cm90ZToNCj4gPg0KPiA+IFRoZSBjb21waWxlciBjYW5ub3Qg
+ZGV0ZXJtaW5lIHdoZXRoZXIgdGhlIHJldHVybiB2YWx1ZXMgb2YgdGhlDQo+ID4geHRlbnNhX29w
+ZXJhbmRfaXNfcmVnaXN0ZXIoaXNhLCBvcGMsIG9wbmQpICBhbmQNCj4geHRlbnNhX29wZXJhbmRf
+aXNfdmlzaWJsZShpc2EsIG9wYywgb3BuZCkgZnVuY3Rpb25zIGFyZSB0aGUgc2FtZS4NCj4gDQo+
+IEl0IGRvZXNuJ3QgaGF2ZSB0byBiZWNhdXNlIDEpIHRoZXkgZGVmaW5pdGVseSBhcmUgbm90IHRo
+ZSBzYW1lLCBidXQNCj4gMikgaXQgZG9lc24ndCBtYXR0ZXIuDQo+IA0KPiA+IFNvLGl0IGFzc3Vt
+ZXMgdGhhdCAncmYnIGlzIG5vdCBhc3NpZ25lZCwgYnV0IGl0J3MgdXNlZC4NCj4gDQo+IFRoZSBh
+c3N1bXB0aW9uIGlzIHdyb25nLiByZiBpcyB1c2VkIHVuZGVyIHRoZSAnaWYgKHJlZ2lzdGVyX2Zp
+bGUpJw0KPiBjb25kaXRpb24gYW5kIHJlZ2lzdGVyX2ZpbGUgaXMgaW5pdGlhbGl6ZWQgdG8gTlVM
+TCBhbmQgdGhlbiBzZXQgdG8gc29tZXRoaW5nDQo+IG5vbi1OVUxMIGJhc2VkIG9uIHRoZSB2YWx1
+ZSBvZiByZiBoZXJlOg0KPiANCkhpIE1heCwNCiAgWWVhaCwgeW91ciBhbmFseXNpcyBpcyBjb3Jy
+ZWN0LiBUaGlzIHJmIGlzIHVzZWQgb25seSB3aGVuIHJlZ2lzdGVyX2ZpbGUgaXMgbm9uLU5VTEwu
+IFdoZW4gdGhpcyBjb25kaXRpb24gaXMgbWV0LCB0aGUgcmYgbXVzdCBoYXZlIGJlZW4gYXNzaWdu
+ZWQgYSB2YWx1ZS4NClRoZSBHQ0MgOS4zIGNvbXBpbGF0aW9uIEkgdXNlIGNvbnRhaW5zIHRoZSBX
+bWF5YmUtdW5pbml0aWFsaXplZCBwYXJhbWV0ZXIgYnkgZGVmYXVsdC4gSXQgY2Fubm90IHJlY29n
+bml6ZSB0aGlzIGNvbXBsZXggbG9naWMganVkZ21lbnQuDQpUaGlzIHdhcm5pbmcgbWF5IGJlIGZy
+ZXF1ZW50bHkgZW5jb3VudGVyZWQgYnkgZGV2ZWxvcGVycyB3aG8gY29tcGlsZSB0aGlzIHBhcnQg
+b2YgY29kZS4NCg0KPiA5NTggICAgICAgICAgICAgaWYgKHh0ZW5zYV9vcGVyYW5kX2lzX3JlZ2lz
+dGVyKGlzYSwgb3BjLCBvcG5kKSkgew0KPiA5NTkgICAgICAgICAgICAgICAgIHJmID0geHRlbnNh
+X29wZXJhbmRfcmVnZmlsZShpc2EsIG9wYywgb3BuZCk7DQo+IDk2MCAgICAgICAgICAgICAgICAg
+cmVnaXN0ZXJfZmlsZSA9IGRjLT5jb25maWctPnJlZ2ZpbGVbcmZdOw0KPiANCj4gPiBUaGUgY29t
+cGlsZXIgc2hvd2VkIHdhcm5pbmc6DQo+ID4gdGFyZ2V0L3h0ZW5zYS90cmFuc2xhdGUuYzogSW4g
+ZnVuY3Rpb24g4oCYZGlzYXNfeHRlbnNhX2luc27igJk6DQo+ID4gdGFyZ2V0L3h0ZW5zYS90cmFu
+c2xhdGUuYzo5ODU6NDM6IHdhcm5pbmc6IOKAmHJm4oCZIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6
+ZWQgaW4NCj4gdGhpcyBmdW5jdGlvbiBbLVdtYXliZS11bmluaXRpYWxpemVkXQ0KPiA+ICAgOTg1
+IHwgICAgICAgICAgICAgICAgICAgICBhcmdbdm9wbmRdLm51bV9iaXRzID0NCj4geHRlbnNhX3Jl
+Z2ZpbGVfbnVtX2JpdHMoaXNhLCByZik7DQo+ID4gICAgICAgfA0KPiBefn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fg0KPiA+DQo+ID4gQWRkIGEgZGVmYXVsdCB2YWx1ZSBmb3IgJ3JmJyB0
+byBwcmV2ZW50ZWQgdGhlIHdhcm5pbmcuDQo+IA0KPiBJIGRvbid0IHNlZSBpdCBkb2luZyBkZWZh
+dWx0IGJ1aWxkIHdpdGggZ2NjIDguMy4gQnV0IHRoZW4gSSBkb24ndCBzZWUNCj4gLVdtYXliZS11
+bmluaXRpYWxpemVkIGluIHRoZSBjb21waWxlciBjb21tYW5kIGxpbmUgZWl0aGVyLg0KPiANCk1h
+eWJlIGl0J3MgYXZhaWxhYmxlIGFmdGVyIEdDQzksIG9yIHNvbWUgQ0ZMQUcgY29uZmlndXJhdGlv
+bi4NCg0KVGhlIC1XbWF5YmUtdW5pbml0aWFsaXplZCBwYXJhbWV0ZXIgaGFzIHRoaXMgZGVzY3Jp
+cHRpb27vvJoNCiJUaGVzZSB3YXJuaW5ncyBhcmUgb25seSBwb3NzaWJsZSBpbiBvcHRpbWl6aW5n
+IGNvbXBpbGF0aW9uLCBiZWNhdXNlIG90aGVyd2lzZSBHQ0MgZG9lcyBub3Qga2VlcCB0cmFjayBv
+ZiB0aGUgc3RhdGUgb2YgdmFyaWFibGVzLiINCkZyb23vvJpodHRwczovL2djYy5nbnUub3JnL29u
+bGluZWRvY3MvZ2NjL1dhcm5pbmctT3B0aW9ucy5odG1sI1dhcm5pbmctT3B0aW9ucw0KDQpJIGhh
+dmUgdHJpZWQgdG8gY29uZmlndXJlIG9ubHkgIi1PMiAtZmV4Y2VwdGlvbnMiIGZvciB0aGUgQ0ZM
+QUcgb24gR0NDOSwgYW5kIHRoaXMgd2FybmluZyB3aWxsIG9jY3VyLg0KDQo+ID4gUmVwb3J0ZWQt
+Ynk6IEV1bGVyIFJvYm90IDxldWxlci5yb2JvdEBodWF3ZWkuY29tPg0KPiA+IFNpZ25lZC1vZmYt
+Ynk6IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiBDYzog
+TWF4IEZpbGlwcG92IDxqY212YmtiY0BnbWFpbC5jb20+DQo+ID4gLS0tDQo+ID4gIHRhcmdldC94
+dGVuc2EvdHJhbnNsYXRlLmMgfCAyICstDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlv
+bigrKSwgMSBkZWxldGlvbigtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL3RhcmdldC94dGVuc2Ev
+dHJhbnNsYXRlLmMgYi90YXJnZXQveHRlbnNhL3RyYW5zbGF0ZS5jDQo+ID4gaW5kZXggOTQ0YTE1
+Nzc0Ny4uZWVhODUxYmJlNyAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQveHRlbnNhL3RyYW5zbGF0
+ZS5jDQo+ID4gKysrIGIvdGFyZ2V0L3h0ZW5zYS90cmFuc2xhdGUuYw0KPiA+IEBAIC05NTMsNyAr
+OTUzLDcgQEAgc3RhdGljIHZvaWQgZGlzYXNfeHRlbnNhX2luc24oQ1BVWHRlbnNhU3RhdGUgKmVu
+diwNCj4gPiBEaXNhc0NvbnRleHQgKmRjKQ0KPiA+DQo+ID4gICAgICAgICAgZm9yIChvcG5kID0g
+dm9wbmQgPSAwOyBvcG5kIDwgb3BuZHM7ICsrb3BuZCkgew0KPiA+ICAgICAgICAgICAgICB2b2lk
+ICoqcmVnaXN0ZXJfZmlsZSA9IE5VTEw7DQo+ID4gLSAgICAgICAgICAgIHh0ZW5zYV9yZWdmaWxl
+IHJmOw0KPiA+ICsgICAgICAgICAgICB4dGVuc2FfcmVnZmlsZSByZiA9IC0xOw0KPiANCj4gUGxl
+YXNlIHVzZSBYVEVOU0FfVU5ERUZJTkVEIGluc3RlYWQgaWYgeW91IHN0aWxsIHRoaW5rIHRoaXMg
+aXMgd29ydGggY2hhbmdpbmcuDQo+IA0KSSBkb24ndCB0aGluayBpdCdzIHdyb25nLCBpdCdzIGp1
+c3QgYSBiaXQgb2YgdHJvdWJsZSBmb3IgdGhlIGNvbXBpbGVyIDopDQoNClRoYW5rcywNCkNoZW4g
+UXVuDQo=
 
