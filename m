@@ -2,88 +2,86 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D00C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 11:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24BCAC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 11:51:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C31292071A
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 11:50:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A7FC2071A
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 11:51:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="IISCcF9Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C31292071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ROTcPaEK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A7FC2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaHIe-0003FE-PK
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 06:50:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57558)
+	id 1kaHJh-00046n-4j
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 06:51:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1kaHI0-0002pA-K6
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 06:49:20 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34833)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1kaHHy-0004Jo-00
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 06:49:20 -0500
-Received: by mail-oi1-x241.google.com with SMTP id c80so10363378oib.2
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 03:49:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2+0jnG8LK0hnNd7Jf5NvXaKrqMHrCVDgHd8a0tXzWfo=;
- b=IISCcF9Q2s9P/lOBkvFISxf/ZWyOW3ZmuzTnJKhG/qf1WFot9uJRFfk39H47td0yix
- ZAeWjrLeMRxCXPnXe9QQ7R/OJ/ic1sH8hYcMQDWrnhEdee9O5MBoQ+THNMqycxVoKg4P
- Q5s8NxisewoQj3LNRFfRUl7UEk7Xm+av1nx9KOIkipDsGeVGbI2gjG078gQvA0PH3psd
- vZWlo9EQCOPBskcCVY1/epsplkx1z9lNXp3zpqEsrtu16gMmLjWJmUoHiv43ViJ6WJyP
- /do6croJcNPKjoOKvcIH3rcXOOkXcqq2VujYGcsj8YYWR1b5sjODSIK9hfBMN9tqhDju
- z3Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2+0jnG8LK0hnNd7Jf5NvXaKrqMHrCVDgHd8a0tXzWfo=;
- b=XYUV9F4wQodgRElpOLZR9yYem5NQwYwXDvlWCKf4nazOs2kpptw4LeolLFTWcAxBYA
- hF1Zf3ZLzkcilR2XwiO4oMtEHqjj1bbtfddkpd5Xq0ulgoKxQDg+tZP2sYnXqCB+/QOv
- XaPQX6RoZDPiS0DCjHLK73aYGa8STaQvowNdKe0VIYRHVJ9cvLfNb5twSHo/mshp9GxG
- yfmXrugO96eP9lBD23FMJbgUmorRr4s1HR936DZcSYx6X0nUQwFOv5dRR2DJTCqV05Fw
- 6eAZnpQb1illAC0D7MFbV7z/THvd3HXMWAkVZv5rlCVowA2PgIg6vKdovitnOOnPZI0/
- AUOg==
-X-Gm-Message-State: AOAM530PNpAlrq1GllbUFtAH7QkJ9OgF1ZgtaDv4CooQW9BGY7aY480q
- T63J/bXo9dcmXyXXwYj/TqzXghZWWLwPKwWxlqg5iQ==
-X-Google-Smtp-Source: ABdhPJz6h/+FC3GBmon6BXHd4na2gDuiMCug8jC5RKuJJQo4w7bEk2jlUJqpmhnsW0hmgsgXmfO2EipI2F9d5Ql3jrE=
-X-Received: by 2002:aca:8c1:: with SMTP id 184mr2423586oii.137.1604490556480; 
- Wed, 04 Nov 2020 03:49:16 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kaHIQ-0003C8-Au
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 06:49:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23929)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kaHIO-0004Ly-2i
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 06:49:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604490583;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=FrbWX5TvokkOxyal1wc2ef3gbLipin32PLSm525RtC8=;
+ b=ROTcPaEKxnUXlILsVPXUHMQcyUTRbHa5yqCThCIcCZk3a2Ao0sf5ddp+OwuRPYAqO2pi4v
+ R0rTLVnb2tRw+N2I1njt8Dsjhqwxm7EPimxUwRRxRVTRVACNBmdVv4JSBFrIthtdhRHPyW
+ TsnVjL+RllwdPzRkyondvODj3emSMh0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-GQ59zPxyPQyh5CRljL8wKg-1; Wed, 04 Nov 2020 06:49:39 -0500
+X-MC-Unique: GQ59zPxyPQyh5CRljL8wKg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B159A809DDB
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 11:49:38 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3E6235D9CC;
+ Wed,  4 Nov 2020 11:49:38 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qapi,
+ qemu-options: make all parsing visitors parse boolean options the same
+Date: Wed,  4 Nov 2020 06:49:37 -0500
+Message-Id: <20201104114937.520288-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20201102185115.7425-1-andrew@daynix.com>
- <0164a42f-4542-6f3e-bd71-3319dfaae190@redhat.com>
- <CAOEp5Oe3btwgPcOA6v=kK9s2to=x2Hg6Qw2iCFXOOWZs49s=-Q@mail.gmail.com>
- <caa38709-88f1-bd6d-3ff9-61e64c3aa51f@redhat.com>
-In-Reply-To: <caa38709-88f1-bd6d-3ff9-61e64c3aa51f@redhat.com>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Wed, 4 Nov 2020 13:49:05 +0200
-Message-ID: <CAOEp5OciCLsKtnZ=mYavaFbePBwh7VWVg9NyFrns6zy18YKC=w@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/6] eBPF RSS support for virtio-net
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000aa3b3805b3469196"
-Received-SPF: none client-ip=2607:f8b0:4864:20::241;
- envelope-from=yuri.benditovich@daynix.com; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,622 +94,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, Andrew Melnychenko <andrew@daynix.com>,
- qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000aa3b3805b3469196
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+OptsVisitor, StringInputVisitor and the keyval visitor have
+three different ideas of how a human could write the value of
+a boolean option.  Pay homage to the backwards-compatibility
+gods and make the new common helper accept all four sets (on/off,
+true/false, y/n and yes/no), but remove case-insensitivity.
 
-On Wed, Nov 4, 2020 at 4:08 AM Jason Wang <jasowang@redhat.com> wrote:
+Since OptsVisitor is supposed to match qemu-options, adjust
+it as well.
 
->
-> On 2020/11/3 =E4=B8=8B=E5=8D=886:32, Yuri Benditovich wrote:
-> >
-> >
-> > On Tue, Nov 3, 2020 at 11:02 AM Jason Wang <jasowang@redhat.com
-> > <mailto:jasowang@redhat.com>> wrote:
-> >
-> >
-> >     On 2020/11/3 =E4=B8=8A=E5=8D=882:51, Andrew Melnychenko wrote:
-> >     > Basic idea is to use eBPF to calculate and steer packets in TAP.
-> >     > RSS(Receive Side Scaling) is used to distribute network packets
-> >     to guest virtqueues
-> >     > by calculating packet hash.
-> >     > eBPF RSS allows us to use RSS with vhost TAP.
-> >     >
-> >     > This set of patches introduces the usage of eBPF for packet
-> steering
-> >     > and RSS hash calculation:
-> >     > * RSS(Receive Side Scaling) is used to distribute network packets
-> to
-> >     > guest virtqueues by calculating packet hash
-> >     > * eBPF RSS suppose to be faster than already existing 'software'
-> >     > implementation in QEMU
-> >     > * Additionally adding support for the usage of RSS with vhost
-> >     >
-> >     > Supported kernels: 5.8+
-> >     >
-> >     > Implementation notes:
-> >     > Linux TAP TUNSETSTEERINGEBPF ioctl was used to set the eBPF
-> program.
-> >     > Added eBPF support to qemu directly through a system call, see th=
-e
-> >     > bpf(2) for details.
-> >     > The eBPF program is part of the qemu and presented as an array
-> >     of bpf
-> >     > instructions.
-> >     > The program can be recompiled by provided Makefile.ebpf(need to
-> >     adjust
-> >     > 'linuxhdrs'),
-> >     > although it's not required to build QEMU with eBPF support.
-> >     > Added changes to virtio-net and vhost, primary eBPF RSS is used.
-> >     > 'Software' RSS used in the case of hash population and as a
-> >     fallback option.
-> >     > For vhost, the hash population feature is not reported to the
-> guest.
-> >     >
-> >     > Please also see the documentation in PATCH 6/6.
-> >     >
-> >     > I am sending those patches as RFC to initiate the discussions
-> >     and get
-> >     > feedback on the following points:
-> >     > * Fallback when eBPF is not supported by the kernel
-> >
-> >
-> >     Yes, and it could also a lacking of CAP_BPF.
-> >
-> >
-> >     > * Live migration to the kernel that doesn't have eBPF support
-> >
-> >
-> >     Is there anything that we needs special treatment here?
-> >
-> > Possible case: rss=3Don, vhost=3Don, source system with kernel 5.8
-> > (everything works) -> dest. system 5.6 (bpf does not work), the
-> > adapter functions, but all the steering does not use proper queues.
->
->
-> Right, I think we need to disable vhost on dest.
->
->
-Is this acceptable to disable vhost at time of migration?
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20201103161339.447118-1-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/qapi/util.h           |  2 ++
+ qapi/opts-visitor.c           | 14 +-------------
+ qapi/qapi-util.c              | 23 +++++++++++++++++++++++
+ qapi/qobject-input-visitor.c  |  6 +-----
+ qapi/string-input-visitor.c   | 17 +----------------
+ tests/qemu-iotests/051.out    |  6 +++---
+ tests/qemu-iotests/051.pc.out |  6 +++---
+ tests/qemu-iotests/133.out    |  8 ++++----
+ tests/qemu-iotests/137.out    |  4 ++--
+ util/qemu-option.c            | 20 ++------------------
+ 10 files changed, 42 insertions(+), 64 deletions(-)
 
+diff --git a/include/qapi/util.h b/include/qapi/util.h
+index bc312e90aa..6178e98e97 100644
+--- a/include/qapi/util.h
++++ b/include/qapi/util.h
+@@ -19,6 +19,8 @@ typedef struct QEnumLookup {
+ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val);
+ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+                     int def, Error **errp);
++bool qapi_bool_parse(const char *name, const char *value, bool *obj,
++                     Error **errp);
+ 
+ int parse_qapi_name(const char *name, bool complete);
+ 
+diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+index 7781c23a42..587f31baf6 100644
+--- a/qapi/opts-visitor.c
++++ b/qapi/opts-visitor.c
+@@ -368,7 +368,6 @@ opts_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+ }
+ 
+ 
+-/* mimics qemu-option.c::parse_option_bool() */
+ static bool
+ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ {
+@@ -379,19 +378,8 @@ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+     if (!opt) {
+         return false;
+     }
+-
+     if (opt->str) {
+-        if (strcmp(opt->str, "on") == 0 ||
+-            strcmp(opt->str, "yes") == 0 ||
+-            strcmp(opt->str, "y") == 0) {
+-            *obj = true;
+-        } else if (strcmp(opt->str, "off") == 0 ||
+-            strcmp(opt->str, "no") == 0 ||
+-            strcmp(opt->str, "n") == 0) {
+-            *obj = false;
+-        } else {
+-            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
+-                       "on|yes|y|off|no|n");
++        if (!qapi_bool_parse(opt->name, opt->str, obj, errp)) {
+             return false;
+         }
+     } else {
+diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+index 29a6c98b53..dfc0bde497 100644
+--- a/qapi/qapi-util.c
++++ b/qapi/qapi-util.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qemu/ctype.h"
++#include "qapi/qmp/qerror.h"
+ 
+ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+ {
+@@ -40,6 +41,28 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+     return def;
+ }
+ 
++bool qapi_bool_parse(const char *name, const char *value, bool *obj, Error **errp)
++{
++    if (g_str_equal(value, "on") ||
++        g_str_equal(value, "yes") ||
++        g_str_equal(value, "true") ||
++        g_str_equal(value, "y")) {
++        *obj = true;
++        return true;
++    }
++    if (g_str_equal(value, "off") ||
++        g_str_equal(value, "no") ||
++        g_str_equal(value, "false") ||
++        g_str_equal(value, "n")) {
++        *obj = false;
++        return true;
++    }
++
++    error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name,
++               "boolean (on/off)");
++    return false;
++}
++
+ /*
+  * Parse a valid QAPI name from @str.
+  * A valid name consists of letters, digits, hyphen and underscore.
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 7b184b50a7..23843b242e 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -512,11 +512,7 @@ static bool qobject_input_type_bool_keyval(Visitor *v, const char *name,
+         return false;
+     }
+ 
+-    if (!strcmp(str, "on")) {
+-        *obj = true;
+-    } else if (!strcmp(str, "off")) {
+-        *obj = false;
+-    } else {
++    if (!qapi_bool_parse(name, str, obj, NULL)) {
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    full_name(qiv, name), "'on' or 'off'");
+         return false;
+diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+index 6e53396ea3..197139c1c0 100644
+--- a/qapi/string-input-visitor.c
++++ b/qapi/string-input-visitor.c
+@@ -332,22 +332,7 @@ static bool parse_type_bool(Visitor *v, const char *name, bool *obj,
+     StringInputVisitor *siv = to_siv(v);
+ 
+     assert(siv->lm == LM_NONE);
+-    if (!strcasecmp(siv->string, "on") ||
+-        !strcasecmp(siv->string, "yes") ||
+-        !strcasecmp(siv->string, "true")) {
+-        *obj = true;
+-        return true;
+-    }
+-    if (!strcasecmp(siv->string, "off") ||
+-        !strcasecmp(siv->string, "no") ||
+-        !strcasecmp(siv->string, "false")) {
+-        *obj = false;
+-        return true;
+-    }
+-
+-    error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-               "boolean");
+-    return false;
++    return qapi_bool_parse(name ? name : "null", siv->string, obj, errp);
+ }
+ 
+ static bool parse_type_str(Visitor *v, const char *name, char **obj,
+diff --git a/tests/qemu-iotests/051.out b/tests/qemu-iotests/051.out
+index de4771bcb3..21d2dbec4c 100644
+--- a/tests/qemu-iotests/051.out
++++ b/tests/qemu-iotests/051.out
+@@ -110,13 +110,13 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) quit
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=
+-QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=: Parameter 'lazy-refcounts' expects 'on' or 'off'
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=: Parameter 'lazy-refcounts' expects boolean (on/off)
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=42
+-QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=42: Parameter 'lazy-refcounts' expects 'on' or 'off'
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=42: Parameter 'lazy-refcounts' expects boolean (on/off)
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=foo
+-QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=foo: Parameter 'lazy-refcounts' expects 'on' or 'off'
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=foo: Parameter 'lazy-refcounts' expects boolean (on/off)
+ 
+ 
+ === With version 2 images enabling lazy refcounts must fail ===
+diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+index f707471fb0..d814b83871 100644
+--- a/tests/qemu-iotests/051.pc.out
++++ b/tests/qemu-iotests/051.pc.out
+@@ -110,13 +110,13 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) quit
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=
+-QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=: Parameter 'lazy-refcounts' expects 'on' or 'off'
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=: Parameter 'lazy-refcounts' expects boolean (on/off)
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=42
+-QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=42: Parameter 'lazy-refcounts' expects 'on' or 'off'
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=42: Parameter 'lazy-refcounts' expects boolean (on/off)
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=foo
+-QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=foo: Parameter 'lazy-refcounts' expects 'on' or 'off'
++QEMU_PROG: -drive file=TEST_DIR/t.qcow2,format=qcow2,lazy-refcounts=foo: Parameter 'lazy-refcounts' expects boolean (on/off)
+ 
+ 
+ === With version 2 images enabling lazy refcounts must fail ===
+diff --git a/tests/qemu-iotests/133.out b/tests/qemu-iotests/133.out
+index d70c2e8041..75431c2594 100644
+--- a/tests/qemu-iotests/133.out
++++ b/tests/qemu-iotests/133.out
+@@ -35,8 +35,8 @@ qemu-io: Cannot set both -c and the cache options
+ 
+ === Check that invalid options are handled correctly ===
+ 
+-qemu-io: Parameter 'read-only' expects 'on' or 'off'
+-qemu-io: Parameter 'cache.no-flush' expects 'on' or 'off'
+-qemu-io: Parameter 'cache.direct' expects 'on' or 'off'
+-qemu-io: Parameter 'auto-read-only' expects 'on' or 'off'
++qemu-io: Parameter 'read-only' expects boolean (on/off)
++qemu-io: Parameter 'cache.no-flush' expects boolean (on/off)
++qemu-io: Parameter 'cache.direct' expects boolean (on/off)
++qemu-io: Parameter 'auto-read-only' expects boolean (on/off)
+ *** done
+diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
+index 86377c80cd..a420db61d5 100644
+--- a/tests/qemu-iotests/137.out
++++ b/tests/qemu-iotests/137.out
+@@ -15,7 +15,7 @@ read 33554432/33554432 bytes at offset 0
+ 
+ === Try setting some invalid values ===
+ 
+-qemu-io: Parameter 'lazy-refcounts' expects 'on' or 'off'
++qemu-io: Parameter 'lazy-refcounts' expects boolean (on/off)
+ qemu-io: cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
+ qemu-io: l2-cache-size may not exceed cache-size
+ qemu-io: refcount-cache-size may not exceed cache-size
+@@ -38,7 +38,7 @@ wrote 512/512 bytes at offset 0
+ ./common.rc: Killed                  ( VALGRIND_QEMU="${VALGRIND_QEMU_IO}" _qemu_proc_exec "${VALGRIND_LOGFILE}" "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@" )
+ OK: Dirty bit not set
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+-qemu-io: Parameter 'lazy-refcounts' expects 'on' or 'off'
++qemu-io: Parameter 'lazy-refcounts' expects boolean (on/off)
+ qcow2: Marking image as corrupt: Preventing invalid allocation of L2 table at offset 0; further corruption events will be suppressed
+ write failed: Input/output error
+ *** done
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index b9f93a7f8b..acefbc23fa 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -96,21 +96,6 @@ const char *get_opt_value(const char *p, char **value)
+     return offset;
+ }
+ 
+-static bool parse_option_bool(const char *name, const char *value, bool *ret,
+-                              Error **errp)
+-{
+-    if (!strcmp(value, "on")) {
+-        *ret = 1;
+-    } else if (!strcmp(value, "off")) {
+-        *ret = 0;
+-    } else {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+-                   name, "'on' or 'off'");
+-        return false;
+-    }
+-    return true;
+-}
+-
+ static bool parse_option_number(const char *name, const char *value,
+                                 uint64_t *ret, Error **errp)
+ {
+@@ -363,7 +348,7 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
+     if (opt == NULL) {
+         def_val = find_default_by_name(opts, name);
+         if (def_val) {
+-            parse_option_bool(name, def_val, &ret, &error_abort);
++            qapi_bool_parse(name, def_val, &ret, &error_abort);
+         }
+         return ret;
+     }
+@@ -471,8 +456,7 @@ static bool qemu_opt_parse(QemuOpt *opt, Error **errp)
+         /* nothing */
+         return true;
+     case QEMU_OPT_BOOL:
+-        return parse_option_bool(opt->name, opt->str, &opt->value.boolean,
+-                                 errp);
++        return qapi_bool_parse(opt->name, opt->str, &opt->value.boolean, errp);
+     case QEMU_OPT_NUMBER:
+         return parse_option_number(opt->name, opt->str, &opt->value.uint,
+                                    errp);
+-- 
+2.26.2
 
-> >
-> >
-> >
-> >     > * Integration with current QEMU build
-> >
-> >
-> >     Yes, a question here:
-> >
-> >     1) Any reason for not using libbpf, e.g it has been shipped with so=
-me
-> >     distros
-> >
-> >
-> > We intentionally do not use libbpf, as it present only on some distros.
-> > We can switch to libbpf, but this will disable bpf if libbpf is not
-> > installed
->
->
-> That's better I think.
->
-
-We think the preferred way is to have an eBPF code built-in in QEMU (not
-distribute it as a separate file).
-
-Our initial idea was to not use the libbpf because it:
-1. Does not create additional dependency during build time and during
-run-time
-2. Gives us smaller footprint of loadable eBPF blob inside qemu
-3. Do not add too much code to QEMU
-
-We can switch to libbpf, in this case:
-1. Presence of dynamic library is not guaranteed on the target system
-2. Static library is large
-3. libbpf uses eBPF ELF which is significantly bigger than just the array
-or instructions (May be we succeed to reduce the ELF to some suitable size
-and still have it built-in)
-
-Please let us know whether you still think libbpf is better and why.
-
-Thanks
-
-
->
-> >     2) It would be better if we can avoid shipping bytecodes
-> >
-> >
-> >
-> > This creates new dependencies: llvm + clang + ...
-> > We would prefer byte code and ability to generate it if prerequisites
-> > are installed.
->
->
-> It's probably ok if we treat the bytecode as a kind of firmware.
->
-> But in the long run, it's still worthwhile consider the qemu source is
-> used for development and llvm/clang should be a common requirement for
-> generating eBPF bytecode for host.
->
->
-> >
-> >
-> >     > * Additional usage for eBPF for packet filtering
-> >
-> >
-> >     Another interesting topics in to implement mac/vlan filters. And
-> >     in the
-> >     future, I plan to add mac based steering. All of these could be
-> >     done via
-> >     eBPF.
-> >
-> >
-> > No problem, we can cooperate if needed
-> >
-> >
-> >     >
-> >     > Know issues:
-> >     > * hash population not supported by eBPF RSS: 'software' RSS used
-> >
-> >
-> >     Is this because there's not way to write to vnet header in
-> >     STERRING BPF?
-> >
-> > Yes. We plan to submit changes for kernel to cooperate with BPF and
-> > populate the hash, this work is in progress
->
->
-> That would require a new type of eBPF program and may need some work on
-> verifier.
->
->
-May be need to allow loading of an additional type in tun.c, not only
-socket filter (to use bpf_set_hash)
-Also vhost and tun in kernel need to be aware of header extension for hash
-population.
-
-
-> Btw, macvtap is still lacking even steering ebpf program. Would you want
-> to post a patch to support that?
->
->
-Probably after we have full functioning BPF with TAP/TUN
-
-
->
-> >
-> >     > as a fallback, also, hash population feature is not reported to
-> >     guests
-> >     > with vhost.
-> >     > * big-endian BPF support: for now, eBPF is disabled for
-> >     big-endian systems.
-> >
-> >
-> >     Are there any blocker for this?
-> >
-> >
-> > No, can be added in v2
->
->
-> Cool.
->
-> Thanks
->
->
-> >
-> >     Just some quick questions after a glance of the codes. Will go
-> >     through
-> >     them tomorrow.
-> >
-> >     Thanks
-> >
-> >
-> >     >
-> >     > Andrew (6):
-> >     >    Added SetSteeringEBPF method for NetClientState.
-> >     >    ebpf: Added basic eBPF API.
-> >     >    ebpf: Added eBPF RSS program.
-> >     >    ebpf: Added eBPF RSS loader.
-> >     >    virtio-net: Added eBPF RSS to virtio-net.
-> >     >    docs: Added eBPF documentation.
-> >     >
-> >     >   MAINTAINERS                    |   6 +
-> >     >   configure                      |  36 +++
-> >     >   docs/ebpf.rst                  |  29 ++
-> >     >   docs/ebpf_rss.rst              | 129 ++++++++
-> >     >   ebpf/EbpfElf_to_C.py           |  67 ++++
-> >     >   ebpf/Makefile.ebpf             |  38 +++
-> >     >   ebpf/ebpf-stub.c               |  28 ++
-> >     >   ebpf/ebpf.c                    | 107 +++++++
-> >     >   ebpf/ebpf.h                    |  35 +++
-> >     >   ebpf/ebpf_rss.c                | 178 +++++++++++
-> >     >   ebpf/ebpf_rss.h                |  30 ++
-> >     >   ebpf/meson.build               |   1 +
-> >     >   ebpf/rss.bpf.c                 | 470 ++++++++++++++++++++++++++=
-++
-> >     >   ebpf/trace-events              |   4 +
-> >     >   ebpf/trace.h                   |   2 +
-> >     >   ebpf/tun_rss_steering.h        | 556
-> >     +++++++++++++++++++++++++++++++++
-> >     >   hw/net/vhost_net.c             |   2 +
-> >     >   hw/net/virtio-net.c            | 120 ++++++-
-> >     >   include/hw/virtio/virtio-net.h |   4 +
-> >     >   include/net/net.h              |   2 +
-> >     >   meson.build                    |   3 +
-> >     >   net/tap-bsd.c                  |   5 +
-> >     >   net/tap-linux.c                |  19 ++
-> >     >   net/tap-solaris.c              |   5 +
-> >     >   net/tap-stub.c                 |   5 +
-> >     >   net/tap.c                      |   9 +
-> >     >   net/tap_int.h                  |   1 +
-> >     >   net/vhost-vdpa.c               |   2 +
-> >     >   28 files changed, 1889 insertions(+), 4 deletions(-)
-> >     >   create mode 100644 docs/ebpf.rst
-> >     >   create mode 100644 docs/ebpf_rss.rst
-> >     >   create mode 100644 ebpf/EbpfElf_to_C.py
-> >     >   create mode 100755 ebpf/Makefile.ebpf
-> >     >   create mode 100644 ebpf/ebpf-stub.c
-> >     >   create mode 100644 ebpf/ebpf.c
-> >     >   create mode 100644 ebpf/ebpf.h
-> >     >   create mode 100644 ebpf/ebpf_rss.c
-> >     >   create mode 100644 ebpf/ebpf_rss.h
-> >     >   create mode 100644 ebpf/meson.build
-> >     >   create mode 100644 ebpf/rss.bpf.c
-> >     >   create mode 100644 ebpf/trace-events
-> >     >   create mode 100644 ebpf/trace.h
-> >     >   create mode 100644 ebpf/tun_rss_steering.h
-> >     >
-> >
->
->
-
---000000000000aa3b3805b3469196
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Nov 4, 2020 at 4:08 AM Jason =
-Wang &lt;<a href=3D"mailto:jasowang@redhat.com">jasowang@redhat.com</a>&gt;=
- wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
-0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br>
-On 2020/11/3 =E4=B8=8B=E5=8D=886:32, Yuri Benditovich wrote:<br>
-&gt;<br>
-&gt;<br>
-&gt; On Tue, Nov 3, 2020 at 11:02 AM Jason Wang &lt;<a href=3D"mailto:jasow=
-ang@redhat.com" target=3D"_blank">jasowang@redhat.com</a> <br>
-&gt; &lt;mailto:<a href=3D"mailto:jasowang@redhat.com" target=3D"_blank">ja=
-sowang@redhat.com</a>&gt;&gt; wrote:<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0On 2020/11/3 =E4=B8=8A=E5=8D=882:51, Andrew Melnych=
-enko wrote:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Basic idea is to use eBPF to calculate and ste=
-er packets in TAP.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; RSS(Receive Side Scaling) is used to distribut=
-e network packets<br>
-&gt;=C2=A0 =C2=A0 =C2=A0to guest virtqueues<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; by calculating packet hash.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; eBPF RSS allows us to use RSS with vhost TAP.<=
-br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; This set of patches introduces the usage of eB=
-PF for packet steering<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; and RSS hash calculation:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; * RSS(Receive Side Scaling) is used to distrib=
-ute network packets to<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; guest virtqueues by calculating packet hash<br=
->
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; * eBPF RSS suppose to be faster than already e=
-xisting &#39;software&#39;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; implementation in QEMU<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; * Additionally adding support for the usage of=
- RSS with vhost<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Supported kernels: 5.8+<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Implementation notes:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Linux TAP TUNSETSTEERINGEBPF ioctl was used to=
- set the eBPF program.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Added eBPF support to qemu directly through a =
-system call, see the<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; bpf(2) for details.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; The eBPF program is part of the qemu and prese=
-nted as an array<br>
-&gt;=C2=A0 =C2=A0 =C2=A0of bpf<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; instructions.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; The program can be recompiled by provided Make=
-file.ebpf(need to<br>
-&gt;=C2=A0 =C2=A0 =C2=A0adjust<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; &#39;linuxhdrs&#39;),<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; although it&#39;s not required to build QEMU w=
-ith eBPF support.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Added changes to virtio-net and vhost, primary=
- eBPF RSS is used.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; &#39;Software&#39; RSS used in the case of has=
-h population and as a<br>
-&gt;=C2=A0 =C2=A0 =C2=A0fallback option.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; For vhost, the hash population feature is not =
-reported to the guest.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Please also see the documentation in PATCH 6/6=
-.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; I am sending those patches as RFC to initiate =
-the discussions<br>
-&gt;=C2=A0 =C2=A0 =C2=A0and get<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; feedback on the following points:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; * Fallback when eBPF is not supported by the k=
-ernel<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Yes, and it could also a lacking of CAP_BPF.<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; * Live migration to the kernel that doesn&#39;=
-t have eBPF support<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Is there anything that we needs special treatment h=
-ere?<br>
-&gt;<br>
-&gt; Possible case: rss=3Don, vhost=3Don, source system with kernel 5.8 <br=
->
-&gt; (everything works) -&gt; dest. system 5.6 (bpf does not work), the <br=
->
-&gt; adapter functions, but all the steering does not use proper queues.<br=
->
-<br>
-<br>
-Right, I think we need to disable vhost on dest.<br><br></blockquote><div><=
-br></div><div>Is this acceptable to disable vhost at time of migration?=C2=
-=A0</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin=
-:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
->
-&gt;<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; * Integration with current QEMU build<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Yes, a question here:<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A01) Any reason for not using libbpf, e.g it has been=
- shipped with some<br>
-&gt;=C2=A0 =C2=A0 =C2=A0distros<br>
-&gt;<br>
-&gt;<br>
-&gt; We intentionally do not use libbpf, as it present only on some distros=
-.<br>
-&gt; We can switch to libbpf, but this will disable bpf if libbpf is not <b=
-r>
-&gt; installed<br>
-<br>
-<br>
-That&#39;s better I think.<br></blockquote><div><br></div><div>We think the=
- preferred way is to have an eBPF code built-in in QEMU (not distribute it =
-as a separate=C2=A0file).</div><div><br></div><div>Our initial idea was to =
-not use the=C2=A0libbpf because it:</div><div>1. Does not create additional=
- dependency during build time and during run-time</div><div>2. Gives us sma=
-ller footprint=C2=A0of loadable eBPF blob inside qemu</div><div>3. Do not a=
-dd too much code to QEMU</div><div><br></div><div>We can switch to libbpf, =
-in this case:</div><div>1. Presence of dynamic library is not guaranteed on=
- the target system</div><div>2. Static library is large</div><div>3. libbpf=
- uses eBPF ELF which is significantly bigger than just the array or instruc=
-tions (May be we succeed to reduce the ELF to some suitable size and still =
-have it built-in)</div><div></div><div><br></div><div>Please let us know wh=
-ether you still think libbpf is better and why.=C2=A0</div><div><br></div><=
-div>Thanks</div><div><br></div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
-:1ex">
-<br>
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A02) It would be better if we can avoid shipping byte=
-codes<br>
-&gt;<br>
-&gt;<br>
-&gt;<br>
-&gt; This creates new dependencies: llvm=C2=A0+ clang=C2=A0+ ...<br>
-&gt; We would prefer byte code and ability to generate it if prerequisites =
-<br>
-&gt; are installed.<br>
-<br>
-<br>
-It&#39;s probably ok if we treat the bytecode as a kind of firmware.<br>
-<br>
-But in the long run, it&#39;s still worthwhile consider the qemu source is =
-<br>
-used for development and llvm/clang should be a common requirement for <br>
-generating eBPF bytecode for host.<br>
-<br>
-<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; * Additional usage for eBPF for packet filteri=
-ng<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Another interesting topics in to implement mac/vlan=
- filters. And<br>
-&gt;=C2=A0 =C2=A0 =C2=A0in the<br>
-&gt;=C2=A0 =C2=A0 =C2=A0future, I plan to add mac based steering. All of th=
-ese could be<br>
-&gt;=C2=A0 =C2=A0 =C2=A0done via<br>
-&gt;=C2=A0 =C2=A0 =C2=A0eBPF.<br>
-&gt;<br>
-&gt;<br>
-&gt; No problem, we can cooperate if needed<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Know issues:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; * hash population not supported by eBPF RSS: &=
-#39;software&#39; RSS used<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Is this because there&#39;s not way to write to vne=
-t header in<br>
-&gt;=C2=A0 =C2=A0 =C2=A0STERRING BPF?<br>
-&gt;<br>
-&gt; Yes. We plan to submit changes for kernel to cooperate with BPF and <b=
-r>
-&gt; populate the hash, this work is in progress<br>
-<br>
-<br>
-That would require a new type of eBPF program and may need some work on <br=
->
-verifier.<br>
-<br></blockquote><div><br></div><div>May be need to allow loading of an add=
-itional type in tun.c, not only socket filter (to use bpf_set_hash)</div><d=
-iv>Also vhost and tun in kernel need to be aware of header extension for ha=
-sh population.<br></div><div>=C2=A0<br></div><blockquote class=3D"gmail_quo=
-te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
-);padding-left:1ex">
-Btw, macvtap is still lacking even steering ebpf program. Would you want <b=
-r>
-to post a patch to support that?<br>
-<br></blockquote><div><br></div><div>Probably after we have full functionin=
-g BPF with TAP/TUN</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" =
-style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pa=
-dding-left:1ex">
-<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; as a fallback, also, hash population feature i=
-s not reported to<br>
-&gt;=C2=A0 =C2=A0 =C2=A0guests<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; with vhost.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; * big-endian BPF support: for now, eBPF is dis=
-abled for<br>
-&gt;=C2=A0 =C2=A0 =C2=A0big-endian systems.<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Are there any blocker for this?<br>
-&gt;<br>
-&gt;<br>
-&gt; No, can be added in v2<br>
-<br>
-<br>
-Cool.<br>
-<br>
-Thanks<br>
-<br>
-<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Just some quick questions after a glance of the cod=
-es. Will go<br>
-&gt;=C2=A0 =C2=A0 =C2=A0through<br>
-&gt;=C2=A0 =C2=A0 =C2=A0them tomorrow.<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Thanks<br>
-&gt;<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Andrew (6):<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 Added SetSteeringEBPF method for =
-NetClientState.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 ebpf: Added basic eBPF API.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 ebpf: Added eBPF RSS program.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 ebpf: Added eBPF RSS loader.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 virtio-net: Added eBPF RSS to vir=
-tio-net.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 docs: Added eBPF documentation.<b=
-r>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A06 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 36 +++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0docs/ebpf.rst=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 29 ++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0docs/ebpf_rss.rst=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 129 ++++++++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/EbpfElf_to_C.py=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 67 ++++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/Makefile.ebpf=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 38 +++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/ebpf-stub.c=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 28 ++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/ebpf.c=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 107 +++++++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/ebpf.h=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 35 +++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/ebpf_rss.c=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 178 +++++++++++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/ebpf_rss.h=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 30 ++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/meson.build=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A01 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/rss.bpf.c=C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 470 +++++++++++++++++++++++++++=
-+<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/trace-events=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A04 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/trace.h=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A02 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0ebpf/tun_rss_steering.h=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 | 556<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+++++++++++++++++++++++++++++++++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0hw/net/vhost_net.c=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A02 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0hw/net/virtio-net.c=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 120 ++++++-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0include/hw/virtio/virtio-net.h |=
-=C2=A0 =C2=A04 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0include/net/net.h=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A02 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0meson.build=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A03 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0net/tap-bsd.c=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A05 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0net/tap-linux.c=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 19 ++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0net/tap-solaris.c=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A05 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0net/tap-stub.c=C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A05 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0net/tap.c=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A09 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0net/tap_int.h=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0net/vhost-vdpa.c=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A02 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A028 files changed, 1889 insertions(=
-+), 4 deletions(-)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 docs/ebpf.rst<b=
-r>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 docs/ebpf_rss.r=
-st<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/EbpfElf_to=
-_C.py<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100755 ebpf/Makefile.e=
-bpf<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/ebpf-stub.=
-c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/ebpf.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/ebpf.h<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/ebpf_rss.c=
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/ebpf_rss.h=
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/meson.buil=
-d<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/rss.bpf.c<=
-br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/trace-even=
-ts<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/trace.h<br=
->
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0create mode 100644 ebpf/tun_rss_st=
-eering.h<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;<br>
-<br>
-</blockquote></div></div>
-
---000000000000aa3b3805b3469196--
 
