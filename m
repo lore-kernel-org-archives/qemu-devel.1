@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2639AC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46435C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:19:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 841042064C
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B268920665
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:19:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MXxEyBtY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 841042064C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RvtV+B9l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B268920665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaLV0-0002c3-Jc
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:19:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42462)
+	id 1kaLVA-00033U-Nw
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:19:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLFP-0002nf-0m
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57808)
+ id 1kaLFX-0003BU-Ot
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25106)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLFL-0005e4-Td
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:54 -0500
+ id 1kaLFP-0005fP-Nx
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604505771;
+ s=mimecast20190719; t=1604505774;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=H98XLpUksdIgX7C5G11L5PaMJaT7m6T8YKA2VVNxxBo=;
- b=MXxEyBtYJBx4BXx2yNw2omjDqwha+rT5QwswRuQi3UkmNEawl0/kKgVTGJNFUqyCn4y4aS
- sh6/IZIU5VLVDbPPGo3Y0ybEJjsyh329MmjFImTDxKe5B0JezyEo3JlXMrAm8Wc9oTKH5J
- QRNPZAShv4PJHqIt8GCTRzV6tBQefDE=
+ bh=r7270hbDFJf10L+jBPZu0S0+3zjLu26lLc2uz5p62+8=;
+ b=RvtV+B9loUt5eUk8d/SWv+9Lwvls/tB1YV67r0qClTr+4bDoCeU4KFkJQ+89S/U3WtbNzk
+ h+Yaj5/C+2o/Q3llGWM65jecQoRw8BrcDedAxoSllv7nzulNLYfPrW3xAxouC69X6tBdZA
+ tt/es1ioE/oo8aQtjyHtWqqM1CJE8hU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-6_tuzgmNNPuF0fzxxnmWkA-1; Wed, 04 Nov 2020 11:02:49 -0500
-X-MC-Unique: 6_tuzgmNNPuF0fzxxnmWkA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-142-FqGvdunvOYiEEsJgk07nEA-1; Wed, 04 Nov 2020 11:02:49 -0500
+X-MC-Unique: FqGvdunvOYiEEsJgk07nEA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A57851097F36;
- Wed,  4 Nov 2020 16:02:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DA1CAD7E2;
+ Wed,  4 Nov 2020 16:01:41 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6AE3A55798;
- Wed,  4 Nov 2020 16:02:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E3DA610F3;
+ Wed,  4 Nov 2020 16:01:39 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 32/44] qom: Add allow_set callback to ObjectProperty
-Date: Wed,  4 Nov 2020 11:00:09 -0500
-Message-Id: <20201104160021.2342108-33-ehabkost@redhat.com>
+Subject: [PATCH v2 19/44] qdev: Add name parameter to qdev_class_add_property()
+Date: Wed,  4 Nov 2020 10:59:56 -0500
+Message-Id: <20201104160021.2342108-20-ehabkost@redhat.com>
 In-Reply-To: <20201104160021.2342108-1-ehabkost@redhat.com>
 References: <20201104160021.2342108-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,121 +105,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a ObjectProperty.allow_set callback, that can be set by QOM
-property registration functions.
-
-Note that this doesn't replace the check callback at
-object*_property_add_link() (yet), because currently the link
-property check callback needs to get the property value as
-argument (despite this not being necessary in most cases).
+This will make it easier to remove Property.name in the future.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes v1 -> v2:
-* Redone patch on top of changes in previous patches in the
-  series
-* Provide prop_allow_set_always() and prop_allow_set_never()
-  helpers
+This is a new patch added in series v2
 ---
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- include/qom/object.h | 38 ++++++++++++++++++++++++++++++++++++++
- qom/object.c         | 16 ++++++++++++++++
- 2 files changed, 54 insertions(+)
+ hw/core/qdev-properties.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index d378f13a11..2ab124b8f0 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -86,6 +86,43 @@ typedef void (ObjectPropertyRelease)(Object *obj,
-  */
- typedef void (ObjectPropertyInit)(Object *obj, ObjectProperty *prop);
- 
-+/**
-+ * typedef ObjectPropertyAllowSet:
-+ * @obj: the object that owns the property
-+ * @prop: the property being set
-+ * @errp: pointer to error information
-+ *
-+ * Called when a property is being set.
-+ *
-+ * If return value is false, it will prevent the property from
-+ * being changed.  Error information should be filled in @errp
-+ * if return vlaue is false.
-+ */
-+typedef bool (ObjectPropertyAllowSet)(Object *obj, ObjectProperty *prop,
-+                                      Error **errp);
-+
-+/**
-+ * prop_allow_set_always:
-+ * @obj: the object that owns the property
-+ * @prop: the property being set
-+ * @errp: pointer to error information
-+ *
-+ * ObjectPropertyAllowSet implementation that always allow the
-+ * property to be set.
-+ */
-+bool prop_allow_set_always(Object *obj, ObjectProperty *prop, Error **errp);
-+
-+/**
-+ * prop_allow_set_never:
-+ * @obj: the object that owns the property
-+ * @prop: the property being set
-+ * @errp: pointer to error information
-+ *
-+ * ObjectPropertyAllowSet implementation that never allows the
-+ * property to be set.
-+ */
-+bool prop_allow_set_never(Object *obj, ObjectProperty *prop, Error **errp);
-+
- struct ObjectProperty
- {
-     char *name;
-@@ -96,6 +133,7 @@ struct ObjectProperty
-     ObjectPropertyResolve *resolve;
-     ObjectPropertyRelease *release;
-     ObjectPropertyInit *init;
-+    ObjectPropertyAllowSet *allow_set;
-     void *opaque;
-     QObject *defval;
- };
-diff --git a/qom/object.c b/qom/object.c
-index 1065355233..7c11bcd3b1 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1381,6 +1381,18 @@ bool object_property_get(Object *obj, const char *name, Visitor *v,
-     return !err;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 69181ce31d..dff98646e6 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -887,7 +887,8 @@ void qdev_property_add_static(DeviceState *dev, Property *prop)
+     }
  }
  
-+bool prop_allow_set_always(Object *obj, ObjectProperty *prop, Error **errp)
-+{
-+    return true;
-+}
-+
-+bool prop_allow_set_never(Object *obj, ObjectProperty *prop, Error **errp)
-+{
-+    error_setg(errp, "Property '%s.%s' can't be set",
-+               object_get_typename(obj), prop->name);
-+    return false;
-+}
-+
- bool object_property_set(Object *obj, const char *name, Visitor *v,
-                          Error **errp)
+-static void qdev_class_add_property(DeviceClass *klass, Property *prop)
++static void qdev_class_add_property(DeviceClass *klass, const char *name,
++                                    Property *prop)
  {
-@@ -1395,6 +1407,10 @@ bool object_property_set(Object *obj, const char *name, Visitor *v,
-         error_setg(errp, QERR_PERMISSION_DENIED);
-         return false;
+     ObjectClass *oc = OBJECT_CLASS(klass);
+ 
+@@ -897,7 +898,7 @@ static void qdev_class_add_property(DeviceClass *klass, Property *prop)
+         ObjectProperty *op;
+ 
+         op = object_class_property_add(oc,
+-                                       prop->name, prop->info->name,
++                                       name, prop->info->name,
+                                        prop->info->get, prop->info->set,
+                                        prop->info->release,
+                                        prop);
+@@ -905,7 +906,7 @@ static void qdev_class_add_property(DeviceClass *klass, Property *prop)
+             prop->info->set_default_value(op, prop);
+         }
      }
-+    if (prop->allow_set && !prop->allow_set(obj, prop, errp)) {
-+        return false;
-+    }
-+
-     prop->set(obj, v, name, prop->opaque, &err);
-     error_propagate(errp, err);
-     return !err;
+-    object_class_property_set_description(oc, prop->name,
++    object_class_property_set_description(oc, name,
+                                           prop->info->description);
+ }
+ 
+@@ -962,7 +963,7 @@ void device_class_set_props(DeviceClass *dc, Property *props)
+     dc->props_ = props;
+     for (prop = props; prop && prop->name; prop++) {
+         qdev_class_add_legacy_property(dc, prop);
+-        qdev_class_add_property(dc, prop);
++        qdev_class_add_property(dc, prop->name, prop);
+     }
+ }
+ 
 -- 
 2.28.0
 
