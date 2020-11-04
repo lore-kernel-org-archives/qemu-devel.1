@@ -2,112 +2,83 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6249C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6D1C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:17:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A8F2206DC
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:13:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JtFn8QWh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A8F2206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B8F7920735
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:17:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8F7920735
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaRyG-0003KD-W6
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 18:13:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48060)
+	id 1kaS1Z-0005H5-L7
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 18:17:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaRxS-0002ck-16
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 18:12:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36147)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaRxO-000268-Dp
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 18:12:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604531563;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Wzp/JQwuWCsLiTg1vw/vn3h0w5HqZ/TGc2ldv9QPD3I=;
- b=JtFn8QWhKMyI3GwhKt0rtM0QGoa8PDWtPhfA9a0x5mregZMuUnaJASFWTZdVXVFD/5taU5
- hCvw1kd5sSU87fTnV3xln+tkanRVOopVD9DRsHi2BzGBUY32bQZppEY/t/hdSmDd2sh1lT
- 8EO1pGOHasDdu7jlftTn+6JpG9u+6Ds=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-9VK_E6MGNNSUnG3thC2Qhw-1; Wed, 04 Nov 2020 18:12:42 -0500
-X-MC-Unique: 9VK_E6MGNNSUnG3thC2Qhw-1
-Received: by mail-lf1-f70.google.com with SMTP id 205so91729lfb.17
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 15:12:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:cc:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Wzp/JQwuWCsLiTg1vw/vn3h0w5HqZ/TGc2ldv9QPD3I=;
- b=C1TIgBuc/qiBwhnUnnCJ4aqa/8Lxw/COoweaPHPR6ixJAto1xPv/eYpdo89xnJh7gw
- xw9opR/ncrRvJZxisSX2htS54Q1YNAvuJOP8YzwnuA9CsEWLd4IOiI0LFyOQ3sGt1aU5
- 8weXl0foB3prSuurIP7k/i8I7L0YswWqWgAVwy7oOZrQAp+Xz7oWsGS7RguSJW5qc2Kz
- ydPZjVfc39GzPdo8d8e2SkacyBONaH2bP2Cl+sZePNOU8aoTSfKe7Qe+U/jnFXL8weP+
- FwePaNxSEggfD7KmOntaIFAhJ/wFgIppxxtB3sGySOFmdcc5BM17QJwdxZPPB9qV3W67
- jGUQ==
-X-Gm-Message-State: AOAM530jGF1k/fU7SeA9re/cJd5xHXR11dY2QhxWiBGdae3m872yMIBK
- SfDoOa0OWaqiPAbSquhUrUfAjBEfvRa7CznusCKsPvvofOcbBEmO8LMWvu85KakFLEXDoVZlXMi
- ABIvbqkdNu3S1VWk=
-X-Received: by 2002:adf:ef02:: with SMTP id e2mr293506wro.381.1604531559954;
- Wed, 04 Nov 2020 15:12:39 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxuaPImparodBUUgVBw/hn0HnXSYtcFm2/uZl3BiJqIMhgqiPz9GBKED65XV69qi4r0+5e/Lw==
-X-Received: by 2002:adf:ef02:: with SMTP id e2mr293487wro.381.1604531559780;
- Wed, 04 Nov 2020 15:12:39 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id e6sm4749508wrs.7.2020.11.04.15.12.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Nov 2020 15:12:39 -0800 (PST)
-Subject: Re: [Bug 1879672] Re: QEMU installer with WHPX support
-To: Mike Battista <Mike.Battista@microsoft.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, John Snow <jsnow@redhat.com>
-References: <158996968484.21371.12685815665992748631.malonedeb@wampee.canonical.com>
- <160452011092.12514.8206218482979551684.malone@gac.canonical.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e3b4bf14-c460-5777-df0d-89f90aa5e3e3@redhat.com>
-Date: Thu, 5 Nov 2020 00:12:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kaS0e-000472-RL
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 18:16:08 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41026)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kaS0c-0002Z7-Q8
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 18:16:08 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kaS0Z-0001Ca-RN
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 23:16:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 33C792E813E
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 23:16:03 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <160452011092.12514.8206218482979551684.malone@gac.canonical.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 04 Nov 2020 23:09:39 -0000
+From: John Snow <1826200@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=berrange@redhat.com; 
+X-Launchpad-Bug-Tags: feature-request
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange jnsnow lersek
+X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
+X-Launchpad-Bug-Modifier: John Snow (jnsnow)
+References: <155610584995.13565.1262636932024040431.malonedeb@wampee.canonical.com>
+Message-Id: <160453137912.18915.5426777679998496960.malone@wampee.canonical.com>
+Subject: [Bug 1826200] Re: RFE: populate "OEM Strings" (type 11) SMBIOS table
+ strings from regular files
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
+X-Launchpad-Hash: 61285ce3cfa313dd3dbbae788162cc8ebaf78e17
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 17:35:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -116,34 +87,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, Bug 1879672 <1879672@bugs.launchpad.net>,
- qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Bug 1826200 <1826200@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi John,
+Merged:
+https://patchew.org/QEMU/20200923133804.2089190-1-berrange@redhat.com/
 
-On 11/4/20 9:01 PM, John Snow wrote:
-> Removing 'Opinion' and moving back to 'New'; as 'Opinion' is essentially
-> the same as "WONTFIX" but allows discussion to continue. I believe you
-> want a Feature Request tag instead.
-> 
-> If there is still work for us to do, let's move this to
-> Confirmed/Triaged and add the feature request tag.
+Commits:
 
-It seems Launchpad didn't Cc'ed the interested parties.
+https://gitlab.com/qemu-project/qemu/-/commit/bb99f4772f54017490e3356ecbb3d=
+f25c5d4537f
+https://gitlab.com/qemu-project/qemu/-/commit/10c3666658f53c5ec8fd9ec27cdf5=
+c393ff814a0
+https://gitlab.com/qemu-project/qemu/-/commit/48a7ff4d516c92323ca7bd88df90e=
+bb974bc0a9a
 
-Our contact is Mike Battista (see [*]) but so far he never
-made any comment regarding this issue.
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
 
-Cc'ing Sunil who is the active developer (of WHPX in QEMU)
-at Microsoft, and Stefan, who does the Open Source packaging.
+-- =
 
-Regards,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826200
 
-Phil.
+Title:
+  RFE: populate "OEM Strings" (type 11) SMBIOS table strings from
+  regular files
 
-[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg731227.html
+Status in QEMU:
+  Fix Committed
 
+Bug description:
+  The feature added in
+
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D2d6dcbf93fb01b4a7f4=
+5a93d276d4d74b16392dd
+
+  and exposed by libvirt as
+
+    https://libvirt.org/formatdomain.html#elementsSysinfo
+
+  allows the user to specify up to 255 strings in the unofmatted area of
+  the Type 11 SMBIOS table, where each string may be of arbitrary
+  length. This feature is useful for exposing arbitrary text to
+  arbitrary guest components (in particular when strings are prefixed
+  with "application identifiers").
+
+  Right now, strings can only be specified on the QEMU command line,
+  which limits the amount of data that can be passed. Please enable
+  users to pass data from regular files too.
+
+  For example:
+
+    $QEMU -smbios
+  type=3D11,value=3DHello,txtfile=3Dfile1.txt,txtfile=3Dfile2.txt
+
+  where "file1.txt" and "file2.txt" could be text files containing ASCII
+  application prefixes, followed by base64-encoded binary data.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826200/+subscriptions
 
