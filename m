@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DD4C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91EA0C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:18:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 728C8208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FB9D208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:18:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i0POv7zL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 728C8208C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1WKYtkO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FB9D208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaHj6-0002p9-DJ
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 07:17:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34740)
+	id 1kaHkY-0004QQ-0U
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 07:18:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfa-0007m8-D6
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20247)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfU-0007Zl-21
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48925)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfY-0007qZ-Dz
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:42 -0500
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfR-0007pQ-Sp
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604492019;
+ s=mimecast20190719; t=1604492013;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=W/26RM5hlf5NGwN7ijzuGblgAmBmtVQ0RyzNJoompVY=;
- b=i0POv7zLWkxFSMocdBJc6rYA8s4j6Thy4X3FhifpGF4hnG72CwGd6luVpHF1gAeTxDyosU
- V8I+kc75qZfPQwD7230XYPTpRQkdUm3Bp6DqJ57BUlVFuvO66WAFXf41EyRm8I2pNLfgHB
- j0L1C7uaoRWQyjz3ptUeLgg4mGdpRAg=
+ bh=646hBwDT3ly74j+7kRJ85Jb/eYj/a88qAi8iM6HKKUM=;
+ b=S1WKYtkOxwycJyxtQ4nJAL/YvvC3rNKtpXwAL+lUdRu/R2AyrLpINkR7WaeSISyUqG4C1h
+ cl7Tu31dCP5U/0M3rQpG54t7bpWrZqR5y462JAVZGRDIFVN26srGOmTLnNmVRs4Gir1OHW
+ iDGvB4fhyTg+Q80d52PDOt64cvfBpvk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-T75FN1AiNQKomESNumAHxw-1; Wed, 04 Nov 2020 07:13:37 -0500
-X-MC-Unique: T75FN1AiNQKomESNumAHxw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-358-4YShpDS5MKGyQ7Ebodd7xw-1; Wed, 04 Nov 2020 07:13:28 -0500
+X-MC-Unique: 4YShpDS5MKGyQ7Ebodd7xw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40668804746;
- Wed,  4 Nov 2020 12:13:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92C7B804749;
+ Wed,  4 Nov 2020 12:13:27 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 421B7508E1;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2843676649;
  Wed,  4 Nov 2020 12:13:27 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 97F209CAE; Wed,  4 Nov 2020 13:13:21 +0100 (CET)
+ id 770539C87; Wed,  4 Nov 2020 13:13:21 +0100 (CET)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 8/8] dev-serial: store flow control and xon/xoff characters
-Date: Wed,  4 Nov 2020 13:13:21 +0100
-Message-Id: <20201104121321.7772-9-kraxel@redhat.com>
+Subject: [PULL 5/8] dev-serial: replace DeviceOutVendor/DeviceInVendor with
+ equivalent macros from usb.h
+Date: Wed,  4 Nov 2020 13:13:18 +0100
+Message-Id: <20201104121321.7772-6-kraxel@redhat.com>
 In-Reply-To: <20201104121321.7772-1-kraxel@redhat.com>
 References: <20201104121321.7772-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
@@ -98,116 +99,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Gerd Hoffmann <kraxel@redhat.com>
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Note that whilst the device does not do anything with these values, they are
-logged with trace events and stored to allow future implementation.
-
-The default flow control is set to none at reset as documented in the Linux
-ftdi_sio.h header file.
+The DeviceOutVendor and DeviceInVendor macros can be replaced with their
+equivalent VendorDeviceOutRequest and VendorDeviceRequest macros from usb.h.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Message-id: 20201027150456.24606-9-mark.cave-ayland@ilande.co.uk
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20201027150456.24606-6-mark.cave-ayland@ilande.co.uk
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/dev-serial.c | 38 +++++++++++++++++++++++++++++++++++---
- hw/usb/trace-events |  2 ++
- 2 files changed, 37 insertions(+), 3 deletions(-)
+ hw/usb/dev-serial.c | 25 ++++++++++---------------
+ 1 file changed, 10 insertions(+), 15 deletions(-)
 
 diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
-index e42ce362956b..19e1933f0496 100644
+index badf8785db46..92c35615eb13 100644
 --- a/hw/usb/dev-serial.c
 +++ b/hw/usb/dev-serial.c
-@@ -52,6 +52,7 @@
+@@ -37,11 +37,6 @@
+ #define FTDI_SET_LATENCY       9
+ #define FTDI_GET_LATENCY       10
  
- /* SET_FLOW_CTRL */
+-#define DeviceOutVendor \
+-           ((USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE) << 8)
+-#define DeviceInVendor \
+-           ((USB_DIR_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE) << 8)
+-
+ /* RESET */
  
-+#define FTDI_NO_HS         0
- #define FTDI_RTS_CTS_HS    1
- #define FTDI_DTR_DSR_HS    2
- #define FTDI_XON_XOFF_HS   4
-@@ -98,6 +99,9 @@ struct USBSerialState {
-     uint8_t error_chr;
-     uint8_t event_trigger;
-     bool always_plugged;
-+    uint8_t flow_control;
-+    uint8_t xon;
-+    uint8_t xoff;
-     QEMUSerialSetParams params;
-     int latency;        /* ms */
-     CharBackend cs;
-@@ -181,14 +185,36 @@ static const USBDesc desc_braille = {
-     .str  = desc_strings,
- };
+ #define FTDI_RESET_SIO 0
+@@ -253,7 +248,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+         break;
  
-+static void usb_serial_set_flow_control(USBSerialState *s,
-+                                        uint8_t flow_control)
-+{
-+    USBDevice *dev = USB_DEVICE(s);
-+    USBBus *bus = usb_bus_from_device(dev);
-+
-+    /* TODO: ioctl */
-+    s->flow_control = flow_control;
-+    trace_usb_serial_set_flow_control(bus->busnr, dev->addr, flow_control);
-+}
-+
-+static void usb_serial_set_xonxoff(USBSerialState *s, int xonxoff)
-+{
-+    USBDevice *dev = USB_DEVICE(s);
-+    USBBus *bus = usb_bus_from_device(dev);
-+
-+    s->xon = xonxoff & 0xff;
-+    s->xoff = (xonxoff >> 8) & 0xff;
-+
-+    trace_usb_serial_set_xonxoff(bus->busnr, dev->addr, s->xon, s->xoff);
-+}
-+
- static void usb_serial_reset(USBSerialState *s)
- {
--    /* TODO: Set flow control to none */
-     s->event_chr = 0x0d;
-     s->event_trigger = 0;
-     s->recv_ptr = 0;
-     s->recv_used = 0;
-     /* TODO: purge in char driver */
-+    usb_serial_set_flow_control(s, FTDI_NO_HS);
- }
- 
- static void usb_serial_handle_reset(USBDevice *dev)
-@@ -285,9 +311,15 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+     /* Class specific requests.  */
+-    case DeviceOutVendor | FTDI_RESET:
++    case VendorDeviceOutRequest | FTDI_RESET:
+         switch (value) {
+         case FTDI_RESET_SIO:
+             usb_serial_reset(s);
+@@ -268,7 +263,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+             break;
+         }
+         break;
+-    case DeviceOutVendor | FTDI_SET_MDM_CTRL:
++    case VendorDeviceOutRequest | FTDI_SET_MDM_CTRL:
+     {
+         static int flags;
+         qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_GET_TIOCM, &flags);
+@@ -289,10 +284,10 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
          qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_TIOCM, &flags);
          break;
      }
--    case VendorDeviceOutRequest | FTDI_SET_FLOW_CTRL:
--        /* TODO: ioctl */
-+    case VendorDeviceOutRequest | FTDI_SET_FLOW_CTRL: {
-+        uint8_t flow_control = index >> 8;
-+
-+        usb_serial_set_flow_control(s, flow_control);
-+        if (flow_control & FTDI_XON_XOFF_HS) {
-+            usb_serial_set_xonxoff(s, value);
-+        }
+-    case DeviceOutVendor | FTDI_SET_FLOW_CTRL:
++    case VendorDeviceOutRequest | FTDI_SET_FLOW_CTRL:
+         /* TODO: ioctl */
          break;
-+    }
-     case VendorDeviceOutRequest | FTDI_SET_BAUD: {
+-    case DeviceOutVendor | FTDI_SET_BAUD: {
++    case VendorDeviceOutRequest | FTDI_SET_BAUD: {
          static const int subdivisors8[8] = { 0, 4, 2, 1, 3, 5, 6, 7 };
          int subdivisor8 = subdivisors8[((value & 0xc000) >> 14)
-diff --git a/hw/usb/trace-events b/hw/usb/trace-events
-index 109da521cf4d..a3292d46248f 100644
---- a/hw/usb/trace-events
-+++ b/hw/usb/trace-events
-@@ -331,3 +331,5 @@ usb_serial_unsupported_data_bits(int bus, int addr, int value) "dev %d:%u unsupp
- usb_serial_bad_token(int bus, int addr) "dev %d:%u bad token"
- usb_serial_set_baud(int bus, int addr, int baud) "dev %d:%u baud rate %d"
- usb_serial_set_data(int bus, int addr, int parity, int data, int stop) "dev %d:%u parity %c, data bits %d, stop bits %d"
-+usb_serial_set_flow_control(int bus, int addr, int index) "dev %d:%u flow control %d"
-+usb_serial_set_xonxoff(int bus, int addr, uint8_t xon, uint8_t xoff) "dev %d:%u xon 0x%x xoff 0x%x"
+                                      | ((index & 1) << 2)];
+@@ -311,7 +306,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+         qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+         break;
+     }
+-    case DeviceOutVendor | FTDI_SET_DATA:
++    case VendorDeviceOutRequest | FTDI_SET_DATA:
+         switch (value & FTDI_PARITY) {
+         case 0:
+             s->params.parity = 'N';
+@@ -346,23 +341,23 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+         qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+         /* TODO: TX ON/OFF */
+         break;
+-    case DeviceInVendor | FTDI_GET_MDM_ST:
++    case VendorDeviceRequest | FTDI_GET_MDM_ST:
+         data[0] = usb_get_modem_lines(s) | 1;
+         data[1] = FTDI_THRE | FTDI_TEMT;
+         p->actual_length = 2;
+         break;
+-    case DeviceOutVendor | FTDI_SET_EVENT_CHR:
++    case VendorDeviceOutRequest | FTDI_SET_EVENT_CHR:
+         /* TODO: handle it */
+         s->event_chr = value;
+         break;
+-    case DeviceOutVendor | FTDI_SET_ERROR_CHR:
++    case VendorDeviceOutRequest | FTDI_SET_ERROR_CHR:
+         /* TODO: handle it */
+         s->error_chr = value;
+         break;
+-    case DeviceOutVendor | FTDI_SET_LATENCY:
++    case VendorDeviceOutRequest | FTDI_SET_LATENCY:
+         s->latency = value;
+         break;
+-    case DeviceInVendor | FTDI_GET_LATENCY:
++    case VendorDeviceRequest | FTDI_GET_LATENCY:
+         data[0] = s->latency;
+         p->actual_length = 1;
+         break;
 -- 
 2.27.0
 
