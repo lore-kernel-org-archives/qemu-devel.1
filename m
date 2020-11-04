@@ -2,79 +2,79 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58BE1C4741F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA34C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:07:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7FF52071A
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:05:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B3BF20732
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:07:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MYe9lWCv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7FF52071A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xe/yPIak"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B3BF20732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaMEO-0000Vi-P0
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 12:05:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56116)
+	id 1kaMFa-0001x9-En
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 12:07:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kaMCv-0007x8-Dg
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:04:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36306)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kaMCw-0007xO-3T
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:04:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59042)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kaMCs-0005Br-VA
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:04:24 -0500
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kaMCs-0005Bp-E0
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:04:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1604509458;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6KOQ1zCdyYwRyFh5PE/1CRsdiP/tDblKV/eQ9keiIxY=;
- b=MYe9lWCvC9rZ42Da2vbFlBW5J+uAwgmxlIyNm5Q4OPtuN4WsGHFbvmIhQ4CFS6m3WjqNXV
- eqnPkNT73GTPUlieufOUFpaS9EwnuUPH88usdWvBR4ark+8b5Du3e+BuGIJ6Ah3OUIDSH8
- Wn8cPy+7GJnrFc0iaQBs+6LKTa6iOYg=
+ bh=3HPCJDfpddIrodZ04DA1g5MRbX+/QiNc5S/n0QBIkV0=;
+ b=Xe/yPIakvzvKC/My8obbq07L1E8vn7D7NLGMnmLYoJFW7wf7vEjdFAf2C2WVY+hvmv/BlJ
+ Twx4NhmBYpsmfTLI/RXV+9eEnP5M3SvbaYYzqRqRallbVxZJ/m1BfcG0TShH1gTNWecWKz
+ S4beXCblgwNMI/FLRjyMSkeY4w8tMU4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-119-SD-JLZxFP1-Ug8s32VlU0Q-1; Wed, 04 Nov 2020 12:04:16 -0500
-X-MC-Unique: SD-JLZxFP1-Ug8s32VlU0Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-535-XjdvfW7kOyiMujVqnri0yQ-1; Wed, 04 Nov 2020 12:04:16 -0500
+X-MC-Unique: XjdvfW7kOyiMujVqnri0yQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BE1C8030BB;
- Wed,  4 Nov 2020 17:04:06 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-163.ams2.redhat.com
- [10.36.112.163])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8259D19D61;
- Wed,  4 Nov 2020 17:03:27 +0000 (UTC)
-Subject: Re: Migrating to the gitlab issue tracker
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
-References: <bda4f471-8ed6-3832-29ac-279a6d3bb7cc@redhat.com>
- <20201030091636.GD307361@stefanha-x1.localdomain>
- <62284d4e-ccd6-08b4-6cd4-0a5795488996@redhat.com>
- <20201102142645.GE138796@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <76a87809-0e2a-1410-7809-69e0271686d0@redhat.com>
-Date: Wed, 4 Nov 2020 18:03:26 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B921711CC7EF
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 17:04:15 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 66FCD5C3E1;
+ Wed,  4 Nov 2020 17:04:15 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 20/20] qapi,
+ qemu-options: make all parsing visitors parse boolean options the same
+Date: Wed,  4 Nov 2020 12:04:14 -0500
+Message-Id: <20201104170414.546578-2-pbonzini@redhat.com>
+In-Reply-To: <20201104170414.546578-1-pbonzini@redhat.com>
+References: <20201104170414.546578-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201102142645.GE138796@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=lersek@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,132 +97,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, Jeff Cody <codyprime@gmail.com>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Klaus Jensen <its@irrelevant.dk>, Alberto Garcia <berto@igalia.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Ben Warren <ben@skyportsystems.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Halil Pasic <pasic@linux.ibm.com>, Kamil Rytarowski <kamil@netbsd.org>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Jason Wang <jasowang@redhat.com>, Brad Smith <brad@comstyle.com>,
- Laurent Vivier <lvivier@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Beniamino Galvani <b.galvani@gmail.com>, Alexander Bulekov <alxndr@bu.edu>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
- Aarushi Mehta <mehta.aaru20@gmail.com>, Richard Henderson <rth@twiddle.net>,
- Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Ed Maste <emaste@freebsd.org>, Chris Wulff <crwulff@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>, Coiby Xu <Coiby.Xu@gmail.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <fam@euphon.net>,
- Peter Maydell <peter.maydell@linaro.org>, Anup Patel <anup.patel@wdc.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Thomas Huth <thuth@redhat.com>,
- Max Filippov <jcmvbkbc@gmail.com>, Su Hang <suhang16@mails.ucas.ac.cn>,
- Alistair Francis <alistair.francis@wdc.com>, "Denis V. Lunev" <den@openvz.org>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>, Hannes Reinecke <hare@suse.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, Zhang Chen <chen.zhang@intel.com>,
- Gonglei <arei.gonglei@huawei.com>, Radoslaw Biernacki <rad@semihalf.com>,
- Liu Yuan <namei.unix@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Eric Farman <farman@linux.ibm.com>, Corey Minyard <minyard@acm.org>,
- Stefan Weil <sw@weilnetz.de>, Julia Suvorova <jusual@redhat.com>,
- Greg Kurz <groug@kaod.org>, Cameron Esfahani <dirty@apple.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, Jan Kiszka <jan.kiszka@web.de>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Stafford Horne <shorne@gmail.com>, Paul Burton <paulburton@kernel.org>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Tyrone Ting <kfting@nuvoton.com>, Wenchao Wang <wenchao.wang@intel.com>,
- Michael Rolnik <mrolnik@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Paul Durrant <paul@xen.org>,
- Anthony Green <green@moxielogic.com>, Bin Meng <bin.meng@windriver.com>,
- Peter Xu <peterx@redhat.com>, Colin Xu <colin.xu@intel.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, Ari Sundholm <ari@tuxera.com>,
- Rob Herring <robh@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Antony Pavlov <antonynpavlov@gmail.com>, Jason Dillaman <dillaman@redhat.com>,
- Joel Stanley <joel@jms.id.au>, Sergio Lopez <slp@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Fabien Chouteau <chouteau@adacore.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>, Cleber Rosa <crosa@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Sunil Muthuswamy <sunilmut@microsoft.com>,
- Eduardo Otubo <otubo@redhat.com>,
- Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Pavel Pisa <pisa@cmp.felk.cvut.cz>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- Li Zhijian <lizhijian@cn.fujitsu.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>, Huacai Chen <chenhc@lemote.com>,
- Jiri Slaby <jslaby@suse.cz>, Peter Chubb <peter.chubb@nicta.com.au>,
- Marek Vasut <marex@denx.de>, Jia Liu <proljc@gmail.com>,
- Sven Schnelle <svens@stackframe.org>,
- Havard Skinnemoen <hskinnemoen@google.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- Vikram Garhwal <fnu.vikram@xilinx.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
- Li-Wen Hsu <lwhsu@freebsd.org>, David Gibson <david@gibson.dropbear.id.au>,
- Tony Krowiak <akrowiak@linux.ibm.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Eric Auger <eric.auger@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, Wen Congyang <wencongyang2@huawei.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Bin Meng <bmeng.cn@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/02/20 15:26, Daniel P. Berrangé wrote:
-> On Mon, Nov 02, 2020 at 02:57:49PM +0100, Laszlo Ersek wrote:
->> On 10/30/20 10:16, Stefan Hajnoczi wrote:
->>> On Thu, Oct 29, 2020 at 12:01:27PM -0400, John Snow wrote:
->>>> In experimenting with my mirror on gitlab though, I was unable to find a way
->>>> to configure it to send issue tracker notifications to the email list. A
->>>> move to gitlab would likely mean, then:
->>>>
->>>> 1. The cessation of (automatic) issue tracker mails to the list
->>>
->>> A bot could do this.
->>
->> I think a "bug traffic" mailing list (possibly but not necessarily
->> separate from the main qemu development list) is important.
-> 
-> What benefit is there to a bug traffic mailing list, as opposed to people
-> subscribing to direct bug notifications ? In both case people who are
-> interested in watching bugs can get the same content in their inboxes.
+OptsVisitor, StringInputVisitor and the keyval visitor have
+three different ideas of how a human could write the value of
+a boolean option.  Pay homage to the backwards-compatibility
+gods and make the new common helper accept all four sets (on/off,
+true/false, y/n and yes/no), but remove case-insensitivity.
 
-People never subscribed to a particular bug can retroactively learn --
-when it turns into an interest for them -- about actions on the bug,
-over time. Bug tracker web UIs do not always present such a view. (IOW
-it's not interchangeable with retroactively opening the ticket and
-reading through it.)
+Since OptsVisitor is supposed to match qemu-options, adjust
+it as well.
 
-Additionally, mailing list archives can be imported locally, for
-indexing / searching, etc. Nothing beats a local search engine that has
-access to years of bug traffic. Google may come somewhat close; bug
-trackers' own search functionalities are hopeless in comparison (IME).
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20201103161339.447118-1-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/qapi/util.h          |  2 ++
+ qapi/opts-visitor.c          | 14 +-------------
+ qapi/qapi-util.c             | 23 +++++++++++++++++++++++
+ qapi/qobject-input-visitor.c |  6 +-----
+ qapi/string-input-visitor.c  | 17 +----------------
+ util/qemu-option.c           | 20 ++------------------
+ 6 files changed, 30 insertions(+), 52 deletions(-)
 
-Thanks
-Laszlo
+diff --git a/include/qapi/util.h b/include/qapi/util.h
+index bc312e90aa..6178e98e97 100644
+--- a/include/qapi/util.h
++++ b/include/qapi/util.h
+@@ -19,6 +19,8 @@ typedef struct QEnumLookup {
+ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val);
+ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+                     int def, Error **errp);
++bool qapi_bool_parse(const char *name, const char *value, bool *obj,
++                     Error **errp);
+ 
+ int parse_qapi_name(const char *name, bool complete);
+ 
+diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+index 7781c23a42..587f31baf6 100644
+--- a/qapi/opts-visitor.c
++++ b/qapi/opts-visitor.c
+@@ -368,7 +368,6 @@ opts_type_str(Visitor *v, const char *name, char **obj, Error **errp)
+ }
+ 
+ 
+-/* mimics qemu-option.c::parse_option_bool() */
+ static bool
+ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ {
+@@ -379,19 +378,8 @@ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+     if (!opt) {
+         return false;
+     }
+-
+     if (opt->str) {
+-        if (strcmp(opt->str, "on") == 0 ||
+-            strcmp(opt->str, "yes") == 0 ||
+-            strcmp(opt->str, "y") == 0) {
+-            *obj = true;
+-        } else if (strcmp(opt->str, "off") == 0 ||
+-            strcmp(opt->str, "no") == 0 ||
+-            strcmp(opt->str, "n") == 0) {
+-            *obj = false;
+-        } else {
+-            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
+-                       "on|yes|y|off|no|n");
++        if (!qapi_bool_parse(opt->name, opt->str, obj, errp)) {
+             return false;
+         }
+     } else {
+diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+index 29a6c98b53..3c24bb3d45 100644
+--- a/qapi/qapi-util.c
++++ b/qapi/qapi-util.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qemu/ctype.h"
++#include "qapi/qmp/qerror.h"
+ 
+ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+ {
+@@ -40,6 +41,28 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+     return def;
+ }
+ 
++bool qapi_bool_parse(const char *name, const char *value, bool *obj, Error **errp)
++{
++    if (g_str_equal(value, "on") ||
++        g_str_equal(value, "yes") ||
++        g_str_equal(value, "true") ||
++        g_str_equal(value, "y")) {
++        *obj = true;
++        return true;
++    }
++    if (g_str_equal(value, "off") ||
++        g_str_equal(value, "no") ||
++        g_str_equal(value, "false") ||
++        g_str_equal(value, "n")) {
++        *obj = false;
++        return true;
++    }
++
++    error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name,
++               "'on' or 'off'");
++    return false;
++}
++
+ /*
+  * Parse a valid QAPI name from @str.
+  * A valid name consists of letters, digits, hyphen and underscore.
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 7b184b50a7..23843b242e 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -512,11 +512,7 @@ static bool qobject_input_type_bool_keyval(Visitor *v, const char *name,
+         return false;
+     }
+ 
+-    if (!strcmp(str, "on")) {
+-        *obj = true;
+-    } else if (!strcmp(str, "off")) {
+-        *obj = false;
+-    } else {
++    if (!qapi_bool_parse(name, str, obj, NULL)) {
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    full_name(qiv, name), "'on' or 'off'");
+         return false;
+diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+index 6e53396ea3..197139c1c0 100644
+--- a/qapi/string-input-visitor.c
++++ b/qapi/string-input-visitor.c
+@@ -332,22 +332,7 @@ static bool parse_type_bool(Visitor *v, const char *name, bool *obj,
+     StringInputVisitor *siv = to_siv(v);
+ 
+     assert(siv->lm == LM_NONE);
+-    if (!strcasecmp(siv->string, "on") ||
+-        !strcasecmp(siv->string, "yes") ||
+-        !strcasecmp(siv->string, "true")) {
+-        *obj = true;
+-        return true;
+-    }
+-    if (!strcasecmp(siv->string, "off") ||
+-        !strcasecmp(siv->string, "no") ||
+-        !strcasecmp(siv->string, "false")) {
+-        *obj = false;
+-        return true;
+-    }
+-
+-    error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-               "boolean");
+-    return false;
++    return qapi_bool_parse(name ? name : "null", siv->string, obj, errp);
+ }
+ 
+ static bool parse_type_str(Visitor *v, const char *name, char **obj,
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index b9f93a7f8b..acefbc23fa 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -96,21 +96,6 @@ const char *get_opt_value(const char *p, char **value)
+     return offset;
+ }
+ 
+-static bool parse_option_bool(const char *name, const char *value, bool *ret,
+-                              Error **errp)
+-{
+-    if (!strcmp(value, "on")) {
+-        *ret = 1;
+-    } else if (!strcmp(value, "off")) {
+-        *ret = 0;
+-    } else {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+-                   name, "'on' or 'off'");
+-        return false;
+-    }
+-    return true;
+-}
+-
+ static bool parse_option_number(const char *name, const char *value,
+                                 uint64_t *ret, Error **errp)
+ {
+@@ -363,7 +348,7 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
+     if (opt == NULL) {
+         def_val = find_default_by_name(opts, name);
+         if (def_val) {
+-            parse_option_bool(name, def_val, &ret, &error_abort);
++            qapi_bool_parse(name, def_val, &ret, &error_abort);
+         }
+         return ret;
+     }
+@@ -471,8 +456,7 @@ static bool qemu_opt_parse(QemuOpt *opt, Error **errp)
+         /* nothing */
+         return true;
+     case QEMU_OPT_BOOL:
+-        return parse_option_bool(opt->name, opt->str, &opt->value.boolean,
+-                                 errp);
++        return qapi_bool_parse(opt->name, opt->str, &opt->value.boolean, errp);
+     case QEMU_OPT_NUMBER:
+         return parse_option_number(opt->name, opt->str, &opt->value.uint,
+                                    errp);
+-- 
+2.26.2
 
 
