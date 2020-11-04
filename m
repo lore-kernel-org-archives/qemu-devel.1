@@ -2,79 +2,80 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BBBC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6833CC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:12:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99BEA20BED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:12:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD57720BED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:12:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TRfWf/GV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99BEA20BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="duFbm/0+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD57720BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaB62-0003cR-Iu
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:12:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59622)
+	id 1kaB6F-0003lq-KW
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:12:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmR-0007MZ-8x
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30074)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmW-0007aB-VQ
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24630)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmO-0004ra-LT
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:18 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmU-0004tB-Tj
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604465535;
+ s=mimecast20190719; t=1604465542;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=tvJ0s3bSV9g9bsoYugn7fOSbhCEdSfwOqB79D2kkBqw=;
- b=TRfWf/GVv5nWE4XMD5WGwt+C/uN7MQd5EhyCDN0nxc2vkJ4vIkrXn5vb0lkc7h4XciDFq5
- o1Q5m9RsUbyY6dhDn8Im+g2y/rMHN6eoMXNm8QFJpDEymSHegccamhEMwhXjbpi4zvImW5
- tdoKT3kWuzzpvMnQ7XiKl9B01aCHHIo=
+ bh=oAjLZ11EwsHXoMOOACL8j6jIH95zMRiiieEROhG5SCc=;
+ b=duFbm/0+hrycbDX3+0N2et41xH2XKmjPhbFoVVKtAtI/Tx3j9YCOiaJXJCxxCnfYtMwzRE
+ jKkoj9UwmuHb8ymCilmJ4AX++WOi3vrFyBarIS2ZUCfcZmSJt0rt2HRcG2adAqjy3Qx+6H
+ eJQOkSpu0uGRwTLk4BQfxyMyLGyxeAc=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-363-3Ds83iu1MEq-Ii9swDu7qQ-1; Tue, 03 Nov 2020 23:51:24 -0500
-X-MC-Unique: 3Ds83iu1MEq-Ii9swDu7qQ-1
-Received: by mail-wr1-f69.google.com with SMTP id w3so6590919wrt.11
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:51:24 -0800 (PST)
+ us-mta-357-tmEaLNRfP86qUFm6ZqeJiw-1; Tue, 03 Nov 2020 23:52:20 -0500
+X-MC-Unique: tmEaLNRfP86qUFm6ZqeJiw-1
+Received: by mail-wr1-f69.google.com with SMTP id 33so8659315wrf.22
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:52:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=tvJ0s3bSV9g9bsoYugn7fOSbhCEdSfwOqB79D2kkBqw=;
- b=gKcErJ+8xhNrwWR/u/v42mlQ5+AB8oQJSAOZFQwbiAiiFcAgaTakgQ3XF5b4JYPdn0
- 0P9zhGBvlQypvX+L8vd/S1zAfWNHzaztVd9I3bryejaQwR1hJiIHPs32O2vf7z1GuZIb
- bZ/f64WRVIgZG9z614jX5XU+nKXn5F0ET6tvpNdtGQPU5nzq23ZCYpQZglrdJP+aoZaD
- w1naFOn3rb3yc3pNYgBLVPc2rWLPrem4QUEh0lE+fFaY4yeYqfHa2foI1fz3OLBvfqyo
- zcrm/muUDB2trHgwCwKTLTpdndGXEC3ixbkT1RUdseTuw+kPeNGpi9SNATxzIP5hiBqW
- BMwA==
-X-Gm-Message-State: AOAM531xVfehDaxP9y65wmsz2UyQthgoyVvhdlKJXfZDcUCfy/OoohUr
- tnWv/dEpRa3bloIk61Qtn4NvXmA3tiJqXrR/Q2ae2jzDPc0V/qSwAtQXdWs6tsSMzI4TRTleVhl
- kX2zHZm64t766vZY=
-X-Received: by 2002:adf:db44:: with SMTP id f4mr3881025wrj.168.1604465482931; 
- Tue, 03 Nov 2020 20:51:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxNJp6EN/fqDWKrMt2U0OWC0ot8m6MY3XbBQ0nz6vZ4E1EgHuzhN+O6RTQKMsZSdOwmIWvn5Q==
-X-Received: by 2002:adf:db44:: with SMTP id f4mr3881011wrj.168.1604465482822; 
- Tue, 03 Nov 2020 20:51:22 -0800 (PST)
+ bh=oAjLZ11EwsHXoMOOACL8j6jIH95zMRiiieEROhG5SCc=;
+ b=lzQLPxSjRPg4IENnPsmvEadgQyhRQAHB2esuKLdSuDC5gjns5ZZIEu+P5c3HlkWp8D
+ g8buzEGfcKEKEZ4WfHMuq7hV34xqzfcrCJJjCxCYCMmdk3T08R4EXZOvh8BmeL0Le0sh
+ rLGUfmer5e9h6MjKlEsLxIpwXWsuW0mVe8tKy2WvYN0OaqD/7cXSD6RqwlAT0m88Hudf
+ IBzJW7JhglRhusnEI2OP0ZeDTt8ZBRBRSQr7ZmLemCqNk7oaOdECYJ1qiNrasQOvmaCF
+ +Ue7hZklv9WMzsPwdmxvWyxheWhu4VpIB0RBA8lshCbsnRttDMHNUvVzGqM1OKbUEbL6
+ RTqQ==
+X-Gm-Message-State: AOAM533Z7ZqbxyErTza6vXMuif3Yu/8dEYDQJRAIc5Ret5icaZeE6TL8
+ aZt1Bnd+fHH+F9LIbqKCnT7loZyxUrvX53u6HDupp+iJRYOxFcnqCzLGcpTFz7I+VjgobUwmIYd
+ T0TLealfu8ZJm8hc=
+X-Received: by 2002:a5d:4581:: with SMTP id p1mr29642591wrq.353.1604465538923; 
+ Tue, 03 Nov 2020 20:52:18 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxigAe3jPW7Tu6L2pCxoUsdnY8FVMxv/V0FS0A0KvMatcvOkpmVmV6WMKV0cyS8drKtRm3csw==
+X-Received: by 2002:a5d:4581:: with SMTP id p1mr29642576wrq.353.1604465538803; 
+ Tue, 03 Nov 2020 20:52:18 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id y187sm813239wmg.33.2020.11.03.20.51.21
+ by smtp.gmail.com with ESMTPSA id u15sm853127wrm.77.2020.11.03.20.52.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 20:51:22 -0800 (PST)
-Date: Tue, 3 Nov 2020 23:51:20 -0500
+ Tue, 03 Nov 2020 20:52:18 -0800 (PST)
+Date: Tue, 3 Nov 2020 23:52:16 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 14/38] virtio-iommu: Store memory region in endpoint struct
-Message-ID: <20201104044937.226370-15-mst@redhat.com>
+Subject: [PULL v2 35/38] vhost-user-blk-test: rename destroy_drive() to
+ destroy_file()
+Message-ID: <20201104044937.226370-36-mst@redhat.com>
 References: <20201104044937.226370-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
@@ -109,75 +110,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eric Auger <eric.auger@redhat.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Store the memory region associated to each endpoint into the endpoint
-structure, to allow efficient memory notification on map/unmap.
+The function is used not just for image files but also for UNIX domain
+sockets (QMP monitor and vhost-user-blk). Reflect that in the name.
 
-Acked-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Message-Id: <20201030180510.747225-3-jean-philippe@linaro.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20201027173528.213464-10-stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-iommu.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ tests/qtest/vhost-user-blk-test.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 4c8f3909b7..a5c2d69aad 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -49,6 +49,7 @@ typedef struct VirtIOIOMMUDomain {
- typedef struct VirtIOIOMMUEndpoint {
-     uint32_t id;
-     VirtIOIOMMUDomain *domain;
-+    IOMMUMemoryRegion *iommu_mr;
-     QLIST_ENTRY(VirtIOIOMMUEndpoint) next;
- } VirtIOIOMMUEndpoint;
+diff --git a/tests/qtest/vhost-user-blk-test.c b/tests/qtest/vhost-user-blk-test.c
+index 31f2335f97..f05f14c192 100644
+--- a/tests/qtest/vhost-user-blk-test.c
++++ b/tests/qtest/vhost-user-blk-test.c
+@@ -658,7 +658,8 @@ static const char *qtest_qemu_storage_daemon_binary(void)
+     return qemu_storage_daemon_bin;
+ }
  
-@@ -137,16 +138,19 @@ static VirtIOIOMMUEndpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
-                                                       uint32_t ep_id)
+-static void drive_destroy(void *path)
++/* g_test_queue_destroy() cleanup function for files */
++static void destroy_file(void *path)
  {
-     VirtIOIOMMUEndpoint *ep;
-+    IOMMUMemoryRegion *mr;
+     unlink(path);
+     g_free(path);
+@@ -678,7 +679,7 @@ static char *drive_create(void)
+     g_assert_cmpint(ret, ==, 0);
+     close(fd);
  
-     ep = g_tree_lookup(s->endpoints, GUINT_TO_POINTER(ep_id));
-     if (ep) {
-         return ep;
-     }
--    if (!virtio_iommu_mr(s, ep_id)) {
-+    mr = virtio_iommu_mr(s, ep_id);
-+    if (!mr) {
-         return NULL;
-     }
-     ep = g_malloc0(sizeof(*ep));
-     ep->id = ep_id;
-+    ep->iommu_mr = mr;
-     trace_virtio_iommu_get_endpoint(ep_id);
-     g_tree_insert(s->endpoints, GUINT_TO_POINTER(ep_id), ep);
-     return ep;
-@@ -910,9 +914,14 @@ static gboolean reconstruct_endpoints(gpointer key, gpointer value,
-     VirtIOIOMMU *s = (VirtIOIOMMU *)data;
-     VirtIOIOMMUDomain *d = (VirtIOIOMMUDomain *)value;
-     VirtIOIOMMUEndpoint *iter;
-+    IOMMUMemoryRegion *mr;
+-    g_test_queue_destroy(drive_destroy, t_path);
++    g_test_queue_destroy(destroy_file, t_path);
+     return t_path;
+ }
  
-     QLIST_FOREACH(iter, &d->endpoint_list, next) {
-+        mr = virtio_iommu_mr(s, iter->id);
-+        assert(mr);
-+
-         iter->domain = d;
-+        iter->iommu_mr = mr;
-         g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
-     }
-     return false; /* continue the domain traversal */
+@@ -717,7 +718,7 @@ static char *start_vhost_user_blk(GString *cmd_line, int vus_instances,
+ 
+     qmp_fd = mkstemp(qmp_sock_path);
+     g_assert_cmpint(qmp_fd, >=, 0);
+-    g_test_queue_destroy(drive_destroy, qmp_sock_path);
++    g_test_queue_destroy(destroy_file, qmp_sock_path);
+ 
+     g_string_append_printf(storage_daemon_command,
+             "exec %s "
+@@ -731,7 +732,7 @@ static char *start_vhost_user_blk(GString *cmd_line, int vus_instances,
+         sock_path = g_strdup(sock_path_tempate);
+         fd = mkstemp(sock_path);
+         g_assert_cmpint(fd, >=, 0);
+-        g_test_queue_destroy(drive_destroy, sock_path);
++        g_test_queue_destroy(drive_file, sock_path);
+         /* create image file */
+         img_path = drive_create();
+         g_string_append_printf(storage_daemon_command,
 -- 
 MST
 
