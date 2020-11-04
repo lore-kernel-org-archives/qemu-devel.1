@@ -2,70 +2,81 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8465AC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 22:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D91C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 22:36:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9E7E20756
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 22:29:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9E7E20756
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F84120704
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 22:36:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F84120704
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaRHH-00084d-M2
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 17:29:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32868)
+	id 1kaROC-0002Lo-5J
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 17:36:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ard.biesheuvel@arm.com>)
- id 1kaQmu-0003qA-9t; Wed, 04 Nov 2020 16:57:52 -0500
-Received: from foss.arm.com ([217.140.110.172]:36988)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ard.biesheuvel@arm.com>)
- id 1kaQmr-0000et-O7; Wed, 04 Nov 2020 16:57:51 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08C4C14BF;
- Wed,  4 Nov 2020 13:57:43 -0800 (PST)
-Received: from [192.168.1.81] (unknown [10.37.8.17])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EA6273F719;
- Wed,  4 Nov 2020 13:57:40 -0800 (PST)
-Subject: Re: Question on UEFI ACPI tables setup and probing on arm64
-To: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Ying Fang <fangying1@huawei.com>
-References: <ee3b7fdf-f6ba-cafc-5b44-42b0bcda01c5@huawei.com>
- <20201103133913.1fee3337@redhat.com>
- <a79383a6-92d4-5b10-d143-414543caab70@redhat.com>
-From: Ard Biesheuvel <ard.biesheuvel@arm.com>
-Message-ID: <a21964bc-d603-9a3c-1012-627088688ce1@arm.com>
-Date: Wed, 4 Nov 2020 22:57:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kaRNR-0001Rh-L1
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 17:35:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35830)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kaRNP-0005Un-Fr
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 17:35:37 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kaRNN-00063l-TD
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 22:35:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CEEBB2E8132
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 22:35:33 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <a79383a6-92d4-5b10-d143-414543caab70@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=217.140.110.172;
- envelope-from=ard.biesheuvel@arm.com; helo=foss.arm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 16:57:43
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 04 Nov 2020 22:23:58 -0000
+From: John Snow <1900779@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: bytes disassembly mixes
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dennis-restle jnsnow pmaydell
+X-Launchpad-Bug-Reporter: Chaoscode (dennis-restle)
+X-Launchpad-Bug-Modifier: John Snow (jnsnow)
+References: <160324353545.18570.15111142462284405315.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160452863852.18274.15834527466646652236.malone@wampee.canonical.com>
+Subject: [Bug 1900779] Re: xp /16i on arm mixes DWords
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
+X-Launchpad-Hash: 5781795bb6ae16b0a5df6bd72e3ed818f052cf35
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 17:35:34
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Wed, 04 Nov 2020 17:28:39 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,72 +85,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Drew Jones <drjones@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- "wangzhigang17@huawei.com" <wangzhigang17@huawei.com>, philmd@redhat.com
+Reply-To: Bug 1900779 <1900779@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/20 10:46 PM, Laszlo Ersek wrote:
-...
-> 
-> (9) (Ard, please correct the below if necessary; thanks.)
-> 
-> The UEFI stub of the guest kernel (which is a UEFI application) uses a
-> device tree as its main communication channel to the (later-started)
-> kernel entry point, AIUI.
-> 
-> The UEFI stub basically inverts the importance of the UEFI system table
-> versus the device tree -- the UEFI stub *converts* the UEFI system table
-> (the multitude of UEFI config tables) into a device tree. This is my
-> understanding anyway.
-> 
+Staged: 437588d81d99ac91cb1e4ff060610458e67852d5
 
-Not entirely. The UEFI stub uses DT to communicate with the kernel 
-proper, just like a non-EFI bootloader does. There are two pieces of 
-information regarding EFI that the stub passes via the device tree:
-- the EFI system table address
-- the EFI memory map (address, size, descriptor size etc)
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
 
-(Aside: unfortunately, we cannot pass the latter information via a EFI 
-configuration table, given that we call SetVirtualAddressMap() in the 
-stub, which causes the config_tables member of the system table to be 
-converted into a virtual address. That virtual address can only be 
-converted into a physical address if we have access to the EFI memory map.)
+-- =
 
-All other information passed between the EFI stub and the kernel proper 
-is passed via Linux-specific EFI configuration tables.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1900779
 
-> (9a) If ACPI was disabled on the QEMU command line, then the guest
-> kernel *adopts* the device tree that was forwarded to it in (6), via the
-> UEFI config table marked with DEVICE_TREE_GUID.
-> 
+Title:
+  xp /16i on arm mixes DWords
 
-Yes, although the EFI stub updates/augments it with the two data items 
-mentioned above, as well as the kernel command line, initrd base and 
-size and a KASLR seed [if enabled].
+Status in QEMU:
+  Fix Committed
 
-> (9b) If ACPI was enabled on the QEMU command line, then the UEFI stub
-> creates a brand new (empty) device tree (AIUI).
->
+Bug description:
+  I was working with qemuand wanted to understag ATAG structure.
+  In Monitor mode I used xp /16i 0x100 and I got really confused.
+  with xp /16i 0x100:
+  At address 0x120 the DWords are 0x00000000, 0x00000004, 0x54410009, 0x747=
+36574
+  with xp /16x 0x100:
+  At address 0x120 the DWords are 0x54410001, 0x00000001, 0x00000001, 0x000=
+00000
 
-... unless GRUB executed first and loaded a initrd, and passed this 
-information via the device tree. In this case, GRUB creates an empty DT 
-(Note that I posted the GRUB patches to implement LoadFile2 based initrd 
-loading just a week or so ago)
+  from my Terminal:
 
-> Either way, the UEFI system table is linked *under* the -- adopted or
-> new -- device tree, through the "chosen" node. And so, if ACPI was
-> enabled, the ACPI RSD PTR (coming from step (7)) becomes visible to the
-> kernel proper as well, through the UEFI config table with
-> ACPI_20_TABLE_GUID.
-> 
-> I believe this is implemented under "drivers/firmware/efi/libstub" in
-> the kernel tree.
-> 
-> Thanks,
-> Laszlo
-> 
+  (qemu) xp /16x 0x100
+  0000000000000100: 0x00000005 0x54410001 0x00000001 0x00001000
+  0000000000000110: 0x00000000 0x00000004 0x54410002 0x3c000000
+  0000000000000120: 0x00000000 0x00000004 0x54410009 0x74736574
+  0000000000000130: 0x00000000 0x00000000 0x00000000 0x00000000
+  (qemu) xp /16i 0x100
+  0x00000100:  00000005  andeq    r0, r0, r5
+  0x00000104:  54410001  strbpl   r0, [r1], #-1
+  0x00000108:  00000001  andeq    r0, r0, r1
+  0x0000010c:  00001000  andeq    r1, r0, r0
+  0x00000110:  00000000  andeq    r0, r0, r0
+  0x00000114:  00000004  andeq    r0, r0, r4
+  0x00000118:  54410002  strbpl   r0, [r1], #-2
+  0x0000011c:  3c000000  .byte    0x00, 0x00, 0x00, 0x3c
+  0x00000120:  54410001  strbpl   r0, [r1], #-1
+  0x00000124:  00000001  andeq    r0, r0, r1
+  0x00000128:  00001000  andeq    r1, r0, r0
+  0x0000012c:  00000000  andeq    r0, r0, r0
+  0x00000130:  00000004  andeq    r0, r0, r4
+  0x00000134:  54410002  strbpl   r0, [r1], #-2
+  0x00000138:  3c000000  .byte    0x00, 0x00, 0x00, 0x3c
+  0x0000013c:  00000000  andeq    r0, r0, r0
+  (increasing length only results in more 00000000  andeq    r0, r0, r0 Lin=
+es)
 
+  Version:
+  4.2.1Debian 1:4.2-3ubuntu6.6
+  Commandline:
+  qemu-system-arm -machine raspi2 --nographic -S -s -kernel ./vmlinuz --app=
+end "test"
+  ./vmlinuz is a x64 linux kernel. I didn't care about architecture because=
+ i just wanted to see ATAG structure.
+  I also tried
+  qemu-system-arm -machine raspi2 --nographic -S -s -kernel ./overview.pdf =
+--append "test"
+  same result.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1900779/+subscriptions
 
