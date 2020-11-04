@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05EEEC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1993C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:37:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F66C20759
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:36:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 338A3221F8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:37:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MiGYwuhK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F66C20759
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiK+gY1q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 338A3221F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaFDh-0001J1-AR
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 04:36:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57150)
+	id 1kaFEj-0002mE-7F
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 04:37:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kaFCj-0008Rw-Bc
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 04:35:45 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52001)
+ id 1kaFCo-0000Aq-LP
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 04:35:50 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:55556)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kaFCh-0003vA-Pl
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 04:35:44 -0500
-Received: by mail-wm1-x341.google.com with SMTP id v5so1693375wmh.1
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 01:35:43 -0800 (PST)
+ id 1kaFCm-0003vU-VO
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 04:35:50 -0500
+Received: by mail-wm1-x336.google.com with SMTP id c9so1671955wml.5
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 01:35:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=4AhUjeQiN0LcEfpx9fUA0RoRAgGVy7D+433bMg8WIoY=;
- b=MiGYwuhK4bBAXxdeMn4u87pmsXL3PJjESP2bna9x91x/I8QrOTJCWapDuj7bhXASK/
- tiipDW+vkv1FNRk5slRDB4WD+LmdgrUR/NYDScqx98W06aE5H7nV64PzdCn0PfM2LyC4
- K0ORHkzb1OXar2SCl3sSj4Ji/C8gIQfHnBdlwRWyMsHyf+oXUb/1eN367ztbqTunLYES
- Na6sAyGVLycGmRY0IuAC+ZkBytfkyBIfKjaSr82TfHD9x4MInKyD0zVCjenlSEaLVWHI
- Aivu8BnbOAicQ4rlUdQjgZlssdfCQJ3lkAEWalilvFfJl2sJCZzPXqkZLoIebcOZCjbI
- NKZQ==
+ bh=oU5UbR5ntNYy2SUlvhi9joWPDwzoXedtc395+AIU/FU=;
+ b=UiK+gY1qMkcIbHe1lyQpWs29c7MRIx27Dij2gKezrDhPavG0xGQKeMc0HH2O+FwWMW
+ Oqxz0cDeFupQQe1oowuGa7VtSaEaGaUwNLvjLNxUQ7egRr09C6tzhe487ZIHZVMQ0Uku
+ Rl6/fEoYVA6TW1rk/b+opnauZsaCrIeqC7wgJlwqppDeMcWBnxp/6CvJ3XfpfW8gDsu1
+ g778ReZj4T2sof/byrtun6WMsbOHpfVi7BSJECB5ZIJQWO8a7/Sp7Avpg9Pobu9ofdVk
+ vN+Lmmj9+qcOLLGEo/oyFFCMmLMwUTwdCxr7dpAfjnNqUuT7jakrLmZ+N17hyUM2fdGG
+ ++ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=4AhUjeQiN0LcEfpx9fUA0RoRAgGVy7D+433bMg8WIoY=;
- b=HQrJU25F2zTx27K/r6eCRXAaeM5JbVKRR3A+hCPlaDX8FOjh+fjqFr2ZPk7SzR2nCH
- 26y+t/2tWh8zctlTZq+noQJuDXBjbw8Q9RSJII7rGbURbDh8wGzPFgwd3F0pO1pbNR/3
- nyaQWVyoHQjzwpZjj5cvsc6x4VWWH3z+GkzaxuZvxpN1kyViFI+4LqTp9g1rhoXUfyTV
- pRIx+JKBirt+HkSlTVN0qIgTDQPonqbzPgsnGrFVQ24I2vG8e7+IYGwciZ6g5ZEooP6G
- 4vWF2laFgU7ID/qQLlbnc2xoY6xQivY1o3lDsrbJFxArkdZP6Z9C92hu+JMTmdIfLg84
- BD3g==
-X-Gm-Message-State: AOAM533463sEQMBNjimERR9al6opjAkQddlvLuxWIf+IyrB3C/Pt5hRH
- VzreGMe9O1NwvOe+ESMpEV/80VD7nbI=
-X-Google-Smtp-Source: ABdhPJzkWSP7lIgkSDvBwGpprX90shpPVzibsZhma2tGLUU8tMY56+QQGb023emfOGnLLcVcbaoKjw==
-X-Received: by 2002:a1c:96cb:: with SMTP id y194mr3469929wmd.62.1604482542378; 
- Wed, 04 Nov 2020 01:35:42 -0800 (PST)
+ bh=oU5UbR5ntNYy2SUlvhi9joWPDwzoXedtc395+AIU/FU=;
+ b=PJQmVF+Dpgs207jRMnnoMrvam4ywAvhYyyuxVXui5a3iijweK5OHBQo0dyh6+OpMke
+ auanlZtwX9bJa/1zOq6enDry4W9TRuyf9UhSK6iaqEIbOjJxUGau3N4fr/tblwZu7DAi
+ RFxADc0GdTvBei6m/pm6Do5VAY6hAd42CcjlDOfn5VdTw9wWppprTY5L4ER2fqD37xst
+ /Gu/mxnOdbb6CIoJHLP38tXnFj9riiXl+RC6Vz71YXRl53noY1VzCoCgquHP7NDsegTD
+ xKi7lrUayZ7njdoJf/EVrL8C1U2DfQaSd+FfU8ksCyAGDVC/t70gUEqOJCzPEU9u7rCq
+ fNRA==
+X-Gm-Message-State: AOAM533FIRMRRz91paRQgYJz71bQrQI2BVi4RDnd0fTAhf4MVNrzs2YS
+ iO82Qd0KSWCLKOQb7ztZ0IYMH7p3wnw=
+X-Google-Smtp-Source: ABdhPJxWPCt9IvKwbjlLBPh1mfSeLVBntguEsuqGa2yUdgaZq5uJP32JjIg87gu8rd6/ThFGw2hKxg==
+X-Received: by 2002:a1c:b387:: with SMTP id c129mr3759443wmf.66.1604482547100; 
+ Wed, 04 Nov 2020 01:35:47 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id f3sm1880884wrw.81.2020.11.04.01.35.41
+ by smtp.gmail.com with ESMTPSA id r1sm1772468wro.18.2020.11.04.01.35.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Nov 2020 01:35:41 -0800 (PST)
+ Wed, 04 Nov 2020 01:35:46 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] MAINTAINERS: Cover exec-vary.c (variable page size)
-Date: Wed,  4 Nov 2020 10:35:33 +0100
-Message-Id: <20201104093534.3064440-2-f4bug@amsat.org>
+Subject: [PATCH 2/2] exec: Ensure variable page size is only used with
+ TARGET_PAGE_BITS_VARY
+Date: Wed,  4 Nov 2020 10:35:34 +0100
+Message-Id: <20201104093534.3064440-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201104093534.3064440-1-f4bug@amsat.org>
 References: <20201104093534.3064440-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::336;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x336.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -110,25 +111,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add exec-vary.c to the 'Overall TCG CPUs' section.
+If TARGET_PAGE_BITS_VARY is not supported, machines should not
+intent to modify the target page size.
+As set_preferred_target_page_bits() is supposed to return 'false'
+on failure (documented in "qemu-common.h"), return false to
+indicate failure if this ever happens.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ include/qemu-common.h | 4 +++-
+ exec-vary.c           | 4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index dd16606bcdc..466898d3dbd 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -117,6 +117,7 @@ R: Paolo Bonzini <pbonzini@redhat.com>
- S: Maintained
- F: softmmu/cpus.c
- F: cpus-common.c
-+F: exec-vary.c
- F: accel/tcg/
- F: accel/stubs/tcg-stub.c
- F: scripts/decodetree.py
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index fda7dc6ca77..3ea616d4567 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -70,7 +70,9 @@ void cpu_exec_step_atomic(CPUState *cpu);
+  * size may be smaller than any given CPU's preference).
+  * Returns true on success, false on failure (which can only happen
+  * if this is called after the system has already finalized its
+- * choice of page size and the requested page size is smaller than that).
++ * choice of page size and the requested page size is smaller than
++ * that). Only target supporting variable page size should set a
++ * preferred target page size.
+  */
+ bool set_preferred_target_page_bits(int bits);
+ 
+diff --git a/exec-vary.c b/exec-vary.c
+index ff905f2a8fb..4b0b7f193af 100644
+--- a/exec-vary.c
++++ b/exec-vary.c
+@@ -86,8 +86,10 @@ bool set_preferred_target_page_bits(int bits)
+         }
+         init_target_page.bits = bits;
+     }
+-#endif
+     return true;
++#else
++    return false;
++#endif
+ }
+ 
+ void finalize_target_page_bits(void)
 -- 
 2.26.2
 
