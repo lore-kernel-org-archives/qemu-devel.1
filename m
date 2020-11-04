@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9418BC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 773F2C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:14:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00E0420719
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:13:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DACC720719
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:14:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iQOcxwh7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E0420719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JIAazF69"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DACC720719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaLPb-000132-03
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:13:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42566)
+	id 1kaLQD-0001yB-Q3
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:14:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLFT-0002yD-2D
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40711)
+ id 1kaLFK-0002b0-5E
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49861)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLFO-0005ex-KI
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:58 -0500
+ id 1kaLFF-0005cc-Vk
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604505773;
+ s=mimecast20190719; t=1604505764;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kMkn0qKfJmXT8iilPJPxpGrCY4NsAyw9mbK413S8G1M=;
- b=iQOcxwh7NicCMcBUIFkO/jBNABXQfXqah2u7QOzReswGrMFoeDn7c1Gnsvq4I7tOmshtIM
- hrM7eMxX0J00BtBYjWfq+BuUD8ZYtT91wabuir31hj6W+hcTxcvxwZmIM6+Fuf+LtUPA9E
- qV2IM4bBEEdgsjIjCGPlvJ0y8I7vGio=
+ bh=lP8Ipa5mLqAE9VjgBoHfNOntAlIkapGWtuBsO7JT7S0=;
+ b=JIAazF69hi4UL2DGokdCrUSc9t5a9ieU0C4W5I8HwHCyAaC0XhEtxugreR0Ez9fmhQy3fd
+ Teidc03dN6D13LveC9TRkDVZ9XtgmSlwSe2aDqnb9oytXnTCCzikhjyBWKzRK3EUBNqHXk
+ cA2ogh/6pC4nvkyDfebSbPkNPQOWh24=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-a9gRWEaWOfaG3wUDLFu8Mw-1; Wed, 04 Nov 2020 11:02:52 -0500
-X-MC-Unique: a9gRWEaWOfaG3wUDLFu8Mw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-428-ItveJD3yO1SldmfE1lT_3Q-1; Wed, 04 Nov 2020 11:02:43 -0500
+X-MC-Unique: ItveJD3yO1SldmfE1lT_3Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F418680A182;
- Wed,  4 Nov 2020 16:01:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 766E71921FAE;
+ Wed,  4 Nov 2020 16:01:37 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8916F5B4B8;
- Wed,  4 Nov 2020 16:01:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0AD4B7366D;
+ Wed,  4 Nov 2020 16:01:36 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 29/44] qdev: Remove ArrayElementProperty.propname field
-Date: Wed,  4 Nov 2020 11:00:06 -0500
-Message-Id: <20201104160021.2342108-30-ehabkost@redhat.com>
+Subject: [PATCH v2 17/44] qdev: Get just property name at
+ error_set_from_qdev_prop_error()
+Date: Wed,  4 Nov 2020 10:59:54 -0500
+Message-Id: <20201104160021.2342108-18-ehabkost@redhat.com>
 In-Reply-To: <20201104160021.2342108-1-ehabkost@redhat.com>
 References: <20201104160021.2342108-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -95,67 +96,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, John Snow <jsnow@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>,
  Markus Armbruster <armbru@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we don't save the property name in Property.name
-anymore, we don't need the to keep the property name string alive
-after the property was registered.
-
-We can remove the ArrayElementProperty.propname field, and free
-the string immediately after registering the property.
+Replace `Property *prop` parameter with `char *name`, to reduce
+dependency of getter and setter functions on the Property struct
+(which will be changed in following patches).
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-This is a new patch added in v2 of the series
+This is a new patch added in series v2
 ---
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: David Hildenbrand <david@redhat.com>
 Cc: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org
 ---
- hw/core/qdev-properties.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ include/hw/qdev-properties.h     |  2 +-
+ hw/core/qdev-properties-system.c | 12 ++++++------
+ hw/core/qdev-properties.c        |  8 ++++----
+ hw/s390x/css.c                   |  2 +-
+ 4 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 4cbdd34a04..a0192c3723 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -533,7 +533,6 @@ const PropertyInfo qdev_prop_size32 = {
-  */
- typedef struct {
-     struct Property prop;
--    char *propname;
-     ObjectPropertyRelease *release;
- } ArrayElementProperty;
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 1b58e4f922..476737b9da 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -201,7 +201,7 @@ const GlobalProperty *qdev_find_global_prop(Object *obj,
+ int qdev_prop_check_globals(void);
+ void qdev_prop_set_globals(DeviceState *dev);
+ void error_set_from_qdev_prop_error(Error **errp, int ret, Object *obj,
+-                                    Property *prop, const char *value);
++                                    const char *name, const char *value);
  
-@@ -547,7 +546,6 @@ static void array_element_release(Object *obj, const char *name, void *opaque)
-     if (p->release) {
-         p->release(obj, name, opaque);
-     }
--    g_free(p->propname);
-     g_free(p);
+ /**
+  * qdev_property_add_static:
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index a05150bfd0..808e7136a0 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -354,7 +354,7 @@ static void set_mac(Object *obj, Visitor *v, const char *name, void *opaque,
+     return;
+ 
+ inval:
+-    error_set_from_qdev_prop_error(errp, EINVAL, obj, prop, str);
++    error_set_from_qdev_prop_error(errp, EINVAL, obj, name, str);
+     g_free(str);
  }
  
-@@ -590,10 +588,9 @@ static void set_prop_arraylen(Object *obj, Visitor *v, const char *name,
-      */
-     *arrayptr = eltptr = g_malloc0(*alenptr * prop->arrayfieldsize);
-     for (i = 0; i < *alenptr; i++, eltptr += prop->arrayfieldsize) {
--        char *propname = g_strdup_printf("%s[%d]", arrayname, i);
-+        g_autofree char *propname = g_strdup_printf("%s[%d]", arrayname, i);
-         ArrayElementProperty *arrayprop = g_new0(ArrayElementProperty, 1);
-         arrayprop->release = prop->arrayinfo->release;
--        arrayprop->propname = propname;
-         arrayprop->prop.info = prop->arrayinfo;
-         /* This ugly piece of pointer arithmetic sets up the offset so
-          * that when the underlying get/set hooks call qdev_get_prop_ptr
+@@ -442,7 +442,7 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
+     peers_ptr->queues = queues;
+ 
+ out:
+-    error_set_from_qdev_prop_error(errp, err, obj, prop, str);
++    error_set_from_qdev_prop_error(errp, err, obj, name, str);
+     g_free(str);
+ }
+ 
+@@ -494,7 +494,7 @@ static void set_audiodev(Object *obj, Visitor *v, const char* name,
+     card->state = state;
+ 
+ out:
+-    error_set_from_qdev_prop_error(errp, err, obj, prop, str);
++    error_set_from_qdev_prop_error(errp, err, obj, name, str);
+     g_free(str);
+ }
+ 
+@@ -792,7 +792,7 @@ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
+     return;
+ 
+ invalid:
+-    error_set_from_qdev_prop_error(errp, EINVAL, obj, prop, str);
++    error_set_from_qdev_prop_error(errp, EINVAL, obj, name, str);
+     g_free(str);
+ }
+ 
+@@ -915,7 +915,7 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
+     return;
+ 
+ inval:
+-    error_set_from_qdev_prop_error(errp, EINVAL, obj, prop, str);
++    error_set_from_qdev_prop_error(errp, EINVAL, obj, name, str);
+     g_free(str);
+ }
+ 
+@@ -1145,7 +1145,7 @@ static void set_uuid(Object *obj, Visitor *v, const char *name, void *opaque,
+     if (!strcmp(str, UUID_VALUE_AUTO)) {
+         qemu_uuid_generate(uuid);
+     } else if (qemu_uuid_parse(str, uuid) < 0) {
+-        error_set_from_qdev_prop_error(errp, EINVAL, obj, prop, str);
++        error_set_from_qdev_prop_error(errp, EINVAL, obj, name, str);
+     }
+     g_free(str);
+ }
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index d7796e8cc3..a7bbc1235a 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -679,21 +679,21 @@ static Property *qdev_prop_find(DeviceState *dev, const char *name)
+ }
+ 
+ void error_set_from_qdev_prop_error(Error **errp, int ret, Object *obj,
+-                                    Property *prop, const char *value)
++                                    const char *name, const char *value)
+ {
+     switch (ret) {
+     case -EEXIST:
+         error_setg(errp, "Property '%s.%s' can't take value '%s', it's in use",
+-                  object_get_typename(obj), prop->name, value);
++                  object_get_typename(obj), name, value);
+         break;
+     default:
+     case -EINVAL:
+         error_setg(errp, QERR_PROPERTY_VALUE_BAD,
+-                   object_get_typename(obj), prop->name, value);
++                   object_get_typename(obj), name, value);
+         break;
+     case -ENOENT:
+         error_setg(errp, "Property '%s.%s' can't find value '%s'",
+-                  object_get_typename(obj), prop->name, value);
++                  object_get_typename(obj), name, value);
+         break;
+     case 0:
+         break;
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 38fd46b9a9..7a44320d12 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -2390,7 +2390,7 @@ static void set_css_devid(Object *obj, Visitor *v, const char *name,
+ 
+     num = sscanf(str, "%2x.%1x%n.%4x%n", &cssid, &ssid, &n1, &devid, &n2);
+     if (num != 3 || (n2 - n1) != 5 || strlen(str) != n2) {
+-        error_set_from_qdev_prop_error(errp, EINVAL, obj, prop, str);
++        error_set_from_qdev_prop_error(errp, EINVAL, obj, name, str);
+         goto out;
+     }
+     if ((cssid > MAX_CSSID) || (ssid > MAX_SSID)) {
 -- 
 2.28.0
 
