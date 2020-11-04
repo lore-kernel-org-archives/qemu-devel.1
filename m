@@ -2,96 +2,102 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A5CC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD34C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:02:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C77D208C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:02:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55E0A208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:02:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SsnStMy5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C77D208C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RjjaQe38"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55E0A208C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaAvu-0005rr-C5
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:02:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60114)
+	id 1kaAwc-00078x-Bt
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:02:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=57073d1dd=alistair.francis@wdc.com>)
- id 1kaAp2-00041L-Ob; Tue, 03 Nov 2020 23:55:00 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:17610)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=57073d1dd=alistair.francis@wdc.com>)
- id 1kaAow-0005i4-RZ; Tue, 03 Nov 2020 23:55:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1604465694; x=1636001694;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=ep2GJLYUBqDTkqBDYjaRnUPXdh+Um5MrS3McpIDE6P8=;
- b=SsnStMy50pX0zVR/PaCL6md/42CkdOTy+Ek5aCAnSXG7qMrYDAEXYLP3
- Xc+taQ90zV4D4v8wIJ2FWs6SSvGjP4cZGtqoT0DHJQ9axq1vO/fq3OFgf
- B1VLSu4M5YcwIDi3Ey2odW2CJrDOujFUdfOt9hmG4ywaTTFNR+EoyL2tu
- fXlePTVYDG8s8iCAgxwTEa838SV2lR9S7DUKkTbut9XpXM+zKVEjonGsS
- luIEL+4u9tqdxnnmizw+gbGuDOHfkXs1AZOLHKZlNUrfcXJZeaPHRuYDT
- LtD5vYugWLf2XXGVedggX48RWq1tTDNi3dis3n+JkAP9o3M7yK0gfMd2i g==;
-IronPort-SDR: iC4b7TbDvPKDhqo1hIZ1k6d7PII74mVorujJJC8VhQLcQul4sa7hyt/smBB0tbFUB5gdV+wLQ/
- 4l8gSz9ZSm++NiR/EybNlrYri7XNpAcaGQRQ2naXq8cel01e/aTd6C4296MAMdt1t2ZLexBFQs
- 5dYgamDtcQXab29UWecIlcCwTmZpw4BXV1RBRPnreEiUCDMwO//G69m9vJfjKLY3zARZePRHnd
- 4ghFaMJXYjTK0hs91/8m9NSbBEK/ou8PO0mjR2aHjJlGAhiPU1TdTzqiOvrbqHLjdYlY/i5bOB
- Xgg=
-X-IronPort-AV: E=Sophos;i="5.77,449,1596470400"; d="scan'208";a="151656924"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 04 Nov 2020 12:54:51 +0800
-IronPort-SDR: fYK+FbiMtAc1FhOMX52PEVY/N7duKarnitX7Ds1mrwWEJoZRocjFko98fweQL1E+szDgNfKFfD
- cnYADYB+asHYJTI7+VezuigwhnYZV3u5JByTIErz/thIC5pRqbhtNVjkNdCtbjbJVviojgm3lb
- tiG6wnn+bAcLEOy8vkLqxjYy7vBGgSgjOKbVPKNYH+IiHSeIgDjDfm9HUGDEdn4JFn/f5uNRos
- nyGLFN2gpcgRlba3YgFz+09LKJfb7raVY02YvOM9TWVmft/Lc8OdEYPvU1MoiS5Ywbmg5qg20c
- 3PxrI1l1Xiu/3zt+onTIt7FJ
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 03 Nov 2020 20:41:00 -0800
-IronPort-SDR: Xgtj4n4cUNI+uiEcag2hlBaiju2sHiMCx10/2Hpu2aFN/jeTtcOspuOjK0LeL+3vz/kgMEISqz
- 81gITj+jncZm37zz5vGq2BQt6hyImdk3BQV6JyflrOzsMLQAx4meKQ4Rs8o3xjb0iy8LMpP8Ps
- pVdyNxSTENcdmwWeHi5iTWvvMHJs9WyjjEeDsEkSHIgpXI4aeXyCFeOc6ug5iXTGEEJCnRbwBb
- wtIYWW/ybJHD1fb5g93MnzrmBAuDiF31bsq/brGZeI5HBDwhgDWJcp35SOhsNmTCEM8ferv1uX
- At8=
-WDCIronportException: Internal
-Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.60.113])
- by uls-op-cesaip01.wdc.com with ESMTP; 03 Nov 2020 20:54:51 -0800
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v4 0/5]  Fix the Hypervisor access functions
-Date: Tue,  3 Nov 2020 20:43:20 -0800
-Message-Id: <cover.1604464950.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmH-0006wu-6I
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43011)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmF-0004oa-CF
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604465526;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=lgzOL39RvILiPn2GJxc4fQ6TNHjpeFII29h+nk2BQE8=;
+ b=RjjaQe38X7hk9q9I8nfkWRk6TKy8W1ddu4MPpd1WT+BXWs4j6I4YiuYe3zjRkokG4VSU3m
+ Ab1aC/GPkrXUBItAer1KOUUui6qUSE09oaxg8w0Ux8ZTGRqu7MJJhhM6hOEbTeQ8qxPXUL
+ glkHhXZ7ISTiSUu2w1DEJw2xGtszGL4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-F_7sRAEnPaOJbbcuYb50tw-1; Tue, 03 Nov 2020 23:52:04 -0500
+X-MC-Unique: F_7sRAEnPaOJbbcuYb50tw-1
+Received: by mail-wr1-f70.google.com with SMTP id w1so8715746wrr.5
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:52:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=lgzOL39RvILiPn2GJxc4fQ6TNHjpeFII29h+nk2BQE8=;
+ b=maM/5e1M7OgENOKqAzqVTTHGM4ljum1qGFdXQA3KyPlD64+5ri0XZgl3wTXQ5qayko
+ 0cbRU5TOmJ/oC3r1ekh0atbi25eXSnme7ByoIXfnRH51WhnLqO4L0ovTG7xqNWVRFRSD
+ r6iv9LgmyDM20Sl2bnDEobBl8QyehLts1f6YzK69ScgC6lvs+T8N7b5SzISU7MCAk6e7
+ EImDAlqOV8kkvaT169WkD/QOK43DD8Zsuk9eNAWJ834pn8fDqL4rWrk8cabkYigQYcqn
+ soaJ1c0oGVfYLyw7pPP78u4WUQ+Mlhm5Pn0VDEM4TBMRLs+l/P9K+zXi/ikk5COa5B1V
+ OCBQ==
+X-Gm-Message-State: AOAM530IkwFNjGpaovoCp4Tplr3klDXjPVG9cp19QscgLVs65UHZGY3b
+ i60+7bwqsheBfj7aeP31+jz/O4s3RdMkcpvHQJAYD3iKRm4tgT9LGhy4IVdXma7WWVJ141ANRJF
+ qp6F/K1gDMlWeuwI=
+X-Received: by 2002:a1c:7c0e:: with SMTP id x14mr2475926wmc.88.1604465522788; 
+ Tue, 03 Nov 2020 20:52:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz5DhDAtpcepurpUgZdYPNJw26kJOIbtD7ONwZ0YooCQ7nfCZwZbMFRlvOd/Mw6cR3XBcrJFA==
+X-Received: by 2002:a1c:7c0e:: with SMTP id x14mr2475911wmc.88.1604465522517; 
+ Tue, 03 Nov 2020 20:52:02 -0800 (PST)
+Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
+ by smtp.gmail.com with ESMTPSA id c2sm794577wmf.47.2020.11.03.20.52.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Nov 2020 20:52:01 -0800 (PST)
+Date: Tue, 3 Nov 2020 23:52:00 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 29/38] block/export: make vhost-user-blk config space
+ little-endian
+Message-ID: <20201104044937.226370-30-mst@redhat.com>
+References: <20201104044937.226370-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.42;
- envelope-from=prvs=57073d1dd=alistair.francis@wdc.com;
- helo=esa4.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 23:54:51
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,43 +110,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, richard.henderson@linaro.org, bmeng.cn@gmail.com,
- palmer@dabbelt.com, alistair23@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Coiby Xu <Coiby.Xu@gmail.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Richard pointed out that the Hypervisor access functions don't work
-correctly, see:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg751540.html.
-This seris fixes them up by adding a new MMU index for the virtualised
-state.
-v4:
- - Consolidate the inline helper to a helper function
- - Actually don't have a virtualised MMU index
-v3:
- - Don't use an external helper
-v2:
- - Use only 6 MMU modes instead of 8
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Alistair Francis (5):
-  target/riscv: Add a virtualised MMU Mode
-  target/riscv: Set the virtualised MMU mode when doing hyp accesses
-  target/riscv: Remove the HS_TWO_STAGE flag
-  target/riscv: Remove the hyp load and store functions
-  target/riscv: Split the Hypervisor execute load helpers
+VIRTIO 1.0 devices have little-endian configuration space. The
+vhost-user-blk-server.c code already uses little-endian for virtqueue
+processing but not for the configuration space fields. Fix this so the
+vhost-user-blk export works on big-endian hosts.
 
- target/riscv/cpu-param.h                |  11 +-
- target/riscv/cpu.h                      |  19 +++-
- target/riscv/cpu_bits.h                 |   1 -
- target/riscv/helper.h                   |   5 +-
- target/riscv/cpu_helper.c               |  62 +++++-----
- target/riscv/op_helper.c                | 124 +-------------------
- target/riscv/translate.c                |   2 +
- target/riscv/insn_trans/trans_rvh.c.inc | 143 +++++++++---------------
- 8 files changed, 112 insertions(+), 255 deletions(-)
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20201027173528.213464-4-stefanha@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ block/export/vhost-user-blk-server.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
+diff --git a/block/export/vhost-user-blk-server.c b/block/export/vhost-user-blk-server.c
+index 41f4933d6e..33cc0818b8 100644
+--- a/block/export/vhost-user-blk-server.c
++++ b/block/export/vhost-user-blk-server.c
+@@ -264,7 +264,6 @@ static uint64_t vu_blk_get_protocol_features(VuDev *dev)
+ static int
+ vu_blk_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
+ {
+-    /* TODO blkcfg must be little-endian for VIRTIO 1.0 */
+     VuServer *server = container_of(vu_dev, VuServer, vu_dev);
+     VuBlkExport *vexp = container_of(server, VuBlkExport, vu_server);
+     memcpy(config, &vexp->blkcfg, len);
+@@ -343,18 +342,18 @@ vu_blk_initialize_config(BlockDriverState *bs,
+                          uint32_t blk_size,
+                          uint16_t num_queues)
+ {
+-    config->capacity = bdrv_getlength(bs) >> BDRV_SECTOR_BITS;
+-    config->blk_size = blk_size;
+-    config->size_max = 0;
+-    config->seg_max = 128 - 2;
+-    config->min_io_size = 1;
+-    config->opt_io_size = 1;
+-    config->num_queues = num_queues;
+-    config->max_discard_sectors = 32768;
+-    config->max_discard_seg = 1;
+-    config->discard_sector_alignment = config->blk_size >> 9;
+-    config->max_write_zeroes_sectors = 32768;
+-    config->max_write_zeroes_seg = 1;
++    config->capacity = cpu_to_le64(bdrv_getlength(bs) >> BDRV_SECTOR_BITS);
++    config->blk_size = cpu_to_le32(blk_size);
++    config->size_max = cpu_to_le32(0);
++    config->seg_max = cpu_to_le32(128 - 2);
++    config->min_io_size = cpu_to_le16(1);
++    config->opt_io_size = cpu_to_le32(1);
++    config->num_queues = cpu_to_le16(num_queues);
++    config->max_discard_sectors = cpu_to_le32(32768);
++    config->max_discard_seg = cpu_to_le32(1);
++    config->discard_sector_alignment = cpu_to_le32(config->blk_size >> 9);
++    config->max_write_zeroes_sectors = cpu_to_le32(32768);
++    config->max_write_zeroes_seg = cpu_to_le32(1);
+ }
+ 
+ static void vu_blk_exp_request_shutdown(BlockExport *exp)
 -- 
-2.28.0
+MST
 
 
