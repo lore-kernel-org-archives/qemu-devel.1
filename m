@@ -2,82 +2,88 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9844C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 14:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BBEEC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 14:06:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97A9B21734
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 14:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A9B21734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 371CD206D9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 14:06:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZgdEh+9T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 371CD206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaJMb-00048h-9R
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 09:02:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34046)
+	id 1kaJQu-0006cK-LT
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 09:06:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaJLa-0003QK-0v
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 09:01:10 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43108)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaJLW-0005MA-MR
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 09:01:09 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kaJLT-0008Da-4M
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 14:01:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4D2C22E8158
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 14:00:59 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Nov 2020 13:55:23 -0000
-From: Gerd Hoffmann <1901981@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kaJPw-00067V-MV
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 09:05:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51800)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kaJPs-0005ql-0H
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 09:05:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604498735;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=6AH6oE8GDWXO1ylfyYrsvb2YviLu1pLR8hxq+9ZsB9s=;
+ b=ZgdEh+9TEa7e6vyPlDgQU5Y0cbJfNlBFqQRMHz7mhSEwpbjWfiV4mrHrknATCy25ZGbEvQ
+ Zj673yFd9bji2/fcsrHN0OZ/gVxhx18V2R7/Yu6JZSbnDXQ9hmJuedRTYn2ltx5JBHpBwd
+ B39NyoOkGImLPL0saZZnCgJdyRxqa8Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-5lCW17UJOQmWicBUnHF-bw-1; Wed, 04 Nov 2020 09:05:32 -0500
+X-MC-Unique: 5lCW17UJOQmWicBUnHF-bw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E8C8107B27A;
+ Wed,  4 Nov 2020 14:05:31 +0000 (UTC)
+Received: from fedora.redhat.com (ovpn-115-26.ams2.redhat.com [10.36.115.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7AECB5D9CC;
+ Wed,  4 Nov 2020 14:05:29 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
- assignee=pgn@zju.edu.cn; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: hades0506 kraxel-redhat
-X-Launchpad-Bug-Reporter: Gaoning Pan (hades0506)
-X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
-References: <160395133608.8291.17236692663498581160.malonedeb@soybean.canonical.com>
-Message-Id: <160449812362.30216.2352478508394791747.malone@soybean.canonical.com>
-Subject: [Bug 1901981] Re: assert issue locates in hw/usb/dev-storage.c:248:
- usb_msd_send_status
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="8e1d622aa7e69e8b5bd9e10dd26da4991d9a7dfb"; Instance="production"
-X-Launchpad-Hash: a84ebf9deaf8ccff21415c9775b3689933943b42
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 09:01:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH] Prefer 'on' | 'off' over 'yes' | 'no' for bool options
+Date: Wed,  4 Nov 2020 14:05:28 +0000
+Message-Id: <20201104140528.608015-1-berrange@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,52 +92,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1901981 <1901981@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-https://git.kraxel.org/cgit/qemu/log/?h=3Dsirius/usb-asserts
-can you try that branch?
+Update some docs and test cases to use 'on' | 'off' as the preferred
+value for bool options.
 
--- =
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ docs/system/vnc-security.rst | 6 +++---
+ include/authz/listfile.h     | 2 +-
+ qemu-options.hx              | 4 ++--
+ tests/qemu-iotests/233       | 4 ++--
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1901981
+diff --git a/docs/system/vnc-security.rst b/docs/system/vnc-security.rst
+index b237b07330..e97b42dfdc 100644
+--- a/docs/system/vnc-security.rst
++++ b/docs/system/vnc-security.rst
+@@ -89,7 +89,7 @@ but with ``verify-peer`` set to ``yes`` instead.
+ .. parsed-literal::
+ 
+    |qemu_system| [...OPTIONS...] \
+-     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=yes \
++     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=on \
+      -vnc :1,tls-creds=tls0 -monitor stdio
+ 
+ .. _vnc_005fsec_005fcertificate_005fpw:
+@@ -103,7 +103,7 @@ authentication to provide two layers of authentication for clients.
+ .. parsed-literal::
+ 
+    |qemu_system| [...OPTIONS...] \
+-     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=yes \
++     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=on \
+      -vnc :1,tls-creds=tls0,password -monitor stdio
+    (qemu) change vnc password
+    Password: ********
+@@ -145,7 +145,7 @@ x509 options:
+ .. parsed-literal::
+ 
+    |qemu_system| [...OPTIONS...] \
+-     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=yes \
++     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=on \
+      -vnc :1,tls-creds=tls0,sasl -monitor stdio
+ 
+ .. _vnc_005fsetup_005fsasl:
+diff --git a/include/authz/listfile.h b/include/authz/listfile.h
+index 0a1e5bddd3..0b7fe72198 100644
+--- a/include/authz/listfile.h
++++ b/include/authz/listfile.h
+@@ -73,7 +73,7 @@ OBJECT_DECLARE_SIMPLE_TYPE(QAuthZListFile,
+  * The object can be created on the command line using
+  *
+  *   -object authz-list-file,id=authz0,\
+- *           filename=/etc/qemu/myvm-vnc.acl,refresh=yes
++ *           filename=/etc/qemu/myvm-vnc.acl,refresh=on
+  *
+  */
+ struct QAuthZListFile {
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 2c83390504..0bdc07bc47 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -5002,7 +5002,7 @@ SRST
+         Note the use of quotes due to the x509 distinguished name
+         containing whitespace, and escaping of ','.
+ 
+-    ``-object authz-listfile,id=id,filename=path,refresh=yes|no``
++    ``-object authz-listfile,id=id,filename=path,refresh=on|off``
+         Create an authorization object that will control access to
+         network services.
+ 
+@@ -5047,7 +5047,7 @@ SRST
+ 
+              # |qemu_system| \\
+                  ... \\
+-                 -object authz-simple,id=auth0,filename=/etc/qemu/vnc-sasl.acl,refresh=yes \\
++                 -object authz-simple,id=auth0,filename=/etc/qemu/vnc-sasl.acl,refresh=on \\
+                  ...
+ 
+     ``-object authz-pam,id=id,service=string``
+diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
+index a5c17c3963..0b99530f7f 100755
+--- a/tests/qemu-iotests/233
++++ b/tests/qemu-iotests/233
+@@ -83,7 +83,7 @@ echo
+ echo "== check plain client to TLS server fails =="
+ 
+ nbd_server_start_tcp_socket \
+-    --object tls-creds-x509,dir=${tls_dir}/server1,endpoint=server,id=tls0,verify-peer=yes \
++    --object tls-creds-x509,dir=${tls_dir}/server1,endpoint=server,id=tls0,verify-peer=on \
+     --tls-creds tls0 \
+     -f $IMGFMT "$TEST_IMG" 2>> "$TEST_DIR/server.log"
+ 
+@@ -128,7 +128,7 @@ echo "== check TLS with authorization =="
+ nbd_server_stop
+ 
+ nbd_server_start_tcp_socket \
+-    --object tls-creds-x509,dir=${tls_dir}/server1,endpoint=server,id=tls0,verify-peer=yes \
++    --object tls-creds-x509,dir=${tls_dir}/server1,endpoint=server,id=tls0,verify-peer=on \
+     --object "authz-simple,id=authz0,identity=CN=localhost,, \
+       O=Cthulu Dark Lord Enterprises client1,,L=R'lyeh,,C=South Pacific" \
+     --tls-authz authz0 \
+-- 
+2.28.0
 
-Title:
-  assert issue locates in hw/usb/dev-storage.c:248: usb_msd_send_status
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  I found an assertion failure through hw/usb/dev-storage.c.
-
-  This was found in latest version 5.1.0.
-
-  --------
-
-  qemu-system-x86_64: hw/usb/dev-storage.c:248: usb_msd_send_status: Assert=
-ion `s->csw.sig =3D=3D cpu_to_le32(0x53425355)' failed.
-  [1]    29544 abort      sudo  -enable-kvm -boot c -m 2G -drive format=3Dq=
-cow2,file=3D./ubuntu.img -nic
-
-  To reproduce the assertion failure, please run the QEMU with following
-  command line.
-
-  =
-
-  $ qemu-system-x86_64 -enable-kvm -boot c -m 2G -drive format=3Dqcow2,file=
-=3D./ubuntu.img -nic user,model=3Drtl8139,hostfwd=3Dtcp:0.0.0.0:5555-:22 -d=
-evice piix4-usb-uhci,id=3Duhci -device usb-storage,drive=3Dmydrive -drive i=
-d=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone
-
-  The poc is attached.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1901981/+subscriptions
 
