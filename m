@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D80C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:14:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ADC4C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:14:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43BAB21734
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:14:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8477F21734
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 12:14:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AmttSDET"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43BAB21734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jIfJIBel"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8477F21734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaHgT-0008Vq-Vv
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 07:14:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34642)
+	id 1kaHga-00007l-Cb
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 07:14:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfR-0007XU-Ul
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23099)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfS-0007Xl-E1
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42830)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfO-0007op-Mi
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:33 -0500
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kaHfP-0007ol-0R
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 07:13:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1604492010;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GGXtE3jHMrZgfZ/07sr+Uqedrf6BZjf6Pg4RnxdzhfI=;
- b=AmttSDETw9xTeXWbPN9ta8gDlLuHt9dYF1BL0CoXSnhM381VbO9ROBC9KdsNSASjYOxoVG
- px/aCfbS6PAIJgRyIhwHyI3jVaW3KiODgZXdi7Fcm+ZzpWg5rp8ZyrYX6DXqQCgnA9QdBp
- gXMi8qHWLKx1nva83dSqtXYzMmEf6cg=
+ bh=rqPwVuzd+xNcq2NOXZ5u95vdesxmjeaiKL4t//5lY64=;
+ b=jIfJIBelYSjRNtmT3500x2Gf8OQxnQG8h3vebXONe9KjoE+MGzPqXbFQsPnsGBL8bUIYjw
+ NEHlfnckvtfoLA7MTs1K3nl4Q9Wz55KFQrWQKOZrkQk+402GIYB55Q4Oag6Zlr57UVFs6j
+ pmgsjJUuI51fdO/1OEv6OiskfdeEFp0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-9kQZjKCfPfWrGbDlZg3qdA-1; Wed, 04 Nov 2020 07:13:28 -0500
-X-MC-Unique: 9kQZjKCfPfWrGbDlZg3qdA-1
+ us-mta-111-i02fnIF6N_yrJn91XhQVkQ-1; Wed, 04 Nov 2020 07:13:27 -0500
+X-MC-Unique: i02fnIF6N_yrJn91XhQVkQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B859664149;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFB1187951C;
  Wed,  4 Nov 2020 12:13:26 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F0315DA6B;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3EFC05DA30;
  Wed,  4 Nov 2020 12:13:22 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 55AAB9D15; Wed,  4 Nov 2020 13:13:21 +0100 (CET)
+ id 6CD0E9D17; Wed,  4 Nov 2020 13:13:21 +0100 (CET)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/8] dev-serial: use USB_SERIAL QOM macro for USBSerialState
- assignments
-Date: Wed,  4 Nov 2020 13:13:15 +0100
-Message-Id: <20201104121321.7772-3-kraxel@redhat.com>
+Subject: [PULL 4/8] dev-serial: add trace-events for baud rate and data
+ parameters
+Date: Wed,  4 Nov 2020 13:13:17 +0100
+Message-Id: <20201104121321.7772-5-kraxel@redhat.com>
 In-Reply-To: <20201104121321.7772-1-kraxel@redhat.com>
 References: <20201104121321.7772-1-kraxel@redhat.com>
 MIME-Version: 1.0
@@ -110,43 +110,44 @@ From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20201027150456.24606-3-mark.cave-ayland@ilande.co.uk
+Message-id: 20201027150456.24606-5-mark.cave-ayland@ilande.co.uk
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/dev-serial.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/usb/dev-serial.c | 3 +++
+ hw/usb/trace-events | 2 ++
+ 2 files changed, 5 insertions(+)
 
 diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
-index 7a5fa3770e7f..77ce89d38b27 100644
+index abc316c7bf1f..badf8785db46 100644
 --- a/hw/usb/dev-serial.c
 +++ b/hw/usb/dev-serial.c
-@@ -204,7 +204,7 @@ static void usb_serial_reset(USBSerialState *s)
+@@ -307,6 +307,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+         }
  
- static void usb_serial_handle_reset(USBDevice *dev)
- {
--    USBSerialState *s = (USBSerialState *)dev;
-+    USBSerialState *s = USB_SERIAL(dev);
+         s->params.speed = (48000000 / 2) / (8 * divisor + subdivisor8);
++        trace_usb_serial_set_baud(bus->busnr, dev->addr, s->params.speed);
+         qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+         break;
+     }
+@@ -340,6 +341,8 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+             goto fail;
+         }
  
-     DPRINTF("Reset\n");
- 
-@@ -243,7 +243,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
-                                       int request, int value, int index,
-                                       int length, uint8_t *data)
- {
--    USBSerialState *s = (USBSerialState *)dev;
-+    USBSerialState *s = USB_SERIAL(dev);
-     int ret;
- 
-     DPRINTF("got control %x, value %x\n", request, value);
-@@ -430,7 +430,7 @@ static void usb_serial_token_in(USBSerialState *s, USBPacket *p)
- 
- static void usb_serial_handle_data(USBDevice *dev, USBPacket *p)
- {
--    USBSerialState *s = (USBSerialState *)dev;
-+    USBSerialState *s = USB_SERIAL(dev);
-     uint8_t devep = p->ep->nr;
-     struct iovec *iov;
-     int i;
++        trace_usb_serial_set_data(bus->busnr, dev->addr, s->params.parity,
++                                  s->params.data_bits, s->params.stop_bits);
+         qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+         /* TODO: TX ON/OFF */
+         break;
+diff --git a/hw/usb/trace-events b/hw/usb/trace-events
+index 89f1c351e339..98ee1c54627d 100644
+--- a/hw/usb/trace-events
++++ b/hw/usb/trace-events
+@@ -328,3 +328,5 @@ usb_serial_unsupported_parity(int bus, int addr, int value) "dev %d:%u unsupport
+ usb_serial_unsupported_stopbits(int bus, int addr, int value) "dev %d:%u unsupported stop bits %d"
+ usb_serial_unsupported_control(int bus, int addr, int request, int value) "dev %d:%u got unsupported/bogus control 0x%x, value 0x%x"
+ usb_serial_bad_token(int bus, int addr) "dev %d:%u bad token"
++usb_serial_set_baud(int bus, int addr, int baud) "dev %d:%u baud rate %d"
++usb_serial_set_data(int bus, int addr, int parity, int data, int stop) "dev %d:%u parity %c, data bits %d, stop bits %d"
 -- 
 2.27.0
 
