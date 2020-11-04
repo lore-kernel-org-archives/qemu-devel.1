@@ -2,103 +2,86 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07AFAC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB5DC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:20:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F31022384
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:13:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A755D2074F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:20:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/L/zoUm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F31022384
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="bv0H3MGA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A755D2074F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaDvJ-0008Tp-Vw
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 03:13:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38586)
+	id 1kaE1R-0001GO-Jl
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 03:20:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kaDug-0007lp-D6
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:13:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36172)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kaDue-0001fR-NH
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:13:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604477579;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ceiJjVJiuP39c7jvGZlPEkqo+iI/UIuc+xm9Ar02lws=;
- b=Y/L/zoUm+qPakX3VnLcOXVd8SVnXcxTyqrdBXjQKGDUE5pTpfXsq6K79NNncggBUOX+liu
- dw6Iib2phc5w4Gpc5v6seJL/YDVsMonf9L6ch4KCNKqxVoTTQBCT6wBaNgHnSkXMetpbT/
- I3Otu4rIoBvcLSIzZIWG+dthZ9E/FuA=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-bozFZvUANseAKe3J3fdahQ-1; Wed, 04 Nov 2020 03:12:57 -0500
-X-MC-Unique: bozFZvUANseAKe3J3fdahQ-1
-Received: by mail-pg1-f197.google.com with SMTP id j5so13296895pgt.4
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 00:12:57 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
+ id 1kaE0s-0000rM-86
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:19:26 -0500
+Received: from mail-qk1-x72e.google.com ([2607:f8b0:4864:20::72e]:36932)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
+ id 1kaE0q-0002o1-2i
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:19:25 -0500
+Received: by mail-qk1-x72e.google.com with SMTP id z6so18361050qkz.4
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 00:19:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=a2xn/972ZQE+RGCuFDWPwVqrFRwi4Z8R96uvetrtIzg=;
+ b=bv0H3MGAhlWRvXO57cfylNEzXAuNYNAiGpkOMiScMUsuYGOSyJnJtBneMvR7+hgQC/
+ lY0ZtBgLha3V74aUjNQBK0lWjaeaCzpjtWpLt3Gd7uB521SsVx3QRZ+iUJuXUUwdRlUD
+ KqW0d9z/1gCoPe3otMsRm9gYtXRzKk8WOXr2JT6cuW18z2ASxcY8bNbe6/xCsj/YFtDO
+ zew26dFyM+bKos4m93FGn7/+EMVRgbDyBHOIsWHBfM4Qloc+dDW29BsjLY82xiL6x8B/
+ x801kW6xC2LDjoFeC6YUZxLKXBOQNJJ95Wh56siJSDjgeBHIbjJIfi95v7a/MmgiqlTp
+ MZxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=ceiJjVJiuP39c7jvGZlPEkqo+iI/UIuc+xm9Ar02lws=;
- b=fzS4OuY1ZQjVVcAx1SVMt9TxnwVShldI8DYaH1RieJVIlogTTI7ZuPG6ZgTGp8ydTL
- TDFFfRbD+sCt1/b2RlTE7Kco2MWjhXizYAAu3W1aCBztNT1gLOpYAb0NMeHftj2RuU/p
- I4IMEcXQVETSp61uA78EH5rzTrgcwaP85FYFo1AnlY90kgFmxwhF+IfX5qmmC11VErqk
- dF3AEnrS0GMbJRHXSW2RNxjK228mb8Uiptr/bDGaf2Lla9kt9VhGzLuCpYMrqJ4tUeps
- /JLJ6R2JtiNV6FM0+0zsGEdjVESCL4BuyL41fnHxCvWmOvTqpE6WOAaPvKk4zM6wbgt9
- lDIw==
-X-Gm-Message-State: AOAM5326tV/excO1GuVFXVq3GW77DsDy53gVz0TmxnNymofmK3KDcVth
- YMavaPZ9Ooljzgmy7vZvsbwee66WOXqrbPS/wKSlQ90gnDiVGOUhFGeECp8dhHEa1VXzmLymFIA
- 0E/HIvJpkG87/uq6/9WsLiK8GzImoD5U=
-X-Received: by 2002:a17:90b:783:: with SMTP id
- l3mr3441368pjz.122.1604477576584; 
- Wed, 04 Nov 2020 00:12:56 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy9VEpGaTs4FobVdmURAavhmVrSlcOVxSA8lQRAnf6DR3hx+8yKl8lKQ0FpfM8iza8JMrUtTBW+D3SUMqpvPJM=
-X-Received: by 2002:a17:90b:783:: with SMTP id
- l3mr3441336pjz.122.1604477576301; 
- Wed, 04 Nov 2020 00:12:56 -0800 (PST)
+ bh=a2xn/972ZQE+RGCuFDWPwVqrFRwi4Z8R96uvetrtIzg=;
+ b=pTc2tlO2vaG8AVApDdIU1xfdDHrUA77Y7pSEdWJJ4+nVRJzuqCXM7MjtQBPhR5QPKM
+ 4X71lppUEMxGfPVknwpXCn2xIke6t7cVTiDnXOrWCF5kGxzFG2ivvdZxeYQdF36voOPH
+ Q0vUFs5eqrwzhoNUTp1THWCzx6uxHgFcQQCveVrq37oyR8mceJuE2yrepizCfoyQGfXJ
+ YbbYhWeAJ8gZyewJs4dYfKzgzR5zE6OU/GKzTUq4OqNhSuAA56SDNvtYbqEiYHA7Sd+h
+ Nvbys+PJqIGY0WJe5XrCbHHIO6llwCR07yXXtisxzmLO6M2F6J6rNifuDNq0zOEzjK25
+ UugA==
+X-Gm-Message-State: AOAM530Kkql354j5cViPHpVinCb/WIuyczUfw4rq3cSzSTAjM3o8sBJ5
+ svWWTdMRA6o7KTFXFcWqlSTuVVzTX1kN8XT1Gul/fQ==
+X-Google-Smtp-Source: ABdhPJxY8TiAG0I/G8VJr+ywli80lXDQU7j1fmXaJ8LFvmfgyyH7KW2cC/Lt/u18Nl87S88dEE1b8ZJgofdypLtAV6M=
+X-Received: by 2002:a37:88c:: with SMTP id 134mr23650062qki.17.1604477962467; 
+ Wed, 04 Nov 2020 00:19:22 -0800 (PST)
 MIME-Version: 1.0
-References: <20201103164604.2692357-1-philmd@redhat.com>
- <20201103164604.2692357-3-philmd@redhat.com>
- <20201103165247.GT205187@redhat.com>
- <7654e063-98d3-84e0-8116-5a1b41d14636@redhat.com>
- <21e90ddb-fe8a-c780-2741-9b7a2f7f1c9a@redhat.com>
- <alpine.DEB.2.21.2011031722100.3264@sstabellini-ThinkPad-T480s>
-In-Reply-To: <alpine.DEB.2.21.2011031722100.3264@sstabellini-ThinkPad-T480s>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 4 Nov 2020 09:12:43 +0100
-Message-ID: <CABgObfaAH1fty0y0Z10GALnhy4kL_FqSxPZc2-=PwJgtSrOX0g@mail.gmail.com>
-Subject: Re: [PATCH-for-5.2 2/3] gitlab-ci: Add a job to cover the
- --without-default-devices config
-To: Stefano Stabellini <sstabellini@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="000000000000fca6bd05b3438b08"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201023151619.3175155-1-alistair.francis@wdc.com>
+ <20201023151619.3175155-13-alistair.francis@wdc.com>
+ <CAFEAcA9MEG_g_YTFdnfjAp6U9zwqKmQWD8UnPYwbGj0c7WnOUg@mail.gmail.com>
+ <CAKmqyKP5b+3QN91BV8sZ8+diTGmJ5SMQJJLPi_jsENQCX_6O4g@mail.gmail.com>
+In-Reply-To: <CAKmqyKP5b+3QN91BV8sZ8+diTGmJ5SMQJJLPi_jsENQCX_6O4g@mail.gmail.com>
+From: Green Wan <green.wan@sifive.com>
+Date: Wed, 4 Nov 2020 16:19:10 +0800
+Message-ID: <CAJivOr6LXhVc7q8toBZEGB2U2Y99o6W+nwJ0hLANO5krF0gijQ@mail.gmail.com>
+Subject: Re: [PULL 12/12] hw/misc/sifive_u_otp: Add backend drive support
+To: Alistair Francis <alistair23@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::72e;
+ envelope-from=green.wan@sifive.com; helo=mail-qk1-x72e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -112,90 +95,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Anthony Perard <anthony.perard@citrix.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- David Hildenbrand <david@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000fca6bd05b3438b08
-Content-Type: text/plain; charset="UTF-8"
+OK, let me do it. I'll send it soon.
 
-Il mer 4 nov 2020, 03:27 Stefano Stabellini <sstabellini@kernel.org> ha
-scritto:
-
-> FYI I tried to build the latest QEMU on Alpine Linux 3.12 ARM64 and I
-> get:
+On Tue, Nov 3, 2020 at 11:53 PM Alistair Francis <alistair23@gmail.com> wrote:
 >
->   ninja: unknown tool 'query'
+> On Mon, Nov 2, 2020 at 9:49 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Fri, 23 Oct 2020 at 16:27, Alistair Francis <alistair.francis@wdc.com> wrote:
+> > >
+> > > From: Green Wan <green.wan@sifive.com>
+> > >
+> > > Add '-drive' support to OTP device. Allow users to assign a raw file
+> > > as OTP image.
+> >
+> > Hi; Coverity reports some issues with this code (CID 1435959,
+> > CID 1435960, CID 1435961). They're all basically the same thing:
+> > in read, write and reset functions this code calls blk_pread()
+> > or blk_pwrite() but doesn't check the return value, so if the
+> > underlying file operation fails then the guest will be
+> > returned garbage data or have its write thrown away without
+> > either the guest or the user being warned about that.
 >
-> Even after rebuilding ninja master by hand. Any ideas? I don't know much
-> about ninja.
+> Green Wan are you able to send a patch to check the error value?
 >
-
-Are you sure you have ninja installed and not its clone samurai (yes, I am
-serious)? I have contributed query support to samurai but it hasn't made it
-to a release yet.
-
-What is the output of "ninja -t list"?
-
-Paolo
-
-
+> Alistair
 >
-> So I gave up on that and I spinned up a Debian Buster x86 container for
-> this build. That one got past the "ninja: unknown tool 'query'" error.
-> The build completed without problems to the end.
->
-> Either way I can't reproduce the build error above.
-
---000000000000fca6bd05b3438b08
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il mer 4 nov 2020, 03:27 Stefano Stabellini &lt;<a hre=
-f=3D"mailto:sstabellini@kernel.org">sstabellini@kernel.org</a>&gt; ha scrit=
-to:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;b=
-order-left:1px #ccc solid;padding-left:1ex">FYI I tried to build the latest=
- QEMU on Alpine Linux 3.12 ARM64 and I<br>
-get:<br>
-<br>
-=C2=A0 ninja: unknown tool &#39;query&#39;<br>
-<br>
-Even after rebuilding ninja master by hand. Any ideas? I don&#39;t know muc=
-h<br>
-about ninja.<br></blockquote></div></div><div dir=3D"auto"><br></div><div d=
-ir=3D"auto">Are you sure you have ninja installed and not its clone samurai=
- (yes, I am serious)? I have contributed query support to samurai but it ha=
-sn&#39;t made it to a release yet.</div><div dir=3D"auto"><br></div><div di=
-r=3D"auto">What is the output of &quot;ninja -t list&quot;?</div><div dir=
-=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div dir=3D"auto"><br></di=
-v><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_q=
-uote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1e=
-x">
-<br>
-<br>
-So I gave up on that and I spinned up a Debian Buster x86 container for<br>
-this build. That one got past the &quot;ninja: unknown tool &#39;query&#39;=
-&quot; error.<br>
-The build completed without problems to the end.<br>
-<br>
-Either way I can&#39;t reproduce the build error above.</blockquote></div><=
-/div></div>
-
---000000000000fca6bd05b3438b08--
-
+> >
+> > > @@ -54,6 +57,16 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
+> > >          if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
+> > >              (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
+> > >              (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
+> > > +
+> > > +            /* read from backend */
+> > > +            if (s->blk) {
+> > > +                int32_t buf;
+> > > +
+> > > +                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
+> > > +                          SIFIVE_U_OTP_FUSE_WORD);
+> > > +                return buf;
+> > > +            }
+> > > +
+> > >              return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
+> > >          } else {
+> > >              return 0xff;
+> > > @@ -145,6 +158,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
+> > >              /* write bit data */
+> > >              SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
+> > >
+> > > +            /* write to backend */
+> > > +            if (s->blk) {
+> > > +                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD,
+> > > +                           &s->fuse[s->pa], SIFIVE_U_OTP_FUSE_WORD, 0);
+> > > +            }
+> > > +
+> > >              /* update written bit */
+> > >              SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
+> > >          }
+> > > @@ -168,16 +187,48 @@ static const MemoryRegionOps sifive_u_otp_ops = {
+> >
+> > >  static void sifive_u_otp_reset(DeviceState *dev)
+> > > @@ -191,6 +242,20 @@ static void sifive_u_otp_reset(DeviceState *dev)
+> > >      s->fuse[SIFIVE_U_OTP_SERIAL_ADDR] = s->serial;
+> > >      s->fuse[SIFIVE_U_OTP_SERIAL_ADDR + 1] = ~(s->serial);
+> > >
+> > > +    if (s->blk) {
+> > > +        /* Put serial number to backend as well*/
+> > > +        uint32_t serial_data;
+> > > +        int index = SIFIVE_U_OTP_SERIAL_ADDR;
+> > > +
+> > > +        serial_data = s->serial;
+> > > +        blk_pwrite(s->blk, index * SIFIVE_U_OTP_FUSE_WORD,
+> > > +                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
+> > > +
+> > > +        serial_data = ~(s->serial);
+> > > +        blk_pwrite(s->blk, (index + 1) * SIFIVE_U_OTP_FUSE_WORD,
+> > > +                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
+> > > +    }
+> > > +
+> > >      /* Initialize write-once map */
+> > >      memset(s->fuse_wo, 0x00, sizeof(s->fuse_wo));
+> > >  }
+> > > --
+> > > 2.28.0
+> >
+> > thanks
+> > -- PMM
 
