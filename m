@@ -2,64 +2,64 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D54C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB003C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:48:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BEC3223C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:48:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 310BF223C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:48:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iaDNhD9B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BEC3223C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/Yekjwi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 310BF223C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka6y8-00057z-Ec
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 19:48:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35382)
+	id 1ka6yG-0005NP-4B
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 19:48:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6n5-0006KJ-7a
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39860)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nB-0006Mr-PT
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:49 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57494)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6n1-0004pS-7o
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:42 -0500
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6n7-0004px-27
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604450198;
+ s=mimecast20190719; t=1604450202;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3QuQaF6iiaUBvHFsB5tFzilcDmfaadSV7wQWEbVMWB8=;
- b=iaDNhD9BuZGPs3onPDNs+IKETFmDHx71wFF7KG9iciE6wAtbwpWgXrGBjk8CxMdSVrqICi
- ACxJAsrbGiFKweTGx4ugk8Dl716cpa1vmGPCqFWgC6hc4XJC3lcGN7Xq/tsh5R2BAT4Vcb
- I7stQgov5LCWMqtefJP9esL9larYLeo=
+ bh=QOf6X564u68YDgrr4+ImRp2w40G6MZqV8eYk6Yyrpk4=;
+ b=N/Yekjwiaezdrdy5bqOTDtGC4elhD4JCEhkuzF8G4AvMXWSfSp+AAAStrpuCyfy5kZb5Nf
+ yuqI+hf7QCxd1RuK4syzrEzCT4t7Qc/j4WlJhmnPZdMrng4xMNUDIrBGfIdWp4vI9XMXdn
+ ZwWNysTCYVEQgApJ47ktmq7r+zIP5I0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-UNPloPR3PwGBYVc2FyC8gg-1; Tue, 03 Nov 2020 19:36:36 -0500
-X-MC-Unique: UNPloPR3PwGBYVc2FyC8gg-1
+ us-mta-55-EWfNmpFSPhSy29UJKR7V6w-1; Tue, 03 Nov 2020 19:36:40 -0500
+X-MC-Unique: EWfNmpFSPhSy29UJKR7V6w-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D396D9CC08
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:36:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDE071054FA5
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:36:33 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-97.rdu2.redhat.com [10.10.119.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BE03655766;
- Wed,  4 Nov 2020 00:36:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3C847747C6;
+ Wed,  4 Nov 2020 00:36:33 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 15/72] python: add fuse command to 'qom' tools
-Date: Tue,  3 Nov 2020 19:35:05 -0500
-Message-Id: <20201104003602.1293560-16-jsnow@redhat.com>
+Subject: [PATCH v2 18/72] scripts/qemu-ga-client: apply (most) flake8 rules
+Date: Tue,  3 Nov 2020 19:35:08 -0500
+Message-Id: <20201104003602.1293560-19-jsnow@redhat.com>
 In-Reply-To: <20201104003602.1293560-1-jsnow@redhat.com>
 References: <20201104003602.1293560-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,16 +70,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,61 +99,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+- Line length should be < 80
+- You shouldn't perform unscoped imports except at the top of the module
+
+Notably, the sys.path hack creates problems with the import rule. This
+will be fixed later.
+
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/qemu/qmp/qom.py | 12 +++++++++++-
- python/setup.cfg       |  1 +
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ scripts/qmp/qemu-ga-client | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/python/qemu/qmp/qom.py b/python/qemu/qmp/qom.py
-index 912d1809e60d..52e06a949ab3 100644
---- a/python/qemu/qmp/qom.py
-+++ b/python/qemu/qmp/qom.py
-@@ -1,7 +1,7 @@
- """
- QEMU Object Model testing tools.
+diff --git a/scripts/qmp/qemu-ga-client b/scripts/qmp/qemu-ga-client
+index ae71b30dfa43..a12e0e9b2a6e 100755
+--- a/scripts/qmp/qemu-ga-client
++++ b/scripts/qmp/qemu-ga-client
+@@ -12,7 +12,8 @@
+ # Start QEMU with:
+ #
+ # # qemu [...] -chardev socket,path=/tmp/qga.sock,server,nowait,id=qga0 \
+-#   -device virtio-serial -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0
++#   -device virtio-serial \
++#   -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0
+ #
+ # Run the script:
+ #
+@@ -37,6 +38,7 @@
+ #
  
--usage: qom.py [-h] {set,get,list,tree} ...
-+usage: qom.py [-h] {set,get,list,tree,fuse} ...
+ import base64
++import optparse
+ import os
+ import random
+ import sys
+@@ -94,9 +96,11 @@ class QemuGuestAgentClient:
+         msgs = []
+         msgs.append('version: ' + info['version'])
+         msgs.append('supported_commands:')
+-        enabled = [c['name'] for c in info['supported_commands'] if c['enabled']]
++        enabled = [c['name'] for c in info['supported_commands']
++                   if c['enabled']]
+         msgs.append('\tenabled: ' + ', '.join(enabled))
+-        disabled = [c['name'] for c in info['supported_commands'] if not c['enabled']]
++        disabled = [c['name'] for c in info['supported_commands']
++                    if not c['enabled']]
+         msgs.append('\tdisabled: ' + ', '.join(disabled))
  
- Query and manipulate QOM data
+         return '\n'.join(msgs)
+@@ -119,11 +123,11 @@ class QemuGuestAgentClient:
+                     if ipaddr['ip-address-type'] == 'ipv4':
+                         addr = ipaddr['ip-address']
+                         mask = self.__gen_ipv4_netmask(int(ipaddr['prefix']))
+-                        msgs.append("\tinet %s  netmask %s" % (addr, mask))
++                        msgs.append(f"\tinet {addr}  netmask {mask}")
+                     elif ipaddr['ip-address-type'] == 'ipv6':
+                         addr = ipaddr['ip-address']
+                         prefix = ipaddr['prefix']
+-                        msgs.append("\tinet6 %s  prefixlen %s" % (addr, prefix))
++                        msgs.append(f"\tinet6 {addr}  prefixlen {prefix}")
+             if nif['hardware-address'] != '00:00:00:00:00:00':
+                 msgs.append("\tether " + nif['hardware-address'])
  
-@@ -14,6 +14,7 @@
-     get                Get a QOM property value
-     list               List QOM properties at a given path
-     tree               Show QOM tree from a given path
-+    fuse               Mount a QOM tree as a FUSE filesystem
- """
- ##
- # Copyright John Snow 2020, for Red Hat, Inc.
-@@ -36,6 +37,15 @@
- from .qom_common import QOMCommand
+@@ -237,6 +241,8 @@ def _cmd_suspend(client, args):
  
- 
-+try:
-+    from .qom_fuse import QOMFuse
-+except ImportError:
-+    # either fusepy isn't installed, or qom_fuse itself is broken.
-+    pass
-+else:
-+    assert issubclass(QOMFuse, QOMCommand)
+ def _cmd_shutdown(client, args):
+     client.shutdown()
 +
 +
- class QOMSet(QOMCommand):
-     """QOM Command - Set a property to a given value."""
-     name = 'set'
-diff --git a/python/setup.cfg b/python/setup.cfg
-index a9a76784d45a..908e53527ddc 100644
---- a/python/setup.cfg
-+++ b/python/setup.cfg
-@@ -36,6 +36,7 @@ console_scripts =
-     qom-get = qemu.qmp.qom:QOMGet.entry_point
-     qom-list = qemu.qmp.qom:QOMList.entry_point
-     qom-tree = qemu.qmp.qom:QOMTree.entry_point
-+    qom-fuse = qemu.qmp.qom_fuse:QOMFuse.entry_point
+ _cmd_powerdown = _cmd_shutdown
  
- [flake8]
- extend-ignore = E722  # Prefer pylint's bare-except checks to flake8's
+ 
+@@ -280,17 +286,15 @@ def main(address, cmd, args):
+ 
+ 
+ if __name__ == '__main__':
+-    import optparse
+-    import os
+-    import sys
++    address = os.environ.get('QGA_CLIENT_ADDRESS')
+ 
+-    address = os.environ['QGA_CLIENT_ADDRESS'] if 'QGA_CLIENT_ADDRESS' in os.environ else None
+-
+-    usage = "%prog [--address=<unix_path>|<ipv4_address>] <command> [args...]\n"
++    usage = ("%prog [--address=<unix_path>|<ipv4_address>]"
++             " <command> [args...]\n")
+     usage += '<command>: ' + ', '.join(commands)
+     parser = optparse.OptionParser(usage=usage)
+     parser.add_option('--address', action='store', type='string',
+-                      default=address, help='Specify a ip:port pair or a unix socket path')
++                      default=address,
++                      help='Specify a ip:port pair or a unix socket path')
+     options, args = parser.parse_args()
+ 
+     address = options.address
 -- 
 2.26.2
 
