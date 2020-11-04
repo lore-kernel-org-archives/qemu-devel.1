@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C75C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A19C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:41:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AB60223EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:38:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B98ED223C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:41:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bIEvkjHX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB60223EA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GhqguQEk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B98ED223C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka6ok-0008Fr-5G
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 19:38:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35258)
+	id 1ka6rO-00033A-G0
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 19:41:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6mq-000681-4I
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39962)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6mo-00064p-J4
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28160)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6mo-0004oB-CL
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:27 -0500
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6mm-0004np-NP
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604450185;
+ s=mimecast20190719; t=1604450183;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/7XfrPNcUA+ASzGoojQUyH/mfhYmKp7PqWjbFYoevKc=;
- b=bIEvkjHXeV9DsNpub8l8JZ/yaKEjtaieKlPJ5mlZ1ax04YZ8cj64ydGipB5vvBvTAJA169
- ohQAVSf0V1mPb6lV9PVvejl+Elrg4fT4KcjBvFOGqfkvmCOFDFzTu1BR9jTaH/k2ALZpeY
- ZYBUVrS/bScCDHlbp0CWs83KpH/B1a4=
+ bh=GoN6FiR7SXqCjEjgaiCivn1MHyl3p6NfHJ/cTW8wnyM=;
+ b=GhqguQEkoWPfQILduoqDzHcK5vVTMjEVoTACadyZlWT2favFYaR1qFR2Fde38o4QhYjLmJ
+ /dFqpSxJ7dv4Kh0C5JlneVeGJsD76VvDrTEkzJ6FnYdNWJp3LOK/AqgkALMv+WkaFGD1f4
+ luInRNoKstXDikpJ2bTktgZpcSsYFIM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-DKFH0nmROUWH4gMVaJ8daw-1; Tue, 03 Nov 2020 19:36:24 -0500
-X-MC-Unique: DKFH0nmROUWH4gMVaJ8daw-1
+ us-mta-590-4gATjyqCMyehv5r0C8SepA-1; Tue, 03 Nov 2020 19:36:22 -0500
+X-MC-Unique: 4gATjyqCMyehv5r0C8SepA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFC1FE06D8
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:36:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8671D1052519
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:36:18 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-97.rdu2.redhat.com [10.10.119.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E5298358B;
- Wed,  4 Nov 2020 00:36:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4528255766;
+ Wed,  4 Nov 2020 00:36:17 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 06/72] python: Add 'fh' to known-good variable names
-Date: Tue,  3 Nov 2020 19:34:56 -0500
-Message-Id: <20201104003602.1293560-7-jsnow@redhat.com>
+Subject: [PATCH v2 05/72] scripts/qom-fuse: apply flake8 rules
+Date: Tue,  3 Nov 2020 19:34:55 -0500
+Message-Id: <20201104003602.1293560-6-jsnow@redhat.com>
 In-Reply-To: <20201104003602.1293560-1-jsnow@redhat.com>
 References: <20201104003602.1293560-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,16 +70,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,37 +99,146 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-fd and fh are fine: we often use these for "file descriptor" or "file
-handle" accordingly. It is rarely the case that you need to enforce a
-more semantically meaningful name beyond "This is the file we are using
-right now."
-
-While we're here: add comments for all of the non-standard pylint
-names. (And the underscore.)
+flake8 still has one warning because of the sys.path hack, but that will
+be going away by the end of this patch series.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/setup.cfg | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ scripts/qmp/qom-fuse | 81 +++++++++++++++++++++++---------------------
+ 1 file changed, 43 insertions(+), 38 deletions(-)
 
-diff --git a/python/setup.cfg b/python/setup.cfg
-index c8b7215996e9..c963d05527aa 100644
---- a/python/setup.cfg
-+++ b/python/setup.cfg
-@@ -68,9 +68,10 @@ good-names=i,
-            k,
-            ex,
-            Run,
--           _,
--           fd,
--           c,
-+           _,   # By convention: Unused variable
-+           fh,  # fh = open(...)
-+           fd,  # fd = os.open(...)
-+           c,   # for c in string: ...
+diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
+index 62deb9adb12d..ca30e928679e 100755
+--- a/scripts/qmp/qom-fuse
++++ b/scripts/qmp/qom-fuse
+@@ -9,13 +9,12 @@
+ #  Anthony Liguori   <aliguori@us.ibm.com>
+ #  Markus Armbruster <armbru@redhat.com>
+ #
+-# This work is licensed under the terms of the GNU GPL, version 2 or later.  See
+-# the COPYING file in the top-level directory.
++# This work is licensed under the terms of the GNU GPL, version 2 or later.
++# See the COPYING file in the top-level directory.
+ ##
  
- [pylint.similarities]
- # Ignore imports when computing similarities.
+-from errno import *
++from errno import ENOENT, EPERM
+ import os
+-import posix
+ import stat
+ import sys
+ 
+@@ -29,6 +28,7 @@ from qemu.qmp import QEMUMonitorProtocol
+ 
+ fuse.fuse_python_api = (0, 2)
+ 
++
+ class QOMFS(Operations):
+     def __init__(self, qmp):
+         self.qmp = qmp
+@@ -45,7 +45,7 @@ class QOMFS(Operations):
+ 
+     def is_object(self, path):
+         try:
+-            items = self.qmp.command('qom-list', path=path)
++            self.qmp.command('qom-list', path=path)
+             return True
+         except:
+             return False
+@@ -85,7 +85,7 @@ class QOMFS(Operations):
+             path = '/'
+         try:
+             data = self.qmp.command('qom-get', path=path, property=prop)
+-            data += '\n' # make values shell friendly
++            data += '\n'  # make values shell friendly
+         except:
+             raise FuseOSError(EPERM)
+ 
+@@ -104,38 +104,44 @@ class QOMFS(Operations):
+ 
+     def getattr(self, path, fh=None):
+         if self.is_link(path):
+-            value = { 'st_mode': 0o755 | stat.S_IFLNK,
+-                      'st_ino': self.get_ino(path),
+-                      'st_dev': 0,
+-                      'st_nlink': 2,
+-                      'st_uid': 1000,
+-                      'st_gid': 1000,
+-                      'st_size': 4096,
+-                      'st_atime': 0,
+-                      'st_mtime': 0,
+-                      'st_ctime': 0 }
++            value = {
++                'st_mode': 0o755 | stat.S_IFLNK,
++                'st_ino': self.get_ino(path),
++                'st_dev': 0,
++                'st_nlink': 2,
++                'st_uid': 1000,
++                'st_gid': 1000,
++                'st_size': 4096,
++                'st_atime': 0,
++                'st_mtime': 0,
++                'st_ctime': 0
++            }
+         elif self.is_object(path):
+-            value = { 'st_mode': 0o755 | stat.S_IFDIR,
+-                      'st_ino': self.get_ino(path),
+-                      'st_dev': 0,
+-                      'st_nlink': 2,
+-                      'st_uid': 1000,
+-                      'st_gid': 1000,
+-                      'st_size': 4096,
+-                      'st_atime': 0,
+-                      'st_mtime': 0,
+-                      'st_ctime': 0 }
++            value = {
++                'st_mode': 0o755 | stat.S_IFDIR,
++                'st_ino': self.get_ino(path),
++                'st_dev': 0,
++                'st_nlink': 2,
++                'st_uid': 1000,
++                'st_gid': 1000,
++                'st_size': 4096,
++                'st_atime': 0,
++                'st_mtime': 0,
++                'st_ctime': 0
++            }
+         elif self.is_property(path):
+-            value = { 'st_mode': 0o644 | stat.S_IFREG,
+-                      'st_ino': self.get_ino(path),
+-                      'st_dev': 0,
+-                      'st_nlink': 1,
+-                      'st_uid': 1000,
+-                      'st_gid': 1000,
+-                      'st_size': 4096,
+-                      'st_atime': 0,
+-                      'st_mtime': 0,
+-                      'st_ctime': 0 }
++            value = {
++                'st_mode': 0o644 | stat.S_IFREG,
++                'st_ino': self.get_ino(path),
++                'st_dev': 0,
++                'st_nlink': 1,
++                'st_uid': 1000,
++                'st_gid': 1000,
++                'st_size': 4096,
++                'st_atime': 0,
++                'st_mtime': 0,
++                'st_ctime': 0
++            }
+         else:
+             raise FuseOSError(ENOENT)
+         return value
+@@ -146,8 +152,7 @@ class QOMFS(Operations):
+         for item in self.qmp.command('qom-list', path=path):
+             yield str(item['name'])
+ 
++
+ if __name__ == '__main__':
+-    import os
+-
+     fuse = FUSE(QOMFS(QEMUMonitorProtocol(os.environ['QMP_SOCKET'])),
+                 sys.argv[1], foreground=True)
 -- 
 2.26.2
 
