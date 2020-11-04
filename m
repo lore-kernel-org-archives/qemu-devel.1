@@ -2,82 +2,100 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA54C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92931C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:33:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CBAC20781
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:31:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDA7A2074B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:33:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SlVDyDOv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CBAC20781
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KRss9BQd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA7A2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaECI-000377-8r
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 03:31:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42326)
+	id 1kaEEm-00046Q-Po
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 03:33:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kaEB9-0002bu-Cj
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:30:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24204)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaEDu-0003fa-6H
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:32:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29655)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kaEB6-0003za-KM
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:30:02 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaEDs-0004PG-Af
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:32:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604478598;
+ s=mimecast20190719; t=1604478770;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FTK4DVL+/BudT+tBksiB6zqLjeIMD0mY53n9LTO95oo=;
- b=SlVDyDOv2i3eaeRTwcu0mzDC7xIrnnRYptgTKlgeDG7s2vNTO/k6+XbmbPLX1kFStA12Yu
- IQisVA0qETRF3jGPZ0elVLd4isqS9kFKYZj2ubBfgNIG8wXBZLNKOSBepvpd6RJHEj7EiC
- yqcBbysCZwnhZNUbK9z/4XZ57UWxNMo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-T0e2US8qNkGPxFMqip5aHA-1; Wed, 04 Nov 2020 03:29:56 -0500
-X-MC-Unique: T0e2US8qNkGPxFMqip5aHA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AAB257202
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 08:29:56 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
- [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BECF173672;
- Wed,  4 Nov 2020 08:29:55 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0A0FC1132BD6; Wed,  4 Nov 2020 09:29:54 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] qapi, qemu-options: make all parsing visitors parse
- boolean options the same
-References: <20201103161339.447118-1-pbonzini@redhat.com>
- <20201103162551.GQ205187@redhat.com>
- <e950af86-c45d-4165-a9f2-85ee6e845b01@redhat.com>
-Date: Wed, 04 Nov 2020 09:29:54 +0100
-In-Reply-To: <e950af86-c45d-4165-a9f2-85ee6e845b01@redhat.com> (Paolo
- Bonzini's message of "Tue, 3 Nov 2020 17:33:47 +0100")
-Message-ID: <871rh91q4d.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ bh=tLC3Cc5wjB3/jDE279ohkBMxyga1YQq8QNqQEdaWj4A=;
+ b=KRss9BQdN6GgsdpcKLbNhGqUKLNDBH7abAbDNlGVR8/+6WgncATlGpt6KY6Ygn7d1SbOsV
+ zsiGb/zR2ixBwZeUrUSOLG+hEerJweBujPk795Jaa6uSdczb6BzlmFEWAGCnnOcqToxBa5
+ XHA5Kr9b7LVoU29ck9tus+KTwPkWIwM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-Qi5ouxAONk6hAb5O5w6Ejg-1; Wed, 04 Nov 2020 03:32:49 -0500
+X-MC-Unique: Qi5ouxAONk6hAb5O5w6Ejg-1
+Received: by mail-wm1-f72.google.com with SMTP id 13so932867wmf.0
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 00:32:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tLC3Cc5wjB3/jDE279ohkBMxyga1YQq8QNqQEdaWj4A=;
+ b=nTj3/mtiMPYQGnxnw67hGhJ8Wl4Vi3MJw/sncZlJJm6lWcl+yWkt+6em0ncDRoZFMX
+ THrCF85aOneGHEHWFqGZqIOw8nF34+L7ym/NB39hl3ETt5PjfyGobtYMUDbFy7NfDZWc
+ bcBizqplHSv5CyfFPVMrGxy+ksv6bZH1l93JF6msRIV51d70f58oF9d/UHUM6BHAhO5P
+ EmHZk4ajZHLL239VyjVugE86Ds+ZzWY/T3IyacX5UgNCqbWBqJ+SXuuXnUEnP22dxD7+
+ yQR/Z0AIngvtBYNAIzOnDf5NBwAkjyd2nR4wdr0TJSex6mRFt2+CWgR663wZldtvnu3V
+ /HHA==
+X-Gm-Message-State: AOAM532iVCKSvjYbU3+RI5NftGSqLtp+wDlVVQ3spjIu+2Nh+2x81CEt
+ 6fWLoLnhgXAp+UhiLsBpKv1d2gF5iAUWuM7b8SI89M1yTCTMrIADm68Y3Z9ZnGb5BCLjoS662Ka
+ 2N7lF7M61rT0eglI=
+X-Received: by 2002:a7b:c384:: with SMTP id s4mr3310438wmj.77.1604478767816;
+ Wed, 04 Nov 2020 00:32:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxUII14QktKWhIBzYx/0rJxuSoQ1hQqQbewWcuiin9TEPPNz5i4VOa/6VkJkJt6z3hKMGuO/A==
+X-Received: by 2002:a7b:c384:: with SMTP id s4mr3310405wmj.77.1604478767523;
+ Wed, 04 Nov 2020 00:32:47 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id e5sm1422715wrw.93.2020.11.04.00.32.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 04 Nov 2020 00:32:46 -0800 (PST)
+Subject: Re: [PATCH-for-5.2 2/3] gitlab-ci: Add a job to cover the
+ --without-default-devices config
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20201103164604.2692357-1-philmd@redhat.com>
+ <20201103164604.2692357-3-philmd@redhat.com>
+ <70b50ba2-f0e8-4cf7-b5ff-14178e03d595@redhat.com>
+ <01ec47fa-4e0d-1be9-e4e6-312b9d810d74@redhat.com>
+ <8f79c67c-3851-06a3-8646-403041a793c5@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1c4c591c-4bb2-83b1-383a-e038aec62e27@redhat.com>
+Date: Wed, 4 Nov 2020 09:32:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <8f79c67c-3851-06a3-8646-403041a793c5@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -86,8 +104,9 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,75 +119,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, "Daniel P . Berrange" <berrange@redhat.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 03/11/20 17:25, Daniel P. Berrang=C3=A9 wrote:
->>> OptsVisitor, StringInputVisitor and the keyval visitor have
->>> three different ideas of how a human could write the value of
->>> a boolean option.  Pay homage to the backwards-compatibility
->>> gods and make the new common helper accept all four sets (on/off,
->>> true/false, y/n and yes/no), and case-insensitive at that.
+On 11/4/20 7:21 AM, Thomas Huth wrote:
+> On 03/11/2020 21.41, Philippe Mathieu-Daudé wrote:
+>> On 11/3/20 7:43 PM, Thomas Huth wrote:
+>>> On 03/11/2020 17.46, Philippe Mathieu-Daudé wrote:
+> [...]
+>>>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+>>>> index 3b15ae5c302..6ee098ec53c 100644
+>>>> --- a/.gitlab-ci.yml
+>>>> +++ b/.gitlab-ci.yml
+>>>> @@ -262,6 +262,17 @@ build-user-plugins:
+>>>>      MAKE_CHECK_ARGS: check-tcg
+>>>>    timeout: 1h 30m
+>>>>  
+>>>> +build-system-ubuntu-without-default-devices:
+>>>> +  <<: *native_build_job_definition
+>>>> +  variables:
+>>>> +    IMAGE: ubuntu2004
+>>>> +    CONFIGURE_ARGS: --without-default-devices --disable-user --disable-xen --disable-tools --disable-docs
+>>>> +    MAKE_CHECK_ARGS: check-build
 >>>
->>> Since OptsVisitor is supposed to match qemu-options, adjust
->>> it as well.
->> FWIW, libvirt does not appear to use true/false or y/n, nor
->> ever use uppercase / mixed case.
->>=20
->> IOW this level of back compat may well be overkill.
->>=20
->> I'd particular suggest deprecating case-insensitivity, as
->> Yes, YES, yEs feel unlikely to be important or widely used.
->
-> True; at least it's type-safe code unlike the short-form boolean option.
->  It only hurts in the odd case of a boolean option becoming on/off/auto
-> or on/off/split.
+>>> AFAIK "check-build" is pretty much a no-op since the convertion to meson ...
+>>> could you maybe replace with a set of qtest targets that work, to make sure
+>>> that we do not regress here? E.g.:
+>>>
+>>> MAKE_CHECK_ARGS: check-qtest-avr check-qtestcris check-qtest-m68k
+>>> check-qtest-microblaze check-qtest-mipsel check-qtest-moxie ...
+>>
+>> qtests don't work with --without-default-devices, as we don't check
+>> for (un-)available devices.
+> 
+> Sure, "make check-qtest" does not work, I know. But some targets work fine,
+> e.g. "make check-qtest-avr", and that's what I've suggested.
 
-Another argument for deprecating values other than "on" and "off".
+Yes, I tested that successfully yesterday late.
 
-> I didn't want to introduce deprecation at this point, because
+> By testing
+> those targets, we can make sure that the qtests don't regress any further
+> with --without-default-devices.
 
-Not wanting to rush deprecation this close to the release is a valid
-point.  So is not wanting to rush in additional sugar :)
+Yes, but I'm being wary to use it with the sole AVR target, because
+I don't want this target development to be limited by unrelated
+technical debts (in case we add optional device on an AVR board).
 
-> consistency is better anyway even if we plan to later deprecate
-> something.  For example, since there is a common parser now, introducing
-> deprecation would be much easier.  It also lets us switch parsers even
-> during the deprecation period (which is how I got into this mess).
+> 
+>> I'll try check-unit.
+> 
+> I think that does not have much benefit since it should be independent of
+> the devices and is tested in the other pipelines already?
 
-On the other hand, we'll have more to deprecate.  Status quo:
+Ah, good point.
 
+Regards,
 
-                      on/off  yes/no     y/n  true/false  case-sensitive?
-qemu_opt_get_bool()     X                                 no
-keyval visitor          X                                 no
-string visitor          X        X                X       yes
-opts visitor            X        X        X               no
-
-For once, there is no way to blame QemuOpts ;)
-
-qemu_opt_get_bool() is everywhere in CLI and HMP.
-
-The keyval visitor is used for QAPIfied human-friendly interfaces: block
-stuff, -display, -audio.
-
-The string input visitor is used for -object, -global, HMP object_add,
-qom-set, migrate_set_parameter.
-
-The opts visitor is used for -mon and its sugared forms (new in 5.2!),
--net, -netdev, -acpitable, -numa.
-
-I'd very much prefer to deprecate the odd ones in string and opts
-visitor, and not copy them elsewhere.
-
-We can still factor out a common parsing function if we like: pass a
-flag that makes it recognize deprecated forms.  A single flag should
-suffice; it lets odd ones spread from string to opts visitor and vice
-versa, which I find tolerable.
+Phil.
 
 
