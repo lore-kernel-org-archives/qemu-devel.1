@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D62CC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D090C4741F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:15:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1A7120BED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:15:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9DAA20BED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:15:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E73w5zNC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1A7120BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cyh0pX55"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9DAA20BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaB8S-0006Kn-Mc
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:15:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59694)
+	id 1kaB90-0006qx-Oo
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:15:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmr-0008QQ-Ke
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60192)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAnC-0000sK-86
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:53:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20794)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmp-0004zJ-Pn
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:45 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAn9-00057C-A8
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:53:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604465562;
+ s=mimecast20190719; t=1604465582;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=FOR/bv25dGPFB9FnzIFOxW/ObDgDZns8YprwAzRry/Y=;
- b=E73w5zNCZTTquuLAcHSZ0q4UvMlpTaWcwE0V0Aw4iUPmNNn9zVTBol0FqaRDuUDUp6AWAJ
- qQDr7gQSdcrBCApaMWLLnmZflnGVhjQ5wjysxxXflrJU4Z4utheZHUnv1j4sIUvBOxKSTg
- sTcoGnGfHtvVPE5GV2XRnv2GqQB15OQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-A5QjTE7bO--eG2BLY9L3lg-1; Tue, 03 Nov 2020 23:52:01 -0500
-X-MC-Unique: A5QjTE7bO--eG2BLY9L3lg-1
-Received: by mail-wr1-f69.google.com with SMTP id b6so8660944wrn.17
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:52:01 -0800 (PST)
+ bh=IbXx/en61PP6xw7L1bYEyVwqp2fnuXoDT6+6BHQY4zY=;
+ b=cyh0pX55oKKvv81nHpZUzsj51FWkxfMSOsewD+pA7vUOML5Y5riubtaE7C8Q3zEUbAjm74
+ LpRi1wiiNTxfSfXiiUnMlWe4SWVgYFbE9h2FUt3hW+gAFzzQJmYDLT1QJqhHoxARGKK3Qu
+ H5qzAP7WjP7pVJTBkC1v8wLecrgdsgw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-obTMKEvPP0qHUJCV7fxJNA-1; Tue, 03 Nov 2020 23:52:15 -0500
+X-MC-Unique: obTMKEvPP0qHUJCV7fxJNA-1
+Received: by mail-wm1-f71.google.com with SMTP id o19so740576wme.2
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:52:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=FOR/bv25dGPFB9FnzIFOxW/ObDgDZns8YprwAzRry/Y=;
- b=EYDuxUbowdh3POq0uksVpjWFqN1RS90wXcaQWNdvaL5yhF+6epMuhTO93eXQU6qg63
- cmzLBm4nDLYqk0HTGx1rOl14GQRi1jCXhz6Yn8Kjmy5L6sko5Vm8MR9vDIiCgmiYcQmZ
- zBHGv8WbBgHexQ3Nzvx2mguM01xVbGMkaSlvIZGSxqS3Wor60lrG/VLVHaEwaUVC3FBN
- a/elfhkGdjk9q/ID/zeNF14VmzpbXT8yKNF9RVm6YdxNp8fdtR5MzZGp1FZhLjjmfBHx
- A7zMhEH5er3Zl5YXhfI37MxdgaI+ZgY9FFpPGp7cOTGhrEZHoblJ9pGSIGK3hA3yk/Kv
- Awgg==
-X-Gm-Message-State: AOAM531ylvu6bypTzZVq6w6Ix/leXqQkwps7PlpSfQ1Lz5ZFQ2pJ7QcS
- wZBAe+ozFsVPBH9QWkwWmgmvBLBdGmBXtlo2KCNAhsHbDDw2GLV/JK5jFQ0zWUHDrgCVPFAOJxb
- RyyV8aGsxJv0r40o=
-X-Received: by 2002:a5d:4c4f:: with SMTP id n15mr28976514wrt.137.1604465519814; 
- Tue, 03 Nov 2020 20:51:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxo6ZnRAG/CyyK5D5ryWKX4pbM4rBmKPi8zswxWO1XEaX2+DS4IM7ZCbRexCfz8IaYmzSMvBQ==
-X-Received: by 2002:a5d:4c4f:: with SMTP id n15mr28976509wrt.137.1604465519682; 
- Tue, 03 Nov 2020 20:51:59 -0800 (PST)
+ bh=IbXx/en61PP6xw7L1bYEyVwqp2fnuXoDT6+6BHQY4zY=;
+ b=PE8LjYQoKbrO9fVWVlqdWaFkc+mThy534ebldKVjViUZmx4GxPgfva8mTmWk3O5YHl
+ AVLqhqGL0r9dydvcCXjEyjSOy2MrEiV2Kq47q2uFOlHCihPQpTGySVod+p+g4DjOZgnd
+ vxUPoI1f2pB4dLHp2XHsit/aR7OqDWd3B/x50hxcfErH9nx+3wLchYGADoaWNG2F+2os
+ riZWJDCvtvfPOnpPqtnqjVVqx4fUEJrDTqqnHWdo9OBO5lEpmQbiXH/hNqEVaqdBz8AM
+ Z/Z4X50wWpCinNq8ZF+kjfOYv5R8sTi1x5hWDrX1BbVnRZHJHV+D4UAbxK1U9CHj6V/z
+ 5mzQ==
+X-Gm-Message-State: AOAM533Eu3bpRJfARmCOiQIl9md820tlKv1EKZS/7Uux7MEq1f+mBwtL
+ GOwkwfh4WW4hHbNA7i4nRK+LtEWarYRJ7mWzYTwD6ta9Tk/hiq88LRAUjx4y/2DgT3d05OskQt2
+ xUCtGRF85FgNnBMs=
+X-Received: by 2002:a1c:1f91:: with SMTP id f139mr2339632wmf.187.1604465533632; 
+ Tue, 03 Nov 2020 20:52:13 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxJHdoe4WImVutJSVXm+ed/c7WdUsDEtjtgNrpmiR//+5yqtddfmQwmG92+m8ccY5GJa/s6Bw==
+X-Received: by 2002:a1c:1f91:: with SMTP id f139mr2339620wmf.187.1604465533503; 
+ Tue, 03 Nov 2020 20:52:13 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id n8sm810292wmc.11.2020.11.03.20.51.58
+ by smtp.gmail.com with ESMTPSA id y11sm790618wmj.36.2020.11.03.20.52.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 20:51:59 -0800 (PST)
-Date: Tue, 3 Nov 2020 23:51:57 -0500
+ Tue, 03 Nov 2020 20:52:12 -0800 (PST)
+Date: Tue, 3 Nov 2020 23:52:11 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 28/38] configure: introduce --enable-vhost-user-blk-server
-Message-ID: <20201104044937.226370-29-mst@redhat.com>
+Subject: [PULL v2 33/38] tests/qtest: add multi-queue test case to
+ vhost-user-blk-test
+Message-ID: <20201104044937.226370-34-mst@redhat.com>
 References: <20201104044937.226370-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
@@ -86,17 +87,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,129 +110,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Make it possible to compile out the vhost-user-blk server. It is enabled
-by default on Linux.
-
-Note that vhost-user-server.c depends on libvhost-user, which requires
-CONFIG_LINUX. The CONFIG_VHOST_USER dependency was erroneous since that
-option controls vhost-user frontends (previously known as "master") and
-not device backends (previously known as "slave").
-
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20201027173528.213464-3-stefanha@redhat.com>
+Message-id: 20201001144604.559733-3-stefanha@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20201027173528.213464-8-stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- configure                | 15 +++++++++++++++
- block/export/export.c    |  4 ++--
- block/export/meson.build |  2 +-
- util/meson.build         |  2 +-
- 4 files changed, 19 insertions(+), 4 deletions(-)
+ tests/qtest/vhost-user-blk-test.c | 81 +++++++++++++++++++++++++++++--
+ 1 file changed, 76 insertions(+), 5 deletions(-)
 
-diff --git a/configure b/configure
-index 2c3c69f118..b5e8f5f72c 100755
---- a/configure
-+++ b/configure
-@@ -329,6 +329,7 @@ vhost_crypto=""
- vhost_scsi=""
- vhost_vsock=""
- vhost_user=""
-+vhost_user_blk_server=""
- vhost_user_fs=""
- kvm="auto"
- hax="auto"
-@@ -1246,6 +1247,10 @@ for opt do
-   ;;
-   --enable-vhost-vsock) vhost_vsock="yes"
-   ;;
-+  --disable-vhost-user-blk-server) vhost_user_blk_server="no"
-+  ;;
-+  --enable-vhost-user-blk-server) vhost_user_blk_server="yes"
-+  ;;
-   --disable-vhost-user-fs) vhost_user_fs="no"
-   ;;
-   --enable-vhost-user-fs) vhost_user_fs="yes"
-@@ -1791,6 +1796,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   vhost-crypto    vhost-user-crypto backend support
-   vhost-kernel    vhost kernel backend support
-   vhost-user      vhost-user backend support
-+  vhost-user-blk-server    vhost-user-blk server support
-   vhost-vdpa      vhost-vdpa kernel backend support
-   spice           spice
-   rbd             rados block device (rbd)
-@@ -2382,6 +2388,12 @@ if test "$vhost_net" = ""; then
-   test "$vhost_kernel" = "yes" && vhost_net=yes
- fi
+diff --git a/tests/qtest/vhost-user-blk-test.c b/tests/qtest/vhost-user-blk-test.c
+index e7e44f9bf0..31f2335f97 100644
+--- a/tests/qtest/vhost-user-blk-test.c
++++ b/tests/qtest/vhost-user-blk-test.c
+@@ -559,6 +559,67 @@ static void pci_hotplug(void *obj, void *data, QGuestAllocator *t_alloc)
+     qpci_unplug_acpi_device_test(qts, "drv1", PCI_SLOT_HP);
+ }
  
-+# libvhost-user is Linux-only
-+test "$vhost_user_blk_server" = "" && vhost_user_blk_server=$linux
-+if test "$vhost_user_blk_server" = "yes" && test "$linux" = "no"; then
-+  error_exit "--enable-vhost-user-blk-server is only available on Linux"
-+fi
++static void multiqueue(void *obj, void *data, QGuestAllocator *t_alloc)
++{
++    QVirtioPCIDevice *pdev1 = obj;
++    QVirtioDevice *dev1 = &pdev1->vdev;
++    QVirtioPCIDevice *pdev8;
++    QVirtioDevice *dev8;
++    QTestState *qts = pdev1->pdev->bus->qts;
++    uint64_t features;
++    uint16_t num_queues;
 +
- ##########################################
- # pkg-config probe
++    /*
++     * The primary device has 1 queue and VIRTIO_BLK_F_MQ is not enabled. The
++     * VIRTIO specification allows VIRTIO_BLK_F_MQ to be enabled when there is
++     * only 1 virtqueue, but --device vhost-user-blk-pci doesn't do this (which
++     * is also spec-compliant).
++     */
++    features = qvirtio_get_features(dev1);
++    g_assert_cmpint(features & (1u << VIRTIO_BLK_F_MQ), ==, 0);
++    features = features & ~(QVIRTIO_F_BAD_FEATURE |
++                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
++                            (1u << VIRTIO_F_NOTIFY_ON_EMPTY) |
++                            (1u << VIRTIO_BLK_F_SCSI));
++    qvirtio_set_features(dev1, features);
++
++    /* Hotplug a secondary device with 8 queues */
++    qtest_qmp_device_add(qts, "vhost-user-blk-pci", "drv1",
++                         "{'addr': %s, 'chardev': 'char2', 'num-queues': 8}",
++                         stringify(PCI_SLOT_HP) ".0");
++
++    pdev8 = virtio_pci_new(pdev1->pdev->bus,
++                           &(QPCIAddress) {
++                               .devfn = QPCI_DEVFN(PCI_SLOT_HP, 0)
++                           });
++    g_assert_nonnull(pdev8);
++    g_assert_cmpint(pdev8->vdev.device_type, ==, VIRTIO_ID_BLOCK);
++
++    qos_object_start_hw(&pdev8->obj);
++
++    dev8 = &pdev8->vdev;
++    features = qvirtio_get_features(dev8);
++    g_assert_cmpint(features & (1u << VIRTIO_BLK_F_MQ),
++                    ==,
++                    (1u << VIRTIO_BLK_F_MQ));
++    features = features & ~(QVIRTIO_F_BAD_FEATURE |
++                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
++                            (1u << VIRTIO_F_NOTIFY_ON_EMPTY) |
++                            (1u << VIRTIO_BLK_F_SCSI) |
++                            (1u << VIRTIO_BLK_F_MQ));
++    qvirtio_set_features(dev8, features);
++
++    num_queues = qvirtio_config_readw(dev8,
++            offsetof(struct virtio_blk_config, num_queues));
++    g_assert_cmpint(num_queues, ==, 8);
++
++    qvirtio_pci_device_disable(pdev8);
++    qos_object_destroy(&pdev8->obj);
++
++    /* unplug secondary disk */
++    qpci_unplug_acpi_device_test(qts, "drv1", PCI_SLOT_HP);
++}
++
+ /*
+  * Check that setting the vring addr on a non-existent virtqueue does
+  * not crash.
+@@ -643,7 +704,8 @@ static void quit_storage_daemon(void *qmp_test_state)
+     g_free(qmp_test_state);
+ }
  
-@@ -6275,6 +6287,9 @@ fi
- if test "$vhost_vdpa" = "yes" ; then
-   echo "CONFIG_VHOST_VDPA=y" >> $config_host_mak
- fi
-+if test "$vhost_user_blk_server" = "yes" ; then
-+  echo "CONFIG_VHOST_USER_BLK_SERVER=y" >> $config_host_mak
-+fi
- if test "$vhost_user_fs" = "yes" ; then
-   echo "CONFIG_VHOST_USER_FS=y" >> $config_host_mak
- fi
-diff --git a/block/export/export.c b/block/export/export.c
-index c3478c6c97..bad6f21b1c 100644
---- a/block/export/export.c
-+++ b/block/export/export.c
-@@ -22,13 +22,13 @@
- #include "qapi/qapi-commands-block-export.h"
- #include "qapi/qapi-events-block-export.h"
- #include "qemu/id.h"
--#if defined(CONFIG_LINUX) && defined(CONFIG_VHOST_USER)
-+#ifdef CONFIG_VHOST_USER_BLK_SERVER
- #include "vhost-user-blk-server.h"
- #endif
+-static char *start_vhost_user_blk(GString *cmd_line, int vus_instances)
++static char *start_vhost_user_blk(GString *cmd_line, int vus_instances,
++                                  int num_queues)
+ {
+     const char *vhost_user_blk_bin = qtest_qemu_storage_daemon_binary();
+     int fd, qmp_fd, i;
+@@ -675,8 +737,8 @@ static char *start_vhost_user_blk(GString *cmd_line, int vus_instances)
+         g_string_append_printf(storage_daemon_command,
+             "--blockdev driver=file,node-name=disk%d,filename=%s "
+             "--export type=vhost-user-blk,id=disk%d,addr.type=unix,addr.path=%s,"
+-            "node-name=disk%i,writable=on ",
+-            i, img_path, i, sock_path, i);
++            "node-name=disk%i,writable=on,num-queues=%d ",
++            i, img_path, i, sock_path, i, num_queues);
  
- static const BlockExportDriver *blk_exp_drivers[] = {
-     &blk_exp_nbd,
--#if defined(CONFIG_LINUX) && defined(CONFIG_VHOST_USER)
-+#ifdef CONFIG_VHOST_USER_BLK_SERVER
-     &blk_exp_vhost_user_blk,
- #endif
- };
-diff --git a/block/export/meson.build b/block/export/meson.build
-index 9fb4fbf81d..19526435d8 100644
---- a/block/export/meson.build
-+++ b/block/export/meson.build
-@@ -1,2 +1,2 @@
- blockdev_ss.add(files('export.c'))
--blockdev_ss.add(when: ['CONFIG_LINUX', 'CONFIG_VHOST_USER'], if_true: files('vhost-user-blk-server.c'))
-+blockdev_ss.add(when: 'CONFIG_VHOST_USER_BLK_SERVER', if_true: files('vhost-user-blk-server.c'))
-diff --git a/util/meson.build b/util/meson.build
-index c5159ad79d..f359af0d46 100644
---- a/util/meson.build
-+++ b/util/meson.build
-@@ -66,7 +66,7 @@ if have_block
-   util_ss.add(files('main-loop.c'))
-   util_ss.add(files('nvdimm-utils.c'))
-   util_ss.add(files('qemu-coroutine.c', 'qemu-coroutine-lock.c', 'qemu-coroutine-io.c'))
--  util_ss.add(when: ['CONFIG_LINUX', 'CONFIG_VHOST_USER'], if_true: [
-+  util_ss.add(when: 'CONFIG_LINUX', if_true: [
-     files('vhost-user-server.c'), vhost_user
-   ])
-   util_ss.add(files('block-helpers.c'))
+         g_string_append_printf(cmd_line, "-chardev socket,id=char%d,path=%s ",
+                                i + 1, sock_path);
+@@ -705,7 +767,7 @@ static char *start_vhost_user_blk(GString *cmd_line, int vus_instances)
+ 
+ static void *vhost_user_blk_test_setup(GString *cmd_line, void *arg)
+ {
+-    start_vhost_user_blk(cmd_line, 1);
++    start_vhost_user_blk(cmd_line, 1, 1);
+     return arg;
+ }
+ 
+@@ -719,7 +781,13 @@ static void *vhost_user_blk_test_setup(GString *cmd_line, void *arg)
+ static void *vhost_user_blk_hotplug_test_setup(GString *cmd_line, void *arg)
+ {
+     /* "-chardev socket,id=char2" is used for pci_hotplug*/
+-    start_vhost_user_blk(cmd_line, 2);
++    start_vhost_user_blk(cmd_line, 2, 1);
++    return arg;
++}
++
++static void *vhost_user_blk_multiqueue_test_setup(GString *cmd_line, void *arg)
++{
++    start_vhost_user_blk(cmd_line, 2, 8);
+     return arg;
+ }
+ 
+@@ -746,6 +814,9 @@ static void register_vhost_user_blk_test(void)
+ 
+     opts.before = vhost_user_blk_hotplug_test_setup;
+     qos_add_test("hotplug", "vhost-user-blk-pci", pci_hotplug, &opts);
++
++    opts.before = vhost_user_blk_multiqueue_test_setup;
++    qos_add_test("multiqueue", "vhost-user-blk-pci", multiqueue, &opts);
+ }
+ 
+ libqos_init(register_vhost_user_blk_test);
 -- 
 MST
 
