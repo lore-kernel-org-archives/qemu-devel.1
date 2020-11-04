@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C44F0C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE177C4741F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:25:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28BF1206A5
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:23:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FB61206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:25:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRuzp88W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BF1206A5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ly5lE5S/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB61206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaLZl-0000p5-0F
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:23:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42620)
+	id 1kaLbK-0002ub-6A
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:25:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLFW-000386-He
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46233)
+ id 1kaLFa-0003Ii-Mm
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31067)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLFO-0005fB-VC
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:02 -0500
+ id 1kaLFS-0005g7-B2
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604505774;
+ s=mimecast20190719; t=1604505777;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3hHkNTmxU/SjxKqbd9bYOyZ5qhDLK04BJWGVaSXKhJ0=;
- b=dRuzp88WRhBDs6BSiUcQVWlDmT/x9scr9iBuR3NEbVshe48XLcDNErV3SmFHGxC776KLTb
- Ql/TJtQ+Lr+pIx2y2HNAPtNvVEgK03UH082S2JKyHMRTICx3oqB2XCHr3PdtEZ9Ushgtea
- O/wZ9Gh+JOZ9o+MRsnEaanhPBko6qFo=
+ bh=uj+NvZ1l8bC6Bvg68x/tC2Tl1TJVsNfvAQrVINpztys=;
+ b=Ly5lE5S/WGquTjDo7SqhyoowIQSAm/9K8N/S7KEgX6gX5oxVWuLsMSEVA7IpuAOUFQwhbr
+ hW8OrsDIcieMxKhTqt4dQJXyjUIAdQONnDf4XxUkY3N76omBp/ACQnEe20F/mFg6cmFjFs
+ sEKM2ntw20QEMlMBjxUqaXhM4tyZyCI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-4vvB3C-COsyf5s6UU8RrlA-1; Wed, 04 Nov 2020 11:02:52 -0500
-X-MC-Unique: 4vvB3C-COsyf5s6UU8RrlA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-117-k8LwNk4GOTuAT-e01F-B9w-1; Wed, 04 Nov 2020 11:02:55 -0500
+X-MC-Unique: k8LwNk4GOTuAT-e01F-B9w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C7D81A2E935;
- Wed,  4 Nov 2020 16:02:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A1C71888A2F;
+ Wed,  4 Nov 2020 16:02:45 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E0ABE6266E;
- Wed,  4 Nov 2020 16:02:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A0B235D9CC;
+ Wed,  4 Nov 2020 16:02:41 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 33/44] qdev: Make qdev_prop_allow_set() a
- ObjectProperty.allow_set callback
-Date: Wed,  4 Nov 2020 11:00:10 -0500
-Message-Id: <20201104160021.2342108-34-ehabkost@redhat.com>
+Subject: [PATCH v2 43/44] tests: Use field properties at check-qom-proplist
+ test case
+Date: Wed,  4 Nov 2020 11:00:20 -0500
+Message-Id: <20201104160021.2342108-44-ehabkost@redhat.com>
 In-Reply-To: <20201104160021.2342108-1-ehabkost@redhat.com>
 References: <20201104160021.2342108-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -106,205 +106,143 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new allow_set parameter to object*_property_add_field(),
-and pass qdev_prop_allow_set as argument in the qdev registration
-code.
-
-This removes the last remaining line of code inside the core
-field property code that's specific to TYPE_DEVICE, and will
-allow us to make field properties a core QOM feature.
+Use field properties for the bool and string properties used at
+check-qom-proplist.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes v1 -> v2:
-* Redone patch on top of changes in previous patches in the
-  series
-* Forbid allow_set==NULL to avoid confusion with link property
-  semantics (where NULL makes the property read only)
+Changes v2:
+* Redone patch using PROP_* instead of DEFINE_PROP_*
 ---
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/core/qdev-prop-internal.h |  4 +++-
- include/hw/qdev-properties.h |  8 +++++++-
- hw/core/qdev-properties.c    | 35 +++++++++++++++++++++++------------
- 3 files changed, 33 insertions(+), 14 deletions(-)
+ include/qom/property-types.h |  2 +-
+ tests/check-qom-proplist.c   | 64 +++++-------------------------------
+ 2 files changed, 10 insertions(+), 56 deletions(-)
 
-diff --git a/hw/core/qdev-prop-internal.h b/hw/core/qdev-prop-internal.h
-index 0e16d28171..9fac681e38 100644
---- a/hw/core/qdev-prop-internal.h
-+++ b/hw/core/qdev-prop-internal.h
-@@ -32,12 +32,14 @@ void qdev_propinfo_get_size32(Object *obj, Visitor *v, const char *name,
-  * @obj: object instance
-  * @name: property name
-  * @prop: property definition
-+ * @allow_set: check function called when property is set
-  *
-  * This function should not be used in new code.  Please add class properties
-  * instead, using object_class_add_field().
+diff --git a/include/qom/property-types.h b/include/qom/property-types.h
+index a891dffb6e..3a36e1fec5 100644
+--- a/include/qom/property-types.h
++++ b/include/qom/property-types.h
+@@ -242,7 +242,7 @@ extern const PropertyInfo prop_info_link;
   */
- ObjectProperty *
- object_property_add_field(Object *obj, const char *name,
--                          Property *prop);
-+                          Property *prop,
-+                          ObjectPropertyAllowSet allow_set);
  
- #endif
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index b301fe64d7..7f8d5fc206 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -179,16 +179,22 @@ extern const PropertyInfo qdev_prop_link;
-  * @oc: object class
-  * @name: property name
-  * @prop: property definition
-+ * @allow_set: check function called when property is set
-  *
-  * Add a field property to an object class.  A field property is
-  * a property that will change a field at a specific offset of the
-  * object instance struct.
-  *
-  * *@prop must exist for the life time of @oc.
-+ *
-+ * @allow_set should not be NULL.  If the property can always be
-+ * set, `prop_allow_set_always` can be used.  If the property can
-+ * never be set, `prop_allow_set_never` can be used.
-  */
- ObjectProperty *
- object_class_property_add_field(ObjectClass *oc, const char *name,
--                                Property *prop);
-+                                Property *prop,
-+                                ObjectPropertyAllowSet allow_set);
+ #define FIELD_PROP(def) \
+-    ({ static Property _p = def; &p; })
++    ({ static Property _p = def; &_p; })
  
- /*
-  * Set properties between creation and realization.
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 5faf974c4f..ec9e456d95 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -25,13 +25,13 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
- }
+ #define PROP_SIGNED(...) \
+     FIELD_PROP(DEFINE_PROP_SIGNED(NULL, __VA_ARGS__))
+diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+index 1b76581980..b960df1964 100644
+--- a/tests/check-qom-proplist.c
++++ b/tests/check-qom-proplist.c
+@@ -26,6 +26,9 @@
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+ #include "qom/object_interfaces.h"
++#include "qom/field-property.h"
++#include "qom/field-property-internal.h"
++#include "qom/property-types.h"
  
- /* returns: true if property is allowed to be set, false otherwise */
--static bool qdev_prop_allow_set(Object *obj, const char *name,
-+static bool qdev_prop_allow_set(Object *obj, ObjectProperty *op,
-                                 Error **errp)
- {
-     DeviceState *dev = DEVICE(obj);
  
-     if (dev->realized) {
--        qdev_prop_set_after_realize(dev, name, errp);
-+        qdev_prop_set_after_realize(dev, op->name, errp);
-         return false;
-     }
-     return true;
-@@ -79,10 +79,6 @@ static void field_prop_set(Object *obj, Visitor *v, const char *name,
- {
-     Property *prop = opaque;
- 
--    if (!qdev_prop_allow_set(obj, name, errp)) {
--        return;
--    }
--
-     return prop->info->set(obj, v, name, opaque, errp);
- }
- 
-@@ -534,6 +530,7 @@ static void set_prop_arraylen(Object *obj, Visitor *v, const char *name,
-      * array itself and dynamically add the corresponding properties.
-      */
-     Property *prop = opaque;
-+    ObjectProperty *op = object_property_find_err(obj, name, &error_abort);
-     uint32_t *alenptr = qdev_get_prop_ptr(obj, prop);
-     void **arrayptr = (void *)obj + prop->arrayoffset;
-     void *eltptr;
-@@ -574,7 +571,7 @@ static void set_prop_arraylen(Object *obj, Visitor *v, const char *name,
-          */
-         arrayprop->offset = eltptr - (void *)obj;
-         assert(qdev_get_prop_ptr(obj, arrayprop) == eltptr);
--        object_property_add_field(obj, propname, arrayprop);
-+        object_property_add_field(obj, propname, arrayprop, op->allow_set);
-     }
- }
- 
-@@ -789,9 +786,13 @@ const PropertyInfo qdev_prop_size = {
- static ObjectProperty *create_link_property(ObjectClass *oc, const char *name,
-                                             Property *prop)
- {
-+    /*
-+     * NOTE: object_property_allow_set_link is unconditional, but
-+     *       ObjectProperty.allow_set may be set for the property too.
-+     */
-     return object_class_property_add_link(oc, name, prop->link_type,
-                                           prop->offset,
--                                          qdev_prop_allow_set_link_before_realize,
-+                                          object_property_allow_set_link,
-                                           OBJ_PROP_LINK_STRONG);
- }
- 
-@@ -801,10 +802,12 @@ const PropertyInfo qdev_prop_link = {
+ #define TYPE_DUMMY "qemu-dummy"
+@@ -68,24 +71,6 @@ struct DummyObjectClass {
  };
  
- ObjectProperty *
--object_property_add_field(Object *obj, const char *name, Property *prop)
-+object_property_add_field(Object *obj, const char *name, Property *prop,
-+                          ObjectPropertyAllowSet allow_set)
+ 
+-static void dummy_set_bv(Object *obj,
+-                         bool value,
+-                         Error **errp)
+-{
+-    DummyObject *dobj = DUMMY_OBJECT(obj);
+-
+-    dobj->bv = value;
+-}
+-
+-static bool dummy_get_bv(Object *obj,
+-                         Error **errp)
+-{
+-    DummyObject *dobj = DUMMY_OBJECT(obj);
+-
+-    return dobj->bv;
+-}
+-
+-
+ static void dummy_set_av(Object *obj,
+                          int value,
+                          Error **errp)
+@@ -103,39 +88,18 @@ static int dummy_get_av(Object *obj,
+     return dobj->av;
+ }
+ 
+-
+-static void dummy_set_sv(Object *obj,
+-                         const char *value,
+-                         Error **errp)
+-{
+-    DummyObject *dobj = DUMMY_OBJECT(obj);
+-
+-    g_free(dobj->sv);
+-    dobj->sv = g_strdup(value);
+-}
+-
+-static char *dummy_get_sv(Object *obj,
+-                          Error **errp)
+-{
+-    DummyObject *dobj = DUMMY_OBJECT(obj);
+-
+-    return g_strdup(dobj->sv);
+-}
+-
+-
+ static void dummy_init(Object *obj)
  {
-     ObjectProperty *op;
- 
-+    assert(allow_set);
-     assert(!prop->info->create);
- 
-     op = object_property_add(obj, name, prop->info->name,
-@@ -823,15 +826,19 @@ object_property_add_field(Object *obj, const char *name, Property *prop)
-         }
-     }
- 
-+    op->allow_set = allow_set;
-     return op;
+-    object_property_add_bool(obj, "bv",
+-                             dummy_get_bv,
+-                             dummy_set_bv);
++    object_property_add_field(obj, "bv",
++                              PROP_BOOL(DummyObject, bv, false),
++                              prop_allow_set_always);
  }
  
- ObjectProperty *
- object_class_property_add_field(ObjectClass *oc, const char *name,
--                                Property *prop)
-+                                Property *prop,
-+                                ObjectPropertyAllowSet allow_set)
+-
+ static void dummy_class_init(ObjectClass *cls, void *data)
  {
-     ObjectProperty *op;
- 
-+    assert(allow_set);
-+
-     if (prop->info->create) {
-         op = prop->info->create(oc, name, prop);
-     } else {
-@@ -849,12 +856,15 @@ object_class_property_add_field(ObjectClass *oc, const char *name,
-         object_class_property_set_description(oc, name,
-                                               prop->info->description);
-     }
-+
-+    op->allow_set = allow_set;
-     return op;
+-    object_class_property_add_str(cls, "sv",
+-                                  dummy_get_sv,
+-                                  dummy_set_sv);
++    object_class_property_add_field(cls, "sv",
++                                    PROP_STRING(DummyObject, sv),
++                                    prop_allow_set_always);
+     object_class_property_add_enum(cls, "av",
+                                    "DummyAnimal",
+                                    &dummy_animal_map,
+@@ -143,21 +107,11 @@ static void dummy_class_init(ObjectClass *cls, void *data)
+                                    dummy_set_av);
  }
  
- void qdev_property_add_static(DeviceState *dev, Property *prop)
- {
--    object_property_add_field(OBJECT(dev), prop->qdev_prop_name, prop);
-+    object_property_add_field(OBJECT(dev), prop->qdev_prop_name, prop,
-+                              qdev_prop_allow_set);
- }
- 
- /**
-@@ -911,7 +921,8 @@ void device_class_set_props(DeviceClass *dc, Property *props)
-     dc->props_ = props;
-     for (prop = props; prop && prop->qdev_prop_name; prop++) {
-         qdev_class_add_legacy_property(dc, prop);
--        object_class_property_add_field(oc, prop->qdev_prop_name, prop);
-+        object_class_property_add_field(oc, prop->qdev_prop_name, prop,
-+                                        qdev_prop_allow_set);
-     }
- }
- 
+-
+-static void dummy_finalize(Object *obj)
+-{
+-    DummyObject *dobj = DUMMY_OBJECT(obj);
+-
+-    g_free(dobj->sv);
+-}
+-
+-
+ static const TypeInfo dummy_info = {
+     .name          = TYPE_DUMMY,
+     .parent        = TYPE_OBJECT,
+     .instance_size = sizeof(DummyObject),
+     .instance_init = dummy_init,
+-    .instance_finalize = dummy_finalize,
+     .class_size = sizeof(DummyObjectClass),
+     .class_init = dummy_class_init,
+     .interfaces = (InterfaceInfo[]) {
 -- 
 2.28.0
 
