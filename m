@@ -2,79 +2,79 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AFFC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0D9C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:55:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3374420BED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:54:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF42320BED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:55:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O/9d5wDV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3374420BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZCP3jAc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF42320BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaAoM-0002U0-9S
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 23:54:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59166)
+	id 1kaApM-0003rB-5k
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 23:55:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAlL-0005qF-I4
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:51:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48069)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmU-0007V4-ML
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51547)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAlG-0004Qd-Mm
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:51:11 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmS-0004t2-OA
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604465466;
+ s=mimecast20190719; t=1604465540;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=73Mpz3vICh9QEBEOeL5uEWGSphcZBjM+o5MkFyzWxeI=;
- b=O/9d5wDVhtyL0lM1kXwrxPJEFl5Ai2C8LZGoGvcMT7L8soHgb7kzoD0dihbil2cHYhtLOi
- HPzATNdA3+oLGLlBanfSDAT0XNbYmtSbpOTlqRnwMliCnJAoTylrfIoRhqMI7ehSbRuBMK
- sNsCEaw1OfRsbehIj7gWbHA09gzwGAU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-4eZ7zOzZOuSggcZZcxF_9Q-1; Tue, 03 Nov 2020 23:51:02 -0500
-X-MC-Unique: 4eZ7zOzZOuSggcZZcxF_9Q-1
-Received: by mail-wr1-f69.google.com with SMTP id w6so1099914wrk.1
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:51:02 -0800 (PST)
+ bh=TD7SW6oID+mQnZFy+V2Ba30n404JJ+wGVVREK/DvNQg=;
+ b=aZCP3jAcMXUKp7xzl4wGCRhPY1pmIPd0O7TT2J8FpshJwgy4PQ36lHSUyFr7QATiKWz1nQ
+ Dk+Na8/3W31OfT3gh6IVVXff8zH6/UM+Js2eD2IheGSeLD+G9fj5gmf9i57RHngRolXR+m
+ v3ng3OJZlx4iTpfTOb0j6ja7GOJDjQc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-rl1JBh8nPFyQIOXc3GuTlQ-1; Tue, 03 Nov 2020 23:52:18 -0500
+X-MC-Unique: rl1JBh8nPFyQIOXc3GuTlQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 13so745113wmf.0
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:52:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=73Mpz3vICh9QEBEOeL5uEWGSphcZBjM+o5MkFyzWxeI=;
- b=sFH4bKxKSD9sYzv8H3YJqXhoijpPeVPbMd+HBWAWmOSej/20uTNql6k1rT/JBd42e8
- 3C4nwdc6aGfrhfe3sg9zI63ilTPFp2zYi1H3doPuf96ee1AWs5FCWY44XeqLAL6THjWF
- j+qrOa6C0hamwn3xyIv7jBlzoXwlisRu0actUEdVQCJC6FaF7bfdkjswj+aNxVsw4ESV
- /mEnZbH+xJbyALdPjtRnuWD2HrhoS345LHwquOZveFFrkFu/4vUzRyF7yB1TaJVnRVPb
- Gcz+Z1tc+4HnZlaZTFyuyjMvRJ3DtYnAnCLCJb4v3sLNE1ci6k3Mo5xdryU1Rd8jcrxX
- zwEw==
-X-Gm-Message-State: AOAM533Ku1cdhmRwhyjn8FgBgvluB34GrmW4uAIJ+u2DzE7ep1Rctx6Z
- T4TqKWrEuYeAQo5Ex45nSBOv12mrP6pyTU7RaMSM3nQPCnEwM+rV4DJppYdp4Dv7JtdnzHIsl9+
- /yUWNR0Wx83Reltc=
-X-Received: by 2002:a1c:1f91:: with SMTP id f139mr2336235wmf.187.1604465460814; 
- Tue, 03 Nov 2020 20:51:00 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzlGTxgt4fQa8bVOXzeewVRGwCjYkKkN/GaCyW25cF43kupxdh/NTQGpck5fieisT+WO4yKbw==
-X-Received: by 2002:a1c:1f91:: with SMTP id f139mr2336229wmf.187.1604465460681; 
- Tue, 03 Nov 2020 20:51:00 -0800 (PST)
+ bh=TD7SW6oID+mQnZFy+V2Ba30n404JJ+wGVVREK/DvNQg=;
+ b=brJpTjVJVufENROetFwUeGYHHqEKLvwWFbTcHO8OcQwLXr3rUDT7+VEaRtNgM5cDS9
+ IRkg+Zk9fxumpVXr5XopjsC79Gtsj01n9um9rjLN9UeJ0ao9u2Y7sO8wmq4ui51EBiVF
+ IzoxBTXrmr283+mCjSW7gm1pRezFlHTsWw9+zBFRQa1e7DyDUZUy65fAaFhNc8Kk3ovT
+ wg7Npj5RUplgOPzC3CH93RtVMJxqtpumunQ7axTSFxoNFTef3p4FxJUNX/uMTS07B3hC
+ z1iQhDLxZmPrOLRMCDT5HrON4HGG6PWa2FFQoSffW11cQyxahXnJq/1MmnRHb1YFf+6Q
+ LHiw==
+X-Gm-Message-State: AOAM530rGfSmxOBbnunKH056Etmasi44ixvn5wriiUNrl96A6qv0n542
+ ki2qCRcOotPHze+wReVP6QD0repP758eiTnFpnjxGpKINAItogXEZOwghcKNXZTbZPcGyw79S0F
+ JjU/Kei35+S7+2ow=
+X-Received: by 2002:adf:8296:: with SMTP id 22mr30026186wrc.341.1604465536295; 
+ Tue, 03 Nov 2020 20:52:16 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzQtGJvRzuJRVkQQaGdOLzVKaIhBMX8O1pz2/91oQjb81dn1jhGsEP/DXOaEi0JSD38ETqDyw==
+X-Received: by 2002:adf:8296:: with SMTP id 22mr30026174wrc.341.1604465536166; 
+ Tue, 03 Nov 2020 20:52:16 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id b7sm868891wrp.16.2020.11.03.20.50.59
+ by smtp.gmail.com with ESMTPSA id x18sm926510wrg.4.2020.11.03.20.52.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 20:51:00 -0800 (PST)
-Date: Tue, 3 Nov 2020 23:50:58 -0500
+ Tue, 03 Nov 2020 20:52:15 -0800 (PST)
+Date: Tue, 3 Nov 2020 23:52:13 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 06/38] memory-device: Add get_min_alignment() callback
-Message-ID: <20201104044937.226370-7-mst@redhat.com>
+Subject: [PULL v2 34/38] libqtest: add qtest_socket_server()
+Message-ID: <20201104044937.226370-35-mst@redhat.com>
 References: <20201104044937.226370-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
@@ -109,90 +109,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- David Hildenbrand <david@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Add a callback that can be used to express additional alignment
-requirements (exceeding the ones from the memory region).
+There is a qtest_socket_client() API. Add an equivalent
+qtest_socket_server() API that returns a new UNIX domain socket in the
+listen state. The code for this was already there but only used
+internally in init_socket().
 
-Will be used by virtio-mem to express special alignment requirements due
-to manually configured, big block sizes (e.g., 1GB with an ordinary
-memory-backend-ram). This avoids failing later when realizing, because
-auto-detection wasn't able to assign a properly aligned address.
-
-Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20201008083029.9504-6-david@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20201027173528.213464-9-stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/mem/memory-device.h | 10 ++++++++++
- hw/mem/memory-device.c         | 11 +++++++++--
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ tests/qtest/libqos/libqtest.h |  8 +++++++
+ tests/qtest/libqtest.c        | 40 ++++++++++++++++++++---------------
+ 2 files changed, 31 insertions(+), 17 deletions(-)
 
-diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index 30d7e99f52..48d2611fc5 100644
---- a/include/hw/mem/memory-device.h
-+++ b/include/hw/mem/memory-device.h
-@@ -88,6 +88,16 @@ struct MemoryDeviceClass {
-      */
-     MemoryRegion *(*get_memory_region)(MemoryDeviceState *md, Error **errp);
+diff --git a/tests/qtest/libqos/libqtest.h b/tests/qtest/libqos/libqtest.h
+index 241b5f89fb..699be8c2a2 100644
+--- a/tests/qtest/libqos/libqtest.h
++++ b/tests/qtest/libqos/libqtest.h
+@@ -132,6 +132,14 @@ void qtest_qmp_send(QTestState *s, const char *fmt, ...)
+ void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
+     GCC_FMT_ATTR(2, 3);
  
-+    /*
-+     * Optional: Return the desired minimum alignment of the device in guest
-+     * physical address space. The final alignment is computed based on this
-+     * alignment and the alignment requirements of the memory region.
-+     *
-+     * Called when plugging the memory device to detect the required alignment
-+     * during address assignment.
-+     */
-+    uint64_t (*get_min_alignment)(const MemoryDeviceState *md);
++/**
++ * qtest_socket_server:
++ * @socket_path: the UNIX domain socket path
++ *
++ * Create and return a listen socket file descriptor, or abort on failure.
++ */
++int qtest_socket_server(const char *socket_path);
 +
-     /*
-      * Translate the memory device into #MemoryDeviceInfo.
-      */
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 8a736f1a26..cf0627fd01 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -259,7 +259,7 @@ void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
+ /**
+  * qtest_socket_client:
+  * @server_socket_path: the socket server's path
+diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+index ab34075f2b..d652ffc90d 100644
+--- a/tests/qtest/libqtest.c
++++ b/tests/qtest/libqtest.c
+@@ -82,24 +82,8 @@ static void qtest_client_set_rx_handler(QTestState *s, QTestRecvFn recv);
+ 
+ static int init_socket(const char *socket_path)
  {
-     const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
-     Error *local_err = NULL;
--    uint64_t addr, align;
-+    uint64_t addr, align = 0;
-     MemoryRegion *mr;
+-    struct sockaddr_un addr;
+-    int sock;
+-    int ret;
+-
+-    sock = socket(PF_UNIX, SOCK_STREAM, 0);
+-    g_assert_cmpint(sock, !=, -1);
+-
+-    addr.sun_family = AF_UNIX;
+-    snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", socket_path);
++    int sock = qtest_socket_server(socket_path);
+     qemu_set_cloexec(sock);
+-
+-    do {
+-        ret = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+-    } while (ret == -1 && errno == EINTR);
+-    g_assert_cmpint(ret, !=, -1);
+-    ret = listen(sock, 1);
+-    g_assert_cmpint(ret, !=, -1);
+-
+     return sock;
+ }
  
-     mr = mdc->get_memory_region(md, &local_err);
-@@ -267,7 +267,14 @@ void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
-         goto out;
-     }
+@@ -638,6 +622,28 @@ QTestState *qtest_create_state_with_qmp_fd(int fd)
+     return qmp_test_state;
+ }
  
--    align = legacy_align ? *legacy_align : memory_region_get_alignment(mr);
-+    if (legacy_align) {
-+        align = *legacy_align;
-+    } else {
-+        if (mdc->get_min_alignment) {
-+            align = mdc->get_min_alignment(md);
-+        }
-+        align = MAX(align, memory_region_get_alignment(mr));
-+    }
-     addr = mdc->get_addr(md);
-     addr = memory_device_get_free_addr(ms, !addr ? NULL : &addr, align,
-                                        memory_region_size(mr), &local_err);
++int qtest_socket_server(const char *socket_path)
++{
++    struct sockaddr_un addr;
++    int sock;
++    int ret;
++
++    sock = socket(PF_UNIX, SOCK_STREAM, 0);
++    g_assert_cmpint(sock, !=, -1);
++
++    addr.sun_family = AF_UNIX;
++    snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", socket_path);
++
++    do {
++        ret = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
++    } while (ret == -1 && errno == EINTR);
++    g_assert_cmpint(ret, !=, -1);
++    ret = listen(sock, 1);
++    g_assert_cmpint(ret, !=, -1);
++
++    return sock;
++}
++
+ int qtest_socket_client(char *server_socket_path)
+ {
+     struct sockaddr_un serv_addr;
 -- 
 MST
 
