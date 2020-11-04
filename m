@@ -2,74 +2,74 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D320C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 03:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0060C388F2
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 03:33:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4A932067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 03:16:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE5732074F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 03:33:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6BqElAn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4A932067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BkvbjD5s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE5732074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka9Hq-0007Um-MA
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 22:16:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38084)
+	id 1ka9YU-0002tx-Kb
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 22:33:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1ka9H8-00072I-2K
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 22:15:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22572)
+ id 1ka9Xi-0002Tl-4Y
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 22:33:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33671)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1ka9H5-0007wW-9B
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 22:15:53 -0500
+ id 1ka9Xe-00029J-ON
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 22:33:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604459748;
+ s=mimecast20190719; t=1604460777;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WsG/Oerd4HbcZtrWWXs2Jsfr8nF22U/0a49+3tH3zQs=;
- b=e6BqElAnUe7PVeDxoLRo/0Wor59l1qoxQ4L71IfLmZ5bJ1Rdetl3q7SqTXsm3h++cpUSMR
- PU2Fyy5hARzKGDD4Mkr+0+INns++Dk0bobBS4a2x1ECTCTsKRe1/tPuI0EJTv2GXVKM3mQ
- uGTEiZqg+ujMsqzyKikoMN8eB8cP+lY=
+ bh=QYz+77WTNaIuwzdCFkd8ia/LtRGUkw3mWOb1xCLiKI8=;
+ b=BkvbjD5swJ0zdDInftzMeHDL54asMDovCHsPdwie47EcFxd/unQ+7w3Ut2X9VJibMZcGmn
+ uhUFsmhWd71BA3xefh/VBvGVU7uYFWEHBxlwyBJC3ESx9bzqCIgQFVcUu6X1vZ0VvOO2N6
+ TTn43wmEOHGUi/QWYpBLcLNWkRINMT4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-QSeT46ybOSWCuB2PiVcA5Q-1; Tue, 03 Nov 2020 22:15:46 -0500
-X-MC-Unique: QSeT46ybOSWCuB2PiVcA5Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-7-BdQUlT6ZNxqOExDeRhMfFQ-1; Tue, 03 Nov 2020 22:32:48 -0500
+X-MC-Unique: BdQUlT6ZNxqOExDeRhMfFQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 804A26414C;
- Wed,  4 Nov 2020 03:15:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39672802B7D;
+ Wed,  4 Nov 2020 03:32:47 +0000 (UTC)
 Received: from [10.72.13.133] (ovpn-13-133.pek2.redhat.com [10.72.13.133])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A6C455578A;
- Wed,  4 Nov 2020 03:15:40 +0000 (UTC)
-Subject: Re: [RFC PATCH 6/6] docs: Added eBPF documentation.
-To: Andrew Melnychenko <andrew@daynix.com>, mst@redhat.com
-References: <20201102185115.7425-1-andrew@daynix.com>
- <20201102185115.7425-7-andrew@daynix.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ABFE619C4F;
+ Wed,  4 Nov 2020 03:32:35 +0000 (UTC)
+Subject: Re: VFIO Migration
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20201102111153.GC42093@stefanha-x1.localdomain>
+ <ac694df6-0842-3483-dfc6-db82830bb02b@redhat.com>
+ <20201103121515.GB243332@stefanha-x1.localdomain>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <d6b1002f-a3d1-3939-016c-1bd1fc19acd9@redhat.com>
-Date: Wed, 4 Nov 2020 11:15:39 +0800
+Message-ID: <311b467a-3000-7091-77d1-4d6c0e42c1fd@redhat.com>
+Date: Wed, 4 Nov 2020 11:32:34 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201102185115.7425-7-andrew@daynix.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201103121515.GB243332@stefanha-x1.localdomain>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -101,221 +101,327 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com, yuri.benditovich@daynix.com, qemu-devel@nongnu.org
+Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ quintela@redhat.com, qemu-devel@nongnu.org,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020/11/3 上午2:51, Andrew Melnychenko wrote:
-> From: Andrew <andrew@daynix.com>
+On 2020/11/3 下午8:15, Stefan Hajnoczi wrote:
+> On Tue, Nov 03, 2020 at 04:46:53PM +0800, Jason Wang wrote:
+>> On 2020/11/2 下午7:11, Stefan Hajnoczi wrote:
+>>> There is discussion about VFIO migration in the "Re: Out-of-Process
+>>> Device Emulation session at KVM Forum 2020" thread. The current status
+>>> is that Kirti proposed a VFIO device region type for saving and loading
+>>> device state. There is currently no guidance on migrating between
+>>> different device versions or device implementations from different
+>>> vendors. This is known to be non-trivial and raised discussion about
+>>> whether it should really be handled by VFIO or centralized in QEMU.
+>>>
+>>> Below is a document that describes how to ensure migration compatibility
+>>> in VFIO. It does not require changes to the VFIO migration interface. It
+>>> can be used for both VFIO/mdev kernel devices and vfio-user devices.
+>>>
+>>> The idea is that the device state blob is opaque to the VMM but the same
+>>> level of migration compatibility that exists today is still available.
+>>
+>> So if we can't mandate this or there's no way to validate this. Vendor is
+>> still free to implement their own protocol which could lead a lot of
+>> maintaining burden.
+> Yes, the device state representation is their responsibility. We can't
+> do that for them since they define the hardware interface and internal
+> state.
 >
-> Also, added maintainers information.
+> As Michael and Paolo have mentioned in the other thread, we can provide
+> guidelines and standardize common aspects.
 >
-> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
-> ---
->   MAINTAINERS       |   6 +++
->   docs/ebpf.rst     |  29 +++++++++++
->   docs/ebpf_rss.rst | 129 ++++++++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 164 insertions(+)
->   create mode 100644 docs/ebpf.rst
->   create mode 100644 docs/ebpf_rss.rst
+>>> Migration can fail if loading the device state is not possible. It should fail
+>>> early with a clear error message. It must not appear to complete but leave the
+>>> device inoperable due to a migration problem.
+>>
+>> For VFIO-user, how management know that a VM can be migrated from src to
+>> dst? For kernel, we have sysfs.
+> vfio-user devices will normally be instantiated in one of two ways:
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 2c22bbca5a..464b3f3c95 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -3111,6 +3111,12 @@ S: Maintained
->   F: hw/semihosting/
->   F: include/hw/semihosting/
->   
-> +EBPF:
-> +M: Andrew Melnychenko <andrew@daynix.com>
-> +M: Yuri Benditovich <yuri.benditovich@daynix.com>
-> +S: Maintained
-> +F: ebpf/*
-> +
->   Build and test automation
->   -------------------------
->   Build and test automation
-> diff --git a/docs/ebpf.rst b/docs/ebpf.rst
-> new file mode 100644
-> index 0000000000..e45d085432
-> --- /dev/null
-> +++ b/docs/ebpf.rst
-> @@ -0,0 +1,29 @@
-> +===========================
-> +eBPF qemu support
-> +===========================
-> +
-> +eBPF support (CONFIG_EBPF) is enabled automatically by 'configure' script
-> +if 'bpf' system call is available.
-> +To disable eBPF support use './configure --disable-bpf'
-> +
-> +Basic eBPF functionality is located in ebpf/ebpf.c and ebpf/ebpf.h.
-> +There are basic functions to load the eBPF program into the kernel.
-> +Mostly, functions name are self-explanatory:
-> +
-> +- `bpf_create_map()`, `bpf_lookup_element()`, `bpf_update_element()`, `bpf_delete_element()` - manages eBPF maps. On error, a basic error message would be reported and returned -1. On success, 0 would be returned(`bpf_create_map()` returns map's file descriptor).
-> +- `bpf_prog_load()` - load the program. The program has to have proper map file descriptors if there are used. On error - the log eBPF would be reported. On success, the program file descriptor returned.
-> +- `bpf_fixup_mapfd()` - would place map file descriptor into the program according to 'relocate array' of 'struct fixup_mapfd_t'. The function would return how many instructions were 'fixed' aka how many relocations was occurred.
-> +
-> +Simplified workflow would look like this:
-> +
-> +.. code:: C
-> +
-> +    int map1 = bpf_create_map(...);
-> +    int map2 = bpf_create_map(...);
-> +
-> +    bpf_fixup_mapfd(<fixup table>, ARRAY_SIZE(<fixup table>), <instructions pointer>, ARRAY_SIZE(<instructions pointer>), <map1 name>, map1);
-> +    bpf_fixup_mapfd(<fixup table>, ARRAY_SIZE(<fixup table>), <instructions pointer>, ARRAY_SIZE(<instructions pointer>), <map2 name>, map2);
-> +
-> +    int prog = bpf_prog_load(<program type>, <instructions pointer>, ARRAY_SIZE(<instructions pointer>), "GPL");
-> +
-> +See the bpf(2) for details.
-> diff --git a/docs/ebpf_rss.rst b/docs/ebpf_rss.rst
-> new file mode 100644
-> index 0000000000..96fee391b8
-> --- /dev/null
-> +++ b/docs/ebpf_rss.rst
-> @@ -0,0 +1,129 @@
-> +===========================
-> +eBPF RSS virtio-net support
-> +===========================
-> +
-> +RSS(Receive Side Scaling) is used to distribute network packets to guest virtqueues
-> +by calculating packet hash. Usually every queue is processed then by a specific guest CPU core.
-> +
-> +For now there are 2 RSS implementations in qemu:
-> +- 'software' RSS (functions if qemu receives network packets, i.e. vhost=off)
-> +- eBPF RSS (can function with also with vhost=on)
-> +
-> +If steering BPF is not set for kernel's TUN module, the TUN uses automatic selection
-> +of rx virtqueue based on lookup table built according to calculated symmetric hash
-> +of transmitted packets.
-> +If steering BPF is set for TUN the BPF code calculates the hash of packet header and
-> +returns the virtqueue number to place the packet to.
-> +
-> +Simplified decision formula:
-> +
-> +.. code:: C
-> +
-> +    queue_index = indirection_table[hash(<packet data>)%<indirection_table size>]
-> +
-> +
-> +Not for all packets, the hash can/should be calculated.
-> +
-> +Note: currently, eBPF RSS does not support hash reporting.
-> +
-> +eBPF RSS turned on by different combinations of vhost-net, vitrio-net and tap configurations:
-> +
-> +- eBPF is used:
-> +
-> +        tap,vhost=off & virtio-net-pci,rss=on,hash=off
-> +
-> +- eBPF is used:
-> +
-> +        tap,vhost=on & virtio-net-pci,rss=on,hash=off
-> +
-> +- 'software' RSS is used:
-> +
-> +        tap,vhost=off & virtio-net-pci,rss=on,hash=on
-> +
-> +- eBPF is used, hash population feature is not reported to the guest:
-> +
-> +        tap,vhost=on & virtio-net-pci,rss=on,hash=on
-> +
-> +If CONFIG_EBPF is not set then only 'software' RSS is supported.
-> +Also 'software' RSS, as a fallback, is used if the eBPF program failed to load or set to TUN.
-> +
-> +RSS eBPF program
-> +----------------
-> +
-> +RSS program located in ebpf/tun_rss_steering.h as an array of 'struct bpf_insn'.
-> +So the program is part of the qemu binary.
-> +Initially, the eBPF program was compiled by clang and source code located at ebpf/rss.bpf.c.
-> +Prerequisites to recompile the eBPF program (regenerate ebpf/tun_rss_steering.h):
-> +
-> +        llvm, clang, kernel source tree, python3 + (pip3 pyelftools)
-> +        Adjust 'linuxhdrs' in Makefile.ebpf to reflect the location of the kernel source tree
-> +
-> +        $ cd ebpf
-> +        $ make -f Makefile.ebpf
-> +
-> +Note the python script for convertation from eBPF ELF object to '.h' file - Ebpf_to_C.py:
-> +
-> +        $ python EbpfElf_to_C.py rss.bpf.o tun_rss_steering
-> +
-> +The first argument of the script is ELF object, second - section name where the eBPF program located.
-> +The script would generate <section name>.h file with eBPF instructions and 'relocate array'.
-> +'relocate array' is an array of 'struct fixup_mapfd_t' with the name of the eBPF map and instruction offset where the file descriptor of the map should be placed.
-> +
+> 1. Launching a device backend and passing command-line parameters:
+>
+>       $ my-nic --socket-path /tmp/my-nic-vfio-user.sock \
+>                --model https://vendor-a.com/my-nic \
+> 	      --rss on
+>
+>     Here "model" is the device model URL. The program could support
+>     multiple device models.
+>
+>     The "rss" device configuration parameter enables Receive Side Scaling
+>     (RSS) as an example of a configuration parameter.
+>
+> 2. Creating a device using an RPC interface:
+>
+>       (qemu) device-add my-nic,rss=on
+>
+> If the device instantiation succeeds then it is safe to live migrate.
+> The device is exposing the desired hardware interface and expecting the
+> right device state representation.
 
 
-Do we still need this if we decide to use llvm/clang toolchain? (I guess 
-not)
+Does this mean there will still be a "my-nic" stub in qemu? (I thought 
+it should be a generic one like device-add "vfio-user-pci")
+
+
+>
+>>> The rest of this document describes how these requirements can be met.
+>>>
+>>> Device Models
+>>> -------------
+>>> Devices have a *hardware interface* consisting of hardware registers,
+>>> interrupts, and so on.
+>>>
+>>> The hardware interface together with the device state representation is called
+>>> a *device model*. Device models can be assigned URIs such as
+>>> https://qemu.org/devices/e1000e to uniquely identify them.
+>>
+>> It looks worse than "pci://vendor_id.device_id.subvendor_id.subdevice_id".
+>> "e1000e" means a lot of different 8275X implementations that have subtle but
+>> easy to be ignored differences.
+> If you wish to reflect those differences in the device model URI then
+> you can use:
+>
+>    https://qemu.org/devices/pci/<vendor-id>/<device-id>/<subvendor-id>/<subdevice-id>
+>
+> Another option is to use device configuration parameters to express
+> differences.
+>
+> The important thing is that this device model URI has one owner. No one
+> else will use qemu.org. There can be many different e1000e device model
+> URIs, if necessary (with slightly different hardware interfaces and/or
+> device state representations). This avoids collisions.
+>
+>> And is it possible to have a list of URIs here?
+> A device implementation (mdev driver, vfio-user device backend, etc) may
+> support multiple device model URIs.
+>
+> A device instance has an immutable device model URI and list of
+> configuration parameters. In other words, once the device is created its
+> ABI is fixed for the lifetime of the device. A new device instance can
+> be configured by powering off the machine, hotplug, etc.
+>
+>>> Multiple implementations of a device model may exist. They are they are
+>>> interchangeable if they follow the same hardware interface and device
+>>> state representation.
+>>>
+>>> Multiple implementations of the same hardware interface may exist with
+>>> different device state representations, in which case the device models are not
+>>> interchangeable and must be assigned different URIs.
+>>>
+>>> Migration is only possible when the same device model is supported by the
+>>> *source* and the *destination* devices.
+>>>
+>>> Device Configuration
+>>> --------------------
+>>> Device models may have parameters that affect the hardware interface or device
+>>> state representation. For example, a network card may have a configurable
+>>> address filtering table size parameter called ``rx-filter-size``. A
+>>> device state saved with ``rx-filter-size=32`` cannot be safely loaded
+>>> into a device with ``rx-filter-size=0``, because changing the size from
+>>> 32 to 0 may disrupt device operation.
+>>
+>> Do we allow the migration from "rx-filter-size=16" to "rx-filter-size=32" (I
+>> guess not?) And should we extend the concept to "device capability" instead
+>> of just state representation.  E.g src has CAP_X=on,CAP_Y=off but dst has
+>> CAP_X=on,CAP_Y=on, so we disallow the migration from src to dst.
+> A device instance's configuration parameters are immutable.
+> rx-filter-size=16 cannot be migrated to rx-filter-size=32.
+
+
+But then it looks to me we can't migrate back, or do you mean it is 
+required to have the ability to change the max rx-filter-size.
+
+
+>
+> Yes, configuration parameters can describe capabilities. I think of
+> capabilities as something that affects the guest-visible hardware
+> interface (e.g. the RSS feature bit is enabled) that is mentioned in the
+> text, but it would be clearer to mention them explicitly.
+>
+>>> A list of configuration parameters is called the *device configuration*.
+>>> Migration is expected to succeed when the same device model and configuration
+>>> that was used for saving the device state is used again to load it.
+>>>
+>>> Note that not all parameters used to instantiate a device need to be part of
+>>> the device configuration. For example, assigning a network card to a specific
+>>> physical port is not part of the device configuration since it is not part of
+>>> the device's hardware interface or the device state representation.
+>>
+>> Yes, but the task needs to be done by management somehow. So do you expect a
+>> vendor specific provisioning API here?
+> There seems to be no consensus on this yet. It's the question of how to
+> manage the lifecycle of VFIO, mdev, vhost-user, and vfio-user devices.
+> There are attempts to standardize in some of these areas.
+>
+> For mdev drivers we can standardize the sysfs interface so management
+> tools can query source devices and instantiate destination devices
+> without device-specific code.
+
+
+Even for mdev, it should be have some class defined for sysfs which 
+could be a standard way to configure NVME or virtio device.
+
+
+>
+> For vhost-user devices there is the backend program conventions
+> specification, which aims to standardize common parameters. This makes
+> integrating support for new device implementations easier (there is less
+> device implementation-specific code).
+>
+> For vfio-user devices something based on the vhost-user backend program
+> conventions spec could work well.
+>
+> The main issue could be that avoiding vendor-specific provisioning code
+> in management software either requires you to restrict yourself to a few
+> standard device types or to pass through configuration data.
+>
+> A libvirt opinion would be interesting.
+>
+>>> The device
+>>> state can be loaded and run on a different physical port without affecting the
+>>> operation of the device. Therefore the physical port is not part of the device
+>>> configuration.
+>>>
+>>> However, secondary aspects related to the physical port may affect the device's
+>>> hardware interface and need to be reflected in the device configuration. The
+>>> link speed may depend on the physical port and be reported through the device's
+>>> hardware interface. In that case a ``link-speed`` configuration parameter is
+>>> required to prevent unexpected changes to the link speed after migration.
+>>>
+>>> Note that the device configuration is a conservative bound on device
+>>> states that can be migrated successfully since not all configuration
+>>> parameters may be strictly required to match on the source and
+>>> destination devices. For example, if the device's hardware interface has
+>>> not yet been initialized then changes to the link speed may not be
+>>> noticed. However, accurately representing runtime constraints is complex
+>>> and risks introducing migration bugs, so no attempt is made to support
+>>> them to achieve more relaxed bounds on successful migrations.
+>>>
+>>> Device Versions
+>>> ---------------
+>>> As a device evolves, the number of configuration parameters required may become
+>>> inconvenient for users to express in full. A device configuration can be
+>>> aliased by a *device version*, which is a shorthand for the full device
+>>> configuration. This makes it easy to apply a standard device configuration
+>>> without listing every configuration parameter explicitly.
+>>
+>> I'm not sure how to apply the device versions consider the device state is
+>> opaque or the device needs to export another API to do this?
+> Versions are just aliases for a list of configuration parameters. For
+> example, version=2 expands to rx-filter-size=32. The purpose of versions
+> is to provide a human-readable shorthand notation.
+>
+> Versions are not involved in migration compatibility checking, instead
+> the device model URI and expanded configuration parameters are compared.
+>
+> The version has no direct effect on the device state representation. It
+> has an indirect effect due to the configuration parameters that it
+> expands to. For example, the rx-filter-size=32 configuration parameter
+> may change the device state representation to include the 32 addresses
+> that the device is filtering on.
+>
+> No "version check" is necessary when loading the device state
+> representation because the device was already instantiated with the
+> exact configuration parameters that determine the device state
+> representation.
+>
+>>> For example, if address filtering support was added to a network card then
+>>> device versions and the corresponding configurations may look like this:
+>>> * ``version=1`` - Behaves as if ``rx-filter-size=0``
+>>> * ``version=2`` - ``rx-filter-size=32``
+>>>
+>>> Device States
+>>> -------------
+>>> The details of the device state representation are not covered in this document
+>>> but the general requirements are discussed here.
+>>>
+>>> The device state consists of data accessible through the device's hardware
+>>> interface and internal state that is needed to restore device operation.
+>>> State in the hardware interface includes the values of hardware registers.
+>>> An example of internal state is an index value needed to avoid processing
+>>> queued requests more than once.
+>>>
+>>> Changes can be made to the device state representation as follows. Each change
+>>> to device state must have a corresponding device configuration parameter that
+>>> allows the change to toggled:
+>>>
+>>> * When the parameter is disabled the hardware interface and device state
+>>>     representation are unchanged. This allows old device states to be loaded.
+>>>
+>>> * When the parameter is enabled the change comes into effect.
+>>>
+>>> * The parameter's default value disables the change. Therefore old versions do
+>>>     not have to explicitly specify the parameter.
+>>>
+>>> The following example illustrates migration from an old device
+>>> implementation to a new one. A version=1 network card is migrated to a
+>>> new device implementation that is also capable of version=2 and adds the
+>>> rx-filter-size=32 parameter. The new device is instantiated with
+>>> version=1, which disables rx-filter-size and is capable of loading the
+>>> version=1 device state. The migration completes successfully but note
+>>> the device is still operating at version=1 level in the new device.
+>>>
+>>> The following example illustrates migration from a new device
+>>> implementation back to an older one. The new device implementation
+>>> supports version=1 and version=2. The old device implementation supports
+>>> version=1 only. Therefore the device can only be migrated when
+>>> instantiated with version=1 or the equivalent full configuration
+>>> parameters.
+>>
+>> In qemu we have subsection to facilitate the case when some fields were
+>> forgot to migrate. Do we need something similar here?
+> This is an important question and I'm not sure.
+>
+> The problem with subsection semantics is that they break rollback. Once
+> the old device state has been loaded by the new device implementation,
+> saving the device state produces the new device state representation.
+> The old device implementation can no longer load it :(.
+
+
+Only when subsection is needed.
+
+
+>    Manual
+> intervention is necessary to tell the new device implementation to save
+> in the old representation.
+
+
+If we don't support subsection, could we end up with a deadlock like we 
+do migration since want upgrade the kernel, but if we don't upgrade the 
+kernel, we can't do live migration.
+
+
+>
+> In the migration model described in this document it works the other
+> way around: back and forth migration is always safe. If you wish to
+> change the device you need to create a new instance (after poweroff or
+> through hotplug).
+>
+> One way of achieving something similar is to provide additional
+> information about safe transitions between configuration parameter
+> lists. It is not safe to change arbitrary device configuration
+> parameters, but certain parameters can be safely changed.
+>
+> I'm not sure if the complexity is worth it though. The downside to the
+> current approach is that devices must eventually be reconfigured to
+> upgrade to new versions, even if there is no guest-visible hardware
+> interface change.
+>
+> Stefan
+
 
 Thanks
-
-
-> +Current eBPF RSS implementation uses 'bounded loops' with 'backward jump instructions' which present in the last kernels.
-> +Overall eBPF RSS works on kernels 5.8+.
-> +
-> +eBPF RSS implementation
-> +-----------------------
-> +
-> +eBPF RSS loading functionality located in ebpf/ebpf_rss.c and ebpf/ebpf_rss.h.
-> +
-> +The `struct EBPFRSSContext` structure that holds 4 file descriptors:
-> +
-> +- program_fd - file descriptor of the eBPF RSS program.
-> +- map_configuration - file descriptor of the 'configuration' map. This map contains one element of 'struct EBPFRSSConfig'. This configuration determines eBPF program behavior.
-> +- map_toeplitz_key - file descriptor of the 'Toeplitz key' map. One element of the 40byte key prepared for the hashing algorithm.
-> +- map_indirections_table - 128 elements of queue indexes.
-> +
-> +`struct EBPFRSSConfig` fields:
-> +
-> +- redirect - "boolean" value, should the hash be calculated, on false  - `default_queue` would be used as the final decision.
-> +- populate_hash - for now, not used. eBPF RSS doesn't support hash reporting.
-> +- hash_types - binary mask of different hash types. See `VIRTIO_NET_RSS_HASH_TYPE_*` defines. If for packet hash should not be calculated - `default_queue` would be used.
-> +- indirections_len - length of the indirections table, maximum 128.
-> +- default_queue - the queue index that used for packet that shouldn't be hashed. For some packets, the hash can't be calculated(g.e ARP).
-> +
-> +Functions:
-> +
-> +- `ebpf_rss_init()` - sets program_fd to -1, which indicates that EBPFRSSContext is not loaded.
-> +- `ebpf_rss_load()` - creates 3 maps and loads eBPF program from tun_rss_steering.h. Returns 'true' on success. After that, program_fd can be used to set steering for TAP.
-> +- `ebpf_rss_set_all()` - sets values for eBPF maps. `indirections_table` length is in EBPFRSSConfig. `toeplitz_key` is VIRTIO_NET_RSS_MAX_KEY_SIZE aka 40 bytes array.
-> +- `ebpf_rss_unload()` - close all file descriptors and set program_fd to -1.
-> +
-> +Simplified eBPF RSS workflow:
-> +
-> +.. code:: C
-> +
-> +    struct EBPFRSSConfig config;
-> +    config.redirect = 1;
-> +    config.hash_types = VIRTIO_NET_RSS_HASH_TYPE_UDPv4 | VIRTIO_NET_RSS_HASH_TYPE_TCPv4;
-> +    config.indirections_len = VIRTIO_NET_RSS_MAX_TABLE_LEN;
-> +    config.default_queue = 0;
-> +
-> +    uint16_t table[VIRTIO_NET_RSS_MAX_TABLE_LEN] = {...};
-> +    uint8_t key[VIRTIO_NET_RSS_MAX_KEY_SIZE] = {...};
-> +
-> +    struct EBPFRSSContext ctx;
-> +    ebpf_rss_init(&ctx);
-> +    ebpf_rss_load(&ctx);
-> +    ebpf_rss_set_all(&ctx, &config, table, key);
-> +    if (net_client->info->set_steering_ebpf != NULL) {
-> +        net_client->info->set_steering_ebpf(net_client, ctx->program_fd);
-> +    }
-> +    ...
-> +    ebpf_unload(&ctx);
-> +
-> +
-> +NetClientState SetSteeringEBPF()
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +For now, `set_steering_ebpf()` method supported by Linux TAP NetClientState. The method requires an eBPF program file descriptor as an argument.
 
 
