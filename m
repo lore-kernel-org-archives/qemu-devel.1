@@ -2,109 +2,90 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B993C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:12:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59966C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:15:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8BCE2224E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:12:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 77AA32224E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:15:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a/cYWKoA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8BCE2224E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W9Kf1oGA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77AA32224E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaFmR-0006w5-DK
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 05:12:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38436)
+	id 1kaFp7-0007wh-Dz
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 05:15:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaFlp-0006X8-7S
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:12:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24447)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kaFoT-0007VP-RD
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:14:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48118)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaFln-0000zW-6f
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:12:00 -0500
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kaFoR-0001CR-4g
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:14:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604484718;
+ s=mimecast20190719; t=1604484882;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8KCHNBWlxhJ21A8v9hyJ93To5a/M5D3OV6qZxZaUh40=;
- b=a/cYWKoARgnABv3LBGwLHxXQbTcF1FTQxj2ZEN7z6RU93drwsxAN5DGmNZI1ebJuFSp/Cg
- 7+89l+AG92ekJ5xqMySmA6StfBLSysBR8TumqBIgTLLmJRAuBQqV9HExrJaIuTQilIrzgI
- LNomHJk8tgb3lgzEgFGbwpnvLUkagG4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-g-6I7qAyNXuRW6dQlzq86A-1; Wed, 04 Nov 2020 05:11:56 -0500
-X-MC-Unique: g-6I7qAyNXuRW6dQlzq86A-1
-Received: by mail-wr1-f69.google.com with SMTP id t14so9126383wrs.2
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 02:11:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8KCHNBWlxhJ21A8v9hyJ93To5a/M5D3OV6qZxZaUh40=;
- b=Kj/oMnIoc54PxYDUiTLQF6kr6rTTXErp5eu9TOtRZ1aHBi0uHcCdHPGsIaCxiXKJi/
- DzWSZP0uo9JnY7eTHuPcalt9R4IA3bygG8IxG2crwCy/dnTGd3cgTurHjXwTGt8NXVzp
- XSwAmnc0b4/KdMT2p+6Qnnf1djEJtKEvor8KeDDCY0kt1wTpftjiWSShmUKkMCHlA1k1
- 0sCmzF9UsFq423tT0OcE9SuSpwjgQX9KEM5MZfDpN6boZ7zhjuCs17pTDrki4WFRgCe8
- 66wR3HyC7eyrT8A76sAbaDSKC6bTdjXFubkUZw8LiCwea8ANf8hMGK+Zg7nhiai8+3y4
- /IyQ==
-X-Gm-Message-State: AOAM532/tGudj7UO+49kLlIIb+3ZBAfH30yUSRy4b2meTtdPe3+4Wi54
- lz6ydM2XvTq4RV1wry+EP0uxWt0QKJ5Bf29elf0uCRb4UgHoby7C2lafRc8Z0y6FtSFQbDsMHB+
- kbu7n/tUHo8UkxOE=
-X-Received: by 2002:adf:f90f:: with SMTP id b15mr31477336wrr.343.1604484714991; 
- Wed, 04 Nov 2020 02:11:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxMW8vKzYB8rti/vOtzHTte0uBl5pMtlxmwU+D5xgB316sEBtBUD4riisIpuiqizidWI0q6NA==
-X-Received: by 2002:adf:f90f:: with SMTP id b15mr31477311wrr.343.1604484714815; 
- Wed, 04 Nov 2020 02:11:54 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id r3sm1870767wrm.51.2020.11.04.02.11.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Nov 2020 02:11:54 -0800 (PST)
-Subject: Re: [PULL 48/48] hw/timer/armv7m_systick: Rewrite to use ptimers
-To: Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-References: <20201027114438.17662-1-peter.maydell@linaro.org>
- <20201027114438.17662-49-peter.maydell@linaro.org>
- <20201104100357.7t4nnwqot6ahprrh@kamzik.brq.redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b68320e2-d0bc-3d17-c188-f68fb8136f46@redhat.com>
-Date: Wed, 4 Nov 2020 11:11:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ bh=kJxx0ABStBSrG3fD178WI4sJ92bE9Cn7aaNagAUJn0E=;
+ b=W9Kf1oGAQZU4pEm0fHISTGMI1DNOqg+TdibX3RDg9nHcaLxzIqbd9asav8fw2UFbIXDyJA
+ PwlBL9RguW3zGOd+XJtx0fqea0IVR5on3rghJ5e3AfBCdL0uZxqf30oWUlJuEyhmfMYZ7v
+ 7Sx2Y9lDYWA/rYWXHS5ek/7SjGVlkjI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-518-v9_1vUkIOwy1skOe-BpNhQ-1; Wed, 04 Nov 2020 05:14:37 -0500
+X-MC-Unique: v9_1vUkIOwy1skOe-BpNhQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1131F1084D63;
+ Wed,  4 Nov 2020 10:14:36 +0000 (UTC)
+Received: from work-vm (ovpn-115-11.ams2.redhat.com [10.36.115.11])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F9BB6266E;
+ Wed,  4 Nov 2020 10:14:25 +0000 (UTC)
+Date: Wed, 4 Nov 2020 10:14:23 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: VFIO Migration
+Message-ID: <20201104101423.GB3896@work-vm>
+References: <20201102111153.GC42093@stefanha-x1.localdomain>
+ <20201103121709.GD3566@work-vm>
+ <20201103152752.GC253848@stefanha-x1.localdomain>
+ <20201103184951.GM3566@work-vm>
+ <20201104073636.GB390503@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20201104100357.7t4nnwqot6ahprrh@kamzik.brq.redhat.com>
+In-Reply-To: <20201104073636.GB390503@stefanha-x1.localdomain>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,70 +98,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ quintela@redhat.com, Jason Wang <jasowang@redhat.com>,
+ Felipe Franciosi <felipe@nutanix.com>, Kirti Wankhede <kwankhede@nvidia.com>,
+ qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/20 11:03 AM, Andrew Jones wrote:
-> On Tue, Oct 27, 2020 at 11:44:38AM +0000, Peter Maydell wrote:
->> The armv7m systick timer is a 24-bit decrementing, wrap-on-zero,
->> clear-on-write counter. Our current implementation has various
->> bugs and dubious workarounds in it (for instance see
->> https://bugs.launchpad.net/qemu/+bug/1872237).
->>
->> We have an implementation of a simple decrementing counter
->> and we put a lot of effort into making sure it handles the
->> interesting corner cases (like "spend a cycle at 0 before
->> reloading") -- ptimer.
->>
->> Rewrite the systick timer to use a ptimer rather than
->> a raw QEMU timer.
->>
->> Unfortunately this is a migration compatibility break,
->> which will affect all M-profile boards.
->>
->> Among other bugs, this fixes
->> https://bugs.launchpad.net/qemu/+bug/1872237 :
->> now writes to SYST_CVR when the timer is enabled correctly
->> do nothing; when the timer is enabled via SYST_CSR.ENABLE,
->> the ptimer code will (because of POLICY_NO_IMMEDIATE_RELOAD)
->> arrange that after one timer tick the counter is reloaded
->> from SYST_RVR and then counts down from there, as the
->> architecture requires.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> Reviewed-by: Philippe Mathieu-DaudÃƒÆ’Ã‚Â© <f4bug@amsat.org>
->> Message-id: 20201015151829.14656-3-peter.maydell@linaro.org
->> ---
->>  include/hw/timer/armv7m_systick.h |   3 +-
->>  hw/timer/armv7m_systick.c         | 124 +++++++++++++-----------------
->>  2 files changed, 54 insertions(+), 73 deletions(-)
->>
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> On Tue, Nov 03, 2020 at 06:49:51PM +0000, Dr. David Alan Gilbert wrote:
+> > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > > On Tue, Nov 03, 2020 at 12:17:09PM +0000, Dr. David Alan Gilbert wrote:
+> > > > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > > > > Device Models
+> > > > > -------------
+> > > > > Devices have a *hardware interface* consisting of hardware registers,
+> > > > > interrupts, and so on.
+> > > > > 
+> > > > > The hardware interface together with the device state representation is called
+> > > > > a *device model*. Device models can be assigned URIs such as
+> > > > > https://qemu.org/devices/e1000e to uniquely identify them.
+> > > > 
+> > > > I think this is a unique identifier, not actually a URI; the https://
+> > > > isn't needed since no one expects to ever connect to this.
+> > > 
+> > > Yes, it could be any unique string. If the URI idea is not popular we
+> > > can use any similar scheme.
+> > 
+> > I'm OK with it being a URI; just drop the https.
 > 
-> Do we also need something like the diff below now?
+> Okay.
 > 
+> > > > > However, secondary aspects related to the physical port may affect the device's
+> > > > > hardware interface and need to be reflected in the device configuration. The
+> > > > > link speed may depend on the physical port and be reported through the device's
+> > > > > hardware interface. In that case a ``link-speed`` configuration parameter is
+> > > > > required to prevent unexpected changes to the link speed after migration.
+> > > > 
+> > > > That's an interesting example; because depending on the device, it might
+> > > > be:
+> > > >     a) Completely virtualised so that the guest *shouldn't* know what
+> > > > the physical link speed is, precisely to allow the physical network on
+> > > > the destination to be different.
+> > > > 
+> > > >     b) Part of the migrated state
+> > > > 
+> > > >     c) Something that's allowed to be reloaded after migration
+> > > > 
+> > > >     d) Configurable
+> > > > 
+> > > > so I'm not sure whether it's a good example in this case or not.
+> > > 
+> > > Can you think of an example that has only one option?
+> > > 
+> > > I tried but couldn't. For example take a sound card. The guest is aware
+> > > the device supports stereo playback (2 output channels), but which exact
+> > > stereo host device is used doesn't matter, they are all suitable.
+> > > 
+> > > Now imagine migrating to a 7.1 surround-sound device. Similar options
+> > > come into play:
+> > > 
+> > > a) Emulate stereo and mix it to 7.1 surround-sound on the physical
+> > >    device. The guest still sees the stereo device.
+> > > 
+> > > b) Refuse migration.
+> > > 
+> > > c) Indicate that the output has switched and let the guest reconfigure
+> > >    itself (e.g. a sound card with multiple outputs, where one of them is
+> > >    stereo and another is 7.1 surround sound).
+> > > 
+> > > Which option is desirable depends on the use case.
+> > 
+> > Yes, but I think it might be worth calling out these differences;  there
+> > are explicitly cases where you don't want external changes to be visible
+> > and other cases where you do; both are valid, but both need thinking
+> > about. (Another one, GPU whether you have a monitor plugged in!)
 > 
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index fdf4464b9484..7d5d89e1acf9 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -291,6 +291,7 @@ config ZYNQ
->  
->  config ARM_V7M
->      bool
-> +    select PTIMER
+> Okay.
+> 
+> > > > Maybe what's needed is a stronger instruction to abstract external
+> > > > device state so that it's not part of the configuration in most cases.
+> > > 
+> > > Do you want to propose something?
+> > 
+> > I think something like 'Some part of a devices state may be irrelevant
+> > to a migration; for example on some NICs it might be preferable to hide
+> > the physical characteristics of the link from the guest.'
+> 
+> Got it.
+> 
+> > > > > For example, if address filtering support was added to a network card then
+> > > > > device versions and the corresponding configurations may look like this:
+> > > > > * ``version=1`` - Behaves as if ``rx-filter-size=0``
+> > > > > * ``version=2`` - ``rx-filter-size=32``
+> > > > 
+> > > > Note configuration parameters might have been added during the life of
+> > > > the device; e.g. if the original card had no support for rx-filters, it
+> > > > might not have a rx-filter-size parameter.
+> > > 
+> > > version=1 does not explicitly set rx-filter-size=0. When a new parameter
+> > > is introduced it must have a default value that disables its effect on
+> > > the hardware interface and/or device state representation. This is
+> > > described in a bit more detail in the next section, maybe it should be
+> > > reordered.
+> > 
+> > We've generally found the definition of devices tends in practice to be
+> > done newer->older; i.e. you define the current machine, and then define
+> > the next older machine setting the defaults that used to be true; then
+> > define the older version behind that....
+> 
+> That is not possible here because an older device implementation is
+> unaware of new configuration parameters.
+> 
+> Looking at the example above, imagine a version=1 device is instantiated
+> on a device implementation that supports both version=1 and version=2.
+> Should the configuration parameter list for version=1 be empty or
+> rx-filter-size=0?
+> 
+> It must to be empty, otherwise an older device implementation that only
+> supports version=1 cannot instantiate the device. The older device
+> implementation does not recognize the rx-filter-size configuration
+> parameter (it was introduced in version=2) so we cannot set it to 0.
 
-Oops yes indeed.
+I think this question might come down to who expands the device version
+definition.
+If it's the device itself that expands that, then a version 2 device
+knows about what it needs to do for version 1 compatibility.
+But if you're saying someone outside the device needs to be able to
+expand that list then I'm not sure how you'd keep that expansion in line
+with the implementation of a device.
 
->  
->  config ALLWINNER_A10
->      bool
+> > > > > Device States
+> > > > > -------------
+> > > > > The details of the device state representation are not covered in this document
+> > > > > but the general requirements are discussed here.
+> > > > > 
+> > > > > The device state consists of data accessible through the device's hardware
+> > > > > interface and internal state that is needed to restore device operation.
+> > > > > State in the hardware interface includes the values of hardware registers.
+> > > > > An example of internal state is an index value needed to avoid processing
+> > > > > queued requests more than once.
+> > > > 
+> > > > I try and emphasise that 'internal state' should be represented in a way
+> > > > that reflects the problem rather than the particular implementation;
+> > > > this gives it a better chance of migrating to future versions.
+> > > 
+> > > Sounds like a good idea.
+> > > 
+> > > > > Changes can be made to the device state representation as follows. Each change
+> > > > > to device state must have a corresponding device configuration parameter that
+> > > > > allows the change to toggled:
+> > > > > 
+> > > > > * When the parameter is disabled the hardware interface and device state
+> > > > >   representation are unchanged. This allows old device states to be loaded.
+> > > > > 
+> > > > > * When the parameter is enabled the change comes into effect.
+> > > > > 
+> > > > > * The parameter's default value disables the change. Therefore old versions do
+> > > > >   not have to explicitly specify the parameter.
+> > > > > 
+> > > > > The following example illustrates migration from an old device
+> > > > > implementation to a new one. A version=1 network card is migrated to a
+> > > > > new device implementation that is also capable of version=2 and adds the
+> > > > > rx-filter-size=32 parameter. The new device is instantiated with
+> > > > > version=1, which disables rx-filter-size and is capable of loading the
+> > > > > version=1 device state. The migration completes successfully but note
+> > > > > the device is still operating at version=1 level in the new device.
+> > > > > 
+> > > > > The following example illustrates migration from a new device
+> > > > > implementation back to an older one. The new device implementation
+> > > > > supports version=1 and version=2. The old device implementation supports
+> > > > > version=1 only. Therefore the device can only be migrated when
+> > > > > instantiated with version=1 or the equivalent full configuration
+> > > > > parameters.
+> > > > 
+> > > > I'm sometimes asked for 'ways out' of buggy migration cases; e.g. what
+> > > > happens if version=1 forgot to migrate the X register; or what happens
+> > > > if verison=1 forgot to handle the special, rare case when X=5 and we
+> > > > now need to migrate some extra state.
+> > > 
+> > > Can these cases be handled by adding additional configuration parameters?
+> > > 
+> > > If version=1 is lacks essential state then version=2 can add it. The
+> > > user must configure the device to use version before they can save the
+> > > full state.
+> > > 
+> > > If version=1 didn't handle the X=5 case then the same solution is
+> > > needed. A new configuration parameter is introduced and the user needs
+> > > to configure the device to be the new version before migrating.
+> > > 
+> > > Unfortunately this requires poweroff or hotplugging a new device
+> > > instance. But some disruption is probably necessarily anyway so the
+> > > migration code on the host side can be patched to use the updated device
+> > > state representation.
+> > 
+> > There are some corner cases that people sometimes prefer; for example
+> > lets say the X=5 case is actually really rare - but when it happens the
+> > device is hopelessly broken, some device authors prefer to fix it and
+> > send the extra data and let the migration fail if the destination
+> > doesn't understand it (it would break anyway).
 > 
+> The device implementation needs to be updated to send the extra data. At
+> that point a new device configuration parameter should be introduced and
+> if the user wishes to run the new version of the device then the extra
+> data will be sent.
 > 
-> Thanks,
-> drew
+> If the destination doesn't support the new parameter then migration will
+> be refused. That matches what you've described, so I think the approach
+> in this document handles this case.
+
+Well that's the ideal; but the case I'm describing is where you're
+recovering from a screwup in which the migration is going to fail in a
+rare (runtime defined) corner case, and only sending the extra data
+in that rare case before you get a chance to define a new version.
+
+> > I've also been asked
+> > by mst for a 'unexpected data' mechanism to send data that the
+> > destination might not expect if it didn't know about it, for similar
+> > cases.
 > 
+> Do you mean optional data that can be more or less safely dropped? A new
+> device configuration parameter is not needed because the hardware
+> interface and device state representation remain compatible. That
+> feature can be defined in the device state representation spec and is
+> not visible at the layer discussed in this document. But I think it's
+> worth adding an explanation into this document explaining what to do.
+
+I mean a way to send optional data that the destination can drop; but
+that the destination doesn't know what it means and at the time the
+destination was written, wasn't yet defined. It is part of the device
+state;  it's similar to the X=5 case above - but in this case it allows
+the migration not to fail even when you start sending the extra data.
+
+Dave
+
 > 
+> Stefan
+
+
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
