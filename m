@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95CB5C4741F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7623C4742C
 	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:49:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10F6420782
+	by mail.kernel.org (Postfix) with ESMTPS id 55B0520780
 	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:49:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUDnYRb5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F6420782
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FKRwzjqq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B0520780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaNqW-0003tC-S3
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 13:49:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52474)
+	id 1kaNqX-0003vz-Al
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 13:49:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNjW-0001Ey-Qx
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:42:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59399)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNj6-0000dh-Ts
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:41:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60688)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNjV-00024L-2i
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:42:10 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNj4-0001wf-VX
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:41:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604515328;
+ s=mimecast20190719; t=1604515302;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=CO5kV6TOgl7VkllXO+Cj7QHVQ3FQj45OIYdaYC1hBZU=;
- b=DUDnYRb5dlNZEUo1kejlk8cKALQkv4EIJ/XM61VULaaDkssG1pGJZRFqujvzeYX9JJANHA
- dDiJpW+sRxt+8P0eb1LrB7OMig0nj3hVvvwdcJeKyL9ghdDs48GWLcYLS0MFxvWxJSLpI4
- VBWrKSids7I4xmt9+oivVXpcqgAFnn8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-aXbbKZ2lOfWTzlk-zCGouQ-1; Wed, 04 Nov 2020 13:42:06 -0500
-X-MC-Unique: aXbbKZ2lOfWTzlk-zCGouQ-1
-Received: by mail-wr1-f69.google.com with SMTP id i1so9580059wrb.18
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 10:42:06 -0800 (PST)
+ bh=73Mpz3vICh9QEBEOeL5uEWGSphcZBjM+o5MkFyzWxeI=;
+ b=FKRwzjqqzp5CYquKT6GYF8e4KWzsf9tK49h/Gkmi4me72JejXutLQn4PsGGqXRyXqJNEJd
+ qGSHh6rHPqFswAJNqRqTDJ1jCe9qhBnTg81t4iDCG7OSJ2MFeT/RmwBo/Uyv0uPGoVLcI4
+ E9XS7RHDB3RD4hxQLaclxO2mU0YCSlE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-LYVv4JK5MGmW5bIZheAGiQ-1; Wed, 04 Nov 2020 13:41:38 -0500
+X-MC-Unique: LYVv4JK5MGmW5bIZheAGiQ-1
+Received: by mail-wr1-f72.google.com with SMTP id m20so9617684wrb.21
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 10:41:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=CO5kV6TOgl7VkllXO+Cj7QHVQ3FQj45OIYdaYC1hBZU=;
- b=md0nMy27Y6IjYzpvPLG6+U9sFZFg3/5p9nxdKv22NRrI0p+3JqXcmxmRlcXfTGTrKR
- ZSVN4Y/xZEsAQa3ehQv4TGcpaJNv3Tc1+cD9S2Vt3qz1LPgXXL51ED7N5+KY9rocYSk7
- gJpJBwUV1n+3wd2rN5+NwCOBYEWYhJwF5EBvCpHY095IxJxzstJ5q2aSqsdb3czAzxgo
- HQV06J0Jrel/4ZvXH/X9/HDBOHNoBRLKj7AZ+RcoSpJxk2TuEvkX1/W4w2t0/YWdTPkA
- PJ6CJqGmA8Sn1pJQv2TzKSwX1/YnPKoNJyxozTWI9IrRlr08PB1It1xCpKWCEGmbJ9Rc
- KtUQ==
-X-Gm-Message-State: AOAM532rzNVAZSyG7mdPKlwr9qCjU4EWO19DbkYeTT60VLn8LScnEeKd
- ewLR7dn8GCV11gHBxKgXpVjoPt6oc3UIt5Tu05T7Qkm43iav+PbtD8SP9i7faqNmhflaDoL210t
- zRw4urVHGX+Q4oLA=
-X-Received: by 2002:a5d:60c4:: with SMTP id x4mr35830536wrt.175.1604515325236; 
- Wed, 04 Nov 2020 10:42:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz6Dy0F6GR6UnqLZn65rM3HddEm7KF9VRexPdu3AzmNkvreR//Gh71T88/RO8sqh10JPmWtog==
-X-Received: by 2002:a5d:60c4:: with SMTP id x4mr35830517wrt.175.1604515325041; 
- Wed, 04 Nov 2020 10:42:05 -0800 (PST)
+ bh=73Mpz3vICh9QEBEOeL5uEWGSphcZBjM+o5MkFyzWxeI=;
+ b=U8vXoSa7DFdmUpdfY6StBkpzY9O9LAJlwcERit5qrsCTp/RUCqsPRu7lsokTmKUqpt
+ cLk2DqJfZnTmvO2dR23n1/hXy/67cspBLh6meVqDg+1CxDUVOLuwDd1FO/aVkJ85HroU
+ Y7/l3jflYmp0jAo4t8nVcyQCNoY2dwxY5Wt5uQ2HDFnuDY1c6a9k+mia5dgCZfpToHik
+ WcjxCoskIXLHSce41mB2/nxPvZCC2H+SJ9hFVf3FxBNi6jwRd7mtKWPLzjM/cih5Bu0P
+ ATsDeEr025J8rceiWStw95B1qV8hDbiANWjFddip8pzplvUr9E97q/knchYEfjCiWxVh
+ ldSQ==
+X-Gm-Message-State: AOAM530CeVFdg6ewhzaMYZE+byjZmg6UI5xzy+bgO1u0BtPadAVAWL3W
+ X36E5Jk0Cn2jAsRITNB+Ooprzjcn3wVEH6iL5XjKKvx/t+mGIBKJyITJqAFgo6bX9ImxijIEkzv
+ XHogU3VLBWzXG5+M=
+X-Received: by 2002:a1c:99d3:: with SMTP id b202mr6012003wme.0.1604515296581; 
+ Wed, 04 Nov 2020 10:41:36 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwOphEw6zEwJnClQGThbqzu7B+GB3A+b245i3U2i8A9zmLcfdortit7vCjQsRtLY+jsG/0UyA==
+X-Received: by 2002:a1c:99d3:: with SMTP id b202mr6011987wme.0.1604515296427; 
+ Wed, 04 Nov 2020 10:41:36 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id l1sm4146616wrb.1.2020.11.04.10.42.03
+ by smtp.gmail.com with ESMTPSA id m1sm3342310wme.48.2020.11.04.10.41.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Nov 2020 10:42:04 -0800 (PST)
-Date: Wed, 4 Nov 2020 13:42:02 -0500
+ Wed, 04 Nov 2020 10:41:35 -0800 (PST)
+Date: Wed, 4 Nov 2020 13:41:33 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 16/31] virtio-iommu: Call memory notifiers in attach/detach
-Message-ID: <20201104184040.285057-17-mst@redhat.com>
+Subject: [PULL v3 06/31] memory-device: Add get_min_alignment() callback
+Message-ID: <20201104184040.285057-7-mst@redhat.com>
 References: <20201104184040.285057-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201104184040.285057-1-mst@redhat.com>
@@ -86,16 +86,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,82 +110,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Bharat Bhushan <bbhushan2@marvell.com>, Eric Auger <eric.auger@redhat.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bharat Bhushan <bbhushan2@marvell.com>
+From: David Hildenbrand <david@redhat.com>
 
-Call the memory notifiers when attaching an endpoint to a domain, to
-replay existing mappings, and when detaching the endpoint, to remove all
-mappings.
+Add a callback that can be used to express additional alignment
+requirements (exceeding the ones from the memory region).
 
-Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Message-Id: <20201030180510.747225-5-jean-philippe@linaro.org>
+Will be used by virtio-mem to express special alignment requirements due
+to manually configured, big block sizes (e.g., 1GB with an ordinary
+memory-backend-ram). This avoids failing later when realizing, because
+auto-detection wasn't able to assign a properly aligned address.
+
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20201008083029.9504-6-david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-iommu.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ include/hw/mem/memory-device.h | 10 ++++++++++
+ hw/mem/memory-device.c         | 11 +++++++++--
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 7dd15c5eac..7b64892351 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -170,11 +170,39 @@ static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr virt_start,
-     memory_region_notify_iommu(mr, 0, entry);
- }
+diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+index 30d7e99f52..48d2611fc5 100644
+--- a/include/hw/mem/memory-device.h
++++ b/include/hw/mem/memory-device.h
+@@ -88,6 +88,16 @@ struct MemoryDeviceClass {
+      */
+     MemoryRegion *(*get_memory_region)(MemoryDeviceState *md, Error **errp);
  
-+static gboolean virtio_iommu_notify_unmap_cb(gpointer key, gpointer value,
-+                                             gpointer data)
-+{
-+    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
-+    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
++    /*
++     * Optional: Return the desired minimum alignment of the device in guest
++     * physical address space. The final alignment is computed based on this
++     * alignment and the alignment requirements of the memory region.
++     *
++     * Called when plugging the memory device to detect the required alignment
++     * during address assignment.
++     */
++    uint64_t (*get_min_alignment)(const MemoryDeviceState *md);
 +
-+    virtio_iommu_notify_unmap(mr, interval->low, interval->high);
-+
-+    return false;
-+}
-+
-+static gboolean virtio_iommu_notify_map_cb(gpointer key, gpointer value,
-+                                           gpointer data)
-+{
-+    VirtIOIOMMUMapping *mapping = (VirtIOIOMMUMapping *) value;
-+    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
-+    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
-+
-+    virtio_iommu_notify_map(mr, interval->low, interval->high,
-+                            mapping->phys_addr, mapping->flags);
-+
-+    return false;
-+}
-+
- static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
+     /*
+      * Translate the memory device into #MemoryDeviceInfo.
+      */
+diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+index 8a736f1a26..cf0627fd01 100644
+--- a/hw/mem/memory-device.c
++++ b/hw/mem/memory-device.c
+@@ -259,7 +259,7 @@ void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
  {
-+    VirtIOIOMMUDomain *domain = ep->domain;
-+
-     if (!ep->domain) {
-         return;
+     const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
+     Error *local_err = NULL;
+-    uint64_t addr, align;
++    uint64_t addr, align = 0;
+     MemoryRegion *mr;
+ 
+     mr = mdc->get_memory_region(md, &local_err);
+@@ -267,7 +267,14 @@ void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
+         goto out;
      }
-+    g_tree_foreach(domain->mappings, virtio_iommu_notify_unmap_cb,
-+                   ep->iommu_mr);
-     QLIST_REMOVE(ep, next);
-     ep->domain = NULL;
- }
-@@ -317,6 +345,10 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
  
-     ep->domain = domain;
- 
-+    /* Replay domain mappings on the associated memory region */
-+    g_tree_foreach(domain->mappings, virtio_iommu_notify_map_cb,
-+                   ep->iommu_mr);
-+
-     return VIRTIO_IOMMU_S_OK;
- }
- 
+-    align = legacy_align ? *legacy_align : memory_region_get_alignment(mr);
++    if (legacy_align) {
++        align = *legacy_align;
++    } else {
++        if (mdc->get_min_alignment) {
++            align = mdc->get_min_alignment(md);
++        }
++        align = MAX(align, memory_region_get_alignment(mr));
++    }
+     addr = mdc->get_addr(md);
+     addr = memory_device_get_free_addr(ms, !addr ? NULL : &addr, align,
+                                        memory_region_size(mr), &local_err);
 -- 
 MST
 
