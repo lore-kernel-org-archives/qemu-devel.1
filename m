@@ -2,85 +2,88 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01CAFC388F9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4D90C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:43:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4110F206F1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:42:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27340206F1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:43:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LujySD4W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4110F206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LBICOmu4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27340206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaMns-0005IO-38
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 12:42:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36360)
+	id 1kaMpC-0006jm-74
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 12:43:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kaMmm-0004TJ-MV
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:41:28 -0500
-Received: from mail-ed1-x52e.google.com ([2a00:1450:4864:20::52e]:45676)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kaMmk-0001q2-R2
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:41:28 -0500
-Received: by mail-ed1-x52e.google.com with SMTP id a10so6109975edt.12
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 09:41:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=o8Zq+olWEGYik/6RhTq/V/iTEwRP8qx2DZdhCtjBOXg=;
- b=LujySD4WqvYiJeJfiq64MwQp2E5uGnJUwrdnWukncVp3U8qa0kFOIp5CYn1vKb7H0f
- 3rFBaKOPreZkkAl5SYuMd//DZCPZTjhbTJGYbbVH3gzzppROq0RTpLFpzeL/iqX0H4P/
- xtFie6PMBJPL5GYHbZpAsbPGUmu5v0Q45B0Wo4nkZ3aIic6tOuu01AR/wqcZ9Z2ZcSNH
- BnihMuE7zQs7EX9zRbMhziNSCaRcSIVLyUjJ7td5L+roUiJ+yHx+bp6pam9+w2/oggty
- RX9zi/UK2bNZxw9lcAvkFhtjISHfbFFIkk1vKG+ScOdzLf9rOd4C4bFS/Fa23oUostfd
- gRng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=o8Zq+olWEGYik/6RhTq/V/iTEwRP8qx2DZdhCtjBOXg=;
- b=UF6o0IsTgzZwl/5gBzXUZJYjKYSXJqEKmlS/jBHiEP/X/GfWyUMuWUk+OvKSr03aDh
- pYCUYYkMHEVTruEduVI6GbR1lTt2aPPOcXtVT/6KPUuPgPkaTMuTEDTFSjME6PTvbXvy
- RznuTy0F4Av9lKcab00smNiIJxHamCHBwfV/6nnkAXAR/CgyABOaHaPxri6sJQghsQ51
- mki236NpIo6madQ1/YolvQFXH2AgWN+FNommanuaTGdewV2hsdAnjb//q5jWK2YvROib
- LzcBE0H0gvdqzBN3XBE5nfJrJieondhNCLgTGwx8D4Qh8yHVkJm2FYuLC/YDUnj0kRhv
- zPEA==
-X-Gm-Message-State: AOAM531DG2Zgpm+dT0Yst/x30kWKg7mx0WneMEu9m+JcWYN/5k8m0CkU
- 1f7Y0fdoeKzviichnZQkfqi217DcIg3P+U7SViO8fQ==
-X-Google-Smtp-Source: ABdhPJwadZ3rxSaECxvPGC3jYLgEdlI4T4XnLDH+FwbQ+OWkzNVlfnnQRkqd7Xw2qJckSeStHuw9JF9D4CZjDMU6tbo=
-X-Received: by 2002:a50:fa92:: with SMTP id w18mr7709954edr.44.1604511684676; 
- Wed, 04 Nov 2020 09:41:24 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kaMeD-0002mR-Ig
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:32:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44483)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kaMeA-0000dq-Qh
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:32:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604511153;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JAkNKONqo76aMaOLMEJtdIGjE54M7qVDn/xgaYjJzws=;
+ b=LBICOmu40rvISEEd+ku0EALAnSfGtcsuF7O1KRjX+yJL9I9soNS8SJo9fGV1EwtSDoKsDq
+ 1aT7SoDmIb1cI9VHJQWogT4ZU33oQ1wWe30JgW8ktYV6mRn9qZXr+ofQ/3jVQJhEeXCnWj
+ b1cGC1OmXWcpKPFmJkvL4/eD8OxBNjY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-iVOoeJgpNtidOyQce_ZkpA-1; Wed, 04 Nov 2020 12:32:31 -0500
+X-MC-Unique: iVOoeJgpNtidOyQce_ZkpA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BFAA80476C;
+ Wed,  4 Nov 2020 17:32:30 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.207.23])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2172075128;
+ Wed,  4 Nov 2020 17:32:26 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/5] file-posix: split hdev_refresh_limits from
+ raw_refresh_limits
+Date: Wed,  4 Nov 2020 19:32:13 +0200
+Message-Id: <20201104173217.417538-2-mlevitsk@redhat.com>
+In-Reply-To: <20201104173217.417538-1-mlevitsk@redhat.com>
+References: <20201104173217.417538-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-References: <20201104135400.3938-1-kraxel@redhat.com>
-In-Reply-To: <20201104135400.3938-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 4 Nov 2020 17:41:12 +0000
-Message-ID: <CAFEAcA_ZXUwVCfHFZepkVwESgHZryaBNRPh4M3=Hvhfaa1jCOA@mail.gmail.com>
-Subject: Re: [PULL 0/3] Ui 20201104 patches
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::52e;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,39 +96,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
+ Peter Lieven <pl@kamp.de>, Tom Yan <tom.ty89@gmail.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 4 Nov 2020 at 13:55, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit 3d6e32347a3b57dac7f469a07c5f520e69bd070a:
->
->   Update version for v5.2.0-rc0 release (2020-11-03 21:11:57 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20201104-pull-request
->
-> for you to fetch changes up to 0d9b90ce5c73505648909a89bcd5272081b9c348:
->
->   console: make QMP/HMP screendump run in coroutine (2020-11-04 08:02:25 +010=
-> 0)
->
-> ----------------------------------------------------------------
-> ui: run screendump in coroutine
->
-> ----------------------------------------------------------------
+From: Tom Yan <tom.ty89@gmail.com>
 
+We can and should get max transfer length and max segments for all host
+devices / cdroms (on Linux).
 
-Applied, thanks.
+Also use MIN_NON_ZERO instead when we clamp max transfer length against
+max segments.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
+Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ block/file-posix.c | 61 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 45 insertions(+), 16 deletions(-)
 
--- PMM
+diff --git a/block/file-posix.c b/block/file-posix.c
+index c63926d592..6581f41b2b 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1162,6 +1162,12 @@ static void raw_reopen_abort(BDRVReopenState *state)
+ 
+ static int sg_get_max_transfer_length(int fd)
+ {
++    /*
++     * BLKSECTGET for /dev/sg* character devices incorrectly returns
++     * the max transfer size in bytes (rather than in blocks).
++     * Also note that /dev/sg* doesn't support BLKSSZGET ioctl.
++     */
++
+ #ifdef BLKSECTGET
+     int max_bytes = 0;
+ 
+@@ -1175,7 +1181,24 @@ static int sg_get_max_transfer_length(int fd)
+ #endif
+ }
+ 
+-static int sg_get_max_segments(int fd)
++static int get_max_transfer_length(int fd)
++{
++#if defined(BLKSECTGET) && defined(BLKSSZGET)
++    int sect = 0;
++    int ssz = 0;
++
++    if (ioctl(fd, BLKSECTGET, &sect) == 0 &&
++        ioctl(fd, BLKSSZGET, &ssz) == 0) {
++        return sect * ssz;
++    } else {
++        return -errno;
++    }
++#else
++    return -ENOSYS;
++#endif
++}
++
++static int get_max_segments(int fd)
+ {
+ #ifdef CONFIG_LINUX
+     char buf[32];
+@@ -1230,23 +1253,29 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
+ 
+-    if (bs->sg) {
+-        int ret = sg_get_max_transfer_length(s->fd);
++    raw_probe_alignment(bs, s->fd, errp);
++    bs->bl.min_mem_alignment = s->buf_align;
++    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
++}
+ 
+-        if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+-            bs->bl.max_transfer = pow2floor(ret);
+-        }
++static void hdev_refresh_limits(BlockDriverState *bs, Error **errp)
++{
++    BDRVRawState *s = bs->opaque;
+ 
+-        ret = sg_get_max_segments(s->fd);
+-        if (ret > 0) {
+-            bs->bl.max_transfer = MIN(bs->bl.max_transfer,
+-                                      ret * qemu_real_host_page_size);
+-        }
++    int ret = bs->sg ? sg_get_max_transfer_length(s->fd) :
++                       get_max_transfer_length(s->fd);
++
++    if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
++        bs->bl.max_transfer = pow2floor(ret);
+     }
+ 
+-    raw_probe_alignment(bs, s->fd, errp);
+-    bs->bl.min_mem_alignment = s->buf_align;
+-    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
++    ret = get_max_segments(s->fd);
++    if (ret > 0) {
++        bs->bl.max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
++                                           ret * qemu_real_host_page_size);
++    }
++
++    raw_refresh_limits(bs, errp);
+ }
+ 
+ static int check_for_dasd(int fd)
+@@ -3600,7 +3629,7 @@ static BlockDriver bdrv_host_device = {
+     .bdrv_co_pdiscard       = hdev_co_pdiscard,
+     .bdrv_co_copy_range_from = raw_co_copy_range_from,
+     .bdrv_co_copy_range_to  = raw_co_copy_range_to,
+-    .bdrv_refresh_limits = raw_refresh_limits,
++    .bdrv_refresh_limits = hdev_refresh_limits,
+     .bdrv_io_plug = raw_aio_plug,
+     .bdrv_io_unplug = raw_aio_unplug,
+     .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+@@ -3724,7 +3753,7 @@ static BlockDriver bdrv_host_cdrom = {
+     .bdrv_co_preadv         = raw_co_preadv,
+     .bdrv_co_pwritev        = raw_co_pwritev,
+     .bdrv_co_flush_to_disk  = raw_co_flush_to_disk,
+-    .bdrv_refresh_limits = raw_refresh_limits,
++    .bdrv_refresh_limits = hdev_refresh_limits,
+     .bdrv_io_plug = raw_aio_plug,
+     .bdrv_io_unplug = raw_aio_unplug,
+     .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+-- 
+2.26.2
+
 
