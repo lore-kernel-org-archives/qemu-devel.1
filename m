@@ -2,68 +2,101 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF3EC388F9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 07:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E7BC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 07:52:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3A2920870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 07:51:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3A2920870
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 97159221F9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 07:52:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97159221F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaDZR-0000YL-Uj
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 02:51:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33698)
+	id 1kaDaq-00019a-9h
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 02:52:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chaihaoyu1@huawei.com>)
- id 1kaDYc-0008Nq-CS
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 02:50:14 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:2130)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kaDWg-00080m-SO; Wed, 04 Nov 2020 02:48:15 -0500
+Received: from wnew2-smtp.messagingengine.com ([64.147.123.27]:47745)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chaihaoyu1@huawei.com>)
- id 1kaDYZ-00071z-JF
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 02:50:13 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CQzMG70MLz72wq;
- Wed,  4 Nov 2020 15:49:46 +0800 (CST)
-Received: from [10.108.235.54] (10.108.235.54) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 4 Nov 2020 15:49:39 +0800
-Subject: Re: [PATCH v2 1/3] softmmu: Do not use C99 // comments
-To: Markus Armbruster <armbru@redhat.com>
-References: <160398385565.11191.16172040000588233087@66eaa9a8a123>
- <edcc3e56-2419-8645-8639-d9e50d710a1d@huawei.com>
- <87zh3zot3x.fsf@dusky.pond.sub.org>
-From: chaihaoyu <chaihaoyu1@huawei.com>
-Message-ID: <b062f265-db59-5ca9-7479-3ab7718180cd@huawei.com>
-Date: Wed, 4 Nov 2020 15:49:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kaDWd-0006ti-Cb; Wed, 04 Nov 2020 02:48:14 -0500
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.west.internal (Postfix) with ESMTP id 48B8BF9B;
+ Wed,  4 Nov 2020 02:48:08 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Wed, 04 Nov 2020 02:48:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=cD7ew9Z2oWVguXir6a9RoEy+1p+
+ teQS1+jQtvq7lpCk=; b=swFUAEYtXAGA/YWHpHJM6lisIbc4QoGL/awPhfjPSED
+ fuCoMom1KEHZXfpHQ7p9xJgsicvJkwlDe3G/xARslITmdyCqgGlzMzStZz4+qMPJ
+ k3a9F/z1UXt5VRv2Vcgx/dpzSz0Sj7Fkq5qiEsZS5zKqG0VYG8V8yEmSAWmFKhP3
+ NB14+dsftapThv+XqmZPFKB6ymqvB+48Fv3VTQUWJGndkIOtVTTmYNfVkSRhVQNJ
+ VUC4Dqki9DlmTWDtY9H7aLZgNeTE31jbzkywD6mH2DnekXyRK0g+G4KyhRKi+P7A
+ rVe1l+vdFd8axs0BfSe9j21pBUMVvhudQIIRIV5yVdA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=cD7ew9
+ Z2oWVguXir6a9RoEy+1p+teQS1+jQtvq7lpCk=; b=W70BnG+rxJugvkg3bjolCF
+ Dm/OhpRlNxCaRzSroYpPAW3r2eyds9qWhBqhB0XM8+HE8GD8ATLPReNsyrUav/ox
+ 4OfKyikBKdnH1i9BwURYLyIQ2QmE21VVl1NDIYPU0sttAYADg3nk2i3hBEnUf9SB
+ TDWHYmUjG3r17i6HrxciqShBOJMbahQ6sujmRgEoj92GlTPnt/lSwZQh2MsB4xrH
+ oGXb/RpoJnLSmOBUGyI9XRRAu/Iy4Nv10Dn7z51MZ3yHUmMOHUia4orAlQ7JUzo9
+ 7NQVQvgJai9KXE895hABh2Mc4LF2HH3kOfhiUGXIIZGI8zkZfLaBdBNocOcq8XDg
+ ==
+X-ME-Sender: <xms:tlyiXwQXYF4VSE5bwH2-xldGtSbWYFOImUJO3vBINrdWush-QfJM_w>
+ <xme:tlyiX9yAPXujQEXCV2Eb68TLpTx6pK3YAUsRtM-I3ByDcXBXiD260_Hs_nUB4OxbG
+ hofHMYyQx_pjBdjjb4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedruddtgedguddtlecutefuodetggdotefrod
+ ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+ necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+ enucfjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghu
+ shculfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrth
+ htvghrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvddu
+ ffeknecukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptd
+ enucfrrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:tlyiX93dJUW_6BphhchMwyT_5JaVyogJbSS6wJZ5DJmex5pTK2YhFA>
+ <xmx:tlyiX0BxE-kRfB7da2vEBhcF3oa90PUCpZVSVhfx3XVoc7Scf7tTiQ>
+ <xmx:tlyiX5h8Sth3qkf-Yzmr1YekR49xxIimbwFz1gRCrxkRhv9lQTN-Fw>
+ <xmx:t1yiX0qizI-7bpB-z7F3kSm7bAHXCBx2FvRCDI5wLFPcnyiFHynIPSCeDXs>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id F156D3280390;
+ Wed,  4 Nov 2020 02:48:04 -0500 (EST)
+Date: Wed, 4 Nov 2020 08:48:03 +0100
+From: Klaus Jensen <its@irrelevant.dk>
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PATCH v8 06/11] hw/block/nvme: Support allocated CNS command
+ variants
+Message-ID: <20201104074803.GB177281@apples.localdomain>
+References: <20201030023242.5204-1-dmitry.fomichev@wdc.com>
+ <20201030023242.5204-7-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <87zh3zot3x.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.108.235.54]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=chaihaoyu1@huawei.com;
- helo=szxga07-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 02:49:55
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, MIME_CHARSET_FARAWAY=2.45,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="U+BazGySraz5kW0T"
+Content-Disposition: inline
+In-Reply-To: <20201030023242.5204-7-dmitry.fomichev@wdc.com>
+Received-SPF: pass client-ip=64.147.123.27; envelope-from=its@irrelevant.dk;
+ helo=wnew2-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 02:21:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,87 +110,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.chen@huawei.com, pbonzini@redhat.com, zhang.zhanghailiang@huawei.com,
- qemu-devel@nongnu.org, hunongda@huawei.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Thank you for your replay. That's OK if C99 support both kinds of comment style.
+--U+BazGySraz5kW0T
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-> chaihaoyu <chaihaoyu1@huawei.com> writes:
-> 
->> Hi, recently I found some code style problems while using checkpatch.pl tool,please review.
->>
->> Date: Tue, 3 Nov 2020 11:01:40 +0800
->> signed-off-by: Haoyu Chai<chaihaoyu1@huawei.com>
->> ---
->>  softmmu/memory.c         | 2 +-
->>  softmmu/memory_mapping.c | 2 +-
->>  softmmu/physmem.c        | 2 +-
->>  3 files changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/softmmu/memory.c b/softmmu/memory.c
->> index 107ce0a4f8..5fb591b001 100644
->> --- a/softmmu/memory.c
->> +++ b/softmmu/memory.c
->> @@ -36,7 +36,7 @@
->>  #include "hw/boards.h"
->>  #include "migration/vmstate.h"
->>
->> -//#define DEBUG_UNASSIGNED
->> +/* #define DEBUG_UNASSIGNED */
->>
->>  static unsigned memory_region_transaction_depth;
->>  static bool memory_region_update_pending;
->> diff --git a/softmmu/memory_mapping.c b/softmmu/memory_mapping.c
->> index 18d0b8067c..f64053499e 100644
->> --- a/softmmu/memory_mapping.c
->> +++ b/softmmu/memory_mapping.c
->> @@ -19,7 +19,7 @@
->>  #include "exec/memory.h"
->>  #include "exec/address-spaces.h"
->>
->> -//#define DEBUG_GUEST_PHYS_REGION_ADD
->> +/* #define DEBUG_GUEST_PHYS_REGION_ADD */
->>
->>  static void memory_mapping_list_add_mapping_sorted(MemoryMappingList *list,
->>                                                     MemoryMapping *mapping)
->> diff --git a/softmmu/physmem.c b/softmmu/physmem.c
->> index 44ffb60b5d..78c1b6580a 100644
->> --- a/softmmu/physmem.c
->> +++ b/softmmu/physmem.c
->> @@ -75,7 +75,7 @@
->>  #include <daxctl/libdaxctl.h>
->>  #endif
->>
->> -//#define DEBUG_SUBPAGE
->> +/* #define DEBUG_SUBPAGE */
->>
->>  /* ram_list is read under rcu_read_lock()/rcu_read_unlock().  Writes
->>   * are protected by the ramlist lock.
-> 
-> I recommend to leave these alone.
-> 
-> CODING_STYLE.rst:
-> 
->     Rationale: The // form is valid in C99, so this is purely a matter of
->     consistency of style. The checkpatch script will warn you about this.
-> 
-> For "real" comments, we overwhelmingly use /* */, and avoiding // makes
-> sense.  Most exceptions are in code we copy from elsewhere, such as
-> disas/libvixl/.
-> 
-> For commenting out *code*, we use both forms.  Here are the counts for
-> commenting out macro definitions:
-> 
->     $ git-grep '^/\* *# *define' | wc -l
->     125
->     $ git-grep '^// *# *define' | wc -l
->     192
-> 
-> .
-> 
+On Oct 30 11:32, Dmitry Fomichev wrote:
+> From: Niklas Cassel <niklas.cassel@wdc.com>
+>=20
+> Many CNS commands have "allocated" command variants. These include
+> a namespace as long as it is allocated, that is a namespace is
+> included regardless if it is active (attached) or not.
+>=20
+> While these commands are optional (they are mandatory for controllers
+> supporting the namespace attachment command), our QEMU implementation
+> is more complete by actually providing support for these CNS values.
+>=20
+> However, since our QEMU model currently does not support the namespace
+> attachment command, these new allocated CNS commands will return the
+> same result as the active CNS command variants.
+>=20
+> In NVMe, a namespace is active if it exists and is attached to the
+> controller.
+>=20
+> Add a new Boolean namespace flag, "attached", to provide the most
+> basic namespace attachment support. The default value for this new
+> flag is true. Also, implement the logic in the new CNS values to
+> include/exclude namespaces based on this new property. The only thing
+> missing is hooking up the actual Namespace Attachment command opcode,
+> which will allow a user to toggle the "attached" flag per namespace.
+>=20
+> The reason for not hooking up this command completely is because the
+> NVMe specification requires the namespace management command to be
+> supported if the namespace attachment command is supported.
+>=20
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> Reviewed-by: Keith Busch <kbusch@kernel.org>
+> ---
+
+Please rip out all the ns->attached conditionals (it's dead code).
+
+Just add the new CNS values in the switch and let them fall through.
+
+--U+BazGySraz5kW0T
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+iXLEACgkQTeGvMW1P
+Dele2Af/c/tilRZnurZ1QQF+xtCScVMT/E+pnwNo7n61MEqLMGokQVjRRCd7/28V
+18hDByiRJSuvDm7mGTzmPtruP+CXZyT3tlJHyXnUhGeZHz86A3CSpp5u4Ny2Dalw
+7g0E9j5Gfh/QogcETJs3/Gv71kDUE6hoRTNShvAMywFwpIuydZTIAVsFTRse80JC
+yTbZanzPTJq+XORMCOXiWcN8vY02EVGB9tSEHedI5rlOX6+GmK/WVZF+E6CuBoLT
+8hoxoh9Py6dLKljwradM6k8bchwv6hXE/xCajngJwYq+/c9I99Jx0tQk/+cAG+Go
+KS1uVgpecew2GWRIZsFkmfz/8eo++g==
+=r3oG
+-----END PGP SIGNATURE-----
+
+--U+BazGySraz5kW0T--
 
