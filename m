@@ -7,96 +7,94 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8DAC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 186BEC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:07:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D8A920639
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:06:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6ED4A20BED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:07:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CdMQITVI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D8A920639
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JuyzOJai"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ED4A20BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaB05-0002zY-AJ
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:06:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59398)
+	id 1kaB1T-0004gX-1s
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:07:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAlw-0006Qx-8M
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:51:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43979)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAlt-0004fy-Qf
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:51:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604465504;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=BrWBtHz+T2+mIPkAWH3w+WMghO+0VMpKeuA9wyAHhqM=;
- b=CdMQITVINj1uAlE6J+Lvf+KR5kL94q6hrbbkCc0oU/kEcyRM3WegAMJ+/jSqeoi6zhrhhh
- XdicCsrW51cwFf5ebsMf21qikpe+gF1Z5G5Ultd8EoK17zm5uSwVHX/se5PKFL9/sEySuI
- 15hdMOoMd7l20AnCgD/0Yxdbw4WTPps=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-m8IGIHTGMPW80lni1ZCflw-1; Tue, 03 Nov 2020 23:51:43 -0500
-X-MC-Unique: m8IGIHTGMPW80lni1ZCflw-1
-Received: by mail-wm1-f71.google.com with SMTP id 13so744730wmf.0
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:51:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=BrWBtHz+T2+mIPkAWH3w+WMghO+0VMpKeuA9wyAHhqM=;
- b=aisO4H4QkbCyf5/G975q05EShohisxlYmVrvxBGILFcny38w/bjBbQxRNQmqm5C+d6
- elYvlKkeaGTaUvzl99f/ZIsi7GMTNiSOh7+gisrKNXVvY4miwil3PU4Vf4jiRoITeIho
- dSjZPD5b7aW7oVRS4tkMQb4nY49arjPM+1ajyU1yj4+88kF+LjT526Korw4WFwmkDwLu
- 2lDrgsxk1C1sKMJTloEWYMEatjALStf/w5RTIBBhFJKxxa1Dd43waTEsAqAyWk9871jL
- mS6wcv/OTBhKaebuTeh/BqGIpmRVwQ9FdTNKD1o4WvY5aDvaL/XJ9yu7w+2mmxNOl21y
- 607A==
-X-Gm-Message-State: AOAM532gqNonffjqx6GGGIsuap/ZI4GNRFns+Z6tnbwBuUdqFhQXw0Lp
- ka+RvXVEWPMiMxaTeW2UoK0xqUr37A8E/SuiWIpiNwYcZYYL94JhsCFdW149TBusQXQJXtTBwE5
- 54ObZZOpdyYrPZxw=
-X-Received: by 2002:adf:b7c8:: with SMTP id t8mr30967516wre.143.1604465501475; 
- Tue, 03 Nov 2020 20:51:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwe2EdXTETdB6TxowMHOuv+AJ/Md6n6qtBktremJgT6P0gF1idQkNhYGIU1CQ7CBHe4h6NyuQ==
-X-Received: by 2002:adf:b7c8:: with SMTP id t8mr30967508wre.143.1604465501329; 
- Tue, 03 Nov 2020 20:51:41 -0800 (PST)
-Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id u6sm790064wmj.40.2020.11.03.20.51.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 20:51:40 -0800 (PST)
-Date: Tue, 3 Nov 2020 23:51:39 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 21/38] virtio-iommu: Set supported page size mask
-Message-ID: <20201104044937.226370-22-mst@redhat.com>
-References: <20201104044937.226370-1-mst@redhat.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=57073d1dd=alistair.francis@wdc.com>)
+ id 1kaApC-0004ND-GZ; Tue, 03 Nov 2020 23:55:10 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:21933)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=57073d1dd=alistair.francis@wdc.com>)
+ id 1kaAp9-0005nq-Dn; Tue, 03 Nov 2020 23:55:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1604466622; x=1636002622;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=3ASiHykrJWkIM9t2dOvM+UqrUoVsXYneSkga2iFI3YM=;
+ b=JuyzOJaipV9EpCvV7+E1sy8x/gSq0b3iLF4DIJyAzxAq4PYhitJQy9+V
+ koov6p3x33lT5dAzbY9b7hIILTEzMfSUHpeERI0x6zFCGwlwfJoI3pvwq
+ LVta/AJt/1nlv90o/kkgZChaJJujDMDqHLGVhkOZqy4A/8i6hrXAtA7V2
+ vWCD7Y7xIgI6bG+nYwajZP3JMLyFAYSznX7MVYtSb1ZQgV4mXPzdEI84d
+ YLNbyUUDHpLugS5xnS93sivC7NTdMHoJOIE9Bks6lQMjaKKUYTVoDaSI1
+ K4GH7dIFJ28wVl1FzPnpkniqLBC5IfS4UNQ2M9hQL4Go9VY9weupWbhcD Q==;
+IronPort-SDR: 6j0EfC85/8rTHho+vbNPwfAmoLiHwtaGAMkEzGADzzi/GOi8Mz0F2m5C8upi/sVyyTvoPoZr/7
+ ScyoMKXcuDGtbk9vH3F+EWbrKEO1PL+0d01Lq0Fv8vDrJ3CZeVIFHjGqcmJ2vwD7QQChjSyQq9
+ 3on+odECj7OVCyvQbLtZPXYz6xJ80t/WWEZyKVcqaMB9RXRzYO4AfxBFa1CCV7xB+sL6QC3QfZ
+ 0/bkc61lTTyYsrza36arPcMdydOeMvI0VqROqIZ8jVVlzxRLhEiWKaV632ut/kzPbGAYHyhUeS
+ DUU=
+X-IronPort-AV: E=Sophos;i="5.77,449,1596470400"; d="scan'208";a="255296321"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 04 Nov 2020 13:10:19 +0800
+IronPort-SDR: 4R1GPGFhk+ZFWckMiEJwCVfcrk9/mjbiddzHHOOhdybfP/SXc6epdTcM1FdZjRfbYFnvY4EQ6t
+ c//9I9SMCpihQg/ZOVh2ou8gg8nLglDIX6R8u6sa07rqjBRUSis0394wMLCzgyXbk0sUWdWoV8
+ IyRafyCYO2axWntixi7R7Ff1HXuxgkMY+aCGSsliQ4+kLK1+jcEgB2ktAW6mAfVudUtTUG6rxR
+ X08EmI1jIUwTpfFcrLmuEAOpdAeUN7OV2KDnOqelmmo9ckwqHKN3Y35v9zzYowzhcfYM8UJ1h9
+ RbyQdptiF9Zf2HtHD+eGDNme
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Nov 2020 20:41:14 -0800
+IronPort-SDR: xGdA7S243VrYTIRgWgP4n9nb4bWseJ7n2y6UbWN55vyBprJTB6VZhLE6RFcwxSkubLaN3UFgMp
+ Qlr9HN0yiBIEo+4mHszvVKM/BmWF39kOTa6vQF5AkxfMsP9qkbMT1sbK3YW6w0mjfIKX5H0ToP
+ tO9loUm/A8MvJoij/ZH2riaFQPFkpVKrO3wevENYbBD0/Ibpi9oEx9xtIy74pU1npgeCx8t7KF
+ SDyQUl2imCAR8tJdY6QbSY4JzxtWPjg4OpzD7dzugHsc14DoHOg21v8lzXJTB6gheBR81dyk0g
+ qkg=
+WDCIronportException: Internal
+Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.60.113])
+ by uls-op-cesaip01.wdc.com with ESMTP; 03 Nov 2020 20:55:05 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v4 5/5] target/riscv: Split the Hypervisor execute load helpers
+Date: Tue,  3 Nov 2020 20:43:34 -0800
+Message-Id: <5b1550f0faa3c435cc77f3c1ae811dea98ab9e36.1604464950.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <cover.1604464950.git.alistair.francis@wdc.com>
+References: <cover.1604464950.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=68.232.143.124;
+ envelope-from=prvs=57073d1dd=alistair.francis@wdc.com;
+ helo=esa2.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 23:55:03
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,115 +107,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Bharat Bhushan <bbhushan2@marvell.com>, Eric Auger <eric.auger@redhat.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: alistair.francis@wdc.com, richard.henderson@linaro.org, bmeng.cn@gmail.com,
+ palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bharat Bhushan <bbhushan2@marvell.com>
+Split the hypervisor execute load functions into two seperate functions.
+This avoids us having to pass the memop to the C helper functions.
 
-The virtio-iommu device can deal with arbitrary page sizes for virtual
-endpoints, but for endpoints assigned with VFIO it must follow the page
-granule used by the host IOMMU driver.
-
-Implement the interface to set the vIOMMU page size mask, called by VFIO
-for each endpoint. We assume that all host IOMMU drivers use the same
-page granule (the host page granule). Override the page_size_mask field
-in the virtio config space.
-
-Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Message-Id: <20201030180510.747225-10-jean-philippe@linaro.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/virtio/virtio-iommu.c | 50 ++++++++++++++++++++++++++++++++++++++++
- hw/virtio/trace-events   |  1 +
- 2 files changed, 51 insertions(+)
+ target/riscv/helper.h                   |  3 ++-
+ target/riscv/op_helper.c                | 36 +++++++------------------
+ target/riscv/insn_trans/trans_rvh.c.inc | 20 +++++---------
+ 3 files changed, 17 insertions(+), 42 deletions(-)
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 78e07aa40a..fc5c75d693 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -899,6 +899,55 @@ static int virtio_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu_mr,
-     return 0;
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index ee35311052..939731c345 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -81,7 +81,8 @@ DEF_HELPER_1(tlb_flush, void, env)
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_1(hyp_tlb_flush, void, env)
+ DEF_HELPER_1(hyp_gvma_tlb_flush, void, env)
+-DEF_HELPER_4(hyp_x_load, tl, env, tl, tl, tl)
++DEF_HELPER_2(hyp_hlvx_hu, tl, env, tl)
++DEF_HELPER_2(hyp_hlvx_wu, tl, env, tl)
+ #endif
+ 
+ /* Vector functions */
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index 980d4f39e1..d55def76cf 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -227,36 +227,18 @@ void helper_hyp_gvma_tlb_flush(CPURISCVState *env)
+     helper_hyp_tlb_flush(env);
  }
  
-+/*
-+ * The default mask (TARGET_PAGE_MASK) is the smallest supported guest granule,
-+ * for example 0xfffffffffffff000. When an assigned device has page size
-+ * restrictions due to the hardware IOMMU configuration, apply this restriction
-+ * to the mask.
-+ */
-+static int virtio_iommu_set_page_size_mask(IOMMUMemoryRegion *mr,
-+                                           uint64_t new_mask,
-+                                           Error **errp)
-+{
-+    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
-+    VirtIOIOMMU *s = sdev->viommu;
-+    uint64_t cur_mask = s->config.page_size_mask;
-+
-+    trace_virtio_iommu_set_page_size_mask(mr->parent_obj.name, cur_mask,
-+                                          new_mask);
-+
-+    if ((cur_mask & new_mask) == 0) {
-+        error_setg(errp, "virtio-iommu page mask 0x%"PRIx64
-+                   " is incompatible with mask 0x%"PRIx64, cur_mask, new_mask);
-+        return -1;
-+    }
-+
-+    /*
-+     * After the machine is finalized, we can't change the mask anymore. If by
-+     * chance the hotplugged device supports the same granule, we can still
-+     * accept it. Having a different masks is possible but the guest will use
-+     * sub-optimal block sizes, so warn about it.
-+     */
-+    if (qdev_hotplug) {
-+        int new_granule = ctz64(new_mask);
-+        int cur_granule = ctz64(cur_mask);
-+
-+        if (new_granule != cur_granule) {
-+            error_setg(errp, "virtio-iommu page mask 0x%"PRIx64
-+                       " is incompatible with mask 0x%"PRIx64, cur_mask,
-+                       new_mask);
-+            return -1;
-+        } else if (new_mask != cur_mask) {
-+            warn_report("virtio-iommu page mask 0x%"PRIx64
-+                        " does not match 0x%"PRIx64, cur_mask, new_mask);
-+        }
-+        return 0;
-+    }
-+
-+    s->config.page_size_mask &= new_mask;
-+    return 0;
-+}
-+
- static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+-target_ulong helper_hyp_x_load(CPURISCVState *env, target_ulong address,
+-                               target_ulong attrs, target_ulong memop)
++target_ulong helper_hyp_hlvx_hu(CPURISCVState *env, target_ulong address)
  {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-@@ -1130,6 +1179,7 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
-     imrc->translate = virtio_iommu_translate;
-     imrc->replay = virtio_iommu_replay;
-     imrc->notify_flag_changed = virtio_iommu_notify_flag_changed;
-+    imrc->iommu_set_page_size_mask = virtio_iommu_set_page_size_mask;
+-    if (env->priv == PRV_M ||
+-        (env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
+-        (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
+-            get_field(env->hstatus, HSTATUS_HU))) {
+-        target_ulong pte;
+-        int mmu_idx = cpu_mmu_index(env, false) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
+-
+-        switch (memop) {
+-        case MO_TEUW:
+-            pte = cpu_lduw_mmuidx_ra(env, address, mmu_idx, GETPC());
+-            break;
+-        case MO_TEUL:
+-            pte = cpu_ldl_mmuidx_ra(env, address, mmu_idx, GETPC());
+-            break;
+-        default:
+-            g_assert_not_reached();
+-        }
++    int mmu_idx = cpu_mmu_index(env, true) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
+ 
+-        return pte;
+-    }
++    return cpu_lduw_mmuidx_ra(env, address, mmu_idx, GETPC());
++}
+ 
+-    if (riscv_cpu_virt_enabled(env)) {
+-        riscv_raise_exception(env, RISCV_EXCP_VIRT_INSTRUCTION_FAULT, GETPC());
+-    } else {
+-        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+-    }
+-    return 0;
++target_ulong helper_hyp_hlvx_wu(CPURISCVState *env, target_ulong address)
++{
++    int mmu_idx = cpu_mmu_index(env, true) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
++
++    return cpu_ldl_mmuidx_ra(env, address, mmu_idx, GETPC());
  }
  
- static const TypeInfo virtio_iommu_info = {
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 982d0002a6..2060a144a2 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -109,6 +109,7 @@ virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype, uint64_t start,
- virtio_iommu_notify_map(const char *name, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start, uint32_t flags) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64" phys_start=0x%"PRIx64" flags=%d"
- virtio_iommu_notify_unmap(const char *name, uint64_t virt_start, uint64_t virt_end) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64
- virtio_iommu_remap(const char *name, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64" phys_start=0x%"PRIx64
-+virtio_iommu_set_page_size_mask(const char *name, uint64_t old, uint64_t new) "mr=%s old_mask=0x%"PRIx64" new_mask=0x%"PRIx64
- virtio_iommu_notify_flag_add(const char *name) "add notifier to mr %s"
- virtio_iommu_notify_flag_del(const char *name) "del notifier from mr %s"
+ #endif /* !CONFIG_USER_ONLY */
+diff --git a/target/riscv/insn_trans/trans_rvh.c.inc b/target/riscv/insn_trans/trans_rvh.c.inc
+index cc197e7186..ce7ed5affb 100644
+--- a/target/riscv/insn_trans/trans_rvh.c.inc
++++ b/target/riscv/insn_trans/trans_rvh.c.inc
+@@ -277,20 +277,16 @@ static bool trans_hlvx_hu(DisasContext *ctx, arg_hlvx_hu *a)
+ #ifndef CONFIG_USER_ONLY
+     TCGv t0 = tcg_temp_new();
+     TCGv t1 = tcg_temp_new();
+-    TCGv mem_idx = tcg_temp_new();
+-    TCGv memop = tcg_temp_new();
++
++    check_access(ctx);
  
+     gen_get_gpr(t0, a->rs1);
+-    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
+-    tcg_gen_movi_tl(memop, MO_TEUW);
+ 
+-    gen_helper_hyp_x_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_helper_hyp_hlvx_hu(t1, cpu_env, t0);
+     gen_set_gpr(a->rd, t1);
+ 
+     tcg_temp_free(t0);
+     tcg_temp_free(t1);
+-    tcg_temp_free(mem_idx);
+-    tcg_temp_free(memop);
+     return true;
+ #else
+     return false;
+@@ -303,20 +299,16 @@ static bool trans_hlvx_wu(DisasContext *ctx, arg_hlvx_wu *a)
+ #ifndef CONFIG_USER_ONLY
+     TCGv t0 = tcg_temp_new();
+     TCGv t1 = tcg_temp_new();
+-    TCGv mem_idx = tcg_temp_new();
+-    TCGv memop = tcg_temp_new();
++
++    check_access(ctx);
+ 
+     gen_get_gpr(t0, a->rs1);
+-    tcg_gen_movi_tl(mem_idx, ctx->mem_idx);
+-    tcg_gen_movi_tl(memop, MO_TEUL);
+ 
+-    gen_helper_hyp_x_load(t1, cpu_env, t0, mem_idx, memop);
++    gen_helper_hyp_hlvx_wu(t1, cpu_env, t0);
+     gen_set_gpr(a->rd, t1);
+ 
+     tcg_temp_free(t0);
+     tcg_temp_free(t1);
+-    tcg_temp_free(mem_idx);
+-    tcg_temp_free(memop);
+     return true;
+ #else
+     return false;
 -- 
-MST
+2.28.0
 
 
