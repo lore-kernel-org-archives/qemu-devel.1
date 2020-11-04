@@ -2,81 +2,79 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4F3C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 737C9C4742C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:53:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A4ED2087D
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:53:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB5C720780
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:53:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R8tZFxyC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A4ED2087D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJKYfZEE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB5C720780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaNuE-0002UK-3l
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 13:53:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52340)
+	id 1kaNuC-0002RV-Nm
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 13:53:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNjM-0000wU-4F
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:42:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51578)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNjp-0001gT-GQ
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:42:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33450)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNjK-00020a-Az
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:41:59 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNjk-000261-Kz
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:42:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604515317;
+ s=mimecast20190719; t=1604515343;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QTkwT/HJ1lj3VKT9unaRe9zAEsq3t6jIEnXFjz8fDHg=;
- b=R8tZFxyCgwj9VbBQSeTQi7E7yxR1t39mEAvYv09OSIp+R4EtnDfxTCjWIRu3oklhRi8iXI
- lFjZUCgzchgWpmT1IUtY515WzleC2ACArl5QdeNQzb0OxmiLynxGq8ZEe4n0AVb8A60oI7
- mrqOBeJWtbeJn2PiZFR33VmYQo3u8NY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-518-jCDQI1k2MeS7ZPbyRftYug-1; Wed, 04 Nov 2020 13:41:55 -0500
-X-MC-Unique: jCDQI1k2MeS7ZPbyRftYug-1
-Received: by mail-wr1-f69.google.com with SMTP id y6so333920wrt.22
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 10:41:55 -0800 (PST)
+ bh=BrWBtHz+T2+mIPkAWH3w+WMghO+0VMpKeuA9wyAHhqM=;
+ b=ZJKYfZEEBup3amu2+h2acwnrazICWxy/+z+8HwP37cxcMqGfkEkAVmB7Ad4vzm53ZyatP0
+ AikJErY9TpbAMTV5z4FscQAQZf5fdmZrs3Bk+Z/0KMBMC/ajcFzXQpV99/9cZMLvlKrfnB
+ J7hAcS9RcP8fvTAUAGZbTreK90BeSd0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-412-QAbuIb0zOtG66rsBDivJRA-1; Wed, 04 Nov 2020 13:42:21 -0500
+X-MC-Unique: QAbuIb0zOtG66rsBDivJRA-1
+Received: by mail-wr1-f72.google.com with SMTP id j15so9618569wrd.16
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 10:42:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=QTkwT/HJ1lj3VKT9unaRe9zAEsq3t6jIEnXFjz8fDHg=;
- b=Jh4Xgct+b8iM+LI/9D+FA5pw/5wQu2rQdoVtHA0CXa2ZfqNzeZBStnlsIw2YU/+PNR
- 8AYwfVo1cP/29K//t/zv2ju3OFSpbXOBwosctltvGD2FgBTmTxfAf0RQ9TPv8gPr+XRp
- 8+HSfvYlGhuHckVevyXh1Jp1VJYFra7LajllNQD0xPbMSqfkJrjXQ/C2ybN07BsBfYvV
- J1ae9J+2VkbYPGGlS5yKhc2Bt7XlGNb3ZWZZOAjdSss8Xpg9gFuE93LeX/BeKI+NspB6
- fA6hoUmjqymhjC+lk39E7EOP1GKDtGdsKHulZrZZlkldgErCf7lpr2SI5NqsBhjLWgoG
- Xi5Q==
-X-Gm-Message-State: AOAM530573cH5BiN7o4NvSTQHBr6Dmgc57eBus9s4lo8SNugMJFoKj+U
- h4jiF17WC1SrUBUPiSnYa1QIiSR/IQ2H821x2X70nHPALbRqEoNVEBpNPpfHorvp5be87B17Y1U
- Kwr8KhOfUBWd+iPw=
-X-Received: by 2002:a7b:c94d:: with SMTP id i13mr6019966wml.130.1604515314002; 
- Wed, 04 Nov 2020 10:41:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzFR7fPeQqqsaG9WxompWLgjuhwXhyM5RHygM2F5QD4TQDWTWvj/J4JhM76QDAdioSNR0HahA==
-X-Received: by 2002:a7b:c94d:: with SMTP id i13mr6019955wml.130.1604515313871; 
- Wed, 04 Nov 2020 10:41:53 -0800 (PST)
+ :mime-version:content-disposition:in-reply-to;
+ bh=BrWBtHz+T2+mIPkAWH3w+WMghO+0VMpKeuA9wyAHhqM=;
+ b=P1A5jXD5px40u/AU/OKHV1OEmgu38SfD3aGFdu2eNE8ZX0LfVsspiLDJmeP1wgOyZp
+ Aju7me1aFgTcRhsgAYmaiz4ZkGwKBLFbSSTxglcJp3CMoOARlKkzHn0j4OtCWnWHNJuN
+ ptZAFTw0P4EPpKGF+fLLR5G17I1Tn8DdiXKWZ+wWL71OYvNJ9J79SDGjsn7yeOMQRNA2
+ t63R9+qdKHFboqPXBjuIdGA4L+FAuTgg3zyoNyErH3VqoadDMJCIVn7JFFebFRhBtEId
+ sVOoSDNphkZHPk1Sd8ELBSbaznnfZ18aMB692oCck2Rj+iHWcFHyBBWdAu1il4jgst7H
+ nrWg==
+X-Gm-Message-State: AOAM5317MRkZn5gHFmg4B7fIijZXKfmksCRO6bS+xdSFv7auid9bQkQl
+ 7n8fSQCwxcLWsIV5hMCISbem19g3GdPhoVwC//Rn4Pj6vnHWmn6IvJ8nZ23j85/lvpy694M8fZQ
+ Ma6kJEZP1K3PHJ1U=
+X-Received: by 2002:a1c:23cf:: with SMTP id j198mr6008712wmj.6.1604515339709; 
+ Wed, 04 Nov 2020 10:42:19 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxVQ2/0HYyscWHoChvPXC4VxuvozF5XL4cTE1jZGncs/o6QVqXPFZfRn8Th61SxpG/mzYhrNQ==
+X-Received: by 2002:a1c:23cf:: with SMTP id j198mr6008695wmj.6.1604515339472; 
+ Wed, 04 Nov 2020 10:42:19 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id n9sm3311248wmd.4.2020.11.04.10.41.52
+ by smtp.gmail.com with ESMTPSA id 71sm3580651wrm.20.2020.11.04.10.42.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Nov 2020 10:41:53 -0800 (PST)
-Date: Wed, 4 Nov 2020 13:41:51 -0500
+ Wed, 04 Nov 2020 10:42:18 -0800 (PST)
+Date: Wed, 4 Nov 2020 13:42:17 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 12/31] hw/smbios: Fix leaked fd in save_opt_one() error path
-Message-ID: <20201104184040.285057-13-mst@redhat.com>
+Subject: [PULL v3 21/31] virtio-iommu: Set supported page size mask
+Message-ID: <20201104184040.285057-22-mst@redhat.com>
 References: <20201104184040.285057-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201104184040.285057-1-mst@redhat.com>
@@ -86,9 +84,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
@@ -113,59 +110,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+ Bharat Bhushan <bbhushan2@marvell.com>, Eric Auger <eric.auger@redhat.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Bharat Bhushan <bbhushan2@marvell.com>
 
-Fix the following Coverity issue (RESOURCE_LEAK):
+The virtio-iommu device can deal with arbitrary page sizes for virtual
+endpoints, but for endpoints assigned with VFIO it must follow the page
+granule used by the host IOMMU driver.
 
-  CID 1432879: Resource leak
+Implement the interface to set the vIOMMU page size mask, called by VFIO
+for each endpoint. We assume that all host IOMMU drivers use the same
+page granule (the host page granule). Override the page_size_mask field
+in the virtio config space.
 
-    Handle variable fd going out of scope leaks the handle.
-
-Replace a close() call by qemu_close() since the handle is
-opened with qemu_open().
-
-Fixes: bb99f4772f5 ("hw/smbios: support loading OEM strings values from a file")
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201030152742.1553968-1-philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Message-Id: <20201030180510.747225-10-jean-philippe@linaro.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/smbios/smbios.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/virtio/virtio-iommu.c | 50 ++++++++++++++++++++++++++++++++++++++++
+ hw/virtio/trace-events   |  1 +
+ 2 files changed, 51 insertions(+)
 
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 8b30906e50..6a3d39793b 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -988,16 +988,18 @@ static int save_opt_one(void *opaque,
-             if (ret < 0) {
-                 error_setg(errp, "Unable to read from %s: %s",
-                            value, strerror(errno));
-+                qemu_close(fd);
-                 return -1;
-             }
-             if (memchr(buf, '\0', ret)) {
-                 error_setg(errp, "NUL in OEM strings value in %s", value);
-+                qemu_close(fd);
-                 return -1;
-             }
-             g_byte_array_append(data, (guint8 *)buf, ret);
-         }
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index 78e07aa40a..fc5c75d693 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -899,6 +899,55 @@ static int virtio_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu_mr,
+     return 0;
+ }
  
--        close(fd);
-+        qemu_close(fd);
++/*
++ * The default mask (TARGET_PAGE_MASK) is the smallest supported guest granule,
++ * for example 0xfffffffffffff000. When an assigned device has page size
++ * restrictions due to the hardware IOMMU configuration, apply this restriction
++ * to the mask.
++ */
++static int virtio_iommu_set_page_size_mask(IOMMUMemoryRegion *mr,
++                                           uint64_t new_mask,
++                                           Error **errp)
++{
++    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
++    VirtIOIOMMU *s = sdev->viommu;
++    uint64_t cur_mask = s->config.page_size_mask;
++
++    trace_virtio_iommu_set_page_size_mask(mr->parent_obj.name, cur_mask,
++                                          new_mask);
++
++    if ((cur_mask & new_mask) == 0) {
++        error_setg(errp, "virtio-iommu page mask 0x%"PRIx64
++                   " is incompatible with mask 0x%"PRIx64, cur_mask, new_mask);
++        return -1;
++    }
++
++    /*
++     * After the machine is finalized, we can't change the mask anymore. If by
++     * chance the hotplugged device supports the same granule, we can still
++     * accept it. Having a different masks is possible but the guest will use
++     * sub-optimal block sizes, so warn about it.
++     */
++    if (qdev_hotplug) {
++        int new_granule = ctz64(new_mask);
++        int cur_granule = ctz64(cur_mask);
++
++        if (new_granule != cur_granule) {
++            error_setg(errp, "virtio-iommu page mask 0x%"PRIx64
++                       " is incompatible with mask 0x%"PRIx64, cur_mask,
++                       new_mask);
++            return -1;
++        } else if (new_mask != cur_mask) {
++            warn_report("virtio-iommu page mask 0x%"PRIx64
++                        " does not match 0x%"PRIx64, cur_mask, new_mask);
++        }
++        return 0;
++    }
++
++    s->config.page_size_mask &= new_mask;
++    return 0;
++}
++
+ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -1130,6 +1179,7 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
+     imrc->translate = virtio_iommu_translate;
+     imrc->replay = virtio_iommu_replay;
+     imrc->notify_flag_changed = virtio_iommu_notify_flag_changed;
++    imrc->iommu_set_page_size_mask = virtio_iommu_set_page_size_mask;
+ }
  
-         *opt->dest = g_renew(char *, *opt->dest, (*opt->ndest) + 1);
-         (*opt->dest)[*opt->ndest] = (char *)g_byte_array_free(data,  FALSE);
+ static const TypeInfo virtio_iommu_info = {
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 982d0002a6..2060a144a2 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -109,6 +109,7 @@ virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype, uint64_t start,
+ virtio_iommu_notify_map(const char *name, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start, uint32_t flags) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64" phys_start=0x%"PRIx64" flags=%d"
+ virtio_iommu_notify_unmap(const char *name, uint64_t virt_start, uint64_t virt_end) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64
+ virtio_iommu_remap(const char *name, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start) "mr=%s virt_start=0x%"PRIx64" virt_end=0x%"PRIx64" phys_start=0x%"PRIx64
++virtio_iommu_set_page_size_mask(const char *name, uint64_t old, uint64_t new) "mr=%s old_mask=0x%"PRIx64" new_mask=0x%"PRIx64
+ virtio_iommu_notify_flag_add(const char *name) "add notifier to mr %s"
+ virtio_iommu_notify_flag_del(const char *name) "del notifier from mr %s"
+ 
 -- 
 MST
 
