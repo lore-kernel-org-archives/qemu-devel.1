@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D79A2C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 092E7C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:19:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CE522242C
+	by mail.kernel.org (Postfix) with ESMTPS id 57EAC2242A
 	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:19:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aiHi661J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CE522242C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBTV7zFs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57EAC2242A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka7Sl-0006OV-A6
+	id 1ka7Sl-0006P1-Ai
 	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 20:19:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35906)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nn-0007Ji-Vt
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27224)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nw-0007QX-PW
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26746)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nj-0004wa-CD
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:27 -0500
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nv-0004xx-25
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604450241;
+ s=mimecast20190719; t=1604450254;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dW8nv3mseuwyKhX4fJQG2TcuQYo/mf67EOtBCsNnqNQ=;
- b=aiHi661JuY/Uo3XgMO4czscmsAan+7GVpw47pGWgdfVR1P2acb2V2nisEC+docH5Tcb17L
- QYKPgdAb/UOjqRgt8U0g6CGg0QBRnRdWcSrYNLn+s96jAHQos0DQ/AIw2uNTYHHHCiCU6K
- aEN3RHKPALr+gD9qENng9rm6W1cA1oM=
+ bh=YhQxOEX3MpAK3NV9j1/EgLWzuYfEtOEcMpjIm7W0Vck=;
+ b=QBTV7zFsLF7YXPschc5AAnPLCy3VH8ArpzsWhOttNaNRqa84NYwuOYp5/PcBfsqy+oepiN
+ O2r3X1D+LuMfuK4UWkLAVjzq1nQo1ZM0zZWCyhWXrz0+NHnPG0yoRO5zWGEZq3a/7R0VsT
+ JBQBxennKqHusvKpGFKUORLM/yDdG/A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-Zdz07CrDN_uDKHqLcttwiw-1; Tue, 03 Nov 2020 19:37:20 -0500
-X-MC-Unique: Zdz07CrDN_uDKHqLcttwiw-1
+ us-mta-421-xDIuIumZMGauO18wwFQG4A-1; Tue, 03 Nov 2020 19:37:32 -0500
+X-MC-Unique: xDIuIumZMGauO18wwFQG4A-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22F4A6417E
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:37:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 598721009E27
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:37:31 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-97.rdu2.redhat.com [10.10.119.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 623CC747C6;
- Wed,  4 Nov 2020 00:37:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 585EF55766;
+ Wed,  4 Nov 2020 00:37:30 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 54/72] scripts/qmp-shell: refactor QMPCompleter
-Date: Tue,  3 Nov 2020 19:35:44 -0500
-Message-Id: <20201104003602.1293560-55-jsnow@redhat.com>
+Subject: [PATCH v2 63/72] scripts/qmp-shell: remove TODO
+Date: Tue,  3 Nov 2020 19:35:53 -0500
+Message-Id: <20201104003602.1293560-64-jsnow@redhat.com>
 In-Reply-To: <20201104003602.1293560-1-jsnow@redhat.com>
 References: <20201104003602.1293560-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -99,43 +99,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-list is a generic type, but we expect to use strings directly. We could
-subclass list[str], but pylint does not presently understand that
-invocation.
-
-Change this class to envelop a list instead of *being* a list, for
-simpler typing.
+We still want to revamp qmp-shell again, but there's much more to the
+idea than the comment now intuits. Remove it.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qmp/qmp-shell | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ scripts/qmp/qmp-shell | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index 847d34890f97..73694035b203 100755
+index 0199a13a3428..3c32b576a37d 100755
 --- a/scripts/qmp/qmp-shell
 +++ b/scripts/qmp/qmp-shell
-@@ -78,9 +78,17 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
- from qemu import qmp
+@@ -130,8 +130,6 @@ class FuzzyJSON(ast.NodeTransformer):
+         return node
  
  
--class QMPCompleter(list):
--    def complete(self, text, state):
--        for cmd in self:
-+class QMPCompleter:
-+    # NB: Python 3.9+ will probably allow us to subclass list[str] directly,
-+    # but pylint as of today does not know that List[str] is simply 'list'.
-+    def __init__(self) -> None:
-+        self._matches: List[str] = []
-+
-+    def append(self, value: str) -> None:
-+        return self._matches.append(value)
-+
-+    def complete(self, text: str, state: int) -> Optional[str]:
-+        for cmd in self._matches:
-             if cmd.startswith(text):
-                 if state == 0:
-                     return cmd
+-# TODO: QMPShell's interface is a bit ugly (eg. _fill_completion() and
+-#       _execute_cmd()). Let's design a better one.
+ class QMPShell(qmp.QEMUMonitorProtocol):
+     def __init__(self, address: qmp.SocketAddrT,
+                  pretty: bool = False, verbose: bool = False):
 -- 
 2.26.2
 
