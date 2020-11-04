@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C6BC388F9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D219C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC5162076D
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:02:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C58E2076D
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:02:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ua+mgL84"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC5162076D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QAFDVVtV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C58E2076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaLFJ-00020C-MP
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:02:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41756)
+	id 1kaLFM-00026D-4p
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:02:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLDv-0000Np-Bu
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:01:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33618)
+ id 1kaLDy-0000RQ-DS
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:01:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40320)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLDs-0005S2-Qj
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:01:23 -0500
+ id 1kaLDw-0005SV-Gs
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:01:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604505679;
+ s=mimecast20190719; t=1604505683;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/Phk3lo4bzx8IV8gpStB5TCCGVdAThN5k/nbEt7JmcM=;
- b=Ua+mgL8401u7jSraWk4k/UkP2uV2tAhK7jBCmm1PtXpvwRfd101SqYvXlmym9GRCFcfye4
- n+RbmWqn9cjmuHrNTSxPvo3jApmOX0P4mLCXrgvAg5EL/UVU+uaNkY1/S/6Jz2fiURMlqD
- waH7YIZR9VVh4uPr19g4c+CdU+68gRc=
+ bh=rc36MnKM7EYTaZ8lMBRn2cvGDZYW3v3kepUjkeKaXDs=;
+ b=QAFDVVtVEf/hbYjLfq8CpWDEu1k54jHH0FT/ZOu20Vwo5Bbx3lZNITpmdzU2aetXvUMNcG
+ xkWJYX9Xi7EgAVLl79OYk56j0GMltBTQxwQ9vtR9k9QE1L0TBBdphRvskd6aqrFAeg7IfC
+ aBUWoDvpAd0uenxXYX2YEWXwnfnF1ao=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-agawVptUPm-zdMrklHFj9w-1; Wed, 04 Nov 2020 11:01:18 -0500
-X-MC-Unique: agawVptUPm-zdMrklHFj9w-1
+ us-mta-94-B9vTJSxOOxeNl_V6sp5lCg-1; Wed, 04 Nov 2020 11:01:14 -0500
+X-MC-Unique: B9vTJSxOOxeNl_V6sp5lCg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F356F81EE69;
- Wed,  4 Nov 2020 16:01:08 +0000 (UTC)
-Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2ACA069338;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8773806B39;
  Wed,  4 Nov 2020 16:01:07 +0000 (UTC)
+Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9407B71C85;
+ Wed,  4 Nov 2020 16:01:06 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/44] cs4231: Get rid of empty property array
-Date: Wed,  4 Nov 2020 10:59:38 -0500
-Message-Id: <20201104160021.2342108-2-ehabkost@redhat.com>
+Subject: [PATCH v2 02/44] cpu: Move cpu_common_props to hw/core/cpu.c
+Date: Wed,  4 Nov 2020 10:59:39 -0500
+Message-Id: <20201104160021.2342108-3-ehabkost@redhat.com>
 In-Reply-To: <20201104160021.2342108-1-ehabkost@redhat.com>
 References: <20201104160021.2342108-1-ehabkost@redhat.com>
 MIME-Version: 1.0
@@ -99,46 +99,92 @@ Cc: "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
  Markus Armbruster <armbru@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-An empty props array is unnecessary, we can just not call
-device_class_set_props().
+There's no reason to keep the property list separate from the CPU
+class code.  Move the variable to hw/core/cpu.c and make it
+static.
 
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/audio/cs4231.c | 5 -----
- 1 file changed, 5 deletions(-)
+ include/hw/core/cpu.h |  1 -
+ cpu.c                 | 15 ---------------
+ hw/core/cpu.c         | 15 +++++++++++++++
+ 3 files changed, 15 insertions(+), 16 deletions(-)
 
-diff --git a/hw/audio/cs4231.c b/hw/audio/cs4231.c
-index 8e9554ce9b..209c05a0a0 100644
---- a/hw/audio/cs4231.c
-+++ b/hw/audio/cs4231.c
-@@ -160,17 +160,12 @@ static void cs4231_init(Object *obj)
-     sysbus_init_irq(dev, &s->irq);
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 3d92c967ff..8e7552910d 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -1111,7 +1111,6 @@ AddressSpace *cpu_get_address_space(CPUState *cpu, int asidx);
+ 
+ void QEMU_NORETURN cpu_abort(CPUState *cpu, const char *fmt, ...)
+     GCC_FMT_ATTR(2, 3);
+-extern Property cpu_common_props[];
+ void cpu_exec_initfn(CPUState *cpu);
+ void cpu_exec_realizefn(CPUState *cpu, Error **errp);
+ void cpu_exec_unrealizefn(CPUState *cpu);
+diff --git a/cpu.c b/cpu.c
+index 0be5dcb6f3..0c485cdf2d 100644
+--- a/cpu.c
++++ b/cpu.c
+@@ -144,21 +144,6 @@ void cpu_exec_unrealizefn(CPUState *cpu)
+ #endif
  }
  
--static Property cs4231_properties[] = {
--    {.name = NULL},
+-Property cpu_common_props[] = {
+-#ifndef CONFIG_USER_ONLY
+-    /* Create a memory property for softmmu CPU object,
+-     * so users can wire up its memory. (This can't go in hw/core/cpu.c
+-     * because that file is compiled only once for both user-mode
+-     * and system builds.) The default if no link is set up is to use
+-     * the system address space.
+-     */
+-    DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
+-                     MemoryRegion *),
+-#endif
+-    DEFINE_PROP_BOOL("start-powered-off", CPUState, start_powered_off, false),
+-    DEFINE_PROP_END_OF_LIST(),
 -};
 -
- static void cs4231_class_init(ObjectClass *klass, void *data)
+ void cpu_exec_initfn(CPUState *cpu)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->reset = cs_reset;
-     dc->vmsd = &vmstate_cs4231;
--    device_class_set_props(dc, cs4231_properties);
+     cpu->as = NULL;
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index 576fa1d7ba..5c89c858aa 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -393,6 +393,21 @@ static vaddr cpu_adjust_watchpoint_address(CPUState *cpu, vaddr addr, int len)
+     return addr;
  }
  
- static const TypeInfo cs4231_info = {
++static Property cpu_common_props[] = {
++#ifndef CONFIG_USER_ONLY
++    /* Create a memory property for softmmu CPU object,
++     * so users can wire up its memory. (This can't go in hw/core/cpu.c
++     * because that file is compiled only once for both user-mode
++     * and system builds.) The default if no link is set up is to use
++     * the system address space.
++     */
++    DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
++                     MemoryRegion *),
++#endif
++    DEFINE_PROP_BOOL("start-powered-off", CPUState, start_powered_off, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void cpu_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
 -- 
 2.28.0
 
