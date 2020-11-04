@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80BDAC4741F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B14C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:26:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9764320735
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:26:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9764320735
+	by mail.kernel.org (Postfix) with ESMTPS id ABE4820735
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:26:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABE4820735
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaSAt-0001lk-G5
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 18:26:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50336)
+	id 1kaSAv-0001qw-N3
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 18:26:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaS9w-0000WE-Uk
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 18:25:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41318)
+ id 1kaS9y-0000Xr-FY
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 18:25:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41368)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaS9t-0003Xq-6T
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 18:25:44 -0500
+ id 1kaS9v-0003YA-Qf
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 18:25:46 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kaS9s-0002S3-53
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 23:25:40 +0000
+ id 1kaS9u-0002TY-G5
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 23:25:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 222F32E811E
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 23:25:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 728442E812F
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 23:25:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Nov 2020 23:18:55 -0000
-From: John Snow <1878043@bugs.launchpad.net>
+Date: Wed, 04 Nov 2020 23:13:03 -0000
+From: John Snow <1835865@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=dgilbert@redhat.com; 
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: acpi piix
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr dgilbert-h
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Commenters: amarkovic philmd
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
 X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <158921393717.5475.17098174167918208525.malonedeb@soybean.canonical.com>
-Message-Id: <160453193578.18863.6067158096427191430.launchpad@soybean.canonical.com>
-Subject: [Bug 1878043] Re: memcpy param-overlap in Slirp ip_stripoptions
- through e1000e
+References: <156264634854.21327.17484948855790653898.malonedeb@gac.canonical.com>
+Message-Id: <160453158400.28833.5365492605947924586.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1835865] Re: piix crashes on mips when accessing acpi-pci-hotplug
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: a155a4d910d4459ca363001aee3ddd072cc8dcd3
+X-Launchpad-Hash: 3d9890d6363c6cb727a964932b87249d48ea94b1
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 17:35:34
@@ -85,136 +86,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878043 <1878043@bugs.launchpad.net>
+Reply-To: Bug 1835865 <1835865@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 ** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+       Status: In Progress =3D> Confirmed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878043
+https://bugs.launchpad.net/bugs/1835865
 
 Title:
-  memcpy param-overlap in Slirp ip_stripoptions through e1000e
+  piix crashes on mips when accessing acpi-pci-hotplug
 
 Status in QEMU:
-  Fix Committed
+  Confirmed
 
 Bug description:
-  Hello,
-  While fuzzing, I found an input that triggers an overlapping memcpy (caug=
-ht by AddressSanitizer).
-  Overlapping memcpys are undefined behavior according to the POSIX and C s=
-tandards, and can lead to bugs.
+  $ qemu-system-mips --version
+  QEMU emulator version 4.0.50 (v4.0.0-1975-gf34edbc760)
 
-  =3D=3D16666=3D=3DERROR: AddressSanitizer: memcpy-param-overlap: memory ra=
-nges [0x625000264940,0x62500026699a) and [0x625000264948, 0x6250002669a2) o=
-verlap
-      #0 0x5622d7b6a3d4 in __asan_memcpy (/home/alxndr/Development/qemu/bui=
-ld/i386-softmmu/qemu-system-i386+0x96c3d4)
-      #1 0x5622d896a2d2 in ip_stripoptions /home/alxndr/Development/qemu/sl=
-irp/src/ip_input.c:457:5
-      #2 0x5622d8963378 in udp_input /home/alxndr/Development/qemu/slirp/sr=
-c/udp.c:86:9
-      #3 0x5622d89351ea in slirp_input /home/alxndr/Development/qemu/slirp/=
-src/slirp.c:840:13
-      #4 0x5622d852e162 in net_slirp_receive /home/alxndr/Development/qemu/=
-net/slirp.c:126:5
-      #5 0x5622d8515851 in nc_sendv_compat /home/alxndr/Development/qemu/ne=
-t/net.c:700:15
-      #6 0x5622d8515851 in qemu_deliver_packet_iov /home/alxndr/Development=
-/qemu/net/net.c:728:15
-      #7 0x5622d851786d in qemu_net_queue_deliver_iov /home/alxndr/Developm=
-ent/qemu/net/queue.c:179:11
-      #8 0x5622d851786d in qemu_net_queue_send_iov /home/alxndr/Development=
-/qemu/net/queue.c:224:11
-      #9 0x5622d851b1c1 in net_hub_receive_iov /home/alxndr/Development/qem=
-u/net/hub.c:74:9
-      #10 0x5622d851b1c1 in net_hub_port_receive_iov /home/alxndr/Developme=
-nt/qemu/net/hub.c:125:12
-      #11 0x5622d851572b in qemu_deliver_packet_iov /home/alxndr/Developmen=
-t/qemu/net/net.c:726:15
-      #12 0x5622d851786d in qemu_net_queue_deliver_iov /home/alxndr/Develop=
-ment/qemu/net/queue.c:179:11
-      #13 0x5622d851786d in qemu_net_queue_send_iov /home/alxndr/Developmen=
-t/qemu/net/queue.c:224:11
-      #14 0x5622d828bf87 in net_tx_pkt_sendv /home/alxndr/Development/qemu/=
-hw/net/net_tx_pkt.c:546:9
-      #15 0x5622d828bf87 in net_tx_pkt_send /home/alxndr/Development/qemu/h=
-w/net/net_tx_pkt.c:620:9
-      #16 0x5622d82b5f22 in e1000e_tx_pkt_send /home/alxndr/Development/qem=
-u/hw/net/e1000e_core.c:666:16
-      #17 0x5622d82b5f22 in e1000e_process_tx_desc /home/alxndr/Development=
-/qemu/hw/net/e1000e_core.c:743:17
-      #18 0x5622d82b5f22 in e1000e_start_xmit /home/alxndr/Development/qemu=
-/hw/net/e1000e_core.c:934:9
-      #19 0x5622d82b2be0 in e1000e_set_tdt /home/alxndr/Development/qemu/hw=
-/net/e1000e_core.c:2451:9
-      #20 0x5622d82a30fc in e1000e_core_write /home/alxndr/Development/qemu=
-/hw/net/e1000e_core.c:3261:9
-      #21 0x5622d7c9e336 in memory_region_write_accessor /home/alxndr/Devel=
-opment/qemu/memory.c:483:5
-      #22 0x5622d7c9dcdf in access_with_adjusted_size /home/alxndr/Developm=
-ent/qemu/memory.c:544:18
-      #23 0x5622d7c9dcdf in memory_region_dispatch_write /home/alxndr/Devel=
-opment/qemu/memory.c:1476:16
-      #24 0x5622d7bb31d3 in flatview_write_continue /home/alxndr/Developmen=
-t/qemu/exec.c:3137:23
-      #25 0x5622d7babb97 in flatview_write /home/alxndr/Development/qemu/ex=
-ec.c:3177:14
-      #26 0x5622d7babb97 in address_space_write /home/alxndr/Development/qe=
-mu/exec.c:3268:18
+  $ qemu-system-mips -machine malta -bios /dev/null -nodefaults -monitor st=
+dio -S
+  (qemu) o 0xaf00 0
+  qemu-system-mips: hw/acpi/cpu.c:197: cpu_hotplug_hw_init: Assertion `mc->=
+possible_cpu_arch_ids' failed.
+  Aborted (core dumped)
 
-  0x625000264940 is located 64 bytes inside of 8354-byte region [0x62500026=
-4900,0x6250002669a2)
-  allocated by thread T0 here:
-      #0 0x5622d7b6b06d in malloc (/home/alxndr/Development/qemu/build/i386=
--softmmu/qemu-system-i386+0x96d06d)
-      #1 0x7f724b932500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.=
-so.0+0x54500)
-
-  0x625000264948 is located 72 bytes inside of 8354-byte region [0x62500026=
-4900,0x6250002669a2)
-  allocated by thread T0 here:
-      #0 0x5622d7b6b06d in malloc (/home/alxndr/Development/qemu/build/i386=
--softmmu/qemu-system-i386+0x96d06d)
-      #1 0x7f724b932500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.=
-so.0+0x54500)
-
-  I can reproduce it in qemu 5.0 built with --enable-sanitizers using:
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
--q35-5.0 -accel qtest -qtest stdio -nographic -monitor none -serial none
-  outl 0xcf8 0x80001010
-  outl 0xcfc 0xe1020000
-  outl 0xcf8 0x80001014
-  outl 0xcf8 0x80001004
-  outw 0xcfc 0x7
-  outl 0xcf8 0x800010a2
-  outl 0xcf8 0x8000fa24
-  outl 0xcfc 0xe1069000
-  outl 0xcf8 0x8000fa04
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000fb20
-  write 0xe1069100 0xe 0xff810000000000008420f9e10019
-  write 0x820b 0xc 0x080047bb0c02e10000004011
-  write 0xe1020403 0x36 0xb700000000e1000f009006e100000000625c5e0000b700000=
-000e1000f009006e100000000625c5e0000b700000000e1000f009006e1
-  EOF
-
-  I also attached the trace to this launchpad report, in case the
-  formatting is broken:
-
-  qemu-system-i386 -M pc-q35-5.0 -accel qtest -qtest stdio -nographic
-  -monitor none -serial none < attachment
-
-  Please let me know if I can provide any further info.
-  -Alex
+  (gdb) bt
+  #0  0x00007f6fd748957f in raise () at /lib64/libc.so.6
+  #1  0x00007f6fd7473895 in abort () at /lib64/libc.so.6
+  #2  0x00007f6fd7473769 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
+  #3  0x00007f6fd7481a26 in .annobin_assert.c_end () at /lib64/libc.so.6
+  #4  0x00005646d58ca7bd in cpu_hotplug_hw_init (as=3D0x5646d6ae3300, owner=
+=3D0x5646d6fd5b10, state=3D0x5646d6fd7a30, base_addr=3D44800) at hw/acpi/cp=
+u.c:197
+  #5  0x00005646d58c5284 in acpi_switch_to_modern_cphp (gpe_cpu=3D0x5646d6f=
+d7910, cpuhp_state=3D0x5646d6fd7a30, io_port=3D44800) at hw/acpi/cpu_hotplu=
+g.c:107
+  #6  0x00005646d58c3431 in piix4_set_cpu_hotplug_legacy (obj=3D0x5646d6fd5=
+b10, value=3Dfalse, errp=3D0x5646d61cdb28 <error_abort>) at hw/acpi/piix4.c=
+:617
+  #7  0x00005646d5b00c70 in property_set_bool (obj=3D0x5646d6fd5b10, v=3D0x=
+5646d7697d30, name=3D0x5646d5cf3a90 "cpu-hotplug-legacy", opaque=3D0x5646d7=
+07d110, errp=3D0x5646d61cdb28 <error_abort>) at qom/object.c:2076
+  #8  0x00005646d5afeee6 in object_property_set (obj=3D0x5646d6fd5b10, v=3D=
+0x5646d7697d30, name=3D0x5646d5cf3a90 "cpu-hotplug-legacy", errp=3D0x5646d6=
+1cdb28 <error_abort>) at qom/object.c:1268
+  #9  0x00005646d5b01fb8 in object_property_set_qobject (obj=3D0x5646d6fd5b=
+10, value=3D0x5646d75b5450, name=3D0x5646d5cf3a90 "cpu-hotplug-legacy", err=
+p=3D0x5646d61cdb28 <error_abort>) at qom/qom-qobject.c:26
+  #10 0x00005646d5aff1cb in object_property_set_bool (obj=3D0x5646d6fd5b10,=
+ value=3Dfalse, name=3D0x5646d5cf3a90 "cpu-hotplug-legacy", errp=3D0x5646d6=
+1cdb28 <error_abort>) at qom/object.c:1334
+  #11 0x00005646d58c4fce in cpu_status_write (opaque=3D0x5646d6fd7910, addr=
+=3D0, data=3D0, size=3D1) at hw/acpi/cpu_hotplug.c:44
+  #12 0x00005646d569c707 in memory_region_write_accessor (mr=3D0x5646d6fd79=
+20, addr=3D0, value=3D0x7ffc18053068, size=3D1, shift=3D0, mask=3D255, attr=
+s=3D...) at memory.c:503
+  #13 0x00005646d569c917 in access_with_adjusted_size (addr=3D0, value=3D0x=
+7ffc18053068, size=3D1, access_size_min=3D1, access_size_max=3D4, access_fn=
+=3D0x5646d569c61e <memory_region_write_accessor>, mr=3D0x5646d6fd7920, attr=
+s=3D...)
+      at memory.c:569
+  #14 0x00005646d569f8f3 in memory_region_dispatch_write (mr=3D0x5646d6fd79=
+20, addr=3D0, data=3D0, size=3D1, attrs=3D...) at memory.c:1497
+  #15 0x00005646d563e5c5 in flatview_write_continue (fv=3D0x5646d751b000, a=
+ddr=3D44800, attrs=3D..., buf=3D0x7ffc180531d4 "", len=3D4, addr1=3D0, l=3D=
+1, mr=3D0x5646d6fd7920) at exec.c:3324
+  #16 0x00005646d563e70a in flatview_write (fv=3D0x5646d751b000, addr=3D448=
+00, attrs=3D..., buf=3D0x7ffc180531d4 "", len=3D4) at exec.c:3363
+  #17 0x00005646d563ea0f in address_space_write (as=3D0x5646d618abc0 <addre=
+ss_space_io>, addr=3D44800, attrs=3D..., buf=3D0x7ffc180531d4 "", len=3D4) =
+at exec.c:3453
+  #18 0x00005646d5696ee5 in cpu_outl (addr=3D44800, val=3D0) at ioport.c:80
+  #19 0x00005646d57585d0 in hmp_ioport_write (mon=3D0x5646d6bc70e0, qdict=
+=3D0x5646d6cf7140) at monitor/misc.c:1058
+  #20 0x00005646d5a77b99 in handle_hmp_command (mon=3D0x5646d6bc70e0, cmdli=
+ne=3D0x5646d6bc2542 "0xaf00 0") at monitor/hmp.c:1082
+  #21 0x00005646d5a7540a in monitor_command_cb (opaque=3D0x5646d6bc70e0, cm=
+dline=3D0x5646d6bc2540 "o 0xaf00 0", readline_opaque=3D0x0) at monitor/hmp.=
+c:47
+  #22 0x00005646d5c71450 in readline_handle_byte (rs=3D0x5646d6bc2540, ch=
+=3D13) at util/readline.c:408
+  #23 0x00005646d5a7858f in monitor_read (opaque=3D0x5646d6bc70e0, buf=3D0x=
+7ffc180533d0 "\rtc\327FV", size=3D1) at monitor/hmp.c:1312
+  #24 0x00005646d5bc8d17 in qemu_chr_be_write_impl (s=3D0x5646d6add000, buf=
+=3D0x7ffc180533d0 "\rtc\327FV", len=3D1) at chardev/char.c:177
+  #25 0x00005646d5bc8d7b in qemu_chr_be_write (s=3D0x5646d6add000, buf=3D0x=
+7ffc180533d0 "\rtc\327FV", len=3D1) at chardev/char.c:189
+  #26 0x00005646d5bcb6bf in fd_chr_read (chan=3D0x5646d6a80d60, cond=3DG_IO=
+_IN, opaque=3D0x5646d6add000) at chardev/char-fd.c:68
+  #27 0x00005646d5bec485 in qio_channel_fd_source_dispatch (source=3D0x5646=
+d765a480, callback=3D0x5646d5bcb561 <fd_chr_read>, user_data=3D0x5646d6add0=
+00) at io/channel-watch.c:84
+  #28 0x00007f6fd9c1606d in g_main_context_dispatch () at /lib64/libglib-2.=
+0.so.0
+  #29 0x00005646d5c5323a in glib_pollfds_poll () at util/main-loop.c:213
+  #30 0x00005646d5c532b4 in os_host_main_loop_wait (timeout=3D29821719) at =
+util/main-loop.c:236
+  #31 0x00005646d5c533b9 in main_loop_wait (nonblocking=3D0) at util/main-l=
+oop.c:512
+  #32 0x00005646d581d1a1 in main_loop () at vl.c:1791
+  #33 0x00005646d582485f in main (argc=3D11, argv=3D0x7ffc18054868, envp=3D=
+0x7ffc180548c8) at vl.c:4473
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878043/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1835865/+subscriptions
 
