@@ -2,98 +2,91 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9FE7C4741F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:41:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6451CC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:43:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9F382067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:41:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0F7A206C1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 18:43:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PwBgoG7p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9F382067C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6dPVPfA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0F7A206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaNiU-0007xc-Q6
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 13:41:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51646)
+	id 1kaNkK-0001kj-Kg
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 13:43:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaNhA-0007Oj-UX
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:39:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38663)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNin-0008R9-LC
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:41:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50290)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaNh6-0001Tp-29
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:39:44 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaNil-0001tL-PD
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 13:41:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604515177;
+ s=mimecast20190719; t=1604515282;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kOwr8XM6QAzasWVNtPLf3Iv9W22fZAwOXzdnlC9Bwgk=;
- b=PwBgoG7pf0bDYWJNarK+JWiAz5hEbRscyUG+apb3E6AFmlkk5eSOrxdgek3rShjeOoRaNF
- 2dy+Sd5N3i9KihfDcjXsHUlOx0T38tGS5uqyO5iMWXqes1n5l/H4VFxPKvNPkNqQsZKOeL
- ZovhocY8Zp+uksDuHVhEPve7fO+99p0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-0QDGFrtWMRmIZjUak7tvWw-1; Wed, 04 Nov 2020 13:39:34 -0500
-X-MC-Unique: 0QDGFrtWMRmIZjUak7tvWw-1
-Received: by mail-wm1-f70.google.com with SMTP id p7so925959wma.9
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 10:39:34 -0800 (PST)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=/J2NEj6EQpC5cKRTprcfELq+k2GWUiIro3Y1abL+e4Y=;
+ b=Q6dPVPfAHTHrTxY/xP12bsbQTqcfVgjGFXF2FFyuPUv2WG4/EpWoKE1cH4gpyGrp6wsvr1
+ C4fbnpj4ZyAVSFsS8ILpno1MFhz3VJQUBmQvcrIQQWLTAWOfhXpwSz96CSbLamvcQn7BE4
+ 56GUGcdO8fUCK2xdpkrp5d/KxweKTZY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-154-q1bIzgWJNHagxVSgGPnEqg-1; Wed, 04 Nov 2020 13:41:19 -0500
+X-MC-Unique: q1bIzgWJNHagxVSgGPnEqg-1
+Received: by mail-wr1-f71.google.com with SMTP id j15so9617617wrd.16
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 10:41:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kOwr8XM6QAzasWVNtPLf3Iv9W22fZAwOXzdnlC9Bwgk=;
- b=qvgdXFDfpao7AB3A7KooX/BTc4JKz2jmA5V9Z2LY5Q8Aoi2yTyYDkwL9t4AiLAps0q
- 3+wmHXNcW9XtpK0cGQvsmWPVUd87E5HFt+CY5mSClJUqz5/zWqp3Frij4jYf6OgYFQlS
- W04wa9eLh9I2CTe0EIT7PCmjxASEHW+Z9UIlVP5zaj3tXQrhXgaeAFUTUWkaqbqA5TRP
- cfEEA3EtlUFt4w7K+5vByDgrMURx7SUcwZIichSk5GewZp3cEEWrk4EhmED/SYadxqVr
- EeHkPUP/IXn55TzO59opdPZzGsNIZXM6nKRyD1efh1ZucrwNizKHSLWoGlbWAY5M11Yv
- oCag==
-X-Gm-Message-State: AOAM531TbRkHrvWXVK01IA1LRQ6DNx+gz8e8A/VCpd9Q4hJkFriYQp5F
- ddeUfPxaaN71EAd6Y7VHbQxNgzABy6IvY3JJefSBH7QIdXFAtMwOcVSKqOluta6MQUmFKRkLKQi
- acmK2pVvgs1X/D5A=
-X-Received: by 2002:adf:b190:: with SMTP id q16mr34850764wra.288.1604515173617; 
- Wed, 04 Nov 2020 10:39:33 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyug6n83S1ozCj3zc61pNtn+AjJ16rubJW0sgmND2wLR0fkUsbo9iCj1QTrhwTENIEG//5r/w==
-X-Received: by 2002:adf:b190:: with SMTP id q16mr34850718wra.288.1604515173388; 
- Wed, 04 Nov 2020 10:39:33 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id y2sm4018666wrh.0.2020.11.04.10.39.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Nov 2020 10:39:32 -0800 (PST)
-Subject: Re: [PATCH v11 19/19] multi-process: add configure and usage
- information
-To: Jagannathan Raman <jag.raman@oracle.com>, qemu-devel@nongnu.org,
- Cleber Rosa <crosa@redhat.com>
-References: <cover.1602784930.git.jag.raman@oracle.com>
- <c0c67a48b6ebba7ecb2661d4775c105d2753eebd.1602784930.git.jag.raman@oracle.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <58bb4805-03bd-bfe6-f8a3-4578f8a6870a@redhat.com>
-Date: Wed, 4 Nov 2020 19:39:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition:content-transfer-encoding;
+ bh=/J2NEj6EQpC5cKRTprcfELq+k2GWUiIro3Y1abL+e4Y=;
+ b=OMCGNhKVV/e10SALXqQ1wQQC8bAGdyUwejsSASaetCc3MpeWn9e3Ci+GGY/KY207O1
+ Gmkfwewly5YPmjIh86jWJNmaYg1+AbnKbI9YqggYua/RtJevSD6YWxtmHQHbThVp7ooq
+ gsjNYLa9rd4N32a+W4nEJFXSjcm6KkAR1KPn5+Pf8S3jC62HO/OsvUGBrryVyFMik6CO
+ lVSH9vWC/x+21ZRwjY4ZNNhCy4IrFyNnXUXcxYTYquIJ+oe61NZLjNJ1/OWqWMyWvUyn
+ Z6TI/EjikVPgCoqqA2zPd09kfJBuyc9bRtjXHj5e3ZBPDWdEG58jw/cula/ZSLg4DTGu
+ K7+w==
+X-Gm-Message-State: AOAM5312GHSQfW3MSzkVyDXWuIbEQvv5uzS+xuEqTmHCujXQx5BEE5FF
+ 5q4LktSDAts9kH93YOUI52BbCQ6fI8pN8rvT9WC4iBL3QFWeRkFrENBQhjby9+AfZjLzAgL6Gux
+ DzIZsIwtjGJO79Y4=
+X-Received: by 2002:a1c:9916:: with SMTP id b22mr6347708wme.105.1604515278255; 
+ Wed, 04 Nov 2020 10:41:18 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJztFlzfu543oFbMVwqkCBXbvKKMy8mORtFGWx2WNLF/shdXwsXAANkPDPQh1A7uZ0zSYlUmWg==
+X-Received: by 2002:a1c:9916:: with SMTP id b22mr6347693wme.105.1604515278044; 
+ Wed, 04 Nov 2020 10:41:18 -0800 (PST)
+Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
+ by smtp.gmail.com with ESMTPSA id z6sm3302515wmi.1.2020.11.04.10.41.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Nov 2020 10:41:17 -0800 (PST)
+Date: Wed, 4 Nov 2020 13:41:15 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v3 00/31] pc,pci,vhost,virtio: fixes
+Message-ID: <20201104184040.285057-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c0c67a48b6ebba7ecb2661d4775c105d2753eebd.1602784930.git.jag.raman@oracle.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -102,9 +95,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,200 +109,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, kraxel@redhat.com, quintela@redhat.com,
- mst@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
- felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
- konrad.wilk@oracle.com, dgilbert@redhat.com, alex.williamson@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, rth@twiddle.net, kwolf@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
- marcandre.lureau@gmail.com, thanos.makatos@nutanix.com
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jagannathan,
+changes from v2:
+    drop patches causing issues on BE
 
-On 10/15/20 8:05 PM, Jagannathan Raman wrote:
-> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+The following changes since commit c7a7a877b716cf14848f1fd5c754d293e2f8d852:
 
-Documentation is scarce ;)
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20201102' into staging (2020-11-03 10:38:05 +0000)
 
-> 
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  MAINTAINERS                |  2 ++
->  docs/multi-process.rst     | 67 ++++++++++++++++++++++++++++++++++++++++++++++
->  scripts/mpqemu-launcher.py | 49 +++++++++++++++++++++++++++++++++
->  3 files changed, 118 insertions(+)
->  create mode 100644 docs/multi-process.rst
->  create mode 100755 scripts/mpqemu-launcher.py
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 9a911e0..d12aba7 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -3118,6 +3118,8 @@ F: include/hw/pci/memory-sync.h
->  F: hw/i386/remote-iohub.c
->  F: include/hw/i386/remote-iohub.h
->  F: docs/devel/multi-process.rst
-> +F: scripts/mpqemu-launcher.py
-> +F: scripts/mpqemu-launcher-perf-mode.py
+are available in the Git repository at:
 
-This one was in v7, Stefan asked about it, then the script
-disappeared in v8 =)
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg718984.html
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
->  
->  Build and test automation
->  -------------------------
-> diff --git a/docs/multi-process.rst b/docs/multi-process.rst
-> new file mode 100644
-> index 0000000..c4b022c
-> --- /dev/null
-> +++ b/docs/multi-process.rst
-> @@ -0,0 +1,67 @@
-> +Multi-process QEMU
-> +==================
-> +
-> +This document describes how to configure and use multi-process qemu.
-> +For the design document refer to docs/devel/qemu-multiprocess.
-> +
-> +1) Configuration
-> +----------------
-> +
-> +To enable support for multi-process add --enable-mpqemu
-> +to the list of options for the "configure" script.
-> +
-> +
-> +2) Usage
-> +--------
-> +
-> +Multi-process QEMU requires an orchestrator to launch. Please refer to a
-> +light-weight python based orchestrator for mpqemu in
-> +scripts/mpqemu-launcher.py to lauch QEMU in multi-process mode.
-> +
-> +Following is a description of command-line used to launch mpqemu.
-> +
-> +* Orchestrator:
-> +
-> +  - The Orchestrator creates a unix socketpair
-> +
-> +  - It launches the remote process and passes one of the
-> +    sockets to it via command-line.
-> +
-> +  - It then launches QEMU and specifies the other socket as an option
-> +    to the Proxy device object
-> +
-> +* Remote Process:
-> +
-> +  - QEMU can enter remote process mode by using the "remote" machine
-> +    option.
-> +
-> +  - The orchestrator creates a "remote-object" with details about
-> +    the device and the file descriptor for the device
-> +
-> +  - The remaining options are no different from how one launches QEMU with
-> +    devices.
-> +
-> +  - Example command-line for the remote process is as follows:
-> +
-> +      /usr/bin/qemu-system-x86_64                                        \
-> +      -machine x-remote                                                  \
-> +      -device lsi53c895a,id=lsi0                                         \
-> +      -drive id=drive_image2,file=/build/ol7-nvme-test-1.qcow2           \
-> +      -device scsi-hd,id=drive2,drive=drive_image2,bus=lsi0.0,scsi-id=0  \
-> +      -object x-remote-object,id=robj1,devid=lsi1,fd=4,
-> +
-> +* QEMU:
-> +
-> +  - Since parts of the RAM are shared between QEMU & remote process, a
-> +    memory-backend-memfd is required to facilitate this, as follows:
-> +
-> +    -object memory-backend-memfd,id=mem,size=2G
-> +
-> +  - A "x-pci-proxy-dev" device is created for each of the PCI devices emulated
-> +    in the remote process. A "socket" sub-option specifies the other end of
-> +    unix channel created by orchestrator. The "id" sub-option must be specified
-> +    and should be the same as the "id" specified for the remote PCI device
-> +
-> +  - Example commandline for QEMU is as follows:
-> +
-> +      -device x-pci-proxy-dev,id=lsi0,socket=3
-> diff --git a/scripts/mpqemu-launcher.py b/scripts/mpqemu-launcher.py
-> new file mode 100755
-> index 0000000..6e0ef22
-> --- /dev/null
-> +++ b/scripts/mpqemu-launcher.py
-> @@ -0,0 +1,49 @@
-> +#!/usr/bin/env python3
-> +import socket
-> +import os
-> +import subprocess
-> +import time
-> +
-> +PROC_QEMU='/usr/bin/qemu-system-x86_64'
+for you to fetch changes up to 9f6df01d0e128c2df179789b37140d6aeddfcb92:
 
-If this is a (multiarch) test, then ...
+  contrib/vhost-user-blk: fix get_config() information leak (2020-11-03 16:39:05 -0500)
 
-> +
-> +proxy, remote = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM)
-> +
-> +remote_cmd = [ PROC_QEMU,                                                      \
-> +               '-machine', 'x-remote',                                         \
-> +               '-device', 'lsi53c895a,id=lsi1',                                \
+----------------------------------------------------------------
+pc,pci,vhost,virtio: fixes
 
-... I'd move it to tests/integration/multiproc-x86-lsi53c895a.py ...
+Lots of fixes all over the place.
+virtio-mem and virtio-iommu patches are kind of fixes but
+it seems better to just make them behave sanely than
+try to educate users about the limitations ...
 
-> +               '-drive', 'id=drive_image1,file=/build/ol7-nvme-test-1.qcow2',  \
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-... use avocado.utils.vmimage (see tests/acceptance/boot_linux.py)
-to download a prebuilt image, ...
+----------------------------------------------------------------
+Bharat Bhushan (7):
+      virtio-iommu: Add memory notifiers for map/unmap
+      virtio-iommu: Call memory notifiers in attach/detach
+      virtio-iommu: Add replay() memory region callback
+      virtio-iommu: Add notify_flag_changed() memory region callback
+      memory: Add interface to set iommu page size mask
+      vfio: Set IOMMU page size as per host supported page size
+      virtio-iommu: Set supported page size mask
 
-> +               '-device', 'scsi-hd,id=drive1,drive=drive_image1,bus=lsi1.0,'   \
-> +                              'scsi-id=0',                                     \
-> +               '-object',                                                      \
-> +               'x-remote-object,id=robj1,devid=lsi1,fd='+str(remote.fileno()), \
-> +               '-nographic',                                                   \
-> +             ]
-> +
-> +proxy_cmd = [ PROC_QEMU,                                                       \
-> +              '-name', 'OL7.4',                                                \
-> +              '-machine', 'q35,accel=kvm',                                     \
-> +              '-smp', 'sockets=1,cores=1,threads=1',                           \
-> +              '-m', '2048',                                                    \
-> +              '-object', 'memory-backend-memfd,id=sysmem-file,size=2G',        \
-> +              '-numa', 'node,memdev=sysmem-file',                              \
-> +              '-device', 'virtio-scsi-pci,id=virtio_scsi_pci0',                \
-> +              '-drive', 'id=drive_image1,if=none,format=qcow2,'                \
-> +                            'file=/home/ol7-hdd-1.qcow2',                      \
-> +              '-device', 'scsi-hd,id=image1,drive=drive_image1,'               \
-> +                             'bus=virtio_scsi_pci0.0',                         \
-> +              '-boot', 'd',                                                    \
-> +              '-vnc', ':0',                                                    \
-> +              '-device', 'x-pci-proxy-dev,id=lsi1,fd='+str(proxy.fileno()),    \
-> +            ]
-> +
-> +
-> +pid = os.fork();
-> +
-> +if pid:
-> +    # In Proxy
-> +    print('Launching QEMU with Proxy object');
-> +    process = subprocess.Popen(proxy_cmd, pass_fds=[proxy.fileno()])
-> +else:
-> +    # In remote
-> +    print('Launching Remote process');
-> +    process = subprocess.Popen(remote_cmd, pass_fds=[remote.fileno()])
-> 
+Cindy Lu (2):
+      vhost-vdpa: Add qemu_close in vhost_vdpa_cleanup
+      net: Add vhost-vdpa in show_netdevs()
 
-... and do something within the guest to be sure MultiProc works :)
+David Hildenbrand (6):
+      virtio-mem: Make sure "addr" is always multiples of the block size
+      virtio-mem: Make sure "usable_region_size" is always multiples of the block size
+      virtio-mem: Probe THP size to determine default block size
+      memory-device: Support big alignment requirements
+      memory-device: Add get_min_alignment() callback
+      virito-mem: Implement get_min_alignment()
 
-Regards,
+Jean-Philippe Brucker (3):
+      virtio-iommu: Fix virtio_iommu_mr()
+      virtio-iommu: Store memory region in endpoint struct
+      vfio: Don't issue full 2^64 unmap
 
-Phil.
+Jin Yu (1):
+      vhost-blk: set features before setting inflight feature
+
+Michael S. Tsirkin (1):
+      pc: comment style fixup
+
+Philippe Mathieu-Daudé (2):
+      hw/virtio/vhost-backend: Fix Coverity CID 1432871
+      hw/smbios: Fix leaked fd in save_opt_one() error path
+
+Stefan Hajnoczi (6):
+      Revert "vhost-blk: set features before setting inflight feature"
+      libvhost-user: follow QEMU comment style
+      configure: introduce --enable-vhost-user-blk-server
+      block/export: make vhost-user-blk config space little-endian
+      block/export: fix vhost-user-blk get_config() information leak
+      contrib/vhost-user-blk: fix get_config() information leak
+
+Xinhao Zhang (3):
+      hw/acpi : Don't use '#' flag of printf format
+      hw/acpi : add space before the open parenthesis '('
+      hw/acpi : add spaces around operator
+
+ configure                               |  15 +++
+ contrib/libvhost-user/libvhost-user.h   |  15 ++-
+ include/exec/memory.h                   |  38 ++++++
+ include/hw/mem/memory-device.h          |  10 ++
+ include/hw/virtio/vhost.h               |   2 +-
+ block/export/export.c                   |   4 +-
+ block/export/vhost-user-blk-server.c    |  28 +++--
+ contrib/vhost-user-blk/vhost-user-blk.c |   2 +
+ hw/acpi/core.c                          |   2 +-
+ hw/acpi/nvdimm.c                        |  20 ++--
+ hw/acpi/pcihp.c                         |   2 +-
+ hw/block/vhost-user-blk.c               |   2 +-
+ hw/i386/pc.c                            |   9 +-
+ hw/mem/memory-device.c                  |  20 +++-
+ hw/smbios/smbios.c                      |   4 +-
+ hw/vfio/common.c                        |  19 +++
+ hw/virtio/vhost-backend.c               |   4 +-
+ hw/virtio/vhost.c                       |   8 +-
+ hw/virtio/virtio-iommu.c                | 205 +++++++++++++++++++++++++++++++-
+ hw/virtio/virtio-mem-pci.c              |   7 ++
+ hw/virtio/virtio-mem.c                  | 113 +++++++++++++++++-
+ net/net.c                               |   3 +
+ net/vhost-vdpa.c                        |   4 +
+ softmmu/memory.c                        |  13 ++
+ block/export/meson.build                |   2 +-
+ hw/virtio/trace-events                  |   6 +
+ util/meson.build                        |   2 +-
+ 27 files changed, 501 insertions(+), 58 deletions(-)
 
 
