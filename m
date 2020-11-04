@@ -2,64 +2,64 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8175EC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B26AC4742C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:56:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A401223C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2388F223C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:56:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eOd7BtOz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A401223C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gQ/CCJIb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2388F223C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka76X-0002XD-5i
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 19:56:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35528)
+	id 1ka76Z-0002bi-7n
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 19:56:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nK-0006S4-V6
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38497)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6ne-0007CJ-NU
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38968)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nD-0004qW-DL
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:57 -0500
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nc-0004vw-UN
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604450209;
+ s=mimecast20190719; t=1604450236;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=McaAvtGLW0Lxx0emY5hblWCCh4ECxYbmLwQZTo/NtfY=;
- b=eOd7BtOzVESWR5VunSq4oQ5t19foP5gYjmrX9ZyilStVm+lIEvuwvyi4j/6kisYBroq94Y
- fb58oMWYim5hGcjPqBjjKZDbygCB1lZIG5t5QDrDoMPoByoy0nB8bxnBsu4t5yHXiMYAwJ
- ERuPyBjV5t5bwDIrVDZz7Dxzc6eimV8=
+ bh=pIMjZAoZPo6ny5PBtyWC0I9lcIqZo7oz/v3yVY473cQ=;
+ b=gQ/CCJIbLIS9kPxO1/QnmOGHFni7vWkl8wqVYgUMyKR/GnqhRHUMY5C2RR8/9FYDMJ2FuI
+ m+LYzsHQIEW6YICF8huIcBiDG5d3dDbeYXqg6HHSmrX3kW5l3idSSwMOm5j7CvWIqk0ZEe
+ 88mtlv85NC03DJL4G7WnPft0gplf08Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-585-M0T4-NZpM_K_ZOzAOUZWhA-1; Tue, 03 Nov 2020 19:36:46 -0500
-X-MC-Unique: M0T4-NZpM_K_ZOzAOUZWhA-1
+ us-mta-434-oYFDkvcLNiKt-AmOUD4grw-1; Tue, 03 Nov 2020 19:37:14 -0500
+X-MC-Unique: oYFDkvcLNiKt-AmOUD4grw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 737C3806B21
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:36:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A85964151
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:37:13 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-97.rdu2.redhat.com [10.10.119.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B135255766;
- Wed,  4 Nov 2020 00:36:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7958B55766;
+ Wed,  4 Nov 2020 00:37:12 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 21/72] scripts/qemu-ga-client: add module docstring
-Date: Tue,  3 Nov 2020 19:35:11 -0500
-Message-Id: <20201104003602.1293560-22-jsnow@redhat.com>
+Subject: [PATCH v2 49/72] scripts/qmp-shell: Make verbose a public attribute
+Date: Tue,  3 Nov 2020 19:35:39 -0500
+Message-Id: <20201104003602.1293560-50-jsnow@redhat.com>
 In-Reply-To: <20201104003602.1293560-1-jsnow@redhat.com>
 References: <20201104003602.1293560-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,16 +70,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 01:02:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,92 +99,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Turn that nice usage comment into a docstring.
+No real reason to hide this behind an underscore; make it part of the
+initializer and make it a regular RW attribute.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qmp/qemu-ga-client | 65 +++++++++++++++++++-------------------
- 1 file changed, 33 insertions(+), 32 deletions(-)
+ scripts/qmp/qmp-shell | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/qmp/qemu-ga-client b/scripts/qmp/qemu-ga-client
-index 73d262e8beb4..1061d2eb1437 100755
---- a/scripts/qmp/qemu-ga-client
-+++ b/scripts/qmp/qemu-ga-client
-@@ -1,41 +1,42 @@
- #!/usr/bin/env python3
+diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+index ba27e9801c68..cfcefb95f9da 100755
+--- a/scripts/qmp/qmp-shell
++++ b/scripts/qmp/qmp-shell
+@@ -113,7 +113,7 @@ class FuzzyJSON(ast.NodeTransformer):
+ # TODO: QMPShell's interface is a bit ugly (eg. _fill_completion() and
+ #       _execute_cmd()). Let's design a better one.
+ class QMPShell(qmp.QEMUMonitorProtocol):
+-    def __init__(self, address, pretty=False):
++    def __init__(self, address, pretty=False, verbose=False):
+         super().__init__(self.parse_address(address))
+         self._greeting = None
+         self._completer = None
+@@ -122,7 +122,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+         self._actions = list()
+         self._histfile = os.path.join(os.path.expanduser('~'),
+                                       '.qmp-shell_history')
+-        self._verbose = False
++        self.verbose = verbose
  
--# QEMU Guest Agent Client
--#
- # Copyright (C) 2012 Ryota Ozaki <ozaki.ryota@gmail.com>
- #
- # This work is licensed under the terms of the GNU GPL, version 2.  See
- # the COPYING file in the top-level directory.
--#
--# Usage:
--#
--# Start QEMU with:
--#
--# # qemu [...] -chardev socket,path=/tmp/qga.sock,server,nowait,id=qga0 \
--#   -device virtio-serial \
--#   -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0
--#
--# Run the script:
--#
--# $ qemu-ga-client --address=/tmp/qga.sock <command> [args...]
--#
--# or
--#
--# $ export QGA_CLIENT_ADDRESS=/tmp/qga.sock
--# $ qemu-ga-client <command> [args...]
--#
--# For example:
--#
--# $ qemu-ga-client cat /etc/resolv.conf
--# # Generated by NetworkManager
--# nameserver 10.0.2.3
--# $ qemu-ga-client fsfreeze status
--# thawed
--# $ qemu-ga-client fsfreeze freeze
--# 2 filesystems frozen
--#
--# See also: https://wiki.qemu.org/Features/QAPI/GuestAgent
--#
-+
-+"""
-+QEMU Guest Agent Client
-+
-+Usage:
-+
-+Start QEMU with:
-+
-+# qemu [...] -chardev socket,path=/tmp/qga.sock,server,nowait,id=qga0 \
-+  -device virtio-serial \
-+  -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0
-+
-+Run the script:
-+
-+$ qemu-ga-client --address=/tmp/qga.sock <command> [args...]
-+
-+or
-+
-+$ export QGA_CLIENT_ADDRESS=/tmp/qga.sock
-+$ qemu-ga-client <command> [args...]
-+
-+For example:
-+
-+$ qemu-ga-client cat /etc/resolv.conf
-+# Generated by NetworkManager
-+nameserver 10.0.2.3
-+$ qemu-ga-client fsfreeze status
-+thawed
-+$ qemu-ga-client fsfreeze freeze
-+2 filesystems frozen
-+
-+See also: https://wiki.qemu.org/Features/QAPI/GuestAgent
-+"""
+     def _fill_completion(self):
+         cmds = self.cmd('query-commands')
+@@ -271,7 +271,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+         # For transaction mode, we may have just cached the action:
+         if qmpcmd is None:
+             return True
+-        if self._verbose:
++        if self.verbose:
+             self._print(qmpcmd)
+         resp = self.cmd_obj(qmpcmd)
+         if resp is None:
+@@ -319,8 +319,8 @@ class QMPShell(qmp.QEMUMonitorProtocol):
  
- import argparse
- import base64
+ 
+ class HMPShell(QMPShell):
+-    def __init__(self, address, pretty=False):
+-        super().__init__(address, pretty)
++    def __init__(self, address, pretty=False, verbose=False):
++        super().__init__(address, pretty, verbose)
+         self.__cpu_index = 0
+ 
+     def __cmd_completion(self):
+@@ -420,7 +420,7 @@ def main():
+ 
+     shell_class = HMPShell if args.hmp else QMPShell
+     try:
+-        qemu = shell_class(args.qmp_server, args.pretty)
++        qemu = shell_class(args.qmp_server, args.pretty, args.verbose)
+     except qmp.QMPBadPortError:
+         parser.error(f"Bad port number: {args.qmp_server}")
+         return  # pycharm doesn't know error() is noreturn
+@@ -435,7 +435,6 @@ def main():
+         die(f"Couldn't connect to {args.qmp_server}: {err!s}")
+ 
+     qemu.show_banner()
+-    qemu.set_verbosity(args.verbose)
+     while qemu.read_exec_command(qemu.get_prompt()):
+         pass
+     qemu.close()
 -- 
 2.26.2
 
