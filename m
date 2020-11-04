@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB5EC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:07:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3642AC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47A4A20786
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:07:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACD0920786
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:08:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rl/hiHtA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47A4A20786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8XXlYI+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACD0920786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaLJn-00080n-4x
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:07:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41856)
+	id 1kaLKT-0000xM-LX
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:08:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLEH-0000sF-Hs
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:01:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57388)
+ id 1kaLFH-0002UU-PY
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55708)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLEF-0005Tl-O5
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:01:45 -0500
+ id 1kaLFE-0005cD-3U
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604505702;
+ s=mimecast20190719; t=1604505763;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=e1w67iYQ+9XepZPuBza1kMNBRESrNxur8ZCrpoHr6vg=;
- b=Rl/hiHtAuZc0MeAWZ0CuUHSCTTgvHllp89ogvrG8cCkqC57ifF8lL5veR4vHs9TZ+sXdHq
- m5H2dGR+Q5xT7bO63uniFWl5enXmzGxc3JgB3gCE3uLfq+KIEwCaKUWywsxuCucIPoty0Y
- +FoLc7knkC5xPjIMKnUVnudPAz3jtbA=
+ bh=VS6q04t6dHHN72NkI74EXZ/EGgWszfu/YZ3EAegBiW8=;
+ b=L8XXlYI+yAofW0cqVJN8cVigYEnz8C9lxg8Gk9/3b5YYr6sdhoFPJQa3I7HfnL8hTcEvOG
+ JuuteEN69Z8KRtQdBVN5RzG4QR+Qv5T3yaEUmjhQq1lb8axqMF8BBkab3Q+wyl0d4+q9al
+ 18iTOMhLUW1mQkIyGfrEp5om6D8eEvg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-WZQ-uMHONKGKfFWROBNf-g-1; Wed, 04 Nov 2020 11:01:41 -0500
-X-MC-Unique: WZQ-uMHONKGKfFWROBNf-g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-168-lDIe4f_iOHKkL09bPaxGIA-1; Wed, 04 Nov 2020 11:02:41 -0500
+X-MC-Unique: lDIe4f_iOHKkL09bPaxGIA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB5D01A2E93F;
- Wed,  4 Nov 2020 16:01:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0513A11CC7E0;
+ Wed,  4 Nov 2020 16:01:27 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 80C6051737;
- Wed,  4 Nov 2020 16:01:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BF9B2277CF;
+ Wed,  4 Nov 2020 16:01:25 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 05/44] sparc: Check dev->realized at sparc_set_nwindows()
-Date: Wed,  4 Nov 2020 10:59:42 -0500
-Message-Id: <20201104160021.2342108-6-ehabkost@redhat.com>
+Subject: [PATCH v2 10/44] qdev: Make qdev_find_global_prop() get Object*
+ argument
+Date: Wed,  4 Nov 2020 10:59:47 -0500
+Message-Id: <20201104160021.2342108-11-ehabkost@redhat.com>
 In-Reply-To: <20201104160021.2342108-1-ehabkost@redhat.com>
 References: <20201104160021.2342108-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -96,52 +97,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  Markus Armbruster <armbru@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Stefan Berger <stefanb@linux.ibm.com>
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-sparc_set_nwindows() is one of the very few property setters that
-don't check dev->realized, and there's no reason for it to be
-special.  Check dev->realized like the other setters.
+Make the code more generic and not specific to TYPE_DEVICE.
 
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- target/sparc/cpu.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/hw/qdev-properties.h     | 2 +-
+ hw/core/qdev-properties-system.c | 2 +-
+ hw/core/qdev-properties.c        | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index cf21efd85f..8ecb20e55f 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -798,11 +798,17 @@ static void sparc_get_nwindows(Object *obj, Visitor *v, const char *name,
- static void sparc_set_nwindows(Object *obj, Visitor *v, const char *name,
-                                void *opaque, Error **errp)
- {
-+    DeviceState *dev = DEVICE(obj);
-     const int64_t min = MIN_NWINDOWS;
-     const int64_t max = MAX_NWINDOWS;
-     SPARCCPU *cpu = SPARC_CPU(obj);
-     int64_t value;
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 0b92cfc761..7620095fed 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -305,7 +305,7 @@ void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
+ void *qdev_get_prop_ptr(Object *obj, Property *prop);
  
-+    if (dev->realized) {
-+        qdev_prop_set_after_realize(dev, name, errp);
-+        return;
-+    }
-+
-     if (!visit_type_int(v, name, &value, errp)) {
-         return;
-     }
+ void qdev_prop_register_global(GlobalProperty *prop);
+-const GlobalProperty *qdev_find_global_prop(DeviceState *dev,
++const GlobalProperty *qdev_find_global_prop(Object *obj,
+                                             const char *name);
+ int qdev_prop_check_globals(void);
+ void qdev_prop_set_globals(DeviceState *dev);
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index c8c73c371b..af1339e562 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -36,7 +36,7 @@ static bool check_prop_still_unset(DeviceState *dev, const char *name,
+                                    const void *old_val, const char *new_val,
+                                    Error **errp)
+ {
+-    const GlobalProperty *prop = qdev_find_global_prop(dev, name);
++    const GlobalProperty *prop = qdev_find_global_prop(OBJECT(dev), name);
+ 
+     if (!old_val) {
+         return true;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 0a54a922c8..41482d83d1 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -818,7 +818,7 @@ void qdev_prop_register_global(GlobalProperty *prop)
+     g_ptr_array_add(global_props(), prop);
+ }
+ 
+-const GlobalProperty *qdev_find_global_prop(DeviceState *dev,
++const GlobalProperty *qdev_find_global_prop(Object *obj,
+                                             const char *name)
+ {
+     GPtrArray *props = global_props();
+@@ -827,7 +827,7 @@ const GlobalProperty *qdev_find_global_prop(DeviceState *dev,
+ 
+     for (i = 0; i < props->len; i++) {
+         p = g_ptr_array_index(props, i);
+-        if (object_dynamic_cast(OBJECT(dev), p->driver)
++        if (object_dynamic_cast(obj, p->driver)
+             && !strcmp(p->property, name)) {
+             return p;
+         }
 -- 
 2.28.0
 
