@@ -2,81 +2,82 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B8F0C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 03:35:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66660C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:18:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C18E92074F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 03:35:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD18C2236F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:18:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nh8b1igv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C18E92074F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HT7Jfskn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD18C2236F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka9aH-0004kP-PM
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 22:35:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43714)
+	id 1kaAFu-0002Oo-B3
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 23:18:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53122)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1ka9ZE-0003qt-Aj
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 22:34:36 -0500
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:45358)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kaAF1-0001xD-Nk
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:17:47 -0500
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36943)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1ka9ZC-0002J4-IU
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 22:34:36 -0500
-Received: by mail-il1-x141.google.com with SMTP id g7so18113826ilr.12
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 19:34:34 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kaAEz-0000sZ-PE
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:17:47 -0500
+Received: by mail-lj1-x241.google.com with SMTP id l10so501280lji.4
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:17:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=5PUSGyVUel6H3b39NCDAmJ/GV/NDx9yc0EfMgBVAats=;
- b=Nh8b1igvADNlyZT4E8oz9eWlNtSxij5GonBUgHpeudzLkt9vaybs9YTEdt7pLkuQ1v
- zJpHVdJweDCUTxP1ItByzVE3fAWWRnqTGzhXLKSnY6Z82GAx571bhPR+gf6kGvOkxiUo
- gh8ZjYk8FcqtkicMhNiM8+OYLEsL0KmweRjoKR0cucWoSvIAgkzbnWoh8QeJPfiXxiB6
- lexNrDxw0mgDnnqjTDj/RdrCYU5Wd89RMiqafExfj0nGRafgZzVbY22Emh6PQ8UpH9Gc
- 3RGYuQDgSx4Mt00Bs4YPLKZxUqQijLhweqnfZeCGsMmRrf1nupdMSDVWS5R8U0aSZAaj
- kzOw==
+ bh=aArzmYPVuHcdiBUQ9hkkLj6+Tt19Z3o2MH92xGM3xTU=;
+ b=HT7JfskntJ5MpARy8sj5wZ1LLumq8O05cUjoOgMA0FfCamLhSHRQAcvsq2jMV0Ee92
+ OklWNtHIVmvcVU2x3pRlKglmVcp2jz3GAPKnb5F2sNCaIJTEqZZXj4UdkKnhfBOw7tzZ
+ Yrb9SWVjD+nMH6S29IMBeuQYurRa61zguWB5mzwHF4OjYfymtO6jmXaWCSLa4pHHo7Bi
+ lBa7wZwRjJlzH4FDYUnZiUmri34fXVKfRz2FYNdxTohB1DkZznepkJWdvAlp4nZgNT+v
+ TK94wmKcQQEaW3qVQTwNZiZ+7hxBfEgTUQoBTxON+Pd7J8BqFxmjZVovsyMSIG0yCwS5
+ zMEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=5PUSGyVUel6H3b39NCDAmJ/GV/NDx9yc0EfMgBVAats=;
- b=DR5QZexGEMTS2Uktje9eSpRz1/idhonyjhIsHBREK0ZFk62Vo7GETGXPkRNaYuvzED
- +FZ4aaJzVoGQ2LCX5HfzINhF2L0KzlcUfdbfTzN1MABJTyYvPpkUwg+NegxkIDlebICE
- z5WY4MP6GF+Fa+ljY1/GODgaCRebi+oYg+Rjk4qYF97FZ8gkfgBjEnyvKvapY72GVlMv
- IGLa3u0lsn2uAu9V1iNIOZSd9/TLG14WjjrkTyhBJUYTgJ7EE7gqhEr1Ha/xqjbBaPvH
- KCRuNu7dj+lmPZvE91G14bkgqzrYqcqcE+Ep7EvwH2BHx7JESfP5Xtdu4iYT1QBGslkv
- HKug==
-X-Gm-Message-State: AOAM530fYdYmkNCYvhj5ESysOQplCc7j3RBUSTMf6d0uRi2TbHbGyY/J
- LNJdgQBwjkC5Ct9BWT3uMwvtEzpAEGl2xfDnGqA=
-X-Google-Smtp-Source: ABdhPJwzfzZaimkfJDjSYuzgGgMkdHEzWeoRO4auIFwkJRkX59rLE25c/0KhPqCNP6fJlp3sFTT2m/X+NBv3zd45byo=
-X-Received: by 2002:a92:8e51:: with SMTP id k17mr16682113ilh.270.1604460873500; 
- Tue, 03 Nov 2020 19:34:33 -0800 (PST)
+ bh=aArzmYPVuHcdiBUQ9hkkLj6+Tt19Z3o2MH92xGM3xTU=;
+ b=Azi+6zm65vl5f+E1oXonvHa2hT69/IAmqJOE8/ebhwhPYaE8Qz3tWtn/Q3cYW4u/ij
+ 49vns6K+6e5//qUr+D7mcLVSVDtdodMq/XAKjkYrMJBrIG4T1y/TDzZPMqlL/5Z3IMyo
+ eewczbh93/tYsIjqIcdm5AP8SQpQFrPw1ldZBPwFLW6TrICs0C2/R2+qgoQGg2lsiW0u
+ dBqbYyGGaSS2mxIFTFqud/gr2S4nlB5o0BU60eh0aIBe6heeRFQ5ZxzF/kLWjk7Bmhai
+ 7KNyDSSnSAeqL3hfItPtlCqUjs00wfcfMcuhM5mSGZW2FaTz3sDKQd5g1Vt8eoFVdcOj
+ zH8A==
+X-Gm-Message-State: AOAM532aNr3Pwxeod0es+jm/nLru2W9V99LaiRMj7mpVsSCTKFploCbd
+ tzYX5ULzdxIG6oN03/eG3TtDiqiRIKduDrZOFy0=
+X-Google-Smtp-Source: ABdhPJwdQe+iySUqJ1SQhSXjWRLgmyzQFeE95lWdYGbhE9/VX0fp2GNRGB+7rmCfdIQlnrC7ROCz5nTADdh8Ll9wxC0=
+X-Received: by 2002:a2e:9456:: with SMTP id o22mr815664ljh.210.1604463463061; 
+ Tue, 03 Nov 2020 20:17:43 -0800 (PST)
 MIME-Version: 1.0
-References: <1604053541-27822-1-git-send-email-chenhc@lemote.com>
- <1604053541-27822-2-git-send-email-chenhc@lemote.com>
- <7fdb67f6-edf6-4fe9-6e3b-f2817a3a06f3@amsat.org>
-In-Reply-To: <7fdb67f6-edf6-4fe9-6e3b-f2817a3a06f3@amsat.org>
-From: Huacai Chen <chenhuacai@gmail.com>
-Date: Wed, 4 Nov 2020 11:34:21 +0800
-Message-ID: <CAAhV-H7QB-TQ0ZtW-tSG-EgBRNTtzZNmFsdg=7CzRWnYEYPv5A@mail.gmail.com>
-Subject: Re: [PATCH V16 1/6] target/mips: Fix PageMask with variable page size
+References: <5FA12391.8090400@huawei.com>
+ <a4915556-bc78-a8c4-c887-f53ed14251b6@amsat.org>
+ <02FD0B38-19BC-442F-9DAB-1B56BB8115B0@flygoat.com>
+ <1c3e1462-fdbf-5e2e-6664-28e3ea44b609@amsat.org>
+In-Reply-To: <1c3e1462-fdbf-5e2e-6664-28e3ea44b609@amsat.org>
+From: chen huacai <zltjiangshi@gmail.com>
+Date: Wed, 4 Nov 2020 12:17:31 +0800
+Message-ID: <CABDp7VrEa7hD0hXu-T4iAyVF2vvn_WRg8LiAHrd6wTor7Qt5wQ@mail.gmail.com>
+Subject: Re: [PATCH] hw/intc: Fix incorrect calculation of core in
+ liointc_read() and liointc_write()
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
- envelope-from=chenhuacai@gmail.com; helo=mail-il1-x141.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,118 +99,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: zhengchuan@huawei.com, zhang.zhanghailiang@huawei.com,
+ QEMU <qemu-devel@nongnu.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Markus Armbruster <armbru@redhat.com>, AlexChen <alex.chen@huawei.com>,
+ Huacai Chen <chenhc@lemote.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Phillippe,
+Hi, Philippe and Jiaxun,
 
-On Tue, Nov 3, 2020 at 10:53 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
+On Wed, Nov 4, 2020 at 1:17 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
 >
-> On 10/30/20 11:25 AM, Huacai Chen wrote:
-> > From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> On 11/3/20 4:40 PM, Jiaxun Yang wrote:
+> > =E4=BA=8E 2020=E5=B9=B411=E6=9C=883=E6=97=A5 GMT+08:00 =E4=B8=8B=E5=8D=
+=888:28:27, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> =E5=86=99=E5=88=
+=B0:
+> >> On 11/3/20 10:32 AM, AlexChen wrote:
+> >>> According to the loongson spec
+> >>> (http://www.loongson.cn/uploadfile/cpu/3B1500/Loongson_3B1500_cpu_use=
+r_1.pdf)
+> >>> and the macro definition(#define R_PERCORE_ISR(x) (0x40 + 0x8 * x)), =
+we know
+> >>> that the ISR size of per CORE is 8, so here we need to divide
+> >>> (addr - R_PERCORE_ISR(0)) by 8, not 4.
+> >>>
+> >>> Reported-by: Euler Robot <euler.robot@huawei.com>
+> >>> Signed-off-by: Alex Chen <alex.chen@huawei.com>
+> >>> ---
+> >>>  hw/intc/loongson_liointc.c | 4 ++--
+> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> For a model added in 2020, its code style is a bit
+> >> disappointing (leading to that kind of hidden bugs).
+> >> I'm even surprised it passed the review process.
+> >>
+> >> Thanks for the fix.
+> >>
+> >> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > >
-> > Our current code assumed the target page size is always 4k
-> > when handling PageMask and VPN2, however, variable page size
-> > was just added to mips target and that's no longer true.
-> >
-> > Fixes: ee3863b9d414 ("target/mips: Support variable page size")
-> > Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > ---
-> >  target/mips/cp0_helper.c | 36 +++++++++++++++++++++++++++++-------
-> >  target/mips/cpu.h        |  1 +
-> >  2 files changed, 30 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-> > index 12143ac..d90ddd9 100644
-> > --- a/target/mips/cp0_helper.c
-> > +++ b/target/mips/cp0_helper.c
-> > @@ -892,13 +892,31 @@ void helper_mtc0_memorymapid(CPUMIPSState *env, t=
-arget_ulong arg1)
-> >
-> >  void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pa=
-gemask)
-> >  {
-> > -    uint64_t mask =3D arg1 >> (TARGET_PAGE_BITS + 1);
-> > -    if (!(env->insn_flags & ISA_MIPS32R6) || (arg1 =3D=3D ~0) ||
-> > -        (mask =3D=3D 0x0000 || mask =3D=3D 0x0003 || mask =3D=3D 0x000=
-F ||
-> > -         mask =3D=3D 0x003F || mask =3D=3D 0x00FF || mask =3D=3D 0x03F=
-F ||
-> > -         mask =3D=3D 0x0FFF || mask =3D=3D 0x3FFF || mask =3D=3D 0xFFF=
-F)) {
-> > -        env->CP0_PageMask =3D arg1 & (0x1FFFFFFF & (TARGET_PAGE_MASK <=
-< 1));
-> > +    unsigned long mask;
-> > +    int maskbits;
-> > +
-> > +    if (env->insn_flags & ISA_MIPS32R6) {
-> > +        return;
-> > +    }
-> > +    /* Don't care MASKX as we don't support 1KB page */
-> > +    mask =3D extract32((uint32_t)arg1, CP0PM_MASK, 16);
-> > +    maskbits =3D find_first_zero_bit(&mask, 32);
-> > +
-> > +    /* Ensure no more set bit after first zero */
-> > +    if (mask >> maskbits) {
-> > +        goto invalid;
-> > +    }
-> > +    /* We don't support VTLB entry smaller than target page */
-> > +    if ((maskbits + 12) < TARGET_PAGE_BITS) {
-> > +        goto invalid;
-> >      }
-> > +    env->CP0_PageMask =3D mask << CP0PM_MASK;
-> > +
-> > +    return;
-> > +
-> > +invalid:
-> > +    /* When invalid, set to default target page size. */
-> > +    env->CP0_PageMask =3D (~TARGET_PAGE_MASK >> 12) << CP0PM_MASK;
-> >  }
+> > It was my proof of concept code.
 >
-> I was going to queue this patch for 5.2-rc1, but it fails all
-> I6400 tests...
+> Don't worry Jiaxun, this comment is not to you, but to
+> the QEMU community as a whole. We should have asked
+> improvements during review, and explain what could be
+> improve, what is not the best style but acceptable,
+> and what is good.
 >
->   Linux version 4.7.0-rc1-dirty (root@2e66df87a9ff) (gcc version 6.3.0
-> 20170516 (Debian 6.3.0-18) ) #1 SMP Sat Feb 1 18:38:13 UTC 2020
->   GCRs appear to have been moved (expected them at 0x1fbf8000)!
->   earlycon: uart8250 at I/O port 0x3f8 (options '38400n8')
->   bootconsole [uart8250] enabled
->   MIPS CPS SMP unable to proceed without a CM
->   CPU0 revision is: 0001a900 (MIPS I6400)
->   FPU revision is: 20f30300
->   MSA revision is: 00000300
->   MIPS: machine is mti,malta
->   Software DMA cache coherency enabled
->   Determined physical RAM map:
->   memory: 0000000008000000 @ 0000000000000000 (usable)
->   Zone ranges:
->   DMA      [mem 0x0000000000000000-0x0000000000ffffff]
->   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
->   Normal   empty
->   Movable zone start for each node
->   Early memory node ranges
->   node   0: [mem 0x0000000000000000-0x0000000007ffffff]
->   Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
->   Primary instruction cache 64kB, VIPT, 4-way, linesize 64 bytes.
->   Primary data cache 64kB, 4-way, VIPT, no aliases, linesize 64 bytes
->   percpu: Embedded 5 pages/cpu @980000000107c000 s29664 r8192 d44064 u819=
-20
->   Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 81=
-63
->   Kernel command line: clocksource=3DGIC console=3Dtty0 console=3DttyS0
->   PID hash table entries: 512 (order: -2, 4096 bytes)
->   Dentry cache hash table entries: 16384 (order: 3, 131072 bytes)
->   Inode-cache hash table entries: 8192 (order: 2, 65536 bytes)
->   Kernel panic - not syncing: MMU doesn't support PAGE_SIZE=3D0x4000
-OK, let's investigate it.
+> > Any suggestions on enhancement?
+> > I'll have some free time afterwards so probably can do something.
+>
+> It is a bit awkward to not comment on a patch (diff).
+> Comment I'd have made:
+>
+> - Add definition for 0x8 magic value in R_PERCORE_ISR()
+> - Replace R_PERCORE_ISR() macro my function
+> - Replace dead D() code by trace events
+> - Use a simple 32-bit implementation (pic_ops.impl.min/max =3D 4)
+>   to let the generic memory code deal with the 8-bit accesses
+>   to mapper[].
+>
+> If you have time, today what would be more useful is to have
+> tests for the Loongson-3 board.
+As you suggested, LOONGSON_LIOINTC will be used in loongson3_virt.c
+and it is defined in a .c file now, so this is a chance for me to
+rework liointc.
 
 Huacai
+>
+> You can see some examples with the Malta board in the repository:
+>
+> $ git-grep malta tests/acceptance/
+>
+> Regards,
+>
+> Phil.
+>
+
+
+--=20
+Huacai Chen
 
