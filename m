@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83EDFC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 807EFC4742C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:56:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03B2D2072C
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:56:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE42A20780
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:56:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XVdRFqo0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03B2D2072C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="flQxvzM3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE42A20780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaAqI-0005BA-23
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 23:56:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59094)
+	id 1kaAqJ-0005Gg-T5
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 23:56:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAl9-0005To-Iw
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:50:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34578)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAm3-0006aF-5r
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:51:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29768)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAl7-0004MV-Su
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:50:59 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAm1-0004io-CC
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:51:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604465456;
+ s=mimecast20190719; t=1604465512;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=aiHSSZpWVmtRhYn18w/DUuKk+CQD6Uz5cJmFPDvNuls=;
- b=XVdRFqo0Im53KZbAeyZkMjLckdirJs6harZaqtjthTHB/2QHyIDiJWeyM5RUpnjFzC5O/D
- uGqpszM1iroN2hMZgB6OiulWlnWjSOreTrYr2kuuJh/A3M42Kvk0rTNyTI7FsNoepfibWs
- I/XwzCv8mm3XUQ0QHB88kkX2TERLmU8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-EXnVke99PNe2PjaGMcoKlg-1; Tue, 03 Nov 2020 23:50:54 -0500
-X-MC-Unique: EXnVke99PNe2PjaGMcoKlg-1
-Received: by mail-wr1-f72.google.com with SMTP id e11so1221718wrw.14
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:50:52 -0800 (PST)
+ bh=g3L/0LWUS5AALGZ/Ad9jPepioK718BBOf2ilNljz6+w=;
+ b=flQxvzM3w4rF0Y9gEaSGx0dD6rYGi47oQQlK9ZoNPV0LpQUdoXV3W5TpBMojJj0SldypGc
+ Yy1CNA4HVcsfo/UecYEoTG6YZL2FiXMZSA9aN74qnGYHLvFT61npktZulS1vADY2ZMfKl+
+ JzSas7uQDTn7Cu6HncYa1W6MaiZEX0E=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-94-_KzJ-3paOGuIStQF4wjacQ-1; Tue, 03 Nov 2020 23:51:10 -0500
+X-MC-Unique: _KzJ-3paOGuIStQF4wjacQ-1
+Received: by mail-wr1-f71.google.com with SMTP id w1so8714959wrr.5
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:51:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=aiHSSZpWVmtRhYn18w/DUuKk+CQD6Uz5cJmFPDvNuls=;
- b=XyFzSy7CMqfWVjALXCaUpa6qdCYyR+o5LdNFKrA1wG7wVpaD92a3WzCHYSGRPKBrrc
- yknuVRL/C9ap/In7rXmAaDXsUDxdrY7HK/zmmyY6R+yGJpkOAmt/adGicR4sDlVDXc5W
- B/Yso+B8bbY0OgG0WYFhiINqRlE0m3h9ouzNUcLgGKQmew0p609VpKe0xsv+dOsDjihX
- 09Kgxk12+4bFWKgXc8A9/OgcDJWjXIsiUoK7UFx17yfI+SQDaOaOZ8RLrHnlS/wtmChW
- K3GF2Bs4sCDAstNpWtfwV6gjhKcPw8sLR4vwGweQDlVsIjvro9hQC4c8ikWTgl+I3i7s
- jm4A==
-X-Gm-Message-State: AOAM531x1Ks7uTrsQwXbv8feED5NyW5lKuwQjzVFNlpKU13qGbACWzr+
- 8IghsAH5W465j+cvvzkxHuUou9CIWxChrL38UZ+R5ygRYpEgqWF5tlCbKGcUcCvI4HFQvACGVMw
- 7BvphxpVzePmsFCo=
-X-Received: by 2002:a5d:63cb:: with SMTP id c11mr28127011wrw.243.1604465451615; 
- Tue, 03 Nov 2020 20:50:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzWBU6G6H7aKVRlvxEpplsVFD3joQUH1nzVqW7v0tMF4otcMd0D9boa0u1yAv3wzU4S0mgeAg==
-X-Received: by 2002:a5d:63cb:: with SMTP id c11mr28127005wrw.243.1604465451504; 
- Tue, 03 Nov 2020 20:50:51 -0800 (PST)
+ bh=g3L/0LWUS5AALGZ/Ad9jPepioK718BBOf2ilNljz6+w=;
+ b=mblzNz+Vhi23+MtolHvgtojyqJSrzQbvu//HunBYdkblpSu5zEvmuJmlXfPf5adJl2
+ dnIqbktFJuA43HLEMTqwHiO8RipuxvC7koaOiPTh1V5A8Wwqxcv98NWZ7oGqZFSpqxoK
+ MEGxlkIZqzArI0oZE7HTYOth0hxCnKhwi097VBeEapJhVqW0n3KOiyIkWYVkm2oyehOd
+ KOYDQouTeJ8JGFqF6k6X3kbJq7eDzq/zR/8SUbU5wLYNhwy3nY81NkHtLhzfHCIw+DE2
+ yQrH2fsJ0xy1IdMJW/8TfZqNvhHP5+cyFPZSjpbYp78OiHMWBWwvMVRn/39bZJspqXAK
+ K7gw==
+X-Gm-Message-State: AOAM533nTRn3fOeMNsLR3l8oi2ou0OPfyQjdec6SxL2z12tYwKndvbL4
+ cIvlCZaMF8y1mNfWcBecRc1JwN+88vaMVCvG3HMpKNh14UnfR7r8nk9Rzd6yWq3j5i9MIJXVmix
+ mQiDtHr1iiTdf5iU=
+X-Received: by 2002:adf:e7c1:: with SMTP id e1mr31495182wrn.247.1604465469271; 
+ Tue, 03 Nov 2020 20:51:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwRH3fz1EdqaZqIaBRvcNUlor68i3/UCN/rSCzQqduO81twNUfv8PSUMdTc7o/gD/8zO/BIiw==
+X-Received: by 2002:adf:e7c1:: with SMTP id e1mr31495176wrn.247.1604465469165; 
+ Tue, 03 Nov 2020 20:51:09 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id j9sm859958wrp.59.2020.11.03.20.50.49
+ by smtp.gmail.com with ESMTPSA id f17sm838368wmf.41.2020.11.03.20.51.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 20:50:50 -0800 (PST)
-Date: Tue, 3 Nov 2020 23:50:49 -0500
+ Tue, 03 Nov 2020 20:51:08 -0800 (PST)
+Date: Tue, 3 Nov 2020 23:51:06 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 03/38] virtio-mem: Make sure "usable_region_size" is always
- multiples of the block size
-Message-ID: <20201104044937.226370-4-mst@redhat.com>
+Subject: [PULL v2 09/38] hw/acpi : add space before the open parenthesis '('
+Message-ID: <20201104044937.226370-10-mst@redhat.com>
 References: <20201104044937.226370-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
@@ -111,54 +110,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- David Hildenbrand <david@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
+ Igor Mammedov <imammedo@redhat.com>, Kai Deng <dengkai1@huawei.com>,
+ Xinhao Zhang <zhangxinhao1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Xinhao Zhang <zhangxinhao1@huawei.com>
 
-The spec states:
-  "The device MUST set addr, region_size, usable_region_size, plugged_size,
-   requested_size to multiples of block_size."
+Fix code style. Space required before the open parenthesis '('.
 
-With block sizes > 256MB, we currently wouldn't guarantee that for the
-usable_region_size.
-
-Note that we cannot exceed the region_size, as we already enforce the
-alignment there properly.
-
-Fixes: 910b25766b33 ("virtio-mem: Paravirtualized memory hot(un)plug")
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20201008083029.9504-3-david@redhat.com>
+Signed-off-by: Xinhao Zhang <zhangxinhao1@huawei.com>
+Signed-off-by: Kai Deng <dengkai1@huawei.com>
+Message-Id: <20201103102634.273021-2-zhangxinhao1@huawei.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-mem.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/acpi/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index 70200b4eac..461ac68ee8 100644
---- a/hw/virtio/virtio-mem.c
-+++ b/hw/virtio/virtio-mem.c
-@@ -227,6 +227,9 @@ static void virtio_mem_resize_usable_region(VirtIOMEM *vmem,
-     uint64_t newsize = MIN(memory_region_size(&vmem->memdev->mr),
-                            requested_size + VIRTIO_MEM_USABLE_EXTENT);
- 
-+    /* The usable region size always has to be multiples of the block size. */
-+    newsize = QEMU_ALIGN_UP(newsize, vmem->block_size);
-+
-     if (!requested_size) {
-         newsize = 0;
-     }
+diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+index ade9158cbf..2c0c83221f 100644
+--- a/hw/acpi/core.c
++++ b/hw/acpi/core.c
+@@ -558,7 +558,7 @@ static void acpi_pm1_cnt_write(ACPIREGS *ar, uint16_t val)
+     if (val & ACPI_BITMASK_SLEEP_ENABLE) {
+         /* change suspend type */
+         uint16_t sus_typ = (val >> 10) & 7;
+-        switch(sus_typ) {
++        switch (sus_typ) {
+         case 0: /* soft power off */
+             qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+             break;
 -- 
 MST
 
