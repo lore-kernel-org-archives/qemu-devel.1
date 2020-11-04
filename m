@@ -2,102 +2,89 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8381DC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB2AC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:05:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 321FB22206
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:57:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 321FB22206
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 50304221F9
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:05:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7aZfOzj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50304221F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaFXd-0000gP-1e
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 04:57:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60030)
+	id 1kaFf8-0003Lc-AN
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 05:05:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36350)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kaFTN-0008Af-Le; Wed, 04 Nov 2020 04:52:57 -0500
-Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:39855)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kaFTI-0006BN-83; Wed, 04 Nov 2020 04:52:57 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.west.internal (Postfix) with ESMTP id 9EC9D10C7;
- Wed,  4 Nov 2020 04:52:48 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute4.internal (MEProxy); Wed, 04 Nov 2020 04:52:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=X8atgD/uMb+jgMSqV5vGtBM4mGz
- x6MXR+57P1ud1c+Q=; b=KM19eSFPQaN08SB7z69WVmI9oIw/Ra2lYmcAsAkwtLw
- TotjH5XDrkuQlX82ONBB7peGRInj7I/iurBhGgQ37tlcM/XK9CMrwQ2xpIVBroOr
- 1gzTxaSi+YMmqFQkJjk3WVtUyG8AUGZ4GQWxJUWrL6TuaSoPgXrWe+BioUMCixBJ
- OZgWaHifaTKZdH2RpGKLkM4QVtTzXbeTgkrtxhL8JI59Oh/SfthsufPhYxz5gx0h
- vdYTNajPsFWffC6B9UL/7k9jePq0K8JhjxHZ7CFehdxxUmpHefd0+QD0hYNaHDUE
- JvtGXKpCiCy847VFrqZACvijknnPSksmoPIR2rTBhDg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=X8atgD
- /uMb+jgMSqV5vGtBM4mGzx6MXR+57P1ud1c+Q=; b=hDeP2RnFMyKoDgBhlG9nIx
- 19gtkNW1ocPiajQup5GaZLNvNTtMscoSOMj7KOVkP3D+9t23GAizfqbrYHcX9SF/
- wTuVmM2asJLMs/HkgDVj/BMUjJXRBm0yfFS+E/+xspuWGyitxZftCzJfFjVLzLT4
- gKhJzi2Xk5/p1huoFcTgebF2dE0Pf3qE/dn6fvfZmWbCAekkF+qsv1ahAPD93ry7
- +UMPEfTZfgbH8aLHHlTL58q08LGxCJ+XS2LKsCTitWFB41eyteJya3ZKDWF5wZ3t
- UIKY6lWyqosx2hVcMgDoQGLc4vhnhoZP/xhf2IzVberI4jB/hcQ8rlrtl4Bo8ldQ
- ==
-X-ME-Sender: <xms:73miX8XzUTuQH9Gi6s8w8uHTVQuo_hk2ALcz7nzvCDwDsncnASM0IA>
- <xme:73miXwnlebpjn_Bhtoo9sYVNuDo-R-ZAQ3B69Clu4fxULDUJDX40BkLRMVp5kxGNF
- WyVrzD7gDONKgOO1Oo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedruddthedguddtucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:73miXwbzWNP6EDzb5olVmY98YjlHQU1G5Dhgf-amdeGQofE00eMUJQ>
- <xmx:73miX7VJoml88ZRavTqUzyJX7CSQ7QRVGKD1HZUVV5czlhoCBOgqcQ>
- <xmx:73miX2nEce3mQSqe7zoxoAX56MPEXTio3PvST-sC7osFnqQbrkY2pA>
- <xmx:8HmiX9ucIsWflJHjcgDiP5L0P7M0X472LaQ516Bk5JH__fX9RW-M-A>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 392373064686;
- Wed,  4 Nov 2020 04:52:46 -0500 (EST)
-Date: Wed, 4 Nov 2020 10:52:44 +0100
-From: Klaus Jensen <its@irrelevant.dk>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PULL 18/30] hw/block/nvme: update nsid when registered
-Message-ID: <20201104095244.GA13336@apples.localdomain>
-References: <20201027104932.558087-1-its@irrelevant.dk>
- <20201027104932.558087-19-its@irrelevant.dk>
- <eb0b8a08-d5c4-1bde-f278-58f0c3d0ef05@redhat.com>
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kaFeH-0002sQ-9T
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:04:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23021)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kaFeE-0008NT-7c
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:04:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604484246;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XRXeG1Qh2/Dw8KSDThSFS17XFtND6Nn3OPIgbKhtInc=;
+ b=J7aZfOzjynKI7ZkaC6XZbs95YyIhC16qLDMCIpsdEwLBj0CxcEDEC16wLmO9C0LPq82czL
+ VFaFbuLXb8QVxMeS+zhQq5hCbGhIylFuLL4GCqPU00Qc2AiD+qEqkTeem1kWn08W7Nu++d
+ uUfZhLXWu+gs5iNWxL7t/A6n/+m+mi0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-512-KZCmWdvLPc-yyJREetU5fA-1; Wed, 04 Nov 2020 05:04:02 -0500
+X-MC-Unique: KZCmWdvLPc-yyJREetU5fA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08B281882FAB;
+ Wed,  4 Nov 2020 10:04:01 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 16B841002C2B;
+ Wed,  4 Nov 2020 10:03:59 +0000 (UTC)
+Date: Wed, 4 Nov 2020 11:03:57 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 48/48] hw/timer/armv7m_systick: Rewrite to use ptimers
+Message-ID: <20201104100357.7t4nnwqot6ahprrh@kamzik.brq.redhat.com>
+References: <20201027114438.17662-1-peter.maydell@linaro.org>
+ <20201027114438.17662-49-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="mP3DRpeJDSE+ciuQ"
+In-Reply-To: <20201027114438.17662-49-peter.maydell@linaro.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <eb0b8a08-d5c4-1bde-f278-58f0c3d0ef05@redhat.com>
-Received-SPF: pass client-ip=64.147.123.20; envelope-from=its@irrelevant.dk;
- helo=wout4-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 04:52:49
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=drjones@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,71 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Keith Busch <kbusch@kernel.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Oct 27, 2020 at 11:44:38AM +0000, Peter Maydell wrote:
+> The armv7m systick timer is a 24-bit decrementing, wrap-on-zero,
+> clear-on-write counter. Our current implementation has various
+> bugs and dubious workarounds in it (for instance see
+> https://bugs.launchpad.net/qemu/+bug/1872237).
+> 
+> We have an implementation of a simple decrementing counter
+> and we put a lot of effort into making sure it handles the
+> interesting corner cases (like "spend a cycle at 0 before
+> reloading") -- ptimer.
+> 
+> Rewrite the systick timer to use a ptimer rather than
+> a raw QEMU timer.
+> 
+> Unfortunately this is a migration compatibility break,
+> which will affect all M-profile boards.
+> 
+> Among other bugs, this fixes
+> https://bugs.launchpad.net/qemu/+bug/1872237 :
+> now writes to SYST_CVR when the timer is enabled correctly
+> do nothing; when the timer is enabled via SYST_CSR.ENABLE,
+> the ptimer code will (because of POLICY_NO_IMMEDIATE_RELOAD)
+> arrange that after one timer tick the counter is reloaded
+> from SYST_RVR and then counts down from there, as the
+> architecture requires.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Message-id: 20201015151829.14656-3-peter.maydell@linaro.org
+> ---
+>  include/hw/timer/armv7m_systick.h |   3 +-
+>  hw/timer/armv7m_systick.c         | 124 +++++++++++++-----------------
+>  2 files changed, 54 insertions(+), 73 deletions(-)
+>
 
---mP3DRpeJDSE+ciuQ
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Do we also need something like the diff below now?
 
-On Nov  4 10:32, Max Reitz wrote:
-> On 27.10.20 11:49, Klaus Jensen wrote:
-> > From: Klaus Jensen <k.jensen@samsung.com>
-> >=20
-> > If the user does not specify an nsid parameter on the nvme-ns device,
-> > nvme_register_namespace will find the first free namespace id and assign
-> > that.
-> >=20
-> > This fix makes sure the assigned id is saved.
-> >=20
-> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> > Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> > ---
-> >  hw/block/nvme.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > index 5768a6804f41..2225b944f935 100644
-> > --- a/hw/block/nvme.c
-> > +++ b/hw/block/nvme.c
-> > @@ -2578,7 +2578,7 @@ int nvme_register_namespace(NvmeCtrl *n, NvmeName=
-space *ns, Error **errp)
-> >          for (int i =3D 1; i <=3D n->num_namespaces; i++) {
-> >              NvmeNamespace *ns =3D nvme_ns(n, i);
-> >              if (!ns) {
-> > -                nsid =3D i;
-> > +                nsid =3D ns->params.nsid =3D i;
->=20
-> Coverity reports that @ns is NULL here.  I think the problem is that we
-> want to access the *ns given to nvme_register_namespace() here, but it=E2=
-=80=99s
-> shadowed by another @ns in this for () loop.
->=20
 
-Sure enough. Thanks!
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index fdf4464b9484..7d5d89e1acf9 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -291,6 +291,7 @@ config ZYNQ
+ 
+ config ARM_V7M
+     bool
++    select PTIMER
+ 
+ config ALLWINNER_A10
+     bool
 
-I'll send a fix.
 
---mP3DRpeJDSE+ciuQ
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks,
+drew
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+ieecACgkQTeGvMW1P
-Dem89Qf/RE3fzy5ZXTWB2I/Po9toqQ6SwRPDocKZ7BiWgmEtvj562vyqMxByY+UE
-oXVcpU08p17ZubwuznHPUFA+rRa+8fbCH2YImcNTbXRItBlcjpCI7svoMvZDZfx5
-QD4cyat71T9UhirEAIggFTaisegm6ky625oAe37GZNsCZ8/vJ0goit/ddCVWjwSb
-1ZYCRYcVL5wUhc+usOVdJAu47MibPWB5tMyBq77uZHkGtJlSVzuzCE2e/FmZIz2g
-jz40P5KjXgFups6m210gPuHL7Y0XtbSf76mHkd1Q1epdkq6l4H+CkeAjFmeRJ9YE
-XNId3NIrypOqN+Oj+XbmkQ5iJyENIA==
-=C1PD
------END PGP SIGNATURE-----
-
---mP3DRpeJDSE+ciuQ--
 
