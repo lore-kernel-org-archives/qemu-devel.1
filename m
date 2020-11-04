@@ -2,91 +2,101 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66660C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:18:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB6E5C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:52:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD18C2236F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:18:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C04B92080C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:52:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HT7Jfskn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD18C2236F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mtv2DFmJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C04B92080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaAFu-0002Oo-B3
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 23:18:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53122)
+	id 1kaAmL-0006Xl-MY
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 23:52:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kaAF1-0001xD-Nk
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:17:47 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36943)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kaAEz-0000sZ-PE
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:17:47 -0500
-Received: by mail-lj1-x241.google.com with SMTP id l10so501280lji.4
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:17:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=aArzmYPVuHcdiBUQ9hkkLj6+Tt19Z3o2MH92xGM3xTU=;
- b=HT7JfskntJ5MpARy8sj5wZ1LLumq8O05cUjoOgMA0FfCamLhSHRQAcvsq2jMV0Ee92
- OklWNtHIVmvcVU2x3pRlKglmVcp2jz3GAPKnb5F2sNCaIJTEqZZXj4UdkKnhfBOw7tzZ
- Yrb9SWVjD+nMH6S29IMBeuQYurRa61zguWB5mzwHF4OjYfymtO6jmXaWCSLa4pHHo7Bi
- lBa7wZwRjJlzH4FDYUnZiUmri34fXVKfRz2FYNdxTohB1DkZznepkJWdvAlp4nZgNT+v
- TK94wmKcQQEaW3qVQTwNZiZ+7hxBfEgTUQoBTxON+Pd7J8BqFxmjZVovsyMSIG0yCwS5
- zMEA==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAl1-0005Gx-HA
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:50:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31967)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAkz-0004G7-G1
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:50:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604465448;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=h0heXC8AZt7eXzCvDvOmqsibMEQ+v+zzRIJ+pXZVz+w=;
+ b=Mtv2DFmJVLZwa7O3SAkBYgj3z5YbvdqlbWzRVgUigCtclKYhoACFWZ1d/Vk9syQr7xyguD
+ ngpmBFhSNnE9KkvqbbcSJ6BGYGqdOegEwR5C4OLub+olYDT7BPO64yzbCPVnKqeMSkCwCd
+ vPlN4kOLnUosyzcO+Ou5MVmQq9j28P8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-91-mzhFKT23P-aRPJiB6CRmTw-1; Tue, 03 Nov 2020 23:50:47 -0500
+X-MC-Unique: mzhFKT23P-aRPJiB6CRmTw-1
+Received: by mail-wr1-f71.google.com with SMTP id w3so6590269wrt.11
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:50:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=aArzmYPVuHcdiBUQ9hkkLj6+Tt19Z3o2MH92xGM3xTU=;
- b=Azi+6zm65vl5f+E1oXonvHa2hT69/IAmqJOE8/ebhwhPYaE8Qz3tWtn/Q3cYW4u/ij
- 49vns6K+6e5//qUr+D7mcLVSVDtdodMq/XAKjkYrMJBrIG4T1y/TDzZPMqlL/5Z3IMyo
- eewczbh93/tYsIjqIcdm5AP8SQpQFrPw1ldZBPwFLW6TrICs0C2/R2+qgoQGg2lsiW0u
- dBqbYyGGaSS2mxIFTFqud/gr2S4nlB5o0BU60eh0aIBe6heeRFQ5ZxzF/kLWjk7Bmhai
- 7KNyDSSnSAeqL3hfItPtlCqUjs00wfcfMcuhM5mSGZW2FaTz3sDKQd5g1Vt8eoFVdcOj
- zH8A==
-X-Gm-Message-State: AOAM532aNr3Pwxeod0es+jm/nLru2W9V99LaiRMj7mpVsSCTKFploCbd
- tzYX5ULzdxIG6oN03/eG3TtDiqiRIKduDrZOFy0=
-X-Google-Smtp-Source: ABdhPJwdQe+iySUqJ1SQhSXjWRLgmyzQFeE95lWdYGbhE9/VX0fp2GNRGB+7rmCfdIQlnrC7ROCz5nTADdh8Ll9wxC0=
-X-Received: by 2002:a2e:9456:: with SMTP id o22mr815664ljh.210.1604463463061; 
- Tue, 03 Nov 2020 20:17:43 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=h0heXC8AZt7eXzCvDvOmqsibMEQ+v+zzRIJ+pXZVz+w=;
+ b=G1eTEVq3RKi1bAqCSlkPopjHlk2mbN7fK1wTvz8SYUchCCV1dgAbQFYgs+RDi3DuuF
+ BwlX1pmW7uJeMDMAWB282+kOUe5Bnu/sWl8g+OwpXInwCCmKxFS5Y3OuSzpcH4+QPSax
+ P4EAe5dbA0RoboHU/BUncsPFtVvQFV40VxDiKrXdRcEguwk3vsMXy1rVPY0FSmZCVg8q
+ 9iepAgioxNpyGU9O/esB65hereEiAx01WoGOefVIW22VVMbjsrM1YWamCoYlbdbA5IgJ
+ pq+gikoqAlDIQ0T2r8YajrpBA+6WSlMXedS5P7hWrQDz9qq/etMBJ0qrXlWHXxvP9pJv
+ WJVw==
+X-Gm-Message-State: AOAM531BsbQCVInANCQSUGm2b0dG5PAv07eAEnlludRpYp41ioYXAnOp
+ rD1iRgxNR1lxFOl4xwjBntu+v5Noqqbr67TDye6Pqy6s3ZpjPDSYocCKplK/jLajxOQm73NiRYr
+ t/GnzwBLaSSqg/R4=
+X-Received: by 2002:adf:f142:: with SMTP id y2mr29293504wro.160.1604465446226; 
+ Tue, 03 Nov 2020 20:50:46 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwR8fS79irP/yMcqEEsTB+znKS1JR1WXzlvmNG1CDNAANTzslmkfifgBTPhApTG3c0iiAJIPQ==
+X-Received: by 2002:adf:f142:: with SMTP id y2mr29293487wro.160.1604465446008; 
+ Tue, 03 Nov 2020 20:50:46 -0800 (PST)
+Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
+ by smtp.gmail.com with ESMTPSA id q2sm881069wrw.40.2020.11.03.20.50.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Nov 2020 20:50:45 -0800 (PST)
+Date: Tue, 3 Nov 2020 23:50:43 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 01/38] pc: comment style fixup
+Message-ID: <20201104044937.226370-2-mst@redhat.com>
+References: <20201104044937.226370-1-mst@redhat.com>
 MIME-Version: 1.0
-References: <5FA12391.8090400@huawei.com>
- <a4915556-bc78-a8c4-c887-f53ed14251b6@amsat.org>
- <02FD0B38-19BC-442F-9DAB-1B56BB8115B0@flygoat.com>
- <1c3e1462-fdbf-5e2e-6664-28e3ea44b609@amsat.org>
-In-Reply-To: <1c3e1462-fdbf-5e2e-6664-28e3ea44b609@amsat.org>
-From: chen huacai <zltjiangshi@gmail.com>
-Date: Wed, 4 Nov 2020 12:17:31 +0800
-Message-ID: <CABDp7VrEa7hD0hXu-T4iAyVF2vvn_WRg8LiAHrd6wTor7Qt5wQ@mail.gmail.com>
-Subject: Re: [PATCH] hw/intc: Fix incorrect calculation of core in
- liointc_read() and liointc_write()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=zltjiangshi@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,85 +109,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhengchuan@huawei.com, zhang.zhanghailiang@huawei.com,
- QEMU <qemu-devel@nongnu.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Markus Armbruster <armbru@redhat.com>, AlexChen <alex.chen@huawei.com>,
- Huacai Chen <chenhc@lemote.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Philippe and Jiaxun,
+Fix up checkpatch comment style warnings.
 
-On Wed, Nov 4, 2020 at 1:17 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->
-> On 11/3/20 4:40 PM, Jiaxun Yang wrote:
-> > =E4=BA=8E 2020=E5=B9=B411=E6=9C=883=E6=97=A5 GMT+08:00 =E4=B8=8B=E5=8D=
-=888:28:27, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> =E5=86=99=E5=88=
-=B0:
-> >> On 11/3/20 10:32 AM, AlexChen wrote:
-> >>> According to the loongson spec
-> >>> (http://www.loongson.cn/uploadfile/cpu/3B1500/Loongson_3B1500_cpu_use=
-r_1.pdf)
-> >>> and the macro definition(#define R_PERCORE_ISR(x) (0x40 + 0x8 * x)), =
-we know
-> >>> that the ISR size of per CORE is 8, so here we need to divide
-> >>> (addr - R_PERCORE_ISR(0)) by 8, not 4.
-> >>>
-> >>> Reported-by: Euler Robot <euler.robot@huawei.com>
-> >>> Signed-off-by: Alex Chen <alex.chen@huawei.com>
-> >>> ---
-> >>>  hw/intc/loongson_liointc.c | 4 ++--
-> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>
-> >> For a model added in 2020, its code style is a bit
-> >> disappointing (leading to that kind of hidden bugs).
-> >> I'm even surprised it passed the review process.
-> >>
-> >> Thanks for the fix.
-> >>
-> >> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> >
-> > It was my proof of concept code.
->
-> Don't worry Jiaxun, this comment is not to you, but to
-> the QEMU community as a whole. We should have asked
-> improvements during review, and explain what could be
-> improve, what is not the best style but acceptable,
-> and what is good.
->
-> > Any suggestions on enhancement?
-> > I'll have some free time afterwards so probably can do something.
->
-> It is a bit awkward to not comment on a patch (diff).
-> Comment I'd have made:
->
-> - Add definition for 0x8 magic value in R_PERCORE_ISR()
-> - Replace R_PERCORE_ISR() macro my function
-> - Replace dead D() code by trace events
-> - Use a simple 32-bit implementation (pic_ops.impl.min/max =3D 4)
->   to let the generic memory code deal with the 8-bit accesses
->   to mapper[].
->
-> If you have time, today what would be more useful is to have
-> tests for the Loongson-3 board.
-As you suggested, LOONGSON_LIOINTC will be used in loongson3_virt.c
-and it is defined in a .c file now, so this is a chance for me to
-rework liointc.
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Chen Qun <kuhn.chenqun@huawei.com>
+---
+ hw/i386/pc.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Huacai
->
-> You can see some examples with the Malta board in the repository:
->
-> $ git-grep malta tests/acceptance/
->
-> Regards,
->
-> Phil.
->
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 5e6c0023e0..17b514d1da 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1149,10 +1149,11 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+             error_report("couldn't create HPET device");
+             exit(1);
+         }
+-        /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
+-            * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
+-            * IRQ8 and IRQ2.
+-            */
++        /*
++         * For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7 and
++         * earlier, use IRQ2 for compat. Otherwise, use IRQ16~23, IRQ8 and
++         * IRQ2.
++         */
+         uint8_t compat = object_property_get_uint(OBJECT(hpet),
+                 HPET_INTCAP, NULL);
+         if (!compat) {
+-- 
+MST
 
-
---=20
-Huacai Chen
 
