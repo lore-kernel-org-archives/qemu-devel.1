@@ -2,73 +2,91 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F7F2C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9182C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 11:01:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 787C220867
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:59:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A18820780
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 11:01:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="T5Ejha61"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 787C220867
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gYYJKyvp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A18820780
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaGVf-0001lA-8g
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 05:59:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47250)
+	id 1kaGXo-00043A-Tt
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 06:01:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kaGUT-0000HF-BQ
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:58:11 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:51317)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kaGUO-0006Sr-V6
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:58:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=BuusXKipO9sV7IbeGX/ke1Pbc6tpoFRGsBHLpw4lasc=; b=T5Ejha61cF9Kpw4lq2xBLpp6sb
- PLWT2yj9xw5zzBw5KhERTduXDHYOOW5NmjrJ71DXTwusZbGM5wm592EuyurzImfb730TM/L7RFwvp
- K2XfxKEQ5fTrlC6emp3vUebDFmuxdKk89R3sOu6MH927uzx/g1QE+b4j1zDZOUhPXaTmuLSuLqnPd
- +oooQlfJ0gPVW4uBGPEREm+j6yFQBte6WjXKhSd/jRbSt1gZVaWUCVXBrLuEtvva7s6ES3O2bKz/x
- LUP+QnWgZTHDqbfG+zEC8wdWOn8B9dF43UX99kPpxEqY68LzhtgGYPfpodw5W3Zrck26Doq0/JO0I
- czfLvslw==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Bin Meng <bmeng.cn@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Bin Meng <bin.meng@windriver.com>, Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] hw/9pfs: virtio-9p: Ensure config space is a multiple of
- 4 bytes
-Date: Wed, 04 Nov 2020 11:57:59 +0100
-Message-ID: <10842894.6D7ucCyY7K@silver>
-In-Reply-To: <CAEUhbmUxHkvZ_CimzeAGwgZVNSH7OXtX2Xsu+GiWWYmGXfWuYA@mail.gmail.com>
-References: <1603959941-9689-1-git-send-email-bmeng.cn@gmail.com>
- <20201103065732-mutt-send-email-mst@kernel.org>
- <CAEUhbmUxHkvZ_CimzeAGwgZVNSH7OXtX2Xsu+GiWWYmGXfWuYA@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kaGUM-0000Df-6m
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:58:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23236)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kaGUK-0006Sc-NC
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:58:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604487480;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=olw1pFlQtvZ86PWenMbSCCLQ0P465x5Z9HJnPSvnXRs=;
+ b=gYYJKyvpTEjE1fs2+1Ouq3DVTGDIwVvOBwySmXDLLhFQaMT3f1ACVgLs74uZs8jSDX0GH7
+ TLhTx+TwlxJkXmqtqkdqVahzjLHHTyI+GeI0jYkt+lMpigK3KlZ/vxRZTprXH4hZ+zF0wo
+ qDe5WwUMDzUtXA5IM2I/EudQM0IZO2U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-481-QO937v6nOoqQ9a5Rvll9Ng-1; Wed, 04 Nov 2020 05:57:56 -0500
+X-MC-Unique: QO937v6nOoqQ9a5Rvll9Ng-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95E128018A1;
+ Wed,  4 Nov 2020 10:57:53 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.194.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DFCFA60C84;
+ Wed,  4 Nov 2020 10:57:50 +0000 (UTC)
+Subject: Re: [PATCH for-5.2 1/3] hw/block/nvme: fix null ns in register
+ namespace
+To: Klaus Jensen <its@irrelevant.dk>, qemu-devel@nongnu.org
+References: <20201104102248.32168-1-its@irrelevant.dk>
+ <20201104102248.32168-2-its@irrelevant.dk>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <76a18045-4ae1-85e7-e497-11ea648af82d@redhat.com>
+Date: Wed, 4 Nov 2020 11:57:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 05:58:03
+In-Reply-To: <20201104102248.32168-2-its@irrelevant.dk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,164 +99,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+ Klaus Jensen <k.jensen@samsung.com>, Minwoo Im <minwoo.im.dev@gmail.com>,
+ Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mittwoch, 4. November 2020 08:44:44 CET Bin Meng wrote:
-> Hi Michael,
+On 04.11.20 11:22, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> On Tue, Nov 3, 2020 at 8:05 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > On Tue, Nov 03, 2020 at 02:26:10PM +0800, Bin Meng wrote:
-> > > Hi Michael,
-> > > 
-> > > On Fri, Oct 30, 2020 at 5:29 PM Michael S. Tsirkin <mst@redhat.com> 
-wrote:
-> > > > On Thu, Oct 29, 2020 at 04:25:41PM +0800, Bin Meng wrote:
-> > > > > From: Bin Meng <bin.meng@windriver.com>
-> > > > > 
-> > > > > At present the virtio device config space access is handled by the
-> > > > > virtio_config_readX() and virtio_config_writeX() APIs. They perform
-> > > > > a sanity check on the result of address plus size against the config
-> > > > > space size before the access occurs.
-> > > > > 
-> > > > > For unaligned access, the last converted naturally aligned access
-> > > > > will fail the sanity check on 9pfs. For example, with a mount_tag
-> > > > > `p9fs`, if guest software tries to read the mount_tag via a 4 byte
-> > > > > read at the mount_tag offset which is not 4 byte aligned, the read
-> > > > > result will be `p9\377\377`, which is wrong.
-> > > > > 
-> > > > > This changes the size of device config space to be a multiple of 4
-> > > > > bytes so that correct result can be returned in all circumstances.
-> > > > > 
-> > > > > Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> > > > 
-> > > > The patch is ok, but I'd like to clarify the commit log.
-> > > 
-> > > Thanks for the review.
-> > > 
-> > > > If I understand correctly, what happens is:
-> > > > - tag is set to a value that is not a multiple of 4 bytes
-> > > 
-> > > It's not about the mount_tag value, but the length of the mount_tag is
-> > > 4.
-> > > 
-> > > > - guest attempts to read the last 4 bytes of the tag
-> > > 
-> > > Yep. So the config space of a 9pfs looks like the following:
-> > > 
-> > > offset: 0x14, size: 2 bytes indicating the length of the following
-> > > mount_tag offset: 0x16, size: value of (offset 0x14).
-> > > 
-> > > When a 4-byte mount_tag is given, guest software is subject to read 4
-> > > bytes (value read from offset 0x14) at offset 0x16.
-> > 
-> > Well looking at Linux guest code:
-> > 
-> > 
-> > static inline void __virtio_cread_many(struct virtio_device *vdev,
-> > 
-> >                                        unsigned int offset,
-> >                                        void *buf, size_t count, size_t
-> >                                        bytes)
-> > 
-> > {
-> > 
-> >         u32 old, gen = vdev->config->generation ?
-> >         
-> >                 vdev->config->generation(vdev) : 0;
-> >         
-> >         int i;
-> >         
-> >         might_sleep();
-> >         do {
-> >         
-> >                 old = gen;
-> >                 
-> >                 for (i = 0; i < count; i++)
-> >                 
-> >                         vdev->config->get(vdev, offset + bytes * i,
-> >                         
-> >                                           buf + i * bytes, bytes);
-> >                 
-> >                 gen = vdev->config->generation ?
-> >                 
-> >                         vdev->config->generation(vdev) : 0;
-> >         
-> >         } while (gen != old);
-> > 
-> > }
-> > 
-> > 
-> > 
-> > static inline void virtio_cread_bytes(struct virtio_device *vdev,
-> > 
-> >                                       unsigned int offset,
-> >                                       void *buf, size_t len)
-> > 
-> > {
-> > 
-> >         __virtio_cread_many(vdev, offset, buf, len, 1);
-> > 
-> > }
-> > 
-> > and:
-> >         virtio_cread_bytes(vdev, offsetof(struct virtio_9p_config, tag),
-> >         
-> >                            tag, tag_len);
-> > 
-> > So guest is doing multiple 1-byte reads.
+> Fix dereference after NULL check.
 > 
-> Correct.
-> 
-> > Spec actually says:
-> >         For device configuration access, the driver MUST use 8-bit wide
-> >         accesses for 8-bit wide fields, 16-bit wide
-> >         
-> >         and aligned accesses for 16-bit wide fields and 32-bit wide and
-> >         aligned accesses for 32-bit and 64-bit wide
-> >         
-> >         fields. For 64-bit fields, the driver MAY access each of the high
-> >         and low 32-bit parts of the field independently.
-> Yes.
-> 
-> > 9p was never standardized, but the linux header at least lists it as
-> > follows:
-> > 
-> > struct virtio_9p_config {
-> > 
-> >         /* length of the tag name */
-> >         __virtio16 tag_len;
-> >         /* non-NULL terminated tag name */
-> >         __u8 tag[0];
-> > 
-> > } __attribute__((packed));
-> > 
-> > In that sense tag is an 8 byte field.
-> > 
-> > So which guest reads tag using a 32 bit read, and why?
-> 
-> The obvious fix can be made to the guest which exposed this issue, but
-> I was wondering whether we should enforce all virtio devices' config
-> space size to be a multiple of 4 bytes which sounds more natural.
-> 
-> Regards,
-> Bin
+> Reported-by: Coverity (CID 1436128)
+> Fixes: b20804946bce ("hw/block/nvme: update nsid when registered")
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> ---
+>  hw/block/nvme.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-Personally I am not opposed for this to be addressed in qemu, but Michael 
-should decide that.
-
-But even if it would be addressed in qemu, I still think this would better be 
-addressed on virtio side, not on virtio user side (9pfs, etc.), because that's 
-a virtio implementation detail that might change in future.
-
-What I definitely don't want to see though, is this alignment issue being 
-handled with a hard coded value on user (9pfs) side as this patch does right 
-now. Because that smells like it would be overseen if something changes on 
-virtio side one day.
-
-Best regards,
-Christian Schoenebeck
-
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
