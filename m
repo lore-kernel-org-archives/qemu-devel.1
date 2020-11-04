@@ -2,87 +2,93 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDF8C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B98C5C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:33:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04D0720867
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D263A221F8
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 09:33:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="bpsZChMz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04D0720867
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H/2PzvT6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D263A221F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaF7D-0004uh-BY
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 04:30:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55920)
+	id 1kaFAL-0006GA-Pk
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 04:33:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kaF6d-0004U9-Gp
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 04:29:27 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38128)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kaF6b-00034K-IB
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 04:29:26 -0500
-Received: by mail-pg1-x544.google.com with SMTP id i26so16096182pgl.5
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 01:29:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=8/HnNQ+Hct9/GYNAHvbQpH4erQfEQzRnohmVV7pNij0=;
- b=bpsZChMz/g/NR7nKDng+HS/pl6Ox0rJ3HheOHoHLPqCCHy3j61vzig5fyKVBWL5Saa
- z0rXN32KbfoTkk0lvmB2NjJBCWIzwHxi4MySqtTH1kinO25Kqa5VAuTogabmg6z4Li3D
- +SPb6c1Q0gUG65f1ikZLAwbsFarSzlDcTJdiiC1b+7sGTZFPMYYVW0slZh/dFyX3G9kl
- hg9SMWDdjVeQ4aIDyeQN8bi3EeMgBxzpmxZUktIiXRSR3+rY9c/fLKJjpA2DrK6+f2N1
- iYEG9GNn0fiX8mX7eBWMLPQqwKC2/Ny7Brl0NodoNLSl6XuQNv7QH0r9D3yLFditY9qV
- gUgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=8/HnNQ+Hct9/GYNAHvbQpH4erQfEQzRnohmVV7pNij0=;
- b=m37Ajckp7eazcnAfnxTe69YC49HFieQHkMTlTQc5i8CxMEJrdUWwqrc23oaJKleM1j
- aVtOdwk+cKwcGtARsRJitJ2gYutcIKPWTTxsMcvWqaffYrtQTmJffPEF4mNkXrXS/+uV
- nk17CFM8NoySiyte5EfVwZ8Mns/U1hsAwedX+quamIbjAme+O5R3KZmW3MPLwDwSrZUs
- rICCEv5n/HUbk8dnKibcsBoD6boimelCMPeWaVqdCUwGOaUNM9T7tjFkd+uTBHwwSeXF
- Z5p7Fwx0h3Q7qvqEdpiN0GKhsLxi1Hzk10YNqTkC8qO4webQ1zuQLLd78bt7WCF+Iuf3
- 39tw==
-X-Gm-Message-State: AOAM533t4ni975aG5/V34LHj0AMUu18k4eXOqkhGfFJ5EcEhuun+sGZN
- t6r+RCDfvQqOHh6kTLGMvkWmEZF/mzQsCA==
-X-Google-Smtp-Source: ABdhPJx402myKz5GfNcs75lSPCYoeYjRxpWnqPdGuXYxEvRVuLLiXfc1ns+leuUyhCUnmqW2jqaVfg==
-X-Received: by 2002:a63:4c45:: with SMTP id m5mr4007206pgl.201.1604482163753; 
- Wed, 04 Nov 2020 01:29:23 -0800 (PST)
-Received: from gwan-VirtualBox.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id t74sm1844538pfc.47.2020.11.04.01.29.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Nov 2020 01:29:23 -0800 (PST)
-From: Green Wan <green.wan@sifive.com>
-To: 
-Subject: [PATCH] hw/misc/sifive_u_otp: handling the fails of blk_pread and
- blk_pwrite
-Date: Wed,  4 Nov 2020 17:29:00 +0800
-Message-Id: <20201104092900.21214-1-green.wan@sifive.com>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=green.wan@sifive.com; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kaF9I-0005oH-Kt
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 04:32:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33935)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kaF9F-0003VC-CY
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 04:32:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604482328;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fJ33nL+gPaAOkIMlUQreOlCodNd7oAg9VXwqk4MwIcY=;
+ b=H/2PzvT69Pyf6cZV51+HnYeFZLDxF+7+hTcUBzRFOr9Biovy57mSo8NP08+NNSfLaNcLE5
+ NAc9Y0Nq/W0QH+lJ6stYpm0J6kB9QX/c7IKkU0MKFvtF3E5gi1iDM0DfxMkbgxrU/7pcBb
+ /hVDiLVSGdFRqLp6kTJ2KI7Nohu4on0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-0dDRwXnOOuKc1eqkZ0EGjA-1; Wed, 04 Nov 2020 04:32:06 -0500
+X-MC-Unique: 0dDRwXnOOuKc1eqkZ0EGjA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA107186DD3A;
+ Wed,  4 Nov 2020 09:32:05 +0000 (UTC)
+Received: from redhat.com (ovpn-115-26.ams2.redhat.com [10.36.115.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D14885C5FD;
+ Wed,  4 Nov 2020 09:31:59 +0000 (UTC)
+Date: Wed, 4 Nov 2020 09:31:55 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC PATCH 0/6] eBPF RSS support for virtio-net
+Message-ID: <20201104093155.GB565323@redhat.com>
+References: <20201102185115.7425-1-andrew@daynix.com>
+ <0164a42f-4542-6f3e-bd71-3319dfaae190@redhat.com>
+ <CAOEp5Oe3btwgPcOA6v=kK9s2to=x2Hg6Qw2iCFXOOWZs49s=-Q@mail.gmail.com>
+ <caa38709-88f1-bd6d-3ff9-61e64c3aa51f@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <caa38709-88f1-bd6d-3ff9-61e64c3aa51f@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,79 +101,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, bmeng.cn@gmail.com, qemu-devel@nongnu.org,
- green.wan@sifive.com, peter.maydell@linaro.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Yan Vugenfirer <yan@daynix.com>,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>, qemu-devel@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix code coverage issues by checking return value and handling fail case
-of blk_pread() and blk_pwrite(). Return default value 0xff if read fails.
+On Wed, Nov 04, 2020 at 10:07:52AM +0800, Jason Wang wrote:
+> 
+> On 2020/11/3 下午6:32, Yuri Benditovich wrote:
+> > 
+> > 
+> > On Tue, Nov 3, 2020 at 11:02 AM Jason Wang <jasowang@redhat.com
+> > <mailto:jasowang@redhat.com>> wrote:
+> > 
+> > 
+> >     On 2020/11/3 上午2:51, Andrew Melnychenko wrote:
+> >     > Basic idea is to use eBPF to calculate and steer packets in TAP.
+> >     > RSS(Receive Side Scaling) is used to distribute network packets
+> >     to guest virtqueues
+> >     > by calculating packet hash.
+> >     > eBPF RSS allows us to use RSS with vhost TAP.
+> >     >
+> >     > This set of patches introduces the usage of eBPF for packet steering
+> >     > and RSS hash calculation:
+> >     > * RSS(Receive Side Scaling) is used to distribute network packets to
+> >     > guest virtqueues by calculating packet hash
+> >     > * eBPF RSS suppose to be faster than already existing 'software'
+> >     > implementation in QEMU
+> >     > * Additionally adding support for the usage of RSS with vhost
+> >     >
+> >     > Supported kernels: 5.8+
+> >     >
+> >     > Implementation notes:
+> >     > Linux TAP TUNSETSTEERINGEBPF ioctl was used to set the eBPF program.
+> >     > Added eBPF support to qemu directly through a system call, see the
+> >     > bpf(2) for details.
+> >     > The eBPF program is part of the qemu and presented as an array
+> >     of bpf
+> >     > instructions.
+> >     > The program can be recompiled by provided Makefile.ebpf(need to
+> >     adjust
+> >     > 'linuxhdrs'),
+> >     > although it's not required to build QEMU with eBPF support.
+> >     > Added changes to virtio-net and vhost, primary eBPF RSS is used.
+> >     > 'Software' RSS used in the case of hash population and as a
+> >     fallback option.
+> >     > For vhost, the hash population feature is not reported to the guest.
+> >     >
+> >     > Please also see the documentation in PATCH 6/6.
+> >     >
+> >     > I am sending those patches as RFC to initiate the discussions
+> >     and get
+> >     > feedback on the following points:
+> >     > * Fallback when eBPF is not supported by the kernel
+> > 
+> > 
+> >     Yes, and it could also a lacking of CAP_BPF.
+> > 
+> > 
+> >     > * Live migration to the kernel that doesn't have eBPF support
+> > 
+> > 
+> >     Is there anything that we needs special treatment here?
+> > 
+> > Possible case: rss=on, vhost=on, source system with kernel 5.8
+> > (everything works) -> dest. system 5.6 (bpf does not work), the adapter
+> > functions, but all the steering does not use proper queues.
+> 
+> 
+> Right, I think we need to disable vhost on dest.
+> 
+> 
+> > 
+> > 
+> > 
+> >     > * Integration with current QEMU build
+> > 
+> > 
+> >     Yes, a question here:
+> > 
+> >     1) Any reason for not using libbpf, e.g it has been shipped with some
+> >     distros
+> > 
+> > 
+> > We intentionally do not use libbpf, as it present only on some distros.
+> > We can switch to libbpf, but this will disable bpf if libbpf is not
+> > installed
+> 
+> 
+> That's better I think.
+> 
+> 
+> >     2) It would be better if we can avoid shipping bytecodes
+> > 
+> > 
+> > 
+> > This creates new dependencies: llvm + clang + ...
+> > We would prefer byte code and ability to generate it if prerequisites
+> > are installed.
+> 
+> 
+> It's probably ok if we treat the bytecode as a kind of firmware.
 
-Signed-off-by: Green Wan <green.wan@sifive.com>
----
- hw/misc/sifive_u_otp.c | 31 +++++++++++++++++++++++--------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+That is explicitly *not* OK for inclusion in Fedora. They require that
+BPF is compiled from source, and rejected my suggestion that it could
+be considered a kind of firmware and thus have an exception from building
+from source.
 
-diff --git a/hw/misc/sifive_u_otp.c b/hw/misc/sifive_u_otp.c
-index 60066375ab..4314727d0d 100644
---- a/hw/misc/sifive_u_otp.c
-+++ b/hw/misc/sifive_u_otp.c
-@@ -62,8 +62,13 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
-             if (s->blk) {
-                 int32_t buf;
- 
--                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
--                          SIFIVE_U_OTP_FUSE_WORD);
-+                if (blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
-+                              SIFIVE_U_OTP_FUSE_WORD) < 0) {
-+                    qemu_log_mask(LOG_GUEST_ERROR,
-+                                  "read error index<%d>\n", s->pa);
-+                    return 0xff;
-+                }
-+
-                 return buf;
-             }
- 
-@@ -160,8 +165,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
- 
-             /* write to backend */
-             if (s->blk) {
--                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD,
--                           &s->fuse[s->pa], SIFIVE_U_OTP_FUSE_WORD, 0);
-+                if (blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD,
-+                               &s->fuse[s->pa], SIFIVE_U_OTP_FUSE_WORD,
-+                               0) < 0) {
-+                    qemu_log_mask(LOG_GUEST_ERROR,
-+                                  "write error index<%d>\n", s->pa);
-+                }
-             }
- 
-             /* update written bit */
-@@ -248,12 +257,18 @@ static void sifive_u_otp_reset(DeviceState *dev)
-         int index = SIFIVE_U_OTP_SERIAL_ADDR;
- 
-         serial_data = s->serial;
--        blk_pwrite(s->blk, index * SIFIVE_U_OTP_FUSE_WORD,
--                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
-+        if (blk_pwrite(s->blk, index * SIFIVE_U_OTP_FUSE_WORD,
-+                       &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0) < 0) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "write error index<%d>\n", index);
-+        }
- 
-         serial_data = ~(s->serial);
--        blk_pwrite(s->blk, (index + 1) * SIFIVE_U_OTP_FUSE_WORD,
--                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
-+        if (blk_pwrite(s->blk, (index + 1) * SIFIVE_U_OTP_FUSE_WORD,
-+                       &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0) < 0) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "write error index<%d>\n", index + 1);
-+        }
-     }
- 
-     /* Initialize write-once map */
+> But in the long run, it's still worthwhile consider the qemu source is used
+> for development and llvm/clang should be a common requirement for generating
+> eBPF bytecode for host.
+
+So we need to do this right straight way before this merges.
+
+Regards,
+Daniel
 -- 
-2.17.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
