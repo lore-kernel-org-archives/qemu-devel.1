@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3B6C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA5BC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:44:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0151C21556
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:44:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 742AD2220B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 08:44:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BqqsdnRD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0151C21556
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q2dnftBG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 742AD2220B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaEPU-0008Jj-Sc
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 03:44:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46512)
+	id 1kaEPZ-0008VI-AP
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 03:44:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46586)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaEOO-0006ev-Kr
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:43:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40079)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaEOW-0006om-ME
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:43:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54875)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaEOL-0005ta-5u
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:43:44 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kaEOU-0005uq-Ns
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 03:43:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604479419;
+ s=mimecast20190719; t=1604479429;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tGrjmCEXBoBaCsyPVGeYrGNhz2JCmoDnznUDdTUcGTA=;
- b=BqqsdnRDPElx6Jf2T3KPAoen7j/3Jd6w7vPlnIGWGXjiYdoXEAwQpMqWO5vlpRpdkPYfSz
- 4u6+BwDTAD1B84YSFz1x/CXszOZE/jGiY3y2Jq2d1liZgBL9X9E/FSdkuh5HVxo7W8CfO1
- /4k9UuMYcu8rMwwkOUqQdtyqiRRXh08=
+ bh=x5HpIir+o8Ur2wMjB/JxhGBH9R3J5tpzLrgdobgdzjI=;
+ b=Q2dnftBGu9ZZRxUDS4Dp6EL1M3Hec9+QKkymhMpA5F3dFg7/0sZbwT7O5gNRgbXZP96x8G
+ JGKhp1qvqPVgvQpnVaX/ziEcnnq8kqK08GGtTaKU659GjFZGAxNEcKTTC/sZ3msHC16TW6
+ yhPr7/ImwspmdRmFJ7WvpRh0OrjZ5gg=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-_N_3a-8oPTCIBrGPFs-AUA-1; Wed, 04 Nov 2020 03:43:37 -0500
-X-MC-Unique: _N_3a-8oPTCIBrGPFs-AUA-1
-Received: by mail-wr1-f70.google.com with SMTP id 31so8941277wrg.12
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 00:43:37 -0800 (PST)
+ us-mta-212-VFAl6UbAPimkgABQi26M2A-1; Wed, 04 Nov 2020 03:43:48 -0500
+X-MC-Unique: VFAl6UbAPimkgABQi26M2A-1
+Received: by mail-wr1-f70.google.com with SMTP id x16so8900337wrg.7
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 00:43:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=tGrjmCEXBoBaCsyPVGeYrGNhz2JCmoDnznUDdTUcGTA=;
- b=TgRjXw9QTuJI+uUv/4LOsWA04eu+SEJiVof630xEAMCBc3wWpU50pMv6inKgp75Lyh
- stX+M99iRrd6z7bSCx41kQv4BSL58EpiaxxrRGnGNSwrMt5Cfc30VdjwtTk0KZBQH34s
- 9xL3vxHKbpLQwXIam25sN8zjCeXRVHu0sVCguE/HKAZAHou9cd/sPsbVo0BIxZSZ1wVd
- AMLXxn+jmmiTrEMbLaVbAMtuxcbJnaOO2fYZWLignnR/QDxRUwDGK/CyMoyVcl4CjlE/
- KBJXJf8APU62azxNO/bkLgfHpF0JUZAGmg2u12WK/v1rcExdUa+KkEvF6XCYZbmR4NAD
- 6ssw==
-X-Gm-Message-State: AOAM533GzIds8vViaYYqrnB6bfhOYQF9hgVLFL31p25LAE3RUwKWON36
- /lPWHGo/fDiO9/vUEpFjwThxbvR4SkllM0n92dHNhoHX9TrGXWTadBIfyq5Q5HNotBZQSxYRNXl
- 9k5QrW6eIPZgcAnI=
-X-Received: by 2002:a1c:328a:: with SMTP id y132mr3270205wmy.134.1604479416178; 
- Wed, 04 Nov 2020 00:43:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzAKBMbrYMVmfktTukMP82vBC6mMWUm7JJP3Ip5nEjHwOa1kocaNQENSOogMMSxmOQs/LYjew==
-X-Received: by 2002:a1c:328a:: with SMTP id y132mr3270172wmy.134.1604479415976; 
- Wed, 04 Nov 2020 00:43:35 -0800 (PST)
+ bh=x5HpIir+o8Ur2wMjB/JxhGBH9R3J5tpzLrgdobgdzjI=;
+ b=q0am6MfMxkXKS3lY0nMx1JKObYA02+FVQx1OAu0lTSQLJ/G1GG1tULfWC/0MZljqXa
+ 405xZZToNbxNCyTW0hQiR+xkOh4l+pBccM0i148ahztuFs9V0gCrp8zvbCV7xWYSnrKN
+ 3swcWs57ARWkrGqOPK9PcmJDblrU3TESnyQvIgywlGhC8ZW2v4CiEYyLckDteFlq0OS4
+ k2aNpemg9+U73ZDqv2Pc5Doybf/EVFgqxzwIuI9mGJ5BICTEtJ9NydeoyRWEpeFAuJ96
+ hcv2Py2bvFkbsjbJOIkUbdVK9d90MjqpSEwXmv4j0cM5ASHJO0FVjHzHqp5VusSkuqGM
+ NQuw==
+X-Gm-Message-State: AOAM532oIj7QZlKozqWZhF6ZIGwVVHS5mgwjPDi6rLQMkSJEvTVRp3rS
+ e9FFcAU9RfY0xyT3S8r3PwRxFJs7PWp7cbBiZrWj3xvyHhYmgHzg+fNY19j0IEhYHYCADsSy3R8
+ GCRm7GN2Wwy7VugM=
+X-Received: by 2002:adf:eb4d:: with SMTP id u13mr29352779wrn.146.1604479426799; 
+ Wed, 04 Nov 2020 00:43:46 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz5hSljV8ZtOnvNJ7BrhMIygJ0P0z9XOD5YTEBmW+fusGsgaBkUMKFz/cG9o5k8COXeOpsUng==
+X-Received: by 2002:adf:eb4d:: with SMTP id u13mr29352739wrn.146.1604479426503; 
+ Wed, 04 Nov 2020 00:43:46 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id m4sm1513423wrr.47.2020.11.04.00.43.34
+ by smtp.gmail.com with ESMTPSA id z5sm1533531wrw.87.2020.11.04.00.43.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Nov 2020 00:43:35 -0800 (PST)
+ Wed, 04 Nov 2020 00:43:45 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 v2 1/4] s390x: fix build for --without-default-devices
-Date: Wed,  4 Nov 2020 09:43:24 +0100
-Message-Id: <20201104084327.3010593-2-philmd@redhat.com>
+Subject: [PATCH-for-5.2 v2 3/4] gitlab-ci: Add a job to cover the
+ --without-default-devices config
+Date: Wed,  4 Nov 2020 09:43:26 +0100
+Message-Id: <20201104084327.3010593-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201104084327.3010593-1-philmd@redhat.com>
 References: <20201104084327.3010593-1-philmd@redhat.com>
@@ -97,7 +98,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,49 +127,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cornelia Huck <cohuck@redhat.com>
+We test './configure --without-default-devices' since commit
+20885b5b169 (".travis.yml: test that no-default-device builds
+do not regress") in Travis-CI.
 
-s390-pci-vfio.c calls into the vfio code, so we need it to be
-built conditionally on vfio (which implies CONFIG_LINUX).
+Since having a single CI to look at is easier, and GitLab-CI
+is the preferred one, add the equivalent job there.
 
-Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Fixes: cd7498d07fbb ("s390x/pci: Add routine to get the vfio dma available count")
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20201103123237.718242-1-cohuck@redhat.com>
+As smoke test, run the qtests on the AVR target. Since the
+boards are simple SoC, there is not issue with unavailable
+default devices there.
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/s390x/s390-pci-vfio.h | 3 ++-
- hw/s390x/meson.build             | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ .gitlab-ci.yml | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/include/hw/s390x/s390-pci-vfio.h b/include/hw/s390x/s390-pci-vfio.h
-index c7984905b3b..ff708aef500 100644
---- a/include/hw/s390x/s390-pci-vfio.h
-+++ b/include/hw/s390x/s390-pci-vfio.h
-@@ -13,8 +13,9 @@
- #define HW_S390_PCI_VFIO_H
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 3b15ae5c302..321cca2c216 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -262,6 +262,13 @@ build-user-plugins:
+     MAKE_CHECK_ARGS: check-tcg
+   timeout: 1h 30m
  
- #include "hw/s390x/s390-pci-bus.h"
-+#include CONFIG_DEVICES
- 
--#ifdef CONFIG_LINUX
-+#ifdef CONFIG_VFIO
- bool s390_pci_update_dma_avail(int fd, unsigned int *avail);
- S390PCIDMACount *s390_pci_start_dma_count(S390pciState *s,
-                                           S390PCIBusDevice *pbdev);
-diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
-index f4663a83551..2a7818d94b9 100644
---- a/hw/s390x/meson.build
-+++ b/hw/s390x/meson.build
-@@ -27,7 +27,7 @@
- ))
- s390x_ss.add(when: 'CONFIG_S390_CCW_VIRTIO', if_true: files('s390-virtio-ccw.c'))
- s390x_ss.add(when: 'CONFIG_TERMINAL3270', if_true: files('3270-ccw.c'))
--s390x_ss.add(when: 'CONFIG_LINUX', if_true: files('s390-pci-vfio.c'))
-+s390x_ss.add(when: 'CONFIG_VFIO', if_true: files('s390-pci-vfio.c'))
- 
- virtio_ss = ss.source_set()
- virtio_ss.add(files('virtio-ccw.c'))
++build-system-ubuntu-without-default-devices:
++  <<: *native_build_job_definition
++  variables:
++    IMAGE: ubuntu2004
++    CONFIGURE_ARGS: --without-default-devices --disable-user --disable-tools --disable-docs
++    MAKE_CHECK_ARGS: check-qtest-avr
++
+ build-clang:
+   <<: *native_build_job_definition
+   variables:
 -- 
 2.26.2
 
