@@ -2,99 +2,84 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE00C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FCAC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:32:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4C04206D4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:31:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4C04206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id E95C8206F1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:32:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tx5BeMZG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E95C8206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaG4T-0002Pl-8j
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 05:31:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40826)
+	id 1kaG5j-0003g4-VR
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 05:32:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kaFwQ-0003Uy-Vw; Wed, 04 Nov 2020 05:22:59 -0500
-Received: from wout5-smtp.messagingengine.com ([64.147.123.21]:33625)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kaFwO-0002Hj-Ee; Wed, 04 Nov 2020 05:22:58 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.west.internal (Postfix) with ESMTP id 6885C3D5;
- Wed,  4 Nov 2020 05:22:54 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute4.internal (MEProxy); Wed, 04 Nov 2020 05:22:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm1; bh=UA+VVCnGzkkNI
- uqKXObtavL8wxUG01U2iUsM9Tmlh44=; b=BM/q3bo/I6Yb8FmWFFvq8L7MmQ2hY
- JCt+6mUKjXSGM/O7LxS4rHyTy3tTts+h3IXPLqpUE/7etEH/mvTmkpKxhhAfxu+X
- 2WF1JQKLzDzs9T51ud0wThWBuu1XAFY8HyhZ6rm6I/KjU5EtFMS5+vPS/BPLq8t6
- z5ZQIK6GmJYQ8kMO9By+s+YiahLBGEFKsOxDjK7oW4VDcibMF3rlp1yi1BMaO36O
- MTDYW/JgP5N9ECJ+epc+sWw8LCozgFAlyO74xWQILEaXbrTMDm/HKda7t4aSiBZh
- gU5d6ZjZrda81L/RjLpurg93Z3of6tqiXUsCQ6rRaRx+n/jfheGKSMJDg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:date:from
- :in-reply-to:message-id:mime-version:references:subject:to
- :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm1; bh=UA+VVCnGzkkNIuqKXObtavL8wxUG01U2iUsM9Tmlh44=; b=caGL0rwr
- QTwgyL5jhCAMOxGNcr8KEaL7jWOI6BQz5LY62eOBj1+d2dXWl00bW9XF/T4u8Hw/
- ja0CGfzl/ELIpz4a6oOfQSrk9HGsVdr/HG3R6rHz4j0bN4/yjZt+Eh6R+56wbvHt
- j34w6Vumz2G3yB9Fn7fOZhHKjTxbMNG8mkzyisMQN41PxQ7iPr2S2k/JHHroZRS8
- R2utYbgr9w+u9joQ3dVETptUH94iPutiz2sWhbpNV6+WuUfhuM7Tj5tsB8uYOaX/
- QcM7p8+IxyJ+GqvxPmJl5EipxDovcDYMqmG8lwXZvjI1oWWyqjn039EM66yg8xpT
- j86OeiJr5h/2+g==
-X-ME-Sender: <xms:_YCiX2d8SLjNsJ68dnoBNyQCvYjM4_IOMiVWeGloDtgHaMbUWCVRwg>
- <xme:_YCiXwOei9-uNkUhgI8DHZuGdqXkplYpvEGiDaQxt_mtnmEx6vzZE5qIv4rcMvQ5w
- Ipg7qrN4t5_O_lYR9w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedruddthedgudeiucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeeuleetgeeiuefhgfekfefgveejiefgteekiedtgfdtieefhfdthfefueffvefg
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedune
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:_YCiX3hRjdp6mMkkNZl4RVuha6yYi5hj2I-tMergVx9StqUNRZ6EKQ>
- <xmx:_YCiXz_s4HSQXpTpeYPGQm6nhZuOkFq5FfBz_0IGFoeNSjoLyeqbyw>
- <xmx:_YCiXyv1XIDl_1fRHhjQ0ESSAPm-waeZ6ax3i4KMMQX52NHOVepqxw>
- <xmx:_oCiX_-udIULDQ3I9skdduOz8X9gdRdays8Wq-Sr6jxhjyn99QOC4Q>
-Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 99ADC3280395;
- Wed,  4 Nov 2020 05:22:52 -0500 (EST)
-From: Klaus Jensen <its@irrelevant.dk>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.2 2/3] hw/block/nvme: fix uint16_t use of uint32_t sgls
- member
-Date: Wed,  4 Nov 2020 11:22:47 +0100
-Message-Id: <20201104102248.32168-3-its@irrelevant.dk>
-X-Mailer: git-send-email 2.29.1
-In-Reply-To: <20201104102248.32168-1-its@irrelevant.dk>
-References: <20201104102248.32168-1-its@irrelevant.dk>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kaG1h-0001Jg-N6
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:28:25 -0500
+Received: from mail-ed1-x531.google.com ([2a00:1450:4864:20::531]:43397)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kaG1f-0002zE-US
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 05:28:25 -0500
+Received: by mail-ed1-x531.google.com with SMTP id b9so11681174edu.10
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 02:28:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UQw0xIJ3j4vC9P62Fi73cBepSGsDHmSGkxBaz7gujs8=;
+ b=tx5BeMZGu/qLwZMZvrHw9FogWWUz8QuPOBMiztC5BsLTjsvdCmSU1K3zqV7Sx0uPQI
+ w2+f1/IDeDL0mbStWrc8Wym+qYX6ecb25gUzpjFeRz7sbBxdij3Xsf9oCuTvti2mg3If
+ 0c4iCY36vsnc6nKdOvJ9u43OPPFN5BwOMqFiwBDjNU4ts5PrLL54P01lqmAGPaD4leEu
+ 1e3ys+3mcCGHJEvOoAP3LJLkCDzlfEl7YMAzU1d474T6V7/iebaLGracVWBFgkRVSat1
+ tWbXvmL/8qAR1XTBbmeMERqRGciz9Pl6glJdnZ3qjWjfC4UKZsV+r0dtUEjgBC7XBbPS
+ 2J3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UQw0xIJ3j4vC9P62Fi73cBepSGsDHmSGkxBaz7gujs8=;
+ b=EsdCzgQB8SZl+dvZqsDZytkg6rWUZzVD8oYTFMmrnL9q25rae+OHR1rM7T7FVusQXz
+ tSVU/y+Sr+0WA++h5bR7/ELN6NabSJAKTlBpmRiDru/r3qu60pgCmMBmidDT41t349lJ
+ xYIGYwrdheRLaOvJMK2HOwmHbomC4RyJw36pUwID5w09tO5HdR2I5p2Lu9qIBpaq0Vlr
+ s2YoBEjTws7LBCQZ9eErJoKW+fM1TMafqld7BL+wnDLAnXvFmCxio7RMEMUMem0nkZSP
+ Xd/p/8a2PCxr/neMhqwwAnb2tJrI8+Pewfc14a4j+q0FJUvweILsSQ5b4BJhtRTqm8Vq
+ YBNA==
+X-Gm-Message-State: AOAM530natT0wSiGloY47IRPLLE2IDXGj8xwt8T8Y5ak/FGDbIiWQKuc
+ wz9ubHuWiSyMsbm1qXFPo/LAbQEkWKC9ilC5Nbpqdw==
+X-Google-Smtp-Source: ABdhPJyegAwcnXFmZP4h9vNut0MuxcVItueDD7V0zlyCRC6jVdRH4dIujrfX8zwtUs73iqXWHmn/T6hG6ELnoPBmYyk=
+X-Received: by 2002:a50:fc87:: with SMTP id f7mr15022662edq.36.1604485701792; 
+ Wed, 04 Nov 2020 02:28:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=64.147.123.21; envelope-from=its@irrelevant.dk;
- helo=wout5-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 05:22:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <20201104044937.226370-1-mst@redhat.com>
+In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 4 Nov 2020 10:28:09 +0000
+Message-ID: <CAFEAcA8fUEq6jG5pbVwcaLFkkswsR86Ly5XOSUUYrnEu=sAeiA@mail.gmail.com>
+Subject: Re: [PULL v2 00/38] pc,pci,vhost,virtio: fixes
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::531;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x531.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,41 +93,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Dmitry Fomichev <dmitry.fomichev@wdc.com>,
- Klaus Jensen <k.jensen@samsung.com>, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Minwoo Im <minwoo.im.dev@gmail.com>,
- Klaus Jensen <its@irrelevant.dk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Klaus Jensen <k.jensen@samsung.com>
+On Wed, 4 Nov 2020 at 04:50, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> Sending v2 since v1 was borken on 32 bit.
+>
+> The following changes since commit c7a7a877b716cf14848f1fd5c754d293e2f8d852:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20201102' into staging (2020-11-03 10:38:05 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 5676edd6d984b0696d206faa230c8da15e271044:
+>
+>   vhost-user-blk-test: fix races by using fd passing (2020-11-03 16:39:06 -0500)
+>
+> ----------------------------------------------------------------
+> pc,pci,vhost,virtio: fixes
+>
+> Lots of fixes all over the place.
+> virtio-mem and virtio-iommu patches are kind of fixes but
+> it seems better to just make them behave sanely than
+> try to educate users about the limitations ...
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-nvme_map_sgl_data erroneously uses the sgls member of NvmeIdNs as a
-uint16_t.
+Fails 'make check' on ppc64be and s390x, ie the big-endian hosts:
 
-Reported-by: Coverity (CID 1436129)
-Fixes: cba0a8a344fe ("hw/block/nvme: add support for scatter gather lists")
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
----
- hw/block/nvme.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+**
+ERROR:../../tests/qtest/libqos/virtio.c:228:qvirtio_wait_used_elem:
+assertion failed: (g_get_monotonic_time() - start_time <= timeout_us)
+ERROR qtest-i386/qos-test - Bail out!
+ERROR:../../tests/qtest/libqos/virtio.c:228:qvirtio_wait_used_elem:
+assertion failed: (g_get_monotonic_time() - start_time <= timeout_us)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 080d782f1c2b..2bdc50eb6fce 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -452,7 +452,7 @@ static uint16_t nvme_map_sgl_data(NvmeCtrl *n, QEMUSGList *qsg,
-              * segments and/or descriptors. The controller might accept
-              * ignoring the rest of the SGL.
-              */
--            uint16_t sgls = le16_to_cpu(n->id_ctrl.sgls);
-+            uint32_t sgls = le32_to_cpu(n->id_ctrl.sgls);
-             if (sgls & NVME_CTRL_SGLS_EXCESS_LENGTH) {
-                 break;
-             }
--- 
-2.29.1
-
+thanks
+-- PMM
 
