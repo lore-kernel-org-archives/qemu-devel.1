@@ -2,87 +2,83 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5401EC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 14:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A4DC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 14:12:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A11E8221E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 14:09:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A11E8221E2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=freebsd.org
+	by mail.kernel.org (Postfix) with ESMTPS id E6C5A21734
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 14:12:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6C5A21734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaJTi-0000J1-BH
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 09:09:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33876)
+	id 1kaJWf-0001Wi-HB
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 09:12:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bofh@freebsd.org>) id 1ka6fx-0005RX-4p
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:29:21 -0500
-Received: from mx2.freebsd.org ([2610:1c1:1:606c::19:2]:36728)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bofh@freebsd.org>) id 1ka6fv-0003sm-1Z
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:29:20 -0500
-Received: from mx1.freebsd.org (mx1.freebsd.org [IPv6:2610:1c1:1:606c::19:1])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange X25519 server-signature RSA-PSS (4096 bits)
- client-signature RSA-PSS (4096 bits)) (Client CN "mx1.freebsd.org",
- Issuer "Let's Encrypt Authority X3" (verified OK))
- by mx2.freebsd.org (Postfix) with ESMTPS id A9E9575D4F
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:29:16 +0000 (UTC)
- (envelope-from bofh@freebsd.org)
-Received: from smtp.freebsd.org (smtp.freebsd.org
- [IPv6:2610:1c1:1:606c::24b:4])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
- client-signature RSA-PSS (4096 bits) client-digest SHA256)
- (Client CN "smtp.freebsd.org",
- Issuer "Let's Encrypt Authority X3" (verified OK))
- by mx1.freebsd.org (Postfix) with ESMTPS id 4CQnb03Hchz4g84;
- Wed,  4 Nov 2020 00:29:16 +0000 (UTC)
- (envelope-from bofh@freebsd.org)
-Received: from mx.bofh.network (mx.bofh.network
- [IPv6:2001:19f0:5001:2b77:5400:2ff:fe7b:aa2c])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (Client CN "mx.bofh.network",
- Issuer "Let's Encrypt Authority X3" (verified OK))
- (Authenticated sender: bofh/mail)
- by smtp.freebsd.org (Postfix) with ESMTPSA id B920416A99;
- Wed,  4 Nov 2020 00:29:15 +0000 (UTC)
- (envelope-from bofh@freebsd.org)
-Received: from pdr.bofh.network (<unknown> [2604:6800:0:162:0:1:0:1])
- by mx.bofh.network (OpenSMTPD) with ESMTPSA id 03473004
- (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO); 
- Wed, 4 Nov 2020 00:29:13 +0000 (UTC)
-From: Muhammad Moinur Rahman <bofh@freebsd.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] As FreeBSD ports MAINTAINER add myself for FreeBSD Hosted CI
-Date: Wed,  4 Nov 2020 00:28:21 +0000
-Message-Id: <20201104002821.49600-1-bofh@freebsd.org>
-X-Mailer: git-send-email 2.28.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kaJVF-00017H-Hk
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 09:11:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44682)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kaJV8-0006bw-Og
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 09:11:09 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kaJV5-00014V-Cd
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 14:10:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4B9392E8133
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 14:10:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2610:1c1:1:606c::19:2;
- envelope-from=bofh@freebsd.org; helo=mx2.freebsd.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 04 Nov 2020 13:59:40 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1797262@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee philmd pmaydell xrobau
+X-Launchpad-Bug-Reporter: Rob Thomas (xrobau)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <153921596093.13046.16485884973780639345.malonedeb@wampee.canonical.com>
+Message-Id: <160449838102.6848.2800482197630083361.malone@chaenomeles.canonical.com>
+Subject: [Bug 1797262] Re: qemu arm no longer able to boot RPI Kernels
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="8e1d622aa7e69e8b5bd9e10dd26da4991d9a7dfb"; Instance="production"
+X-Launchpad-Hash: 95edf26425b08d7f1526604be161eeb13760462c
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 09:01:04
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -64
+X-Spam_score: -6.5
+X-Spam_bar: ------
+X-Spam_report: (-6.5 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, URIBL_SBL_A=0.1 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Wed, 04 Nov 2020 09:07:47 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,30 +87,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: emaste@freebsd.org, lwhsu@freebsd.org,
- Muhammad Moinur Rahman <bofh@freebsd.org>
+Reply-To: Bug 1797262 <1797262@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Muhammad Moinur Rahman <bofh@freebsd.org>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+Should be now fixed by commits 74de7145fd6..83ad4695478 (CPRMAN model
+added).
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index dd16606bcd..89d6269888 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3137,6 +3137,7 @@ W: https://app.shippable.com/github/qemu/qemu
- W: http://patchew.org/QEMU/
- 
- FreeBSD Hosted Continuous Integration
-+M: Muhammad Moinur Rahman <bofh@freebsd.org>
- M: Ed Maste <emaste@freebsd.org>
- M: Li-Wen Hsu <lwhsu@freebsd.org>
- S: Maintained
--- 
-2.24.3 (Apple Git-128)
+** Changed in: qemu
+     Assignee: Philippe Mathieu-Daud=C3=A9 (philmd) =3D> (unassigned)
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1797262
+
+Title:
+  qemu arm no longer able to boot RPI Kernels
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  Since RPi Kernel 1.20170427, qemu is no longer able to emulate the
+  Rasberry Pi, as the linux kernel is complaining about timing issues.
+
+  Old kernel output - https://pastebin.com/wvkneNNF
+  New kernel output - https://pastebin.com/QTwgCkV2
+
+  Note that the actual error is caused by the kernel being unable to get
+  the timing source for the mmc (Line 160), which causes an unable-to-
+  mount-root panic.  There are other issues with the serial port
+  returning an invalid speed, which displays a divide-by-zero error,
+  which is PROBABLY a symptom of the same root cause.
+
+  This is simple to replicate - The last working kernel is available
+  here:
+
+  https://github.com/raspberrypi/firmware/tree/1.20170405/boot
+
+  Download kernel7 and the dtb, and try to boot with (for example)
+
+  qemu-system-aarch64 -M raspi2 -kernel kernel7.img -dtb
+  bcm2709-rpi-2-b.dtb -serial stdio -sd noobs.img -append
+  "root=3D/dev/mmcblk0p2 init=3D/bin/bash"
+
+  This works, and boots successfully.
+
+  However, if you replace the kernel7.img and dtb with ones taken from
+  https://github.com/raspberrypi/firmware/tree/1.20170427/boot it will
+  NOT boot because of various clock timing issues (as in the second
+  paste)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1797262/+subscriptions
 
