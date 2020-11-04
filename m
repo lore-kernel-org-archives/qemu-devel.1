@@ -2,66 +2,98 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E01C4C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E4F1C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:27:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58214223FD
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:26:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58214223FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C9E2F206C1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 10:27:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9E2F206C1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaFzW-0007xx-3y
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 05:26:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40536)
+	id 1kaG0M-0008GQ-J1
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 05:27:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <shiliyang@huawei.com>)
- id 1kaFv5-0001xt-G5; Wed, 04 Nov 2020 05:21:35 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2328)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kaFwP-0003Sy-OA; Wed, 04 Nov 2020 05:22:57 -0500
+Received: from wout5-smtp.messagingengine.com ([64.147.123.21]:46725)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <shiliyang@huawei.com>)
- id 1kaFv2-0002BD-Pj; Wed, 04 Nov 2020 05:21:35 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CR2kF3sMdzkZV4;
- Wed,  4 Nov 2020 18:21:25 +0800 (CST)
-Received: from [10.108.235.13] (10.108.235.13) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 4 Nov 2020 18:21:21 +0800
-Subject: [PATCH 3/4] bsd-user: "foo * bar" should be "foo *bar"
-References: <81473730-4d0a-47e0-71f0-3aebdc7401e4@huawei.com>
-To: <richard.henderson@linaro.org>, <pbonzini@redhat.com>,
- <philmd@redhat.com>, <alex.bennee@linaro.org>, <laurent@vivier.eu>
-From: shiliyang <shiliyang@huawei.com>
-X-Forwarded-Message-Id: <81473730-4d0a-47e0-71f0-3aebdc7401e4@huawei.com>
-Message-ID: <b0963e45-fc06-ff70-019c-0dbf3d62d820@huawei.com>
-Date: Wed, 4 Nov 2020 18:21:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kaFwN-0002Gz-Jg; Wed, 04 Nov 2020 05:22:57 -0500
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailout.west.internal (Postfix) with ESMTP id 07168AED;
+ Wed,  4 Nov 2020 05:22:52 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Wed, 04 Nov 2020 05:22:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding; s=fm1; bh=CAmto1w6XHX6Q
+ WY+w0wNuJJUjSX8ez69FJ/6/YTcfcg=; b=OUt8c+lo36rinPl393LlU9W1imcgp
+ eh8bumuMuVjK11npgDU42NRFwZJ7CLYEGaaneNzcDLTkS9wci0TnRrHazxCJGcxK
+ ruNoCFnDMC3713hXuFMrRN7R3VTTn0FTWPi9a55hfdfyIPKnK8IutR5wT8S0LcOl
+ aWmAO48T8g5jBsRDBOsGKBV8rJXAwfIUY2HgD8pxBK53IopCj9Id6cggnSAhVUrL
+ x+Fl8Rnem0vDnaTLgIpnNLSH3hSAymlceCbDb1DX44+xBie2G3r4440ECwInbneO
+ 68Z+tz0oAjiB6uI2FWbzUGr4CE9jIcNNvIoLDTHPvkiQbOs3u0pcQAg7w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:date:from
+ :in-reply-to:message-id:mime-version:references:subject:to
+ :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+ fm1; bh=CAmto1w6XHX6QWY+w0wNuJJUjSX8ez69FJ/6/YTcfcg=; b=Sdj8VjSP
+ 5VBAkZQkXinyNMJ0owAASryyLqpYJqdmTTQFUZEQqdututG4mebMHFgr0fLSje3b
+ D5i1AjxzIoVRAZIqhrSnsRwcCnfqXYV3DGbVObVdsMXTlbSWpS+vI14mGf6/LChL
+ muYo/ryJ4MfS3kUcnlwLhujI4qX1+1fdSSAaCIrkO4CDg9CFFacWyuEclyEgywQB
+ oqMuBMCeNaKfy0OjuxotHs+IWhAldiYyusKNdvoXnni8YZ9jU7OWbINtN3xzdk7b
+ 1PSQQ1e//5yJruBmEJh/+1IubRrIoc3Ua3iyElHK8heceVrJc96NkpH1amiKkN+S
+ Hn8IhQqyubU1mg==
+X-ME-Sender: <xms:_ICiX4qxo11exWde2TUnSXjtbLzxg7VxmxywBjVChvI_DAYGQygeeg>
+ <xme:_ICiX-qvYo9flsx7GXHEJvo8LJoUfoWjcW5b8FaSR2ba582cMGfghLJ8MDWvBr4u6
+ EdhmoB3dI6fssNXASo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedruddthedgudeiucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefmlhgruhhs
+ ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
+ gvrhhnpeeuleetgeeiuefhgfekfefgveejiefgteekiedtgfdtieefhfdthfefueffvefg
+ keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
+ curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:_ICiX9N6KcYMJOj3oVbwt3micucXJBMUg_e5J8qVzWxVCTpWn3sf1g>
+ <xmx:_ICiX_5Jah2lSL8g-hujfREt23gIkvUlLUnFoA4ebTI4x3375L-LzA>
+ <xmx:_ICiX355J7tH48thwpJ3JtD7E_ndrnWnO6NSyejVfbCo51iw8vVObg>
+ <xmx:_ICiX6YI4JXWMGa8yEDftljLkULWiFu0IbUWypakfCO9IyPAjJuL5A>
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 209793280390;
+ Wed,  4 Nov 2020 05:22:51 -0500 (EST)
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for-5.2 1/3] hw/block/nvme: fix null ns in register namespace
+Date: Wed,  4 Nov 2020 11:22:46 +0100
+Message-Id: <20201104102248.32168-2-its@irrelevant.dk>
+X-Mailer: git-send-email 2.29.1
+In-Reply-To: <20201104102248.32168-1-its@irrelevant.dk>
+References: <20201104102248.32168-1-its@irrelevant.dk>
 MIME-Version: 1.0
-In-Reply-To: <81473730-4d0a-47e0-71f0-3aebdc7401e4@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.108.235.13]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190; envelope-from=shiliyang@huawei.com;
- helo=szxga04-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 05:21:16
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=64.147.123.21; envelope-from=its@irrelevant.dk;
+ helo=wout5-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 05:22:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -75,168 +107,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.chen@huawei.com, qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
- hunongda@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+ Klaus Jensen <k.jensen@samsung.com>, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Minwoo Im <minwoo.im.dev@gmail.com>,
+ Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch fixes error style problems found by checkpatch.pl:
-ERROR: "foo ** bar" should be "foo **bar".
-ERROR: "foo * bar" should be "foo *bar"
+From: Klaus Jensen <k.jensen@samsung.com>
 
-Signed-off-by: Liyang Shi <shiliyang@huawei.com>
+Fix dereference after NULL check.
 
+Reported-by: Coverity (CID 1436128)
+Fixes: b20804946bce ("hw/block/nvme: update nsid when registered")
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- bsd-user/bsdload.c |  6 +++---
- bsd-user/elfload.c | 22 +++++++++++-----------
- bsd-user/qemu.h    | 14 +++++++-------
- 3 files changed, 21 insertions(+), 21 deletions(-)
+ hw/block/nvme.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/bsd-user/bsdload.c b/bsd-user/bsdload.c
-index f38c4faacf..b2f352c041 100644
---- a/bsd-user/bsdload.c
-+++ b/bsd-user/bsdload.c
-@@ -20,7 +20,7 @@ abi_long memcpy_to_target(abi_ulong dest, const void *src,
-     return 0;
- }
-
--static int count(char ** vec)
-+static int count(char **vec)
- {
-     int         i;
-
-@@ -125,8 +125,8 @@ abi_ulong loader_build_argptr(int envc, int argc, abi_ulong sp,
-     return sp;
- }
-
--int loader_exec(const char * filename, char ** argv, char ** envp,
--             struct target_pt_regs * regs, struct image_info *infop)
-+int loader_exec(const char *filename, char **argv, char **envp,
-+             struct target_pt_regs *regs, struct image_info *infop)
- {
-     struct linux_binprm bprm;
-     int retval;
-diff --git a/bsd-user/elfload.c b/bsd-user/elfload.c
-index 32378af7b2..d5746f25e7 100644
---- a/bsd-user/elfload.c
-+++ b/bsd-user/elfload.c
-@@ -547,12 +547,12 @@ struct exec
-
- #define DLINFO_ITEMS 12
-
--static inline void memcpy_fromfs(void * to, const void * from, unsigned long n)
-+static inline void memcpy_fromfs(void *to, const void *from, unsigned long n)
- {
-         memcpy(to, from, n);
- }
-
--static int load_aout_interp(void * exptr, int interp_fd);
-+static int load_aout_interp(void *exptr, int interp_fd);
-
- #ifdef BSWAP_NEEDED
- static void bswap_ehdr(struct elfhdr *ehdr)
-@@ -613,7 +613,7 @@ static void bswap_sym(struct elf_sym *sym)
-  * to be put directly into the top of new user memory.
-  *
-  */
--static abi_ulong copy_elf_strings(int argc,char ** argv, void **page,
-+static abi_ulong copy_elf_strings(int argc,char **argv, void **page,
-                                   abi_ulong p)
- {
-     char *tmp, *tmp1, *pag = NULL;
-@@ -756,7 +756,7 @@ static void padzero(abi_ulong elf_bss, abi_ulong last_bss)
-
-
- static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
--                                   struct elfhdr * exec,
-+                                   struct elfhdr *exec,
-                                    abi_ulong load_addr,
-                                    abi_ulong load_bias,
-                                    abi_ulong interp_load_addr, int ibcs,
-@@ -834,7 +834,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
- }
-
-
--static abi_ulong load_elf_interp(struct elfhdr * interp_elf_ex,
-+static abi_ulong load_elf_interp(struct elfhdr *interp_elf_ex,
-                                  int interpreter_fd,
-                                  abi_ulong *interp_load_addr)
- {
-@@ -1143,8 +1143,8 @@ static void load_symbols(struct elfhdr *hdr, int fd)
-     syminfos = s;
- }
-
--int load_elf_binary(struct linux_binprm * bprm, struct target_pt_regs * regs,
--                    struct image_info * info)
-+int load_elf_binary(struct linux_binprm *bprm, struct target_pt_regs *regs,
-+                    struct image_info *info)
- {
-     struct elfhdr elf_ex;
-     struct elfhdr interp_elf_ex;
-@@ -1155,11 +1155,11 @@ int load_elf_binary(struct linux_binprm * bprm, struct target_pt_regs * regs,
-     unsigned int interpreter_type = INTERPRETER_NONE;
-     unsigned char ibcs2_interpreter;
-     int i;
--    struct elf_phdr * elf_ppnt;
-+    struct elf_phdr *elf_ppnt;
-     struct elf_phdr *elf_phdata;
-     abi_ulong elf_bss, k, elf_brk;
-     int retval;
--    char * elf_interpreter;
-+    char *elf_interpreter;
-     abi_ulong elf_entry, interp_load_addr = 0;
-     abi_ulong start_code, end_code, start_data, end_data;
-     abi_ulong reloc_func_desc = 0;
-@@ -1334,7 +1334,7 @@ int load_elf_binary(struct linux_binprm * bprm, struct target_pt_regs * regs,
-        and then start this sucker up */
-
-     {
--        char * passed_p;
-+        char *passed_p;
-
-         if (interpreter_type == INTERPRETER_AOUT) {
-             snprintf(passed_fileno, sizeof(passed_fileno), "%d", bprm->fd);
-@@ -1553,7 +1553,7 @@ int load_elf_binary(struct linux_binprm * bprm, struct target_pt_regs * regs,
-     return 0;
- }
-
--static int load_aout_interp(void * exptr, int interp_fd)
-+static int load_aout_interp(void *exptr, int interp_fd)
- {
-     printf("a.out interpreter not yet supported\n");
-     return(0);
-diff --git a/bsd-user/qemu.h b/bsd-user/qemu.h
-index f8bb1e5459..cbf42129e4 100644
---- a/bsd-user/qemu.h
-+++ b/bsd-user/qemu.h
-@@ -123,19 +123,19 @@ struct linux_binprm {
-         int argc, envc;
-         char **argv;
-         char **envp;
--        char * filename;        /* Name of binary */
-+        char *filename;        /* Name of binary */
- };
-
- void do_init_thread(struct target_pt_regs *regs, struct image_info *infop);
- abi_ulong loader_build_argptr(int envc, int argc, abi_ulong sp,
-                               abi_ulong stringp, int push_ptr);
--int loader_exec(const char * filename, char ** argv, char ** envp,
--             struct target_pt_regs * regs, struct image_info *infop);
-+int loader_exec(const char *filename, char **argv, char **envp,
-+             struct target_pt_regs *regs, struct image_info *infop);
-
--int load_elf_binary(struct linux_binprm * bprm, struct target_pt_regs * regs,
--                    struct image_info * info);
--int load_flt_binary(struct linux_binprm * bprm, struct target_pt_regs * regs,
--                    struct image_info * info);
-+int load_elf_binary(struct linux_binprm *bprm, struct target_pt_regs *regs,
-+                    struct image_info *info);
-+int load_flt_binary(struct linux_binprm *bprm, struct target_pt_regs *regs,
-+                    struct image_info *info);
-
- abi_long memcpy_to_target(abi_ulong dest, const void *src,
-                           unsigned long len);
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index fa2cba744b57..080d782f1c2b 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -2562,8 +2562,7 @@ int nvme_register_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+ 
+     if (!nsid) {
+         for (int i = 1; i <= n->num_namespaces; i++) {
+-            NvmeNamespace *ns = nvme_ns(n, i);
+-            if (!ns) {
++            if (!nvme_ns(n, i)) {
+                 nsid = ns->params.nsid = i;
+                 break;
+             }
 -- 
-2.29.1.59.gf9b6481aed
+2.29.1
+
 
