@@ -2,79 +2,80 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C7CC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ABF2C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:58:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85A4820BED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:58:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF36220BED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 04:58:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BVel3+qc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85A4820BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PFWwhHfi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF36220BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaAs3-0007PY-E7
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 23:58:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59804)
+	id 1kaAsj-00009s-PN
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 23:58:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAnG-00013J-IV
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:53:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53577)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAlA-0005Va-Ij
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:51:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56364)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAnE-00059T-IU
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:53:10 -0500
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAl8-0004Mc-Hv
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:51:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604465588;
+ s=mimecast20190719; t=1604465457;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=vTElEagYE/6ac5+wAhrYnP4rDr3IItx6R4ENpWim+c0=;
- b=BVel3+qcD8bGABB76IKiia+1oS9ud82v/aWjJLavovEkcFg+Z+sSXt32OR76M64OWQSFrO
- IMx6HXDkIJaN8UwktL8rnhE4U+ccJX6sOtu+akg+YjTnqme6q1xTJYQfYsRZlDYAjsJ/TC
- QZFBRfMqo0Z5dtMCuUzaUYf8rP0Z7Hs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-73DlCkPuOiCrp7xYZALQ_w-1; Tue, 03 Nov 2020 23:52:28 -0500
-X-MC-Unique: 73DlCkPuOiCrp7xYZALQ_w-1
-Received: by mail-wr1-f72.google.com with SMTP id 31so8705010wrg.12
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:52:27 -0800 (PST)
+ bh=Bbvtq4HGVJ/wSfBQLsW+iRV9/tlIpRrNFHMItefyjY8=;
+ b=PFWwhHfiHsBK5mjQvoDtLR0SPDVb+Ex6O7sB3WKGxrk/DeSPMNj4POOBZV8P6KNYarDAEV
+ pIsK910/tw4SyjMzHsA0K/YkzKMzWNzzHZral5Gg5B9J0FCKwjjcpbrWnoQEb+ib4NvgFr
+ bg/zr6QHLdQ7Akxcnh0F894CyUF2L9s=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-593-_Zba1jBtPzWzgHAE7nkH1g-1; Tue, 03 Nov 2020 23:50:56 -0500
+X-MC-Unique: _Zba1jBtPzWzgHAE7nkH1g-1
+Received: by mail-wr1-f70.google.com with SMTP id m20so8736419wrb.21
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:50:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=vTElEagYE/6ac5+wAhrYnP4rDr3IItx6R4ENpWim+c0=;
- b=QD+NzqknctZj5/tfyC5xGQlPnpq/+rfGkq1Fx+IJk1sEQdzECW09O4UZ0l1o4O35ZG
- K+jewIFSj58RUTM8Y1vuDjKY7f3uYk0A2yueYxCUl41IvQluiiwYWWD8B4cBiH/1izcA
- DU/15TN5BD6NSDi5UBpPCBrwqGupO/GumcIyR8i2AHtbrO6nXvC/XiLZueOFKbNRDGc0
- 8SYAwdjYrL5To5/aqhDMOkfwbjDyz3RgRhChTFuvZ0jKwtdB3BTCQxOahBG9DaMF3ASx
- EiZ5m8p3ueTJ0uzdXGDhH2eZO9o8Vgz4MDaXMRMYhOXDh1pgyOVU8N6zNccdW5OH5BNP
- nBlA==
-X-Gm-Message-State: AOAM532vWNKuUGBb2FFLx/ViBrdG/pNAApIthDZQLJn1AStkTgn3M4y+
- Xm0S6zBPKGwaffNBGECz68pOupx/Dj85sPkraeioBg1zGZ7q1KpXVy/CBXuP1//tdVfJKoSFjwv
- qqZB6gkxJ/Rq3ZLM=
-X-Received: by 2002:a1c:9e12:: with SMTP id h18mr2416221wme.11.1604465546652; 
- Tue, 03 Nov 2020 20:52:26 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyB5fJrYJcvdt2gVZYrFdnFKns8iyxs/fmgC7mXHBu7gSHzpe+xqaLyJNwwuulO3JRUyY526A==
-X-Received: by 2002:a1c:9e12:: with SMTP id h18mr2416203wme.11.1604465546492; 
- Tue, 03 Nov 2020 20:52:26 -0800 (PST)
+ bh=Bbvtq4HGVJ/wSfBQLsW+iRV9/tlIpRrNFHMItefyjY8=;
+ b=a32hBMddAtUzGlnPjrXVE+AjWiW/TKL15ITIu9KBbRStBesTID5KctgYDnHoUkaosk
+ v6h6Owh5wgdku8mlUwf37f5MFt9rw/yJwaSo1l1V5RxfZerncGby0eX46x7s9h7LsJOC
+ gLhaC8LMHunIlYTpsX6jJvhrdD8FippreWthyTtdSJutTDCollr/hiOzXbc6gUx1W6h/
+ 7YeNyTYBPK5b4eUctetB3PJRATAbtT79BXtJCSqyKs5ylMBOYpurzgKCOTzFd3MGyyFz
+ kgLZxB4fut5kYQCma56mOdYq1v3/ZBZ2gfcpCowwYE1NmIfWGsrElxeFUXPBxMMdN3wQ
+ /saw==
+X-Gm-Message-State: AOAM530y2WToVb8aQfyRIR9FFef1xX40h37giB298XXVPvcTZpekPBdX
+ /aYl5BAr4L+jqcBXS0eLnSQbKJV0YjibXUEqQYTimZ4jJ07Dj/obwQ/Zy8VsrPSJ1SCRQkZ4Hvp
+ 7YJcwsRX+12Q12/U=
+X-Received: by 2002:a1c:bcd6:: with SMTP id m205mr2364010wmf.47.1604465454957; 
+ Tue, 03 Nov 2020 20:50:54 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyOxRbTVqdBUveCQH8FQrRepUEeeNdF1aKWTjm86UoIM4931kx3QFE5sm6Tz1GOxjpK11sGLA==
+X-Received: by 2002:a1c:bcd6:: with SMTP id m205mr2363998wmf.47.1604465454793; 
+ Tue, 03 Nov 2020 20:50:54 -0800 (PST)
 Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id v8sm830659wmg.28.2020.11.03.20.52.25
+ by smtp.gmail.com with ESMTPSA id b5sm820732wrs.97.2020.11.03.20.50.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 20:52:25 -0800 (PST)
-Date: Tue, 3 Nov 2020 23:52:24 -0500
+ Tue, 03 Nov 2020 20:50:54 -0800 (PST)
+Date: Tue, 3 Nov 2020 23:50:51 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 38/38] vhost-user-blk-test: fix races by using fd passing
-Message-ID: <20201104044937.226370-39-mst@redhat.com>
+Subject: [PULL v2 04/38] virtio-mem: Probe THP size to determine default
+ block size
+Message-ID: <20201104044937.226370-5-mst@redhat.com>
 References: <20201104044937.226370-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
@@ -109,109 +110,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-Pass the QMP and vhost-user-blk server sockets as file descriptors. That
-way the sockets are already open and in a listen state when the QEMU
-process is launched.
+Let's allow a minimum block size of 1 MiB in all configurations. Select
+the default block size based on
+- The page size of the memory backend.
+- The THP size if the memory backend size corresponds to the real host
+  page size.
+- The global minimum of 1 MiB.
+and warn if something smaller is configured by the user.
 
-This solves the race with qemu-storage-daemon startup where the UNIX
-domain sockets may not be ready yet when QEMU attempts to connect. It
-also saves us sleeping for 1 second if the qemu-storage-daemon QMP
-socket is not ready yet.
+VIRTIO_MEM only supports Linux (depends on LINUX), so we can probe the
+THP size unconditionally.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20201027173528.213464-13-stefanha@redhat.com>
+For now we only support virtio-mem on x86-64 - there isn't a user-visible
+change (x86-64 only supports 2 MiB THP on the PMD level) - the default
+was, and will be 2 MiB.
+
+If we ever have THP on the PUD level (e.g., 1 GiB THP on x86-64), we
+expect it to be more transparent - e.g., to only optimize fully populated
+ranges unless explicitly told /configured otherwise (in contrast to PMD
+THP).
+
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20201008083029.9504-4-david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/qtest/vhost-user-blk-test.c | 42 +++++++++++++++++++------------
- 1 file changed, 26 insertions(+), 16 deletions(-)
+ hw/virtio/virtio-mem.c | 105 +++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 101 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qtest/vhost-user-blk-test.c b/tests/qtest/vhost-user-blk-test.c
-index 0d056cc189..9589f90b14 100644
---- a/tests/qtest/vhost-user-blk-test.c
-+++ b/tests/qtest/vhost-user-blk-test.c
-@@ -683,8 +683,22 @@ static char *drive_create(void)
-     return t_path;
+diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+index 461ac68ee8..655824ff81 100644
+--- a/hw/virtio/virtio-mem.c
++++ b/hw/virtio/virtio-mem.c
+@@ -33,10 +33,83 @@
+ #include "trace.h"
+ 
+ /*
+- * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
+- * memory (e.g., 2MB on x86_64).
++ * Let's not allow blocks smaller than 1 MiB, for example, to keep the tracking
++ * bitmap small.
+  */
+-#define VIRTIO_MEM_MIN_BLOCK_SIZE ((uint32_t)QEMU_VMALLOC_ALIGN)
++#define VIRTIO_MEM_MIN_BLOCK_SIZE ((uint32_t)(1 * MiB))
++
++#if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) || \
++    defined(__powerpc64__)
++#define VIRTIO_MEM_DEFAULT_THP_SIZE ((uint32_t)(2 * MiB))
++#else
++        /* fallback to 1 MiB (e.g., the THP size on s390x) */
++#define VIRTIO_MEM_DEFAULT_THP_SIZE VIRTIO_MEM_MIN_BLOCK_SIZE
++#endif
++
++/*
++ * We want to have a reasonable default block size such that
++ * 1. We avoid splitting THPs when unplugging memory, which degrades
++ *    performance.
++ * 2. We avoid placing THPs for plugged blocks that also cover unplugged
++ *    blocks.
++ *
++ * The actual THP size might differ between Linux kernels, so we try to probe
++ * it. In the future (if we ever run into issues regarding 2.), we might want
++ * to disable THP in case we fail to properly probe the THP size, or if the
++ * block size is configured smaller than the THP size.
++ */
++static uint32_t thp_size;
++
++#define HPAGE_PMD_SIZE_PATH "/sys/kernel/mm/transparent_hugepage/hpage_pmd_size"
++static uint32_t virtio_mem_thp_size(void)
++{
++    gchar *content = NULL;
++    const char *endptr;
++    uint64_t tmp;
++
++    if (thp_size) {
++        return thp_size;
++    }
++
++    /*
++     * Try to probe the actual THP size, fallback to (sane but eventually
++     * incorrect) default sizes.
++     */
++    if (g_file_get_contents(HPAGE_PMD_SIZE_PATH, &content, NULL, NULL) &&
++        !qemu_strtou64(content, &endptr, 0, &tmp) &&
++        (!endptr || *endptr == '\n')) {
++        /*
++         * Sanity-check the value, if it's too big (e.g., aarch64 with 64k base
++         * pages) or weird, fallback to something smaller.
++         */
++        if (!tmp || !is_power_of_2(tmp) || tmp > 16 * MiB) {
++            warn_report("Read unsupported THP size: %" PRIx64, tmp);
++        } else {
++            thp_size = tmp;
++        }
++    }
++
++    if (!thp_size) {
++        thp_size = VIRTIO_MEM_DEFAULT_THP_SIZE;
++        warn_report("Could not detect THP size, falling back to %" PRIx64
++                    "  MiB.", thp_size / MiB);
++    }
++
++    g_free(content);
++    return thp_size;
++}
++
++static uint64_t virtio_mem_default_block_size(RAMBlock *rb)
++{
++    const uint64_t page_size = qemu_ram_pagesize(rb);
++
++    /* We can have hugetlbfs with a page size smaller than the THP size. */
++    if (page_size == qemu_real_host_page_size) {
++        return MAX(page_size, virtio_mem_thp_size());
++    }
++    return MAX(page_size, VIRTIO_MEM_MIN_BLOCK_SIZE);
++}
++
+ /*
+  * Size the usable region bigger than the requested size if possible. Esp.
+  * Linux guests will only add (aligned) memory blocks in case they fully
+@@ -443,10 +516,23 @@ static void virtio_mem_device_realize(DeviceState *dev, Error **errp)
+     rb = vmem->memdev->mr.ram_block;
+     page_size = qemu_ram_pagesize(rb);
+ 
++    /*
++     * If the block size wasn't configured by the user, use a sane default. This
++     * allows using hugetlbfs backends of any page size without manual
++     * intervention.
++     */
++    if (!vmem->block_size) {
++        vmem->block_size = virtio_mem_default_block_size(rb);
++    }
++
+     if (vmem->block_size < page_size) {
+         error_setg(errp, "'%s' property has to be at least the page size (0x%"
+                    PRIx64 ")", VIRTIO_MEM_BLOCK_SIZE_PROP, page_size);
+         return;
++    } else if (vmem->block_size < virtio_mem_default_block_size(rb)) {
++        warn_report("'%s' property is smaller than the default block size (%"
++                    PRIx64 " MiB)", VIRTIO_MEM_BLOCK_SIZE_PROP,
++                    virtio_mem_default_block_size(rb) / MiB);
+     } else if (!QEMU_IS_ALIGNED(vmem->requested_size, vmem->block_size)) {
+         error_setg(errp, "'%s' property has to be multiples of '%s' (0x%" PRIx64
+                    ")", VIRTIO_MEM_REQUESTED_SIZE_PROP,
+@@ -742,6 +828,18 @@ static void virtio_mem_get_block_size(Object *obj, Visitor *v, const char *name,
+     const VirtIOMEM *vmem = VIRTIO_MEM(obj);
+     uint64_t value = vmem->block_size;
+ 
++    /*
++     * If not configured by the user (and we're not realized yet), use the
++     * default block size we would use with the current memory backend.
++     */
++    if (!value) {
++        if (vmem->memdev && memory_region_is_ram(&vmem->memdev->mr)) {
++            value = virtio_mem_default_block_size(vmem->memdev->mr.ram_block);
++        } else {
++            value = virtio_mem_thp_size();
++        }
++    }
++
+     visit_type_size(v, name, &value, errp);
  }
  
--static char sock_path_tempate[] = "/tmp/qtest.vhost_user_blk.XXXXXX";
--static char qmp_sock_path_tempate[] = "/tmp/qtest.vhost_user_blk.qmp.XXXXXX";
-+static char *create_listen_socket(int *fd)
-+{
-+    int tmp_fd;
-+    char *path;
-+
-+    /* No race because our pid makes the path unique */
-+    path = g_strdup_printf("/tmp/qtest-%d-sock.XXXXXX", getpid());
-+    tmp_fd = mkstemp(path);
-+    g_assert_cmpint(tmp_fd, >=, 0);
-+    close(tmp_fd);
-+    unlink(path);
-+
-+    *fd = qtest_socket_server(path);
-+    g_test_queue_destroy(destroy_file, path);
-+    return path;
-+}
- 
- static void quit_storage_daemon(void *qmp_test_state)
+@@ -821,7 +919,6 @@ static void virtio_mem_instance_init(Object *obj)
  {
-@@ -709,37 +723,33 @@ static void start_vhost_user_blk(GString *cmd_line, int vus_instances,
-                                  int num_queues)
- {
-     const char *vhost_user_blk_bin = qtest_qemu_storage_daemon_binary();
--    int fd, qmp_fd, i;
-+    int qmp_fd, i;
-     QTestState *qmp_test_state;
-     gchar *img_path;
--    char *sock_path = NULL;
--    char *qmp_sock_path = g_strdup(qmp_sock_path_tempate);
-+    char *qmp_sock_path;
-     GString *storage_daemon_command = g_string_new(NULL);
+     VirtIOMEM *vmem = VIRTIO_MEM(obj);
  
--    qmp_fd = mkstemp(qmp_sock_path);
--    g_assert_cmpint(qmp_fd, >=, 0);
--    g_test_queue_destroy(destroy_file, qmp_sock_path);
-+    qmp_sock_path = create_listen_socket(&qmp_fd);
+-    vmem->block_size = VIRTIO_MEM_MIN_BLOCK_SIZE;
+     notifier_list_init(&vmem->size_change_notifiers);
+     vmem->precopy_notifier.notify = virtio_mem_precopy_notify;
  
-     g_string_append_printf(storage_daemon_command,
-             "exec %s "
--            "--chardev socket,id=qmp,path=%s,server,nowait --monitor chardev=qmp ",
--            vhost_user_blk_bin, qmp_sock_path);
-+            "--chardev socket,id=qmp,fd=%d,server,nowait --monitor chardev=qmp ",
-+            vhost_user_blk_bin, qmp_fd);
- 
-     g_string_append_printf(cmd_line,
-             " -object memory-backend-memfd,id=mem,size=256M,share=on -M memory-backend=mem ");
- 
-     for (i = 0; i < vus_instances; i++) {
--        sock_path = g_strdup(sock_path_tempate);
--        fd = mkstemp(sock_path);
--        g_assert_cmpint(fd, >=, 0);
--        g_test_queue_destroy(drive_file, sock_path);
-+        int fd;
-+        char *sock_path = create_listen_socket(&fd);
-+
-         /* create image file */
-         img_path = drive_create();
-         g_string_append_printf(storage_daemon_command,
-             "--blockdev driver=file,node-name=disk%d,filename=%s "
--            "--export type=vhost-user-blk,id=disk%d,addr.type=unix,addr.path=%s,"
-+            "--export type=vhost-user-blk,id=disk%d,addr.type=fd,addr.str=%d,"
-             "node-name=disk%i,writable=on,num-queues=%d ",
--            i, img_path, i, sock_path, i, num_queues);
-+            i, img_path, i, fd, i, num_queues);
- 
-         g_string_append_printf(cmd_line, "-chardev socket,id=char%d,path=%s ",
-                                i + 1, sock_path);
 -- 
 MST
 
