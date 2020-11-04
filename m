@@ -7,63 +7,60 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F90C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 21:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAF52C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 21:25:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B9012076D
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 21:23:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B9012076D
+	by mail.kernel.org (Postfix) with ESMTPS id 154922076D
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 21:25:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 154922076D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaQFT-0007Sw-GG
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 16:23:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55418)
+	id 1kaQH9-0008Mc-0D
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 16:25:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kaQEo-0006vk-46; Wed, 04 Nov 2020 16:22:38 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:38533)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kaQGb-0007xX-A0
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 16:24:29 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:48597)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kaQEl-0005G3-0y; Wed, 04 Nov 2020 16:22:37 -0500
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kaQGZ-0005Oy-Nz
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 16:24:29 -0500
 Received: from [192.168.100.1] ([82.252.154.198]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N6svJ-1kH78m3yk3-018N0C; Wed, 04 Nov 2020 22:22:20 +0100
-Subject: Re: [PATCH v2 4/8] linux-user/mips/cpu_loop: silence the compiler
- warnings
-To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20201030004046.2191790-1-kuhn.chenqun@huawei.com>
- <20201030004046.2191790-5-kuhn.chenqun@huawei.com>
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MTiHb-1kmL3M3Pfp-00U4a3; Wed, 04 Nov 2020 22:24:25 +0100
+Subject: Re: [PATCH] linux-user: Check copy_from_user() return value in
+ vma_dump_size()
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20201103141532.19912-1-peter.maydell@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <f5947be2-40a4-ba46-280f-5acc546d4ffd@vivier.eu>
-Date: Wed, 4 Nov 2020 22:22:17 +0100
+Message-ID: <6d19a37d-f7a2-9257-3b58-03a5231b2311@vivier.eu>
+Date: Wed, 4 Nov 2020 22:24:25 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201030004046.2191790-5-kuhn.chenqun@huawei.com>
+In-Reply-To: <20201103141532.19912-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:RoUhkRYYCeYVDdMfDlkz6jcHaVRUpBM7QDRLn7WDAX4y77SsPXL
- 41fQ6V2g7tWyyZsRQ10PdbHsJyNTNyKPVDLVzoR7ZE+1U02UN+zzYi8/GciiudYIxzi9NqS
- rJFBgSFNimWINPKwtbb8OCl/Kn/KxvSdDAohD34XwAu6reCWp6MolcGQ2gQHqX3+P4aDMJU
- fSVGdOZfMAjZGWX9flL1Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:rtn+bfUrVfU=:3V8hdSWT4q57J1+vJpqU6M
- 35cJHF8T6CrXr7NP1MPHmTJlxBFm/rCAd37StRO1skg+6nGiVVtFApwdU90smi9/GJAZeBiEl
- 7haPHgxQFCedRweN1Sj2TtNDa7fZNJdIN/8IetE9ByH9PBCcvp+1KxqZnR08UFdCPPuDCLZpx
- 7XdfZ/NsQzMVecNWhOdh3Wb5I1lgHgAiDm4tWoFvxU6GilX62CuUW7ZjMC8DEqlzig4J8WlUU
- Kb+fjg4REBDbrm7WcxISVcoMWobUo8ZWytU8g1U/MR/l6zIeL8vyOuuB6Q5IA5CJxinHfRP7Y
- vAdAEaSRbPxjGlN/wOubEhCobMXO9S0hbrXn2KbSrtrIvgPeAiq1gHdMUSWZoo7RY48TEg/Ow
- aYa9UPSXOn4f4FDxdkMWiV/Ir7IcJyp7y6PlgRvfLFsWxAV3jmLa7amTGcG04MP5J0IKQ2Zo4
- YMdnHsakcA==
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:XakDRKori1/IzKCj3RFAY0JHDk0QhF+F5CwZWKpUvZRREW8XwaV
+ FKQHNwWZocg1hkRF0yC5BtIhXRoRDeu2gKeT6YsZ7XTTPZScgd8eRl5FUGOaD5SgWYZ89wa
+ Ho4r7933yGzWi2RUe9Xzq6jXZeknAJQqAfTH61dhBn03UNLYOSXThYsKTLpGZ6rxkhghjFM
+ ja+ACqRrnBdIBJVmTiMhQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:I3aXxU5EBo8=:A1jHOXQsFmCx8ikFvxx5dY
+ FHPgkLK4/2sdl4y2TLdIzFAIixHddQGXfeBTBWiPZkTupXykcwtRm1GSKQ3A5mQhZBYVUSLeI
+ UT9yKkpUc6FxB5ejLqE7u4V81Y7GdVlXkzbZ1KwdAQi8yjUjO9KKNgpvBCfRIh4v+vCheuaTX
+ uH9qXCk1jyEteDxs9sSH55VW31K7verjBxK+fOIx/Et+PmeP1mVT4v+BrcpoJUkk3w1jlYDAr
+ AuhVcsl3drOO0fwE6VZxJhLjBBBoOcy8Tmfvs/JXszXQ/F1PWXdLLGvphO5J8DhK3Va1rYfPK
+ hLodPsPKkbfdK6P+1jQQoutHrV7QXt3J7wZX2CwZljQSs9uFsyilhtdB5oqb9rKESOF8+qPPw
+ 6NsL/h0ofPosQ2DEU4ZHqwzw4sG5824fMOSCtb6fAHtF/berctJcQWQqcf7cf
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 16:22:31
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 16:24:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -83,77 +80,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com,
- ganqixin@huawei.com, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 30/10/2020 à 01:40, Chen Qun a écrit :
-> When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warning:
-> linux-user/mips/cpu_loop.c: In function ‘cpu_loop’:
-> linux-user/mips/cpu_loop.c:104:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
->   104 |                     if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
->       |                        ^
-> linux-user/mips/cpu_loop.c:107:17: note: here
->   107 |                 case 7:
->       |                 ^~~~
-> linux-user/mips/cpu_loop.c:108:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
->   108 |                     if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
->       |                        ^
-> linux-user/mips/cpu_loop.c:111:17: note: here
->   111 |                 case 6:
->       |                 ^~~~
-> linux-user/mips/cpu_loop.c:112:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
->   112 |                     if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
->       |                        ^
-> linux-user/mips/cpu_loop.c:115:17: note: here
->   115 |                 case 5:
->       |                 ^~~~
+Le 03/11/2020 à 15:15, Peter Maydell a écrit :
+> Coverity points out that we don't check the return value from
+> copy_from_user() in vma_dump_size(). This is to some extent
+> a "can't happen" error since we've already checked the page
+> with an access_ok() call earlier, but it's simple enough to
+> handle the error anyway.
 > 
-> Add the corresponding "fall through" comment to fix it.
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Fixes: Coverity CID 1432362
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> ---
->  linux-user/mips/cpu_loop.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  linux-user/elfload.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-> index 553e8ca7f5..cfe7ba5c47 100644
-> --- a/linux-user/mips/cpu_loop.c
-> +++ b/linux-user/mips/cpu_loop.c
-> @@ -104,18 +104,22 @@ void cpu_loop(CPUMIPSState *env)
->                      if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
->                          goto done_syscall;
->                      }
-> +                    /* fall through */
->                  case 7:
->                      if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
->                          goto done_syscall;
->                      }
-> +                    /* fall through */
->                  case 6:
->                      if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
->                          goto done_syscall;
->                      }
-> +                    /* fall through */
->                  case 5:
->                      if ((ret = get_user_ual(arg5, sp_reg + 16)) != 0) {
->                          goto done_syscall;
->                      }
-> +                    /* fall through */
->                  default:
->                      break;
->                  }
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index bf8c1bd2533..e19d0b5cb05 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -3484,7 +3484,9 @@ static abi_ulong vma_dump_size(const struct vm_area_struct *vma)
+>      if (vma->vma_flags & PROT_EXEC) {
+>          char page[TARGET_PAGE_SIZE];
+>  
+> -        copy_from_user(page, vma->vma_start, sizeof (page));
+> +        if (copy_from_user(page, vma->vma_start, sizeof (page))) {
+> +            return 0;
+> +        }
+>          if ((page[EI_MAG0] == ELFMAG0) &&
+>              (page[EI_MAG1] == ELFMAG1) &&
+>              (page[EI_MAG2] == ELFMAG2) &&
 > 
 
-Applied to my linux-user-for-5.2 branch.
-
-Thanks,
-Laurent
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
