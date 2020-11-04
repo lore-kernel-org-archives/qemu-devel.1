@@ -2,76 +2,88 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F31C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD8DC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:59:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0676B2072E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:55:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0676B2072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1E6B320639
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:59:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="umPGdLgI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E6B320639
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaN0U-0004mh-RG
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 12:55:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39514)
+	id 1kaN3z-0006Lb-W3
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 12:59:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kaMzn-0003pG-Ul; Wed, 04 Nov 2020 12:54:55 -0500
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:58383)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kaMzl-0003M0-Aj; Wed, 04 Nov 2020 12:54:55 -0500
-Received: from mxplan5.mail.ovh.net (unknown [10.109.146.197])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id A972570EF28F;
- Wed,  4 Nov 2020 18:54:41 +0100 (CET)
-Received: from kaod.org (37.59.142.97) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 4 Nov 2020
- 18:54:40 +0100
-Authentication-Results: garm.ovh; auth=pass
- (GARM-97G002a60b9b55-a377-4b09-8ef1-53f1e0dae1a2,
- B675344909C57F45DE6B9FBDE8367EDF8CA03E23) smtp.auth=groug@kaod.org
-Date: Wed, 4 Nov 2020 18:54:39 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH-for-5.2 v3 2/4] hw/9pfs: Fix Kconfig dependency problem
- between 9pfs and Xen
-Message-ID: <20201104185439.41e9ddb3@bahia.lan>
-In-Reply-To: <8965407.pN9RvXrJQ9@silver>
-References: <20201104115706.3101190-1-philmd@redhat.com>
- <20201104115706.3101190-3-philmd@redhat.com>
- <8965407.pN9RvXrJQ9@silver>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kaN2j-0005Vt-Qv
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:57:57 -0500
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:41843)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kaN2i-0003oW-71
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 12:57:57 -0500
+Received: by mail-ed1-x544.google.com with SMTP id l24so23345345edj.8
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 09:57:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=jKqnLeZ/soRP6JFVfVPo1dIj3et6wA0vrOMOsss4RRY=;
+ b=umPGdLgIickMRNQC6uGq5q8ilGMPvj1OPXYT1re+FFoZkpIRrQLZVEYdfCNLbs6zeN
+ anpsmpujcA7ZDNU2rPEqAWSEyxNfR08B6Blm68sWjZPsdJIQTT5VTJKUQfR4BV+4k5D4
+ 5BFzISDjSuvH6y2bWsHv9Ewyyy/s/eM6Z4oof0croVRfKuRueAinkRqf/Sh+Z/wp+QBo
+ Q3W3CkKfkzUP1cxLKUWFV46W/tsY9HBRN7US/HO4T7ymG+Zg4REfccg1ZY8I9bhz1Q6y
+ EtJRxDX2QEEm/XCHe18NHqmwvcmB6nRl1dCZgAw39NYu/xsjvFVJ0FA270OSsUWLU0gM
+ rWyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=jKqnLeZ/soRP6JFVfVPo1dIj3et6wA0vrOMOsss4RRY=;
+ b=Nukb+pnUvPCIZZND3ouisW42/E0oJN1g73mw70Jd4P75R9ETwSqRmgQWTmQQApdXZb
+ 9D0q2d6e4KvFmmLAcJ1TYUDOfTyuATYK4q4GT5IW52z9VWIU4djl4ejVMMBWMny49Ws7
+ 1JqBbUs2oJ9/FovmAoHl+VSPPtYGkrBSr1JVN+YJHUZ8632pC9p0YO7i/sX9Sks+QVyn
+ jHh2+BnTpxWo9MiS0Nb13SVRu1PUv+mtOzKQ9Dm/AAdCzg2WIxtsjiw60nbzaNlaZsFW
+ ywFmzMmbTbZLgXbzjx20IJ5sqs254xTOmZ0xojVBEV/7Lyvfj3siQnRBVYXX9RYC7NZZ
+ 1I0A==
+X-Gm-Message-State: AOAM532f+ce1fkjEh1fa1VbVwny0sQZuUc51t0hPLFRiv7/d0soTRwHn
+ hp96opzz1+MYzcEeaEVZMCinc5UijAEP3NmSuLd1zQ==
+X-Google-Smtp-Source: ABdhPJz2uoXLcBU0HRpT+Tbq8w2OeKKPtHoesQtaRVRJv++aU96prNm7rxmeS18DDNDYwhWTd4hRr7rnzNSufBgRl4I=
+X-Received: by 2002:a05:6402:4c6:: with SMTP id
+ n6mr28823057edw.204.1604512674444; 
+ Wed, 04 Nov 2020 09:57:54 -0800 (PST)
 MIME-Version: 1.0
+References: <20201104103343.30392-1-drjones@redhat.com>
+ <612eaae4-6e05-568e-01cc-a191bbb7c835@redhat.com>
+In-Reply-To: <612eaae4-6e05-568e-01cc-a191bbb7c835@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 4 Nov 2020 17:57:43 +0000
+Message-ID: <CAFEAcA93GCoVTSxW_64W_Fmut2O74UXZJGej4FE7g_atGa0VDw@mail.gmail.com>
+Subject: Re: [PATCH] hw/arm/Kconfig: ARM_V7M depends on PTIMER
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [37.59.142.97]
-X-ClientProxiedBy: DAG2EX2.mxp5.local (172.16.2.12) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 003e621b-1e17-4f77-9185-fd9f201e51e8
-X-Ovh-Tracer-Id: 16924808878257838352
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedruddthedguddtkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveelhfdtudffhfeiveehhfelgeellefgteffteekudegheejfffghefhfeeuudffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdeljeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheprhhthhesthifihguughlvgdrnhgvth
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 12:54:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_BL_SPAMCOP_NET=1.347,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,110 +96,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>, "Daniel P .
- Berrange" <berrange@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>,
- Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Wainer dos
- Santos Moschetta <wainersm@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Paul Durrant <paul@xen.org>, Richard Henderson <rth@twiddle.net>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 04 Nov 2020 13:18:09 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-
-> On Mittwoch, 4. November 2020 12:57:04 CET Philippe Mathieu-Daud=C3=A9 wr=
-ote:
-> > Commit b2c00bce54c ("meson: convert hw/9pfs, cleanup") introduced
-> > CONFIG_9PFS (probably a wrong conflict resolution). This config is
-> > not used anywhere. Backends depend on CONFIG_FSDEV_9P which itself
-> > depends on CONFIG_VIRTFS.
-> >=20
-> > Remove the invalid CONFIG_9PFS and use CONFIG_FSDEV_9P instead, to
-> > fix the './configure --without-default-devices --enable-xen' build:
-> >=20
-> >   /usr/bin/ld: libcommon.fa.p/hw_xen_xen-legacy-backend.c.o: in function
-> > `xen_be_register_common': hw/xen/xen-legacy-backend.c:754: undefined
-> > reference to `xen_9pfs_ops' /usr/bin/ld:
-> > libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x8): undefined referenc=
-e to
-> > `local_ops' /usr/bin/ld:
-> > libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x20): undefined referen=
-ce
-> > to `synth_ops' /usr/bin/ld:
-> > libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x38): undefined referen=
-ce
-> > to `proxy_ops' collect2: error: ld returned 1 exit status
-> >=20
-> > Fixes: b2c00bce54c ("meson: convert hw/9pfs, cleanup")
-> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Acked-by: Greg Kurz <groug@kaod.org>
-> > Tested-by: Greg Kurz <groug@kaod.org>
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> Acked-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
->=20
-
-Phil,
-
-Same questioning as Connie. Do you intend to get this merged or should
-Christian or I take care of that ?
-
+On Wed, 4 Nov 2020 at 10:35, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+>
+> On 11/4/20 11:33 AM, Andrew Jones wrote:
+> > commit 32bd322a0134 ("hw/timer/armv7m_systick: Rewrite to use ptimers")
+> > changed armv7m_systick to build on ptimers. Make sure we have ptimers
+> > in the build when building armv7m_systick.
+> >
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > > ---
-> > v2: Reworded description (Greg)
-> >=20
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > Cc: Paul Durrant <paul@xen.org>
-> > Cc: xen-devel@lists.xenproject.org
-> > Cc: Greg Kurz <groug@kaod.org>
-> > Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > ---
-> >  hw/9pfs/Kconfig     | 4 ----
-> >  hw/9pfs/meson.build | 2 +-
-> >  2 files changed, 1 insertion(+), 5 deletions(-)
-> >=20
-> > diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
-> > index d3ebd737301..3ae57496613 100644
-> > --- a/hw/9pfs/Kconfig
-> > +++ b/hw/9pfs/Kconfig
-> > @@ -2,12 +2,8 @@ config FSDEV_9P
-> >      bool
-> >      depends on VIRTFS
-> >=20
-> > -config 9PFS
-> > -    bool
-> > -
-> >  config VIRTIO_9P
-> >      bool
-> >      default y
-> >      depends on VIRTFS && VIRTIO
-> >      select FSDEV_9P
-> > -    select 9PFS
-> > diff --git a/hw/9pfs/meson.build b/hw/9pfs/meson.build
-> > index cc094262122..99be5d91196 100644
-> > --- a/hw/9pfs/meson.build
-> > +++ b/hw/9pfs/meson.build
-> > @@ -15,6 +15,6 @@
-> >    'coxattr.c',
-> >  ))
-> >  fs_ss.add(when: 'CONFIG_XEN', if_true: files('xen-9p-backend.c'))
-> > -softmmu_ss.add_all(when: 'CONFIG_9PFS', if_true: fs_ss)
-> > +softmmu_ss.add_all(when: 'CONFIG_FSDEV_9P', if_true: fs_ss)
-> >=20
-> >  specific_ss.add(when: 'CONFIG_VIRTIO_9P', if_true:
-> > files('virtio-9p-device.c'))
->=20
-> Best regards,
-> Christian Schoenebeck
->=20
->=20
+> >  hw/arm/Kconfig | 1 +
+> >  1 file changed, 1 insertion(+)
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+
+
+Applied to target-arm.next, thanks.
+
+-- PMM
 
