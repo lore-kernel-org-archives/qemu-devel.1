@@ -1,80 +1,82 @@
-Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04933C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:36:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82181C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 00:02:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2B9A20739
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 23:36:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2B9A20739
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 93300206F4
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 00:02:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93300206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaSKS-0005eJ-TN
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 18:36:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51700)
+	id 1kaSjb-0001IW-HL
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 19:02:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kaSJ9-0004eZ-QP; Wed, 04 Nov 2020 18:35:15 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:41145)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kaSJ7-0004RC-FH; Wed, 04 Nov 2020 18:35:15 -0500
-Received: from [192.168.100.1] ([82.252.154.198]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MxVfj-1kPMXc1OZ7-00xs4P; Thu, 05 Nov 2020 00:35:09 +0100
-Subject: Re: [QEMU] Question regarding user mode support for ARM syscalls
-To: Lukasz Majewski <lukma@denx.de>, Alistair Francis <alistair23@gmail.com>
-References: <20201103120027.6fdc868c@jawa>
- <CAKmqyKOFxO+NoyA0N2HbNDujKdDg4vFyMvpq=6+TPPxx4-VMFw@mail.gmail.com>
- <20201103175532.796074fb@jawa>
- <CAKmqyKNRU8EqcyVv4gduNsKcMOUWSmW2oWTvfWMNS3C70Nx9PQ@mail.gmail.com>
- <20201104115706.154e76a4@jawa>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <bd34a46a-545b-49d4-7696-e62599947b83@vivier.eu>
-Date: Thu, 5 Nov 2020 00:35:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kaSiF-0000Sq-6u
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 19:01:11 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43568)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kaSi9-0007dA-Gq
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 19:01:10 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kaSi6-00050u-I0
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 00:01:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8109A2E80AB
+ for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 00:01:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20201104115706.154e76a4@jawa>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:gGRlV9IQoAwrkt6pJYnT78Pz5DTtJDlPivsJrH/H3q3k+JHY3ex
- kqG9hDk5qSToFNNgJFYAiqj0KUUGgS2SieIhRQF9UoD4rStPVoar3RUE1jOFF+C8EKyNbCY
- zj018IXFmAvQ5Sl77TlKerv4UeLquFyEYp/SH7O/i4HQBOU25d2OByxWWiX638Tr+ErV979
- mIyCbpW222L/cCdj5E8VA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:e6Y42seEdj0=:6qmCcAtf9Ugnmp7mxl5BJz
- i6R01asNnRpWHRmACkZBiqDFLgaJozW84iUQKRxlVZYbboTOb3edTssjlxBSPyHls/w0WIzTX
- XiFidVzrAfSvYmBKaW4ukh1pGNIeseC2vZg59YEk/UrVS9awRtF9K8Cx3NjrgNsUfNnAMCdyo
- GIY5Rc8GUOE6G5RgH7C/Y7OUV4/kagpVRGoKManEkz3sBk3MxG1nWklfZSi5FqGN4nh+zmfiF
- Y6YC2a5dKxNaG5ACCQwzxD34ft3xhhZjwwMo2nDvpvm9mRN+Yf7YhJiQOEImtkeQQJS65akT6
- /YaLxZYD81rN58YlIduvb4wV7mfOjlSESs70bk+ymhorCCrLQzE4njFAR7O7/ig3yvtSJpVyz
- /6PIvfnb6JDy8Zz6fjUEKb04uwOu9vBm+6B2p1UVjMgY6JsloR28a+PAyi3d0
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 18:35:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 04 Nov 2020 23:48:28 -0000
+From: John Snow <1681439@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr bugs-syssec janitor jnsnow kempniu th-huth
+X-Launchpad-Bug-Reporter: =?utf-8?b?TWljaGHFgiBLxJlwaWXFhCAoa2VtcG5pdSk=?=
+X-Launchpad-Bug-Modifier: John Snow (jnsnow)
+References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
+Message-Id: <160453370817.19128.5024093621288569432.malone@soybean.canonical.com>
+Subject: [Bug 1681439] Re: qemu-system-x86_64: hw/ide/core.c:685:
+ ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb == NULL' failed.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
+X-Launchpad-Hash: 62cccdf0cdc57176ee43c4f8d17745424aa180fb
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 17:35:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,227 +85,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: GNU C Library <libc-alpha@sourceware.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-discuss <qemu-discuss@nongnu.org>
+Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 04/11/2020 à 11:57, Lukasz Majewski a écrit :
-> Hi Alistair,
-> 
->> On Tue, Nov 3, 2020 at 8:55 AM Lukasz Majewski <lukma@denx.de> wrote:
->>>
->>> Hi Alistair,
->>>  
->>>> On Tue, Nov 3, 2020 at 3:03 AM Lukasz Majewski <lukma@denx.de>
->>>> wrote:  
->>>>>
->>>>> Dear Qemu Community,  
->>>>
->>>> Hey Lukasz,
->>>>
->>>> + QEMU Dev Mailing list
->>>> + Laurent
->>>>  
->>>
->>> Thanks for reaching more people.
->>>  
->>>>>
->>>>> I would like to ask you for some advice regarding the usage of
->>>>> arm-linux-user/qemu-arm user space program simulation.
->>>>>
->>>>> Background:
->>>>> -----------
->>>>>
->>>>> I'm looking for a way to efficiently test y2038 in-glibc
->>>>> solution for 32 bit architectures (e.g. ARM).
->>>>>
->>>>> For now I do use qemu-system-arm (part of Yocto/OE), which I'm
->>>>> using to run Linux kernel 5.1, glibc under test and Y2038
->>>>> tests. It works [1].
->>>>>
->>>>> Problem:
->>>>> --------
->>>>>
->>>>> I would like to test cross-compiled tests (which are built from
->>>>> glibc sources) without the need to run the emulated system with
->>>>> qemu-system-arm.
->>>>>
->>>>> I've come across the "QEMU user mode", which would execute the
->>>>> cross-compiled test (with already cross-compiled glibc via -L
->>>>> switch) and just return exit status code. This sounds
->>>>> appealing.  
->>>>
->>>> As another advantage it is much, much faster at running the glibc
->>>> tests.
->>>>  
->>>
->>> +1
->>>  
->>>>>
->>>>> As fair as I've read - QEMU user mode emulates ARM syscalls.
->>>>>
->>>>> During test execution (single qemu user mode process) I would
->>>>> need to adjust date with clock_settime64 syscall and then
->>>>> execute other syscalls if needed.
->>>>>
->>>>>
->>>>> Please correct me if I'm wrong:
->>>>> - It looks like qemu-arm doesn't have switch which would allow
->>>>> it to set time offset (to e.g. year 2039 - something similar to
->>>>>   qemu-system-arm -rtc=).
->>>>>
->>>>> - As of 5.1 qemu version there is no support for syscalls
->>>>> supporting 64 bit time on 32 bit architectures (e.g.
->>>>> clock_settime64 and friends from [2]).  
->>>>
->>>> There is some support in the current master, for example
->>>> __NR_futex_time64 is supported.  
->>>
->>> I've just looked into v5.1.0 stable release. I will double check
->>> this with -master branch.
->>>  
->>>>
->>>> I started to add some support for RV32 once it was merged into
->>>> glibc.  
->>>
->>> Ok.
->>>  
->>>>  
->>>>>
->>>>> For my example program [3] statically build for testing (it
->>>>> works with qemu-system-arm):
->>>>>
->>>>> ~/work/qemu-arm-tests-program$
->>>>> ../qemu-5.1.0-arm/arm-linux-user/qemu-arm -L
->>>>> ~/work/yocto/y2038/build/tmp/armv7at2hf-neon-poky-linux-gnueabi/y2038-glibc/2.30+git999-r0/image/opt
->>>>> -strace ./cst
->>>>>
->>>>> 17746 brk(NULL) = 0x00074000
->>>>> 17746 brk(0x000748a8) = 0x000748a8
->>>>> 17746 uname(0x40800370) = 0
->>>>> 17746 readlink("/proc/self/exe",0x407ff488,4096) = 43
->>>>> 17746 brk(0x000958a8) = 0x000958a8
->>>>> 17746 brk(0x00096000) = 0x00096000
->>>>> 17746 mprotect(0x00070000,8192,PROT_READ) = 0
->>>>> 17746statx(1,"",AT_EMPTY_PATH|AT_NO_AUTOMOUNT,STATX_BASIC_STATS,0x407ffd70)
->>>>> = 0
->>>>> 17746 Unknown syscall 404 --> is the syscall number of
->>>>> clock_settime64  
->>>>
->>>> clock_settime64 is supported in master QEMU.  
->>>
->>> I will double check it - thanks for pointing this out.
->>>  
->>>>  
->>>>>
->>>>> 17746 dup(2) = 3
->>>>> 17746 fcntl64(3,F_GETFL) = 2
->>>>> 17746statx(3,"",AT_EMPTY_PATH|AT_NO_AUTOMOUNT,STATX_BASIC_STATS,0x407ff8e8)
->>>>> = 0 ERR
->>>>>
->>>>> Questions:
->>>>> ----------
->>>>>
->>>>> 1. Is there any plan to add support for emulating syscalls
->>>>> supporting 64 bit time on 32 bit architectures [2]?  
->>>>
->>>> I would like to have RV32 supported, but it's a low priority for
->>>> me.  
->>>
->>> Having syscalls supporting 64 bit time on 32 bit machines indicated
->>> in [2] would be a very welcome for glibc testing.
->>>  
->>>> I
->>>> expect it's something that will eventually happen though.  
->>>
->>> Ok.
->>>  
->>>>  
->>>>>
->>>>> 2. Provide QEMU user space switch to adjust its time (i.e. add
->>>>> some offset to in-fly emulated time syscalls - like
->>>>> clock_settime64) when it is started?  
->>>>
->>>> That I'm not sure about.  
->>>
->>> For me it would be enough to have:
->>>
->>> qemu-arm -rtc="2039-01-01" -L... ./ctx
->>> So the emulated "time" would be after 32 bit time_t overflow when
->>> QEMU user space emulation process starts (as long as it doesn't
->>> touch the host machine time).
->>>
->>>
->>> Another option (workaround) would be to run clock_settime64() with
->>> time set to year 2038+ on the beginning of each glibc test. It
->>> shall work as long as we don't change host time (and all time
->>> changes would stay in the qemu user mode process).
->>>  
->>>> I assume just running date/clock_settime64
->>>> from a script wouldn't work with the glibc test framework?  
->>>
->>> Could you elaborate on this use case/scenario? Do you have some
->>> examples to share?  
->>
->> Whoops, I got confused here. The clock_gettime syscall goes to the
->> host, so we just report host time. I was thinking about softMMU where
->> we maintain our own time.
->>
->> So your proposed `-rtc` command would add an offset to the host time?
->> Something like:
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 3160a9ba06..240bd59bb2 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -12074,6 +12074,7 @@ static abi_long do_syscall1(void *cpu_env, int
->> num, abi_long arg1,
->>
->>          ret = target_to_host_timespec64(&ts, arg2);
->>          if (!is_error(ret)) {
->> +            ts.tv_sec -= 567993505;
->>              ret = get_errno(clock_settime(arg1, &ts));
->>          }
->>          return ret;
->> @@ -12096,6 +12097,8 @@ static abi_long do_syscall1(void *cpu_env, int
->> num, abi_long arg1,
->>          struct timespec ts;
->>          ret = get_errno(clock_gettime(arg1, &ts));
->>          if (!is_error(ret)) {
->> +            // Calculate different to same time in 2038
->> +            ts.tv_sec += 567993505;
->>              ret = host_to_target_timespec64(arg2, &ts);
->>          }
->>          return ret;
->>
->> That might end up working if you can intercept all of the absolute
->> time syscalls.
-> 
-> It looks to me that intercepting _all_ time related syscalls seems to
-> be a time consuming task.
-> 
->>
->> Without any mainline support that would be easy to do in your local
->> tree,
-> 
-> The "local tree" solution is not an acceptable solution for me.
-> 
->> which would at least allow you to test. You could also change
->> your host time to 2038, but that would break things for your host.
-> 
-> Yes, I would like to avoid changing the host time.
-> 
->
+TLDR: I am not actively working on this, because the problem extends
+well below IDE and I don't have the bandwidth to take point on this at
+the moment.
 
-I didn't read all the mail history but I think you should play with the
-time namespace, see "unshare" and "--time" parameter.
+Here's a writeup I sent to qemu-devel on 2020-07-30:
 
-https://man7.org/linux/man-pages/man1/unshare.1.html
-https://man7.org/linux/man-pages/man7/time_namespaces.7.html
 
-Thanks,
-Laurent
+First, the (partially bogus, fuzzer-generated) IDE command wants to:
+
+1. dma write 259 sectors starting at sector 1
+
+2. Provides a PRDT at addr 0x00 whose first PRDT describes a data buffer
+at 0xffffffff of length 0x10000. [a]
+
+3. The remaining 8,191 PRD entries are uninitialized memory that all
+wind up describing the same data buffer at 0x00 of length 0x10000.
+
+Generally, the entire PRDT is going to be read, but truncated into an
+SGList that's exactly as long as the IDE command. Here, that's 0x20600
+bytes.
+
+Yadda, yadda, yadda, that winds up turning into these map requests:
+
+addr 0xffffffff; len 0x10000
+  -- mapped length: 0x01 (normal map return)
+
+addr 0x100000000; len 0xffff
+  -- mapped length: 0x1000 (bounce buffer return)
+
+addr 0x100001000; len 0xefff
+  -- bounce buffer is busy, cannot map
+
+Then it proceeds and calls the iofunc. We return to dma_blk_cb and then:
+
+unmap 0xffffffff; len 0x01; access_len 0x01;
+
+... That unmaps the "direct" one, but we seemingly fail to unmap the
+indirect one.
+
+Uh, cool. When we build the IOV, we build it with two entries; but
+qemu_iovec_discard_back discards the second entry entirely without
+unmapping it.
+
+IDE asks for an alignment of BDRV_SECTOR_SIZE (512 bytes). The IDE state
+machine transfers an entire sector or nothing at all. The total IOV size
+we have build thus far is 0x1001 bytes, which is not aligned as you
+might have noticed.
+
+So, we try to align it:
+
+qemu_iovec_discard_back(&dbs->iov, QEMU_ALIGN_DOWN(4097, 512))
+
+... I think we probably wanted to ask to shave off one byte instead of
+asking to shave off 4096 bytes.
+
+
+So, a few perceived problems with dma_blk_cb:
+
+1. Our alignment math is wrong. discard_back takes as an argument the
+number of bytes to discard, not the number of bytes you want to have
+afterwards.
+
+2. qemu_iovec_discard_back will happily unwind entire IO vectors that we
+would need to unmap and have now lost. Worse, whenever we do any kind of
+truncating at all, those bytes are not re-added to the source SGList, so
+subsequent transfers will have skipped some bytes in the guest SGList.
+
+3. the dma_blk_io interfaces don't ever check to see if the sg list is
+an even multiple of the alignment. They don't return synchronous error
+and no callers check for an error case. (Though BMDMA does carefully
+prepare the SGList such that it is aligned in this way. AHCI does too,
+IIRC.) This means we might have an unaligned tail that we will just drop
+or ignore, leading to another partial DMA.
+
+4. There's no guarantee that any given individual IO vector will have an
+entire sector's worth of data in it. It is theoretically valid to
+describe a series of vectors of two bytes each. If we can only map 1-2
+vectors at a time, depending, we're never going to be able to scrounge
+up enough buffer real estate to transfer an entire sector.
+
+
+[a] This is against the BMDMA spec. The address must be aligned to 0x02
+and cannot cross a 64K boundary. bit0 is documented as always being
+zero, but it's not clear what should happen if the boundary constraint
+is violated. Absent other concerns, it might just be easiest to fulfill
+the transfer if it's possible.
+
+
+** Changed in: qemu
+     Assignee: John Snow (jnsnow) =3D> (unassigned)
+
+** Changed in: qemu
+       Status: In Progress =3D> Confirmed
+
+** Summary changed:
+
+- qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s-=
+>bus->dma->aiocb =3D=3D NULL' failed.
++ dma_blk_cb leaks memory map handles on misaligned IO
+
+** Description changed:
+
++ Maintainer Edit:
++ =
+
++ The functions in dma-helpers mismanage misaligned IO, badly enough to
++ cause an infinite loop where no progress can be made. This allows the
++ IDE state machine to get wedged such that cancelling DMA can fail;
++ because the DMA helpers have bodged the state of the DMA transfer. See
++ Comment #15 for the in-depth analysis.
++ =
+
++ I've updated the name of this bug to reflect the current status as I
++ understand it.
++ =
+
++ --js
++ =
+
++ =
+
++ Original report:
++ =
+
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
+  =
+
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
+  =
+
+-     qemu-system-x86_64 \
+-         -machine pc-i440fx-2.7,accel=3Dkvm \
+-         -m 3072 \
+-         -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
+ \
+- 	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
+t=3Don \
+-         -device virtio-net-pci,netdev=3Dhostnet0 \
+- 	-vnc :0
++ =C2=A0=C2=A0=C2=A0=C2=A0qemu-system-x86_64 \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-machine pc-i440fx-2.7,ac=
+cel=3Dkvm \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-m 3072 \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-drive file=3D/dev/lvm/qe=
+mu,format=3Draw,if=3Dide,discard=3Dunmap \
++ =C2=A0-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno=
+,vhost=3Don \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,ne=
+tdev=3Dhostnet0 \
++ =C2=A0-vnc :0
+  =
+
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+  =
+
+  QEMU was compiled using:
+  =
+
+-     ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
+mmu
+-     make -j3
++ =C2=A0=C2=A0=C2=A0=C2=A0./configure --python=3D/usr/bin/python2.7 --targe=
+t-list=3Dx86_64-softmmu
++ =C2=A0=C2=A0=C2=A0=C2=A0make -j3
+  =
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681439
+
+Title:
+  dma_blk_cb leaks memory map handles on misaligned IO
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  Maintainer Edit:
+
+  The functions in dma-helpers mismanage misaligned IO, badly enough to
+  cause an infinite loop where no progress can be made. This allows the
+  IDE state machine to get wedged such that cancelling DMA can fail;
+  because the DMA helpers have bodged the state of the DMA transfer. See
+  Comment #15 for the in-depth analysis.
+
+  I've updated the name of this bug to reflect the current status as I
+  understand it.
+
+  --js
+
+  =
+
+  Original report:
+
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
+
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
+
+  =C2=A0=C2=A0=C2=A0=C2=A0qemu-system-x86_64 \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-machine pc-i440fx-2.7,ac=
+cel=3Dkvm \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-m 3072 \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-drive file=3D/dev/lvm/qe=
+mu,format=3Draw,if=3Dide,discard=3Dunmap \
+  =C2=A0-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno=
+,vhost=3Don \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,ne=
+tdev=3Dhostnet0 \
+  =C2=A0-vnc :0
+
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+
+  QEMU was compiled using:
+
+  =C2=A0=C2=A0=C2=A0=C2=A0./configure --python=3D/usr/bin/python2.7 --targe=
+t-list=3Dx86_64-softmmu
+  =C2=A0=C2=A0=C2=A0=C2=A0make -j3
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
 
