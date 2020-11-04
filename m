@@ -1,100 +1,86 @@
-Return-Path: <SRS0=IkQf=EJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8B6C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 23:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C1F3C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:38:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F3B4223EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Nov 2020 23:09:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBDF4223C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:38:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CGPzOM2H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F3B4223EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6htm2sO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBDF4223C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka5Qf-0008O6-8n
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 18:09:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49050)
+	id 1ka6oa-0007t8-MX
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 19:38:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1ka5Pv-0007w1-Rx
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 18:08:43 -0500
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:43752)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1ka5Pr-0002E1-MB
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 18:08:43 -0500
-Received: by mail-pf1-x429.google.com with SMTP id z3so237499pfb.10
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 15:08:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=vTF5LR4J9ibQVZ3XjZSKBn6FJiD2hbzdbedy9KBRYRo=;
- b=CGPzOM2Huc57nYVbHj+//3Ro8PGWtQcCuW8wRUrzlimcMxyJt2DGN08UaCNjn/7fQX
- 0mjaEAYKUO+NnoyTspNykJo2nK9Enrdo8Zd2xR4fjY44EaLrhMVV1ZmfPV/g3XYtdDdR
- L6orhPlTtnfhB8AzJLDb16DiJPRyvcsymrZyBQhyk66bbcOEtZMZ5wGmqKqrGgZT0oYm
- WYDLzW02sSiDM0eoKN7y7I5sG46Wj60vpgawHk1BETOi1rWqpbqwIOhHL0LeYBf/6tf1
- DHdH7Nvz943Czu/lVOzdneBIIiYpdINZxRDV5i6UJ0rvss6rwY04MevK7uH+OOZ1UwxP
- etyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=vTF5LR4J9ibQVZ3XjZSKBn6FJiD2hbzdbedy9KBRYRo=;
- b=bMsN9OhXlOCxTwTsJdqX0JRxZTLzQfb80Wy1iiJEB9jd+D6Fjtwqmt3AIj4iM0MqWs
- znJGsQ8t6hfOjSUKiTDS4v2z+DrwKV17mUC7bB6GsyoBaWTAnWNFv+jOmEnOBFXw1dVl
- jMZ+yVnfYU3wCSOapRKlDATZUvThFO/+S3gSJ4lfW1QzgiY/FgEJ8kRm45bAIt7mf769
- cRXhAy9dauQhDS1UuDSFr3yMKw8kC9LlovPHH5q+vAmuZp3N1AGBCkqOx10up76iqbjO
- VhuMcD8p4IFVap15LFNXti3gcSnY1c10Eu8uxl0V3KoW2d4HWQyq6j/YpdNn9u6VAAjh
- fN8A==
-X-Gm-Message-State: AOAM532x/Q340wtdRqANIro9yUg7e79Tg22WopOax8CUDxQEMtKmJyjg
- EdeboTujCaO2f8q7EDq9qf89OM1afx3EyQ==
-X-Google-Smtp-Source: ABdhPJy5QGUY85DF6YX0+CkkrFxvopZKkgnMultkiEGJ3KlQLMg5b7oV/KgaXT8GntNgkEAe4bqVYg==
-X-Received: by 2002:a17:90a:fb4e:: with SMTP id
- iq14mr1590749pjb.68.1604444917109; 
- Tue, 03 Nov 2020 15:08:37 -0800 (PST)
-Received: from [172.16.1.221] (76-14-210-194.or.wavecable.com. [76.14.210.194])
- by smtp.gmail.com with ESMTPSA id gw10sm196493pjb.24.2020.11.03.15.08.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 03 Nov 2020 15:08:36 -0800 (PST)
-Subject: Re: [PATCH v2 18/19] tcg/aarch64: Implement flush_idcache_range
- manually
-To: Joelle van Dyne <j@getutm.app>
-References: <20201030004921.721096-1-richard.henderson@linaro.org>
- <20201030004921.721096-19-richard.henderson@linaro.org>
- <CA+E+eSB64cm8GPsuEYNQJLkF2gPiF2oueYPOOTtxpYy7hWzTRg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b5136404-3423-cdfb-0979-aa544c704163@linaro.org>
-Date: Tue, 3 Nov 2020 15:08:34 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6ml-00060S-30
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29646)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6mi-0004mp-BV
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604450178;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DwvcW7jNpBKcFtSfGFunStKf7oby9QF8aWFLGmTigZ8=;
+ b=P6htm2sO2nJh+hjh1MSjDaja2YdKdI0JZ5BPOM3T64CIKkh9Z0Aar62TcJypFVUkfnq6yG
+ xNCPsdenOwVXdx47/enVzIt/b//Xw3Q46eEKer9y68oaP7MRnUXvfykXX7k5YYmimQ1ujq
+ dq5l+ri28vGCcuuT3ZcyHyoDL84Xj2c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-547-3GElkm8JOMSGv7CsPXMHqA-1; Tue, 03 Nov 2020 19:36:15 -0500
+X-MC-Unique: 3GElkm8JOMSGv7CsPXMHqA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E41B1804774
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:36:14 +0000 (UTC)
+Received: from scv.redhat.com (ovpn-119-97.rdu2.redhat.com [10.10.119.97])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AE0C855766;
+ Wed,  4 Nov 2020 00:36:13 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 02/72] python/qmp: add qom script entry points
+Date: Tue,  3 Nov 2020 19:34:52 -0500
+Message-Id: <20201104003602.1293560-3-jsnow@redhat.com>
+In-Reply-To: <20201104003602.1293560-1-jsnow@redhat.com>
+References: <20201104003602.1293560-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+E+eSB64cm8GPsuEYNQJLkF2gPiF2oueYPOOTtxpYy7hWzTRg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::429;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x429.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,27 +93,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/31/20 6:25 PM, Joelle van Dyne wrote:
-> Unfortunately this crashes on iOS/Apple Silicon macOS.
-> 
-> (lldb) bt
-> * thread #19, stop reason = EXC_BAD_INSTRUCTION (code=1, subcode=0xd53b002a)
->   * frame #0: 0x00000001169501e0
-> libqemu-x86_64-softmmu.utm.dylib`tcg_prologue_init + 760
-> ...
-> (lldb) x/i 0x00000001169501e0
-> ->  0x1169501e0: 0xd53b002a   mrs    x10, CTR_EL0
+Add the 'qom', 'qom-set', 'qom-get', 'qom-list', and 'qom-tree' scripts
+to the qemu.qmp package. When you install this package, these scripts
+will become available on your command line.
 
-That is *really* annoying.  Why in the world would Apple not set SCTLR_ELx.UCT?
- There's nothing that the OS can do better than the application for ARMv8.0-A.
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ python/setup.cfg | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Oh well.  I'll paste your code in.
+diff --git a/python/setup.cfg b/python/setup.cfg
+index 2c12d9ab89b4..c8b7215996e9 100644
+--- a/python/setup.cfg
++++ b/python/setup.cfg
+@@ -28,6 +28,13 @@ devel =
+     pylint >= 2.6.0
+     pytest >= 3.0.0
+ 
++[options.entry_points]
++console_scripts =
++    qom = qemu.qmp.qom:main
++    qom-set = qemu.qmp.qom:QOMSet.entry_point
++    qom-get = qemu.qmp.qom:QOMGet.entry_point
++    qom-list = qemu.qmp.qom:QOMList.entry_point
++    qom-tree = qemu.qmp.qom:QOMTree.entry_point
+ 
+ [flake8]
+ extend-ignore = E722  # Prefer pylint's bare-except checks to flake8's
+-- 
+2.26.2
 
-
-r~
 
