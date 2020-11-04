@@ -2,90 +2,73 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AF7C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 19:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C19D0C4741F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 19:31:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1F84205ED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 19:27:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hEgsdsEi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1F84205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07C8A2065D
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 19:31:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07C8A2065D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaORk-0001OQ-Mg
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 14:27:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33012)
+	id 1kaOV4-0003SL-Nf
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 14:31:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kaOQf-0000x4-7B
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 14:26:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43300)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kaOQd-0007vD-9n
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 14:26:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604518001;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1v4/PXs02iy8pvLWYcGOcDhi0RB9148RdCLtsEIbOZs=;
- b=hEgsdsEiU+c9/z1Q7UYPUQ6JP/MBFCyQgpdEMoX/ujqIyRikaAsznB2FPu2zJ/Y+OvUZvA
- sp/iplPUXDUereOX11DAR5RPdmM9b9Z5CbvWIY1g+T6Z3f1bVufrXskS6lFtBVV4NeORN1
- eISYE/8tfshS9njF+n6TbMR6/MVolhY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-URSTrjwgOzyUuKUe9nHBLg-1; Wed, 04 Nov 2020 14:26:25 -0500
-X-MC-Unique: URSTrjwgOzyUuKUe9nHBLg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C08D057202;
- Wed,  4 Nov 2020 19:26:24 +0000 (UTC)
-Received: from [10.3.114.103] (ovpn-114-103.phx2.redhat.com [10.3.114.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F93317511;
- Wed,  4 Nov 2020 19:26:24 +0000 (UTC)
-To: Steve Sistare <steven.sistare@oracle.com>, qemu-devel@nongnu.org
-References: <1604332203-435466-1-git-send-email-steven.sistare@oracle.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Subject: Re: [PATCH V2] vl: pause option
-Message-ID: <d93b83ea-f31d-4e6b-2350-c6d4c9b71448@redhat.com>
-Date: Wed, 4 Nov 2020 13:26:23 -0600
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kaOTU-0002mp-OZ; Wed, 04 Nov 2020 14:29:40 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:35428
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kaOTS-00089b-Pn; Wed, 04 Nov 2020 14:29:40 -0500
+Received: from host81-158-111-11.range81-158.btcentralplus.com
+ ([81.158.111.11] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kaOTW-0005Bo-UZ; Wed, 04 Nov 2020 19:29:47 +0000
+To: Thomas Huth <thuth@redhat.com>, armbru@redhat.com,
+ david@gibson.dropbear.id.au, atar4qemu@gmail.com, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
+References: <20200926140216.7368-1-mark.cave-ayland@ilande.co.uk>
+ <20200926140216.7368-6-mark.cave-ayland@ilande.co.uk>
+ <16f13e17-37cb-a238-4e2a-9a945649cafd@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <24aca485-fe87-8aab-7554-ba8dc1a3bbb3@ilande.co.uk>
+Date: Wed, 4 Nov 2020 19:29:24 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <1604332203-435466-1-git-send-email-steven.sistare@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <16f13e17-37cb-a238-4e2a-9a945649cafd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-SA-Exim-Connect-IP: 81.158.111.11
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH v2 5/6] macio: don't reference serial_hd() directly within
+ the device
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,87 +81,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/2/20 9:50 AM, Steve Sistare wrote:
-> Provide the -pause command-line parameter and the QEMU_PAUSE environment
-> variable to pause QEMU during process startup using SIGSTOP and allow a
-> developer to attach a debugger, or observe the process using tools such as
-> strace.  Useful when the QEMU has been launched with some other entity, such
-> as libvirt.  QEMU_PAUSE is checked in a constructor at the highest priority,
-> and can be used to debug other constructors.  The -pause option is checked
-> later, during argument processing in main, but is useful if passing an
-> environment variable from a launcher to qemu is awkard.
-> 
-> Usage: qemu -pause, or QEMU_PAUSE=1
-> After attaching a debugger, send SIGCONT to the qemu process to continue.
+On 04/11/2020 12:47, Thomas Huth wrote:
 
-Changing behavior via a new environment variable is awkward.  What
-happens, for example, if libvirt inherits this variable set, but is not
-aware of its impact to alter how qemu starts up?  Can we get by with
-ONLY a command line option?
-
-Also, how does this option differ from what we already have with qemu
---preconfig?
-
+> On 26/09/2020 16.02, Mark Cave-Ayland wrote:
+>> Instead use qdev_prop_set_chr() to configure the ESCC serial chardevs at the
+>> Mac Old World and New World machine level.
+>>
+>> Also remove the now obsolete comment referring to the use of serial_hd() and
+>> the setting of user_creatable to false accordingly.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>   hw/misc/macio/macio.c | 4 ----
+>>   hw/ppc/mac_newworld.c | 6 ++++++
+>>   hw/ppc/mac_oldworld.c | 6 ++++++
+>>   3 files changed, 12 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+>> index 679722628e..51368884d0 100644
+>> --- a/hw/misc/macio/macio.c
+>> +++ b/hw/misc/macio/macio.c
+>> @@ -109,8 +109,6 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
+>>       qdev_prop_set_uint32(DEVICE(&s->escc), "disabled", 0);
+>>       qdev_prop_set_uint32(DEVICE(&s->escc), "frequency", ESCC_CLOCK);
+>>       qdev_prop_set_uint32(DEVICE(&s->escc), "it_shift", 4);
+>> -    qdev_prop_set_chr(DEVICE(&s->escc), "chrA", serial_hd(0));
+>> -    qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hd(1));
+>>       qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
+>>       qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
+>>       if (!qdev_realize(DEVICE(&s->escc), BUS(&s->macio_bus), errp)) {
+>> @@ -458,8 +456,6 @@ static void macio_class_init(ObjectClass *klass, void *data)
+>>       k->class_id = PCI_CLASS_OTHERS << 8;
+>>       device_class_set_props(dc, macio_properties);
+>>       set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>> -    /* Reason: Uses serial_hds in macio_instance_init */
+>> -    dc->user_creatable = false;
+>>   }
 > 
-> Example:
+>   Hi Mark,
 > 
-> $ QEMU_PAUSE=1 qemu-system-x86_64 ...
-> QEMU pid 18371 is stopped.
-> [1]+  Stopped
->                                  $ gdb -p 18371
->                                  (gdb)
-> $ kill -cont 18371
->                                  (gdb) break rcu_init
->                                  (gdb) continue
->                                  Program received signal SIGCONT, Continued.
->                                  (gdb) continue
->                                  Breakpoint 1, rcu_init () at util/rcu.c:380
+> the macio device can now be used to crash QEMU:
 > 
-> Thanks to Daniel P. Berrange <berrange@redhat.com> for suggesting SIGSTOP.
+>   $ ./qemu-system-ppc -M sam460ex -device macio-newworld
+>   Segmentation fault (core dumped)
 > 
-> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> ---
->  qemu-options.hx | 14 ++++++++++++++
->  softmmu/vl.c    | 23 +++++++++++++++++++++++
->  2 files changed, 37 insertions(+)
-> 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 708583b..42edd70 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3668,6 +3668,20 @@ SRST
->      option is experimental.
->  ERST
->  
-> +DEF("pause", 0, QEMU_OPTION_pause, \
-> +    "-pause          pause the qemu process in main using SIGSTOP.\n"
-> +    "                to pause earlier, before constructors are run, set the\n"
-> +    "                environment variable QEMU_PAUSE=1 before starting qemu.\n",
-> +    QEMU_ARCH_ALL)
-> +
-> +SRST
-> +``-pause``
-> +    Pause the qemu process in main using SIGSTOP.  This is useful for attaching
-> +    a debugger after QEMU has been launched by some other entity.  After
-> +    attaching, send SIGCONT to continue.  To pause earlier, before constructors
-> +    are run, set the environment variable QEMU_PAUSE=1 before starting qemu.
-> +ERST
+> I guess we should either restore the user_creatable flag or add some sanity
+> checks elsewhere?
 
-Isn't it always possible to provide a wrapper qemu process to be invoked
-by whatever third-party management app (like libvirt), where your
-wrapper then starts the real qemu under gdb to begin with, rather than
-having to hack qemu itself to have a special start-up mode?
+(goes and looks)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Ah okay it appears to be because the object property link to the PIC is missing, 
+which is to be expected as it is only present on the Mac machines.
 
+With the latest round of QOM updates I can see the solution but it's probably a bit 
+much now that we've reached rc-0. The easiest thing for the moment is to switch 
+user_creatable back to false if this is causing an issue.
+
+Just out of interest how did you find this? My new workflow involves a local "make 
+check" with all ppc targets and a pass through Travis-CI and it didn't show up there 
+for me (or indeed Peter's pre-merge tests).
+
+
+ATB,
+
+Mark.
 
