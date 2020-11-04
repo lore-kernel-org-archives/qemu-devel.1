@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF79C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E53C4741F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:13:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4306720719
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:11:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A48A2074B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:13:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eDEI4/0p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4306720719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cDpkyGKn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A48A2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaLO3-0006eP-Uy
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:11:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42082)
+	id 1kaLPB-00007C-VS
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:13:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLEu-0001Z5-3h
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24132)
+ id 1kaLFZ-0003FV-Cj
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46240)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLEr-0005Zq-Ue
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:23 -0500
+ id 1kaLFP-0005fK-E1
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604505741;
+ s=mimecast20190719; t=1604505774;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gdMyOjPEyHa8ld0hjAoBSsicMflgaQnNdGClhjzau5k=;
- b=eDEI4/0pfAClI+IZFP2hYzOYCLG9g+mY9pLtzg+hb9TWW4n+qBY5Tv1ePr/OUpFgmJYoxM
- baf9HjVq+/QLoVJnmnZLZy36/xahm0k3crXxUuqr8dgIhWPFLKnPcExS5+rWhksIL+yf7w
- 1Lb2TjOR3Yun7zSOAwmwAB7v0EF3FhI=
+ bh=0sT4tpQsx17JiJ7B1qaX/V9FQ6cli7bMhcm2UKKNARo=;
+ b=cDpkyGKnDhpQgOGkDfn2xFl9ou7v5bUVo6lXu2wKHX3LX1AznwsOlHOp/e749vCRuf1nfm
+ 70zj81iBVNFj0Oa9UxnjXdyysX2X2D6QezCt606gwNuIKPmdzQFJQ2EZ+79lDZIiXhALZN
+ IgtH7wJ8THpgo4yatMMwd1mwAYXYIHE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-EeJL43U9MnS7BG3e5qDCOw-1; Wed, 04 Nov 2020 11:02:16 -0500
-X-MC-Unique: EeJL43U9MnS7BG3e5qDCOw-1
+ us-mta-77-Pye1aa0OMQOMM76YyZnDYg-1; Wed, 04 Nov 2020 11:02:51 -0500
+X-MC-Unique: Pye1aa0OMQOMM76YyZnDYg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 189DF12CC67;
- Wed,  4 Nov 2020 16:01:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5C56196635B;
+ Wed,  4 Nov 2020 16:02:01 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 811988357C;
- Wed,  4 Nov 2020 16:01:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 66E536266E;
+ Wed,  4 Nov 2020 16:02:01 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 08/44] qdev: Make bit_prop_set() get Object* argument
-Date: Wed,  4 Nov 2020 10:59:45 -0500
-Message-Id: <20201104160021.2342108-9-ehabkost@redhat.com>
+Subject: [PATCH v2 30/44] qdev: Get rid of ArrayElementProperty struct
+Date: Wed,  4 Nov 2020 11:00:07 -0500
+Message-Id: <20201104160021.2342108-31-ehabkost@redhat.com>
 In-Reply-To: <20201104160021.2342108-1-ehabkost@redhat.com>
 References: <20201104160021.2342108-1-ehabkost@redhat.com>
 MIME-Version: 1.0
@@ -105,63 +105,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the code more generic and not specific to TYPE_DEVICE.
+Now that we don't store any additional data about the property in
+AraryElementStruct, we don't need it anymore.  We can just
+allocate a Property struct directly.
 
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+This is a new patch added in v2 of the series
 ---
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/core/qdev-properties.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ hw/core/qdev-properties.c | 41 ++++++++-------------------------------
+ 1 file changed, 8 insertions(+), 33 deletions(-)
 
 diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index b6cf53e929..3a4638f4de 100644
+index a0192c3723..0aa482b3ab 100644
 --- a/hw/core/qdev-properties.c
 +++ b/hw/core/qdev-properties.c
-@@ -92,8 +92,9 @@ static uint32_t qdev_get_prop_mask(Property *prop)
-     return 0x1 << prop->bitnr;
- }
+@@ -525,30 +525,6 @@ const PropertyInfo qdev_prop_size32 = {
  
--static void bit_prop_set(DeviceState *dev, Property *props, bool val)
-+static void bit_prop_set(Object *obj, Property *props, bool val)
+ /* --- support for array properties --- */
+ 
+-/* Used as an opaque for the object properties we add for each
+- * array element. Note that the struct Property must be first
+- * in the struct so that a pointer to this works as the opaque
+- * for the underlying element's property hooks as well as for
+- * our own release callback.
+- */
+-typedef struct {
+-    struct Property prop;
+-    ObjectPropertyRelease *release;
+-} ArrayElementProperty;
+-
+-/* object property release callback for array element properties:
+- * we call the underlying element's property release hook, and
+- * then free the memory we allocated when we added the property.
+- */
+-static void array_element_release(Object *obj, const char *name, void *opaque)
+-{
+-    ArrayElementProperty *p = opaque;
+-    if (p->release) {
+-        p->release(obj, name, opaque);
+-    }
+-    g_free(p);
+-}
+-
+ static void set_prop_arraylen(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
  {
-+    DeviceState *dev = DEVICE(obj);
-     uint32_t *p = qdev_get_prop_ptr(dev, props);
-     uint32_t mask = qdev_get_prop_mask(props);
-     if (val) {
-@@ -129,7 +130,7 @@ static void prop_set_bit(Object *obj, Visitor *v, const char *name,
-     if (!visit_type_bool(v, name, &value, errp)) {
-         return;
+@@ -589,21 +565,20 @@ static void set_prop_arraylen(Object *obj, Visitor *v, const char *name,
+     *arrayptr = eltptr = g_malloc0(*alenptr * prop->arrayfieldsize);
+     for (i = 0; i < *alenptr; i++, eltptr += prop->arrayfieldsize) {
+         g_autofree char *propname = g_strdup_printf("%s[%d]", arrayname, i);
+-        ArrayElementProperty *arrayprop = g_new0(ArrayElementProperty, 1);
+-        arrayprop->release = prop->arrayinfo->release;
+-        arrayprop->prop.info = prop->arrayinfo;
++        Property *arrayprop = g_new0(Property, 1);
++        arrayprop->info = prop->arrayinfo;
+         /* This ugly piece of pointer arithmetic sets up the offset so
+          * that when the underlying get/set hooks call qdev_get_prop_ptr
+          * they get the right answer despite the array element not actually
+          * being inside the device struct.
+          */
+-        arrayprop->prop.offset = eltptr - (void *)obj;
+-        assert(qdev_get_prop_ptr(obj, &arrayprop->prop) == eltptr);
++        arrayprop->offset = eltptr - (void *)obj;
++        assert(qdev_get_prop_ptr(obj, arrayprop) == eltptr);
+         object_property_add(obj, propname,
+-                            arrayprop->prop.info->name,
+-                            field_prop_getter(arrayprop->prop.info),
+-                            field_prop_setter(arrayprop->prop.info),
+-                            array_element_release,
++                            arrayprop->info->name,
++                            field_prop_getter(arrayprop->info),
++                            field_prop_setter(arrayprop->info),
++                            arrayprop->info->release,
+                             arrayprop);
      }
--    bit_prop_set(dev, prop, value);
-+    bit_prop_set(obj, prop, value);
  }
- 
- static void set_default_value_bool(ObjectProperty *op, const Property *prop)
-@@ -153,8 +154,9 @@ static uint64_t qdev_get_prop_mask64(Property *prop)
-     return 0x1ull << prop->bitnr;
- }
- 
--static void bit64_prop_set(DeviceState *dev, Property *props, bool val)
-+static void bit64_prop_set(Object *obj, Property *props, bool val)
- {
-+    DeviceState *dev = DEVICE(obj);
-     uint64_t *p = qdev_get_prop_ptr(dev, props);
-     uint64_t mask = qdev_get_prop_mask64(props);
-     if (val) {
-@@ -190,7 +192,7 @@ static void prop_set_bit64(Object *obj, Visitor *v, const char *name,
-     if (!visit_type_bool(v, name, &value, errp)) {
-         return;
-     }
--    bit64_prop_set(dev, prop, value);
-+    bit64_prop_set(obj, prop, value);
- }
- 
- const PropertyInfo qdev_prop_bit64 = {
 -- 
 2.28.0
 
