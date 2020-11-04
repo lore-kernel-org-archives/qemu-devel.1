@@ -2,88 +2,88 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A4AC388F9
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 07:37:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 237C8C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 07:38:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 784B42080D
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 07:37:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 793232080D
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 07:38:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eaqe5edX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 784B42080D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XxT4wv5O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 793232080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaDM5-0001kg-2Z
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 02:37:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59458)
+	id 1kaDNb-0002eL-Sa
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 02:38:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kaDKk-0001KL-M9
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 02:35:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45327)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kaDLf-0001lw-5I
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 02:36:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41553)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kaDKi-0005sb-7q
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 02:35:54 -0500
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kaDLc-0005v0-Lo
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 02:36:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604475348;
+ s=mimecast20190719; t=1604475406;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=3PkTaQgfKvgm32uXWwRw1Hjgsr3TCVL5k58rAv+qyYM=;
- b=eaqe5edXHPdpv+LXUekWV1/jD0ZukH+a7r63Xh3P9pWbZjJIq+FkXq4Z4WjUDa3aTLD40m
- VEOtXFtzBJDWOhUjmGfS2/t6XXa6NWTOtcj2AAHrsNhsDYuRrKJeFHEahsNn9+GWf8yDub
- 3KEpFnazshpvhJ6gQlql6WxPbvyutqQ=
+ bh=oL/OqKS+hMlRz4o6Zc+6ZjO1VGdR0Dom1mgzNNMbEBU=;
+ b=XxT4wv5OYwtXF4ATWcFr9pEMpMx67R9qUP0uTd9aybsSOC+dbJt93TXXYY43ygo+azL5cB
+ Lo9e8tAwbCRfz1679BNvukmlL9cMWZhfpHE+T/NFDdLflTG/c8xmayYBzdm/iPzPd9to2e
+ Z0+CtS5ubpC4cCtlRa+UZ0Qaekm2ZhI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-lfxmEGqWPTmlkbLaIyJIAQ-1; Wed, 04 Nov 2020 02:35:46 -0500
-X-MC-Unique: lfxmEGqWPTmlkbLaIyJIAQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-484-QDlTdqKvM6GG9eLYOfn1Dg-1; Wed, 04 Nov 2020 02:36:42 -0500
+X-MC-Unique: QDlTdqKvM6GG9eLYOfn1Dg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54D3B1009E2D
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 07:35:45 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
- [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F395A5C1D0;
- Wed,  4 Nov 2020 07:35:44 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6831F1132BD6; Wed,  4 Nov 2020 08:35:43 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] qapi, qemu-options: make all parsing visitors parse
- boolean options the same
-References: <20201103161339.447118-1-pbonzini@redhat.com>
-Date: Wed, 04 Nov 2020 08:35:43 +0100
-In-Reply-To: <20201103161339.447118-1-pbonzini@redhat.com> (Paolo Bonzini's
- message of "Tue, 3 Nov 2020 11:13:39 -0500")
-Message-ID: <87h7q51smo.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9E9164166;
+ Wed,  4 Nov 2020 07:36:40 +0000 (UTC)
+Received: from localhost (ovpn-112-86.ams2.redhat.com [10.36.112.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36E0B6EF78;
+ Wed,  4 Nov 2020 07:36:37 +0000 (UTC)
+Date: Wed, 4 Nov 2020 07:36:36 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: VFIO Migration
+Message-ID: <20201104073636.GB390503@stefanha-x1.localdomain>
+References: <20201102111153.GC42093@stefanha-x1.localdomain>
+ <20201103121709.GD3566@work-vm>
+ <20201103152752.GC253848@stefanha-x1.localdomain>
+ <20201103184951.GM3566@work-vm>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20201103184951.GM3566@work-vm>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="uQr8t48UFsdbeI+V"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,251 +97,284 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ quintela@redhat.com, Jason Wang <jasowang@redhat.com>,
+ Felipe Franciosi <felipe@nutanix.com>, Kirti Wankhede <kwankhede@nvidia.com>,
+ qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+--uQr8t48UFsdbeI+V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> OptsVisitor, StringInputVisitor and the keyval visitor have
-> three different ideas of how a human could write the value of
-> a boolean option.  Pay homage to the backwards-compatibility
-> gods and make the new common helper accept all four sets (on/off,
-> true/false, y/n and yes/no), and case-insensitive at that.
->
-> Since OptsVisitor is supposed to match qemu-options, adjust
-> it as well.
+On Tue, Nov 03, 2020 at 06:49:51PM +0000, Dr. David Alan Gilbert wrote:
+> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > On Tue, Nov 03, 2020 at 12:17:09PM +0000, Dr. David Alan Gilbert wrote:
+> > > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > > > Device Models
+> > > > -------------
+> > > > Devices have a *hardware interface* consisting of hardware register=
+s,
+> > > > interrupts, and so on.
+> > > >=20
+> > > > The hardware interface together with the device state representatio=
+n is called
+> > > > a *device model*. Device models can be assigned URIs such as
+> > > > https://qemu.org/devices/e1000e to uniquely identify them.
+> > >=20
+> > > I think this is a unique identifier, not actually a URI; the https://
+> > > isn't needed since no one expects to ever connect to this.
+> >=20
+> > Yes, it could be any unique string. If the URI idea is not popular we
+> > can use any similar scheme.
+>=20
+> I'm OK with it being a URI; just drop the https.
 
-For clarity: s/it/the latter/
+Okay.
 
-> Supersedes: <20201103142344.402353-1-pbonzini@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  include/qapi/util.h          |  2 ++
->  qapi/opts-visitor.c          | 14 +-------------
->  qapi/qapi-util.c             | 23 +++++++++++++++++++++++
->  qapi/qobject-input-visitor.c | 15 +++++----------
->  qapi/string-input-visitor.c  | 17 +----------------
->  util/qemu-option.c           | 20 ++------------------
->  6 files changed, 34 insertions(+), 57 deletions(-)
->
-> diff --git a/include/qapi/util.h b/include/qapi/util.h
-> index bc312e90aa..6178e98e97 100644
-> --- a/include/qapi/util.h
-> +++ b/include/qapi/util.h
-> @@ -19,6 +19,8 @@ typedef struct QEnumLookup {
->  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val);
->  int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
->                      int def, Error **errp);
-> +bool qapi_bool_parse(const char *name, const char *value, bool *obj,
-> +                     Error **errp);
->  
->  int parse_qapi_name(const char *name, bool complete);
->  
-> diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-> index 7781c23a42..587f31baf6 100644
-> --- a/qapi/opts-visitor.c
-> +++ b/qapi/opts-visitor.c
-> @@ -368,7 +368,6 @@ opts_type_str(Visitor *v, const char *name, char **obj, Error **errp)
->  }
->  
->  
-> -/* mimics qemu-option.c::parse_option_bool() */
->  static bool
->  opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
->  {
-> @@ -379,19 +378,8 @@ opts_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
->      if (!opt) {
->          return false;
->      }
-> -
->      if (opt->str) {
-> -        if (strcmp(opt->str, "on") == 0 ||
-> -            strcmp(opt->str, "yes") == 0 ||
-> -            strcmp(opt->str, "y") == 0) {
-> -            *obj = true;
-> -        } else if (strcmp(opt->str, "off") == 0 ||
-> -            strcmp(opt->str, "no") == 0 ||
-> -            strcmp(opt->str, "n") == 0) {
-> -            *obj = false;
-> -        } else {
-> -            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
-> -                       "on|yes|y|off|no|n");
-> +        if (!qapi_bool_parse(opt->name, opt->str, obj, errp)) {
->              return false;
->          }
->      } else {
-> diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-> index 29a6c98b53..4dd8f6c313 100644
-> --- a/qapi/qapi-util.c
-> +++ b/qapi/qapi-util.c
-> @@ -13,6 +13,7 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "qemu/ctype.h"
-> +#include "qapi/qmp/qerror.h"
->  
->  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
->  {
-> @@ -40,6 +41,28 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
->      return def;
->  }
->  
-> +bool qapi_bool_parse(const char *name, const char *value, bool *obj, Error **errp)
-> +{
-> +    if (!strcasecmp(value, "on") ||
-> +        !strcasecmp(value, "yes") ||
-> +        !strcasecmp(value, "true") ||
-> +        !strcasecmp(value, "y")) {
-> +        *obj = true;
-> +        return true;
-> +    }
-> +    if (!strcasecmp(value, "off") ||
-> +        !strcasecmp(value, "no") ||
-> +        !strcasecmp(value, "false") ||
-> +        !strcasecmp(value, "n")) {
-> +        *obj = false;
-> +        return true;
-> +    }
-> +
-> +    error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name,
-> +               "boolean (on/off, yes/no, true/false, y/n)");
+> > > > However, secondary aspects related to the physical port may affect =
+the device's
+> > > > hardware interface and need to be reflected in the device configura=
+tion. The
+> > > > link speed may depend on the physical port and be reported through =
+the device's
+> > > > hardware interface. In that case a ``link-speed`` configuration par=
+ameter is
+> > > > required to prevent unexpected changes to the link speed after migr=
+ation.
+> > >=20
+> > > That's an interesting example; because depending on the device, it mi=
+ght
+> > > be:
+> > >     a) Completely virtualised so that the guest *shouldn't* know what
+> > > the physical link speed is, precisely to allow the physical network o=
+n
+> > > the destination to be different.
+> > >=20
+> > >     b) Part of the migrated state
+> > >=20
+> > >     c) Something that's allowed to be reloaded after migration
+> > >=20
+> > >     d) Configurable
+> > >=20
+> > > so I'm not sure whether it's a good example in this case or not.
+> >=20
+> > Can you think of an example that has only one option?
+> >=20
+> > I tried but couldn't. For example take a sound card. The guest is aware
+> > the device supports stereo playback (2 output channels), but which exac=
+t
+> > stereo host device is used doesn't matter, they are all suitable.
+> >=20
+> > Now imagine migrating to a 7.1 surround-sound device. Similar options
+> > come into play:
+> >=20
+> > a) Emulate stereo and mix it to 7.1 surround-sound on the physical
+> >    device. The guest still sees the stereo device.
+> >=20
+> > b) Refuse migration.
+> >=20
+> > c) Indicate that the output has switched and let the guest reconfigure
+> >    itself (e.g. a sound card with multiple outputs, where one of them i=
+s
+> >    stereo and another is 7.1 surround sound).
+> >=20
+> > Which option is desirable depends on the use case.
+>=20
+> Yes, but I think it might be worth calling out these differences;  there
+> are explicitly cases where you don't want external changes to be visible
+> and other cases where you do; both are valid, but both need thinking
+> about. (Another one, GPU whether you have a monitor plugged in!)
 
-Recommend to have the error message only mention the preferred form.  I
-like the laconic "'on' or 'off'".  It's really all the user needs to
-know.
+Okay.
 
-> +    return false;
-> +}
-> +
->  /*
->   * Parse a valid QAPI name from @str.
->   * A valid name consists of letters, digits, hyphen and underscore.
-> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-> index 7b184b50a7..f4541a4fdd 100644
-> --- a/qapi/qobject-input-visitor.c
-> +++ b/qapi/qobject-input-visitor.c
-> @@ -512,16 +512,11 @@ static bool qobject_input_type_bool_keyval(Visitor *v, const char *name,
->          return false;
->      }
->  
-> -    if (!strcmp(str, "on")) {
-> -        *obj = true;
-> -    } else if (!strcmp(str, "off")) {
-> -        *obj = false;
-> -    } else {
-> -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-> -                   full_name(qiv, name), "'on' or 'off'");
-> -        return false;
-> -    }
-> -    return true;
-> +    /*
-> +     * Calling full_name is a bit slow, but keyval (human/CLI) parsing
-> +     * is not a hot path.
-> +     */
-> +    return qapi_bool_parse(full_name(qiv, name), str, obj, errp);
+> > > Maybe what's needed is a stronger instruction to abstract external
+> > > device state so that it's not part of the configuration in most cases=
+.
+> >=20
+> > Do you want to propose something?
+>=20
+> I think something like 'Some part of a devices state may be irrelevant
+> to a migration; for example on some NICs it might be preferable to hide
+> the physical characteristics of the link from the guest.'
 
-Avoiding the full_name() on success isn't hard:
+Got it.
 
-       if (!qapi_bool_parse(name, str, obj, NULL)) {
-           error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                      full_name(qiv, name), "'on' or 'off'");
-           return false;
-       }
-       return true;
+> > > > For example, if address filtering support was added to a network ca=
+rd then
+> > > > device versions and the corresponding configurations may look like =
+this:
+> > > > * ``version=3D1`` - Behaves as if ``rx-filter-size=3D0``
+> > > > * ``version=3D2`` - ``rx-filter-size=3D32``
+> > >=20
+> > > Note configuration parameters might have been added during the life o=
+f
+> > > the device; e.g. if the original card had no support for rx-filters, =
+it
+> > > might not have a rx-filter-size parameter.
+> >=20
+> > version=3D1 does not explicitly set rx-filter-size=3D0. When a new para=
+meter
+> > is introduced it must have a default value that disables its effect on
+> > the hardware interface and/or device state representation. This is
+> > described in a bit more detail in the next section, maybe it should be
+> > reordered.
+>=20
+> We've generally found the definition of devices tends in practice to be
+> done newer->older; i.e. you define the current machine, and then define
+> the next older machine setting the defaults that used to be true; then
+> define the older version behind that....
 
-A callback to build the name only on error would be overkill.
+That is not possible here because an older device implementation is
+unaware of new configuration parameters.
 
-By the way: related qapi_enum_parse() also takes an @errp parameter, and
-several of its callers pass NULL and call error_setg() themselves.
-Sometimes one doesn't fit all.  I've been tempted more than once to
-provide two functions: one that doesn't take @errp, and the obvious
-wrapper that does.
+Looking at the example above, imagine a version=3D1 device is instantiated
+on a device implementation that supports both version=3D1 and version=3D2.
+Should the configuration parameter list for version=3D1 be empty or
+rx-filter-size=3D0?
 
->  }
->  
->  static bool qobject_input_type_str(Visitor *v, const char *name, char **obj,
-> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-> index 6e53396ea3..197139c1c0 100644
-> --- a/qapi/string-input-visitor.c
-> +++ b/qapi/string-input-visitor.c
-> @@ -332,22 +332,7 @@ static bool parse_type_bool(Visitor *v, const char *name, bool *obj,
->      StringInputVisitor *siv = to_siv(v);
->  
->      assert(siv->lm == LM_NONE);
-> -    if (!strcasecmp(siv->string, "on") ||
-> -        !strcasecmp(siv->string, "yes") ||
-> -        !strcasecmp(siv->string, "true")) {
-> -        *obj = true;
-> -        return true;
-> -    }
-> -    if (!strcasecmp(siv->string, "off") ||
-> -        !strcasecmp(siv->string, "no") ||
-> -        !strcasecmp(siv->string, "false")) {
-> -        *obj = false;
-> -        return true;
-> -    }
-> -
-> -    error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
-> -               "boolean");
-> -    return false;
-> +    return qapi_bool_parse(name ? name : "null", siv->string, obj, errp);
->  }
->  
->  static bool parse_type_str(Visitor *v, const char *name, char **obj,
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index b9f93a7f8b..acefbc23fa 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -96,21 +96,6 @@ const char *get_opt_value(const char *p, char **value)
->      return offset;
->  }
->  
-> -static bool parse_option_bool(const char *name, const char *value, bool *ret,
-> -                              Error **errp)
-> -{
-> -    if (!strcmp(value, "on")) {
-> -        *ret = 1;
-> -    } else if (!strcmp(value, "off")) {
-> -        *ret = 0;
-> -    } else {
-> -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-> -                   name, "'on' or 'off'");
-> -        return false;
-> -    }
-> -    return true;
-> -}
-> -
->  static bool parse_option_number(const char *name, const char *value,
->                                  uint64_t *ret, Error **errp)
->  {
-> @@ -363,7 +348,7 @@ static bool qemu_opt_get_bool_helper(QemuOpts *opts, const char *name,
->      if (opt == NULL) {
->          def_val = find_default_by_name(opts, name);
->          if (def_val) {
-> -            parse_option_bool(name, def_val, &ret, &error_abort);
-> +            qapi_bool_parse(name, def_val, &ret, &error_abort);
->          }
->          return ret;
->      }
-> @@ -471,8 +456,7 @@ static bool qemu_opt_parse(QemuOpt *opt, Error **errp)
->          /* nothing */
->          return true;
->      case QEMU_OPT_BOOL:
-> -        return parse_option_bool(opt->name, opt->str, &opt->value.boolean,
-> -                                 errp);
-> +        return qapi_bool_parse(opt->name, opt->str, &opt->value.boolean, errp);
+It must to be empty, otherwise an older device implementation that only
+supports version=3D1 cannot instantiate the device. The older device
+implementation does not recognize the rx-filter-size configuration
+parameter (it was introduced in version=3D2) so we cannot set it to 0.
 
-Please break the line the same way as before.
+> > > > Device States
+> > > > -------------
+> > > > The details of the device state representation are not covered in t=
+his document
+> > > > but the general requirements are discussed here.
+> > > >=20
+> > > > The device state consists of data accessible through the device's h=
+ardware
+> > > > interface and internal state that is needed to restore device opera=
+tion.
+> > > > State in the hardware interface includes the values of hardware reg=
+isters.
+> > > > An example of internal state is an index value needed to avoid proc=
+essing
+> > > > queued requests more than once.
+> > >=20
+> > > I try and emphasise that 'internal state' should be represented in a =
+way
+> > > that reflects the problem rather than the particular implementation;
+> > > this gives it a better chance of migrating to future versions.
+> >=20
+> > Sounds like a good idea.
+> >=20
+> > > > Changes can be made to the device state representation as follows. =
+Each change
+> > > > to device state must have a corresponding device configuration para=
+meter that
+> > > > allows the change to toggled:
+> > > >=20
+> > > > * When the parameter is disabled the hardware interface and device =
+state
+> > > >   representation are unchanged. This allows old device states to be=
+ loaded.
+> > > >=20
+> > > > * When the parameter is enabled the change comes into effect.
+> > > >=20
+> > > > * The parameter's default value disables the change. Therefore old =
+versions do
+> > > >   not have to explicitly specify the parameter.
+> > > >=20
+> > > > The following example illustrates migration from an old device
+> > > > implementation to a new one. A version=3D1 network card is migrated=
+ to a
+> > > > new device implementation that is also capable of version=3D2 and a=
+dds the
+> > > > rx-filter-size=3D32 parameter. The new device is instantiated with
+> > > > version=3D1, which disables rx-filter-size and is capable of loadin=
+g the
+> > > > version=3D1 device state. The migration completes successfully but =
+note
+> > > > the device is still operating at version=3D1 level in the new devic=
+e.
+> > > >=20
+> > > > The following example illustrates migration from a new device
+> > > > implementation back to an older one. The new device implementation
+> > > > supports version=3D1 and version=3D2. The old device implementation=
+ supports
+> > > > version=3D1 only. Therefore the device can only be migrated when
+> > > > instantiated with version=3D1 or the equivalent full configuration
+> > > > parameters.
+> > >=20
+> > > I'm sometimes asked for 'ways out' of buggy migration cases; e.g. wha=
+t
+> > > happens if version=3D1 forgot to migrate the X register; or what happ=
+ens
+> > > if verison=3D1 forgot to handle the special, rare case when X=3D5 and=
+ we
+> > > now need to migrate some extra state.
+> >=20
+> > Can these cases be handled by adding additional configuration parameter=
+s?
+> >=20
+> > If version=3D1 is lacks essential state then version=3D2 can add it. Th=
+e
+> > user must configure the device to use version before they can save the
+> > full state.
+> >=20
+> > If version=3D1 didn't handle the X=3D5 case then the same solution is
+> > needed. A new configuration parameter is introduced and the user needs
+> > to configure the device to be the new version before migrating.
+> >=20
+> > Unfortunately this requires poweroff or hotplugging a new device
+> > instance. But some disruption is probably necessarily anyway so the
+> > migration code on the host side can be patched to use the updated devic=
+e
+> > state representation.
+>=20
+> There are some corner cases that people sometimes prefer; for example
+> lets say the X=3D5 case is actually really rare - but when it happens the
+> device is hopelessly broken, some device authors prefer to fix it and
+> send the extra data and let the migration fail if the destination
+> doesn't understand it (it would break anyway).
 
->      case QEMU_OPT_NUMBER:
->          return parse_option_number(opt->name, opt->str, &opt->value.uint,
->                                     errp);
+The device implementation needs to be updated to send the extra data. At
+that point a new device configuration parameter should be introduced and
+if the user wishes to run the new version of the device then the extra
+data will be sent.
 
-Nothing wrong, so:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+If the destination doesn't support the new parameter then migration will
+be refused. That matches what you've described, so I think the approach
+in this document handles this case.
 
-Please consider my review comments anyway.
+> I've also been asked
+> by mst for a 'unexpected data' mechanism to send data that the
+> destination might not expect if it didn't know about it, for similar
+> cases.
+
+Do you mean optional data that can be more or less safely dropped? A new
+device configuration parameter is not needed because the hardware
+interface and device state representation remain compatible. That
+feature can be defined in the device state representation spec and is
+not visible at the layer discussed in this document. But I think it's
+worth adding an explanation into this document explaining what to do.
+
+Stefan
+
+--uQr8t48UFsdbeI+V
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+iWgMACgkQnKSrs4Gr
+c8i9pQgAp7C3W+ldjQLu+khvmY+Cr1vht0INcrshEybRTwpge9/H3pVvmOlGbUjD
+rPd/kJu4xotcaq/1qE83io7K/R9ZLy/Iv3btr4EAmPJvkYf/14dPwjl0aBuNzKvY
+K3VQQpMrsCWKKuLZbZFkzgN5dohiODFFo5XWF7UzcOsrLaRySKCoilMN3G1OEHiM
+ZXkG0qSeet3f4VKo4I87oxsDpL1wLxj6hddAKR1yK9B/CYHYFbCSXyW2LHbXh/RM
+j17Rm8scg3t1i9jRd0g9y4bJ1I5h8Z4geL2Nq4ovCMEJ+PiM5F1Ceabilav+k2p+
+Oqd6TId4Ei3B2ziyDU0wylupDyip0Q==
+=0k9D
+-----END PGP SIGNATURE-----
+
+--uQr8t48UFsdbeI+V--
 
 
