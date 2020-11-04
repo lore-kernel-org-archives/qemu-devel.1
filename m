@@ -2,104 +2,99 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F6EFC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39FC1C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:12:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 692D020BED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:11:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91CB720BED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:12:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AilTWkv2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 692D020BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XWI60Lc1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91CB720BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaB4c-0001F3-HN
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:11:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59594)
+	id 1kaB5f-0002pW-FO
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:12:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmN-0007Bi-1H
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35242)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaAmL-0004qL-9o
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:52:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604465532;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QTkwT/HJ1lj3VKT9unaRe9zAEsq3t6jIEnXFjz8fDHg=;
- b=AilTWkv2F+GCR21M0H9WidNTxewPkgV1OIf2lVqY1h0H8t8FDd6gtKok716lQ1ruZosJ3m
- kQoWCRBOxLbmtUzBcY72aWOTmxJpyg6LEsm/2DftX1eRixI2VhVapDZkztomHBREIor8El
- kBPwv1Vth3Yapwf8M80Z4MuRRBpAE4k=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-st653kjrMb-laG9vRXT0ag-1; Tue, 03 Nov 2020 23:51:19 -0500
-X-MC-Unique: st653kjrMb-laG9vRXT0ag-1
-Received: by mail-wr1-f69.google.com with SMTP id h8so8752030wrt.9
- for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:51:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=QTkwT/HJ1lj3VKT9unaRe9zAEsq3t6jIEnXFjz8fDHg=;
- b=CXeTKNLj+q/tC6Cw6DDqm2AosywDZaiDwgJVdZcEkBWaIzb/gi3DKPaJGslCORAcs8
- RJxBOQSNBYVMG5hfwLj40Z+aPfNlL2wgBpK4M293DBAhBiphK43Fj+5UCHrc2oNq4eCS
- 4NykhNgAT2H0/CMLHmuVVDScK6wPMyNdeMwLhMfxGRAFTj7+O/C/+HR82NSFHT59VJV8
- t9kiofITob/u/3fcRhRsPxcff/BP1DbM2vOS+6lB7DRnUkhKgVJP42PFI9+QKKFGnDMf
- zemV+S30ZpJLC+0Q5Mvn58cWxCOWBAV7rOx1G7/JRJcxktJSYSJz2pFfbNA0gp//pFnq
- S32A==
-X-Gm-Message-State: AOAM530liCVAYj09s53JfP2x/LWebEwmbZ4cn1ZgshvZT3ImAizWYriP
- D9XAyKubIVhRlDWmHdypVET7CTqu0+50WLoUjKI8l9d/N2UiS7tyN2cCbNiolUoyoFJVRXvyhVO
- a6DpAvRtmntT+CA0=
-X-Received: by 2002:a5d:54c1:: with SMTP id x1mr31535049wrv.172.1604465477640; 
- Tue, 03 Nov 2020 20:51:17 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzUgsPaveUdfW8VUaAKa0QnpyrEuLakxvhVemX2FGAfbSC5w1+S79jiFtRprGeBjDFfnqL8OQ==
-X-Received: by 2002:a5d:54c1:: with SMTP id x1mr31535034wrv.172.1604465477476; 
- Tue, 03 Nov 2020 20:51:17 -0800 (PST)
-Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
- by smtp.gmail.com with ESMTPSA id o7sm879237wrp.23.2020.11.03.20.51.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Nov 2020 20:51:16 -0800 (PST)
-Date: Tue, 3 Nov 2020 23:51:15 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 12/38] hw/smbios: Fix leaked fd in save_opt_one() error path
-Message-ID: <20201104044937.226370-13-mst@redhat.com>
-References: <20201104044937.226370-1-mst@redhat.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=57073d1dd=alistair.francis@wdc.com>)
+ id 1kaAp3-000430-0D; Tue, 03 Nov 2020 23:55:01 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:17614)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=57073d1dd=alistair.francis@wdc.com>)
+ id 1kaAoy-0005iz-2B; Tue, 03 Nov 2020 23:55:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1604465695; x=1636001695;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=RisuKMhLqPB7mhA2jscmhvu/EDaATgNa1/SbhqIyQWg=;
+ b=XWI60Lc15rHzeVQAYnZyiBIyHBRCYo/xYJ6RE84fARXHg1ya4SP20uXD
+ WHc9BbJwaGdLQYsbGwq3cyxgmcr+T3bEZ+yqayrShlhtuWF94TQOGeCh7
+ iwng3CxCpDX0YmE/dUSkFNbOCyGSBvFJo2IUQvQd4iO1NYe6+4j6jp2dL
+ uZI6GldkwGpGX7vqTuFiWJ3qjeJZ38bzM1KVxrUy0iZo5xnXEP8p/1UoP
+ lePsDznYCARHPh9wc2YxctCU8vuWtrMkCnuUixIYT8/TtXI6pAnqZTcxN
+ 69z0Ar2lWPYKaci8HdNv3bw38VmUn/Y+TrWbobZCHiqsUY6GZccx9yUz/ g==;
+IronPort-SDR: VUyVQOYT2vuzoZFqM1BNbFS0XMyhSgxsArTvgvKc/hCtHGAjVA9KkSXRrXVt1ERXe6N92oVoUn
+ k+cxl5l7Xk+KY88yp0TMQ1ob+bKxvaiYQmP0HNumg8LRYwsMAuQP4Qd+JCXojNWwCxbULSUd9s
+ ONDUBrLp2ej83tvZ7E6foWjeoCm8mQranPAK5XuTf56z8bRA4LY3sY1n2OiYFBJ42JNKnbEobM
+ HZQm+nYLn+qZEBdbWxt/hQWQOKv7y9jq2l97StNtgc64/6hPuKPj9+2Mc7V198pEolg7yU2bD7
+ 4b0=
+X-IronPort-AV: E=Sophos;i="5.77,449,1596470400"; d="scan'208";a="151656927"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 04 Nov 2020 12:54:54 +0800
+IronPort-SDR: B5wgJZncStMPBuEBii5s7GQAfWYs0Fh0/7Dc6DRLsiVJJsTINYOqo19bVQLaPHBNr5y4C9OVR8
+ q3mblVnrb7iFl4asxajkopUwnt5ow4+xUsZWqJSgxfDdA0+/Ic2fMFbkt+mD5ozLsD5DHZPGKW
+ h44MajNmYsUDViI+B48Twn5BsjCVT9nDBVzc5ZtbFYSGKp1YuJaQAFib4LYI0YQ2eSb8KgN8GM
+ BmVADkLcmHb5Sd5eaorHmVbe0cHGh4t1VFRy/9fXE6xPWsqc31slXSLCA/Z5Rf0/RwfpIGpaeA
+ i0OK48xEmaFmPnUbGLK8Z56c
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Nov 2020 20:41:02 -0800
+IronPort-SDR: EeS4b9xAsleFAb0WXJvbYMLmdz2mrxHL6Q24JNLWdo4SJBzAmy1TMCX9bfeUMjez2PEhIx7we0
+ JbIzxZQ2ApA42YFh7hByllIyK1cVg5LEz5LFlygI8Qe+CCpldwEAR9QhHCQkGx350ftBHlQUvI
+ rVeuT90ZCorWyHejp9B2a3QLBVslAzdzIRcdCtBESeZMHKgEXGuuJaZZbsXsyqX4JP/PGCrVgZ
+ wZdmeiGsBiKTrg4KM9muKmL/9X3EPX9fq4L3fh9S8410qTx2q8LiksXwpEiD2fwssWfInoH5dl
+ BZE=
+WDCIronportException: Internal
+Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.60.113])
+ by uls-op-cesaip01.wdc.com with ESMTP; 03 Nov 2020 20:54:54 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v4 1/5] target/riscv: Add a virtualised MMU Mode
+Date: Tue,  3 Nov 2020 20:43:23 -0800
+Message-Id: <4b301bc0ea36da962fc1605371b65019ac3073df.1604464950.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <cover.1604464950.git.alistair.francis@wdc.com>
+References: <cover.1604464950.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=216.71.154.42;
+ envelope-from=prvs=57073d1dd=alistair.francis@wdc.com;
+ helo=esa4.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 23:54:51
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,61 +107,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: alistair.francis@wdc.com, richard.henderson@linaro.org, bmeng.cn@gmail.com,
+ palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Add a new MMU mode that includes the current virt mode.
 
-Fix the following Coverity issue (RESOURCE_LEAK):
-
-  CID 1432879: Resource leak
-
-    Handle variable fd going out of scope leaks the handle.
-
-Replace a close() call by qemu_close() since the handle is
-opened with qemu_open().
-
-Fixes: bb99f4772f5 ("hw/smbios: support loading OEM strings values from a file")
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201030152742.1553968-1-philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/smbios/smbios.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ target/riscv/cpu-param.h  | 11 ++++++++++-
+ target/riscv/cpu.h        |  4 +++-
+ target/riscv/cpu_helper.c |  2 +-
+ 3 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 8b30906e50..6a3d39793b 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -988,16 +988,18 @@ static int save_opt_one(void *opaque,
-             if (ret < 0) {
-                 error_setg(errp, "Unable to read from %s: %s",
-                            value, strerror(errno));
-+                qemu_close(fd);
-                 return -1;
-             }
-             if (memchr(buf, '\0', ret)) {
-                 error_setg(errp, "NUL in OEM strings value in %s", value);
-+                qemu_close(fd);
-                 return -1;
-             }
-             g_byte_array_append(data, (guint8 *)buf, ret);
-         }
+diff --git a/target/riscv/cpu-param.h b/target/riscv/cpu-param.h
+index 664fc1d371..e4cf3c01eb 100644
+--- a/target/riscv/cpu-param.h
++++ b/target/riscv/cpu-param.h
+@@ -18,6 +18,15 @@
+ # define TARGET_VIRT_ADDR_SPACE_BITS 32 /* sv32 */
+ #endif
+ #define TARGET_PAGE_BITS 12 /* 4 KiB Pages */
+-#define NB_MMU_MODES 4
++/*
++ * The current MMU Modes are:
++ *  - U mode 0b000
++ *  - S mode 0b001
++ *  - M mode 0b011
++ *  - U mode HLV/HLVX/HSV 0b100
++ *  - S mode HLV/HLVX/HSV 0b101
++ *  - M mode HLV/HLVX/HSV 0b111
++ */
++#define NB_MMU_MODES 6
  
--        close(fd);
-+        qemu_close(fd);
+ #endif
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 87b68affa8..5d8e54c426 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -363,7 +363,9 @@ void QEMU_NORETURN riscv_raise_exception(CPURISCVState *env,
+ target_ulong riscv_cpu_get_fflags(CPURISCVState *env);
+ void riscv_cpu_set_fflags(CPURISCVState *env, target_ulong);
  
-         *opt->dest = g_renew(char *, *opt->dest, (*opt->ndest) + 1);
-         (*opt->dest)[*opt->ndest] = (char *)g_byte_array_free(data,  FALSE);
+-#define TB_FLAGS_MMU_MASK   3
++#define TB_FLAGS_MMU_MASK   7
++#define TB_FLAGS_PRIV_MMU_MASK                3
++#define TB_FLAGS_PRIV_HYP_ACCESS_MASK   (1 << 2)
+ #define TB_FLAGS_MSTATUS_FS MSTATUS_FS
+ 
+ typedef CPURISCVState CPUArchState;
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 3eb3a034db..9dfa7af401 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -323,7 +323,7 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+      * (riscv_cpu_do_interrupt) is correct */
+     MemTxResult res;
+     MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+-    int mode = mmu_idx;
++    int mode = mmu_idx & TB_FLAGS_PRIV_MMU_MASK;
+     bool use_background = false;
+ 
+     /*
 -- 
-MST
+2.28.0
 
 
