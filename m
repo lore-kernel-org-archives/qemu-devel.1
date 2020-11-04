@@ -2,72 +2,76 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D1BC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F31C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F8192087D
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:50:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F8192087D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0676B2072E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 17:55:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0676B2072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaMv4-0002E8-Ez
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 12:50:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38372)
+	id 1kaN0U-0004mh-RG
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 12:55:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kaMuD-0001k2-6J; Wed, 04 Nov 2020 12:49:09 -0500
-Resent-Date: Wed, 04 Nov 2020 12:49:09 -0500
-Resent-Message-Id: <E1kaMuD-0001k2-6J@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21743)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kaMzn-0003pG-Ul; Wed, 04 Nov 2020 12:54:55 -0500
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:58383)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kaMuA-0002fV-Eu; Wed, 04 Nov 2020 12:49:08 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1604512126; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=GG7IICktHYuwsbAUsXuLH/4+ZwNCIyIl1r0ZxFaNgE+lpW9nTx1OQJbmp1WCSevU9VSXuhaiyjcMLqg7P0LeZ50sHpSMDwZHlPxowSKw7nUNzxAS7OCP3DRdD0toF++fm8pbqCe62K0BlQ4Jq8wuAukclQGgvBhOd0KHgjy83xY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1604512126;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=JEwH0nebTje3xO1n7i2JUTpMKrzgCoIPvdugZqG854U=; 
- b=DFJJCPpnT9uSGAOZSPoEyZriBmtEqVUXL9pmTyUAaTh78vKIQVPVUfFEXocDZXA/iI+q0RJmRK0f5l6VBbOccUivQpP+6U6gW50EcMm24hD6uhRpMI9wf+TSvfBUFfWgESAhCtPNFq4HHfYYZKFZwHowAVa4NvB05CdnhkLLc3M=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1604512123981998.150808443765;
- Wed, 4 Nov 2020 09:48:43 -0800 (PST)
-Subject: Re: [PATCH 0/5] SCSI: fix transfer limits for SCSI passthrough
-Message-ID: <160451212210.17446.5025535715832636959@66eaa9a8a123>
-In-Reply-To: <20201104173217.417538-1-mlevitsk@redhat.com>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1kaMzl-0003M0-Aj; Wed, 04 Nov 2020 12:54:55 -0500
+Received: from mxplan5.mail.ovh.net (unknown [10.109.146.197])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id A972570EF28F;
+ Wed,  4 Nov 2020 18:54:41 +0100 (CET)
+Received: from kaod.org (37.59.142.97) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 4 Nov 2020
+ 18:54:40 +0100
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-97G002a60b9b55-a377-4b09-8ef1-53f1e0dae1a2,
+ B675344909C57F45DE6B9FBDE8367EDF8CA03E23) smtp.auth=groug@kaod.org
+Date: Wed, 4 Nov 2020 18:54:39 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH-for-5.2 v3 2/4] hw/9pfs: Fix Kconfig dependency problem
+ between 9pfs and Xen
+Message-ID: <20201104185439.41e9ddb3@bahia.lan>
+In-Reply-To: <8965407.pN9RvXrJQ9@silver>
+References: <20201104115706.3101190-1-philmd@redhat.com>
+ <20201104115706.3101190-3-philmd@redhat.com>
+ <8965407.pN9RvXrJQ9@silver>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mlevitsk@redhat.com
-Date: Wed, 4 Nov 2020 09:48:43 -0800 (PST)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 11:37:10
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [37.59.142.97]
+X-ClientProxiedBy: DAG2EX2.mxp5.local (172.16.2.12) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 003e621b-1e17-4f77-9185-fd9f201e51e8
+X-Ovh-Tracer-Id: 16924808878257838352
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedruddthedguddtkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveelhfdtudffhfeiveehhfelgeellefgteffteekudegheejfffghefhfeeuudffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdeljeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheprhhthhesthifihguughlvgdrnhgvth
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 12:54:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_BL_SPAMCOP_NET=1.347,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,57 +84,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, ronniesahlberg@gmail.com,
- qemu-block@nongnu.org, pl@kamp.de, qemu-devel@nongnu.org, tom.ty89@gmail.com,
- mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
- mlevitsk@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, "Daniel P .
+ Berrange" <berrange@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Wainer dos
+ Santos Moschetta <wainersm@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Paul Durrant <paul@xen.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTEwNDE3MzIxNy40MTc1
-MzgtMS1tbGV2aXRza0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDExMDQxNzMyMTcuNDE3
-NTM4LTEtbWxldml0c2tAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUEFUQ0ggMC81XSBTQ1NJOiBmaXgg
-dHJhbnNmZXIgbGltaXRzIGZvciBTQ1NJIHBhc3N0aHJvdWdoCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
-c3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
-ICBiMTI2NmI2Li4zYzhjMzZjICBtYXN0ZXIgICAgIC0+IG1hc3RlcgogLSBbdGFnIHVwZGF0ZV0g
-ICAgICBwYXRjaGV3LzIwMjAxMTA0MTYwMDIxLjIzNDIxMDgtMS1laGFia29zdEByZWRoYXQuY29t
-IC0+IHBhdGNoZXcvMjAyMDExMDQxNjAwMjEuMjM0MjEwOC0xLWVoYWJrb3N0QHJlZGhhdC5jb20K
-ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMTEwNDE3MzIxNy40MTc1MzgtMS1tbGV2
-aXRza0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDExMDQxNzMyMTcuNDE3NTM4LTEtbWxldml0
-c2tAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmJkZTYzNzEgYmxv
-Y2svc2NzaTogY29ycmVjdGx5IGVtdWxhdGUgdGhlIFZQRCBibG9jayBsaW1pdHMgcGFnZQpjNDE4
-MGQ2IGJsb2NrOiB1c2UgYmxrX2dldF9tYXhfaW9jdGxfdHJhbnNmZXIgZm9yIFNDU0kgcGFzc3Ro
-cm91Z2gKOWZmN2VkYyBibG9jazogYWRkIG1heF9pb2N0bF90cmFuc2ZlciB0byBCbG9ja0xpbWl0
-cwpkZDJmMWY3IGZpbGUtcG9zaXg6IGFkZCBzZ19nZXRfbWF4X3NlZ21lbnRzIHRoYXQgYWN0dWFs
-bHkgd29ya3Mgd2l0aCBzZwpmOWFkOTQwIGZpbGUtcG9zaXg6IHNwbGl0IGhkZXZfcmVmcmVzaF9s
-aW1pdHMgZnJvbSByYXdfcmVmcmVzaF9saW1pdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNSBD
-aGVja2luZyBjb21taXQgZjlhZDk0MDBlMDExIChmaWxlLXBvc2l4OiBzcGxpdCBoZGV2X3JlZnJl
-c2hfbGltaXRzIGZyb20gcmF3X3JlZnJlc2hfbGltaXRzKQoyLzUgQ2hlY2tpbmcgY29tbWl0IGRk
-MmYxZjc3YTVkMiAoZmlsZS1wb3NpeDogYWRkIHNnX2dldF9tYXhfc2VnbWVudHMgdGhhdCBhY3R1
-YWxseSB3b3JrcyB3aXRoIHNnKQozLzUgQ2hlY2tpbmcgY29tbWl0IDlmZjdlZGMzMTAwMiAoYmxv
-Y2s6IGFkZCBtYXhfaW9jdGxfdHJhbnNmZXIgdG8gQmxvY2tMaW1pdHMpCjQvNSBDaGVja2luZyBj
-b21taXQgYzQxODBkNmFjY2ZmIChibG9jazogdXNlIGJsa19nZXRfbWF4X2lvY3RsX3RyYW5zZmVy
-IGZvciBTQ1NJIHBhc3N0aHJvdWdoKQo1LzUgQ2hlY2tpbmcgY29tbWl0IGJkZTYzNzEzOTUzNiAo
-YmxvY2svc2NzaTogY29ycmVjdGx5IGVtdWxhdGUgdGhlIFZQRCBibG9jayBsaW1pdHMgcGFnZSkK
-RVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRl
-bWVudAojNTE6IEZJTEU6IGh3L3Njc2kvc2NzaS1nZW5lcmljLmM6MTk2OgorICAgICAgICAgICAg
-aWYgKHBhZ2VfaWR4ID49IHItPmJ1ZmxlbikKWy4uLl0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgNTMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS81IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
-MDIwMTEwNDE3MzIxNy40MTc1MzgtMS1tbGV2aXRza0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2tw
-YXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, 04 Nov 2020 13:18:09 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+
+> On Mittwoch, 4. November 2020 12:57:04 CET Philippe Mathieu-Daud=C3=A9 wr=
+ote:
+> > Commit b2c00bce54c ("meson: convert hw/9pfs, cleanup") introduced
+> > CONFIG_9PFS (probably a wrong conflict resolution). This config is
+> > not used anywhere. Backends depend on CONFIG_FSDEV_9P which itself
+> > depends on CONFIG_VIRTFS.
+> >=20
+> > Remove the invalid CONFIG_9PFS and use CONFIG_FSDEV_9P instead, to
+> > fix the './configure --without-default-devices --enable-xen' build:
+> >=20
+> >   /usr/bin/ld: libcommon.fa.p/hw_xen_xen-legacy-backend.c.o: in function
+> > `xen_be_register_common': hw/xen/xen-legacy-backend.c:754: undefined
+> > reference to `xen_9pfs_ops' /usr/bin/ld:
+> > libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x8): undefined referenc=
+e to
+> > `local_ops' /usr/bin/ld:
+> > libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x20): undefined referen=
+ce
+> > to `synth_ops' /usr/bin/ld:
+> > libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x38): undefined referen=
+ce
+> > to `proxy_ops' collect2: error: ld returned 1 exit status
+> >=20
+> > Fixes: b2c00bce54c ("meson: convert hw/9pfs, cleanup")
+> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Acked-by: Greg Kurz <groug@kaod.org>
+> > Tested-by: Greg Kurz <groug@kaod.org>
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+> Acked-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+>=20
+
+Phil,
+
+Same questioning as Connie. Do you intend to get this merged or should
+Christian or I take care of that ?
+
+> > ---
+> > v2: Reworded description (Greg)
+> >=20
+> > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > Cc: Paul Durrant <paul@xen.org>
+> > Cc: xen-devel@lists.xenproject.org
+> > Cc: Greg Kurz <groug@kaod.org>
+> > Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > ---
+> >  hw/9pfs/Kconfig     | 4 ----
+> >  hw/9pfs/meson.build | 2 +-
+> >  2 files changed, 1 insertion(+), 5 deletions(-)
+> >=20
+> > diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
+> > index d3ebd737301..3ae57496613 100644
+> > --- a/hw/9pfs/Kconfig
+> > +++ b/hw/9pfs/Kconfig
+> > @@ -2,12 +2,8 @@ config FSDEV_9P
+> >      bool
+> >      depends on VIRTFS
+> >=20
+> > -config 9PFS
+> > -    bool
+> > -
+> >  config VIRTIO_9P
+> >      bool
+> >      default y
+> >      depends on VIRTFS && VIRTIO
+> >      select FSDEV_9P
+> > -    select 9PFS
+> > diff --git a/hw/9pfs/meson.build b/hw/9pfs/meson.build
+> > index cc094262122..99be5d91196 100644
+> > --- a/hw/9pfs/meson.build
+> > +++ b/hw/9pfs/meson.build
+> > @@ -15,6 +15,6 @@
+> >    'coxattr.c',
+> >  ))
+> >  fs_ss.add(when: 'CONFIG_XEN', if_true: files('xen-9p-backend.c'))
+> > -softmmu_ss.add_all(when: 'CONFIG_9PFS', if_true: fs_ss)
+> > +softmmu_ss.add_all(when: 'CONFIG_FSDEV_9P', if_true: fs_ss)
+> >=20
+> >  specific_ss.add(when: 'CONFIG_VIRTIO_9P', if_true:
+> > files('virtio-9p-device.c'))
+>=20
+> Best regards,
+> Christian Schoenebeck
+>=20
+>=20
+
 
