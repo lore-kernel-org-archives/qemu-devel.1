@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D8CC55179
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:41:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB51C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:41:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2A4B2242E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:41:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FD0E2242A
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 00:41:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OmRf2EQu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2A4B2242E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YQv2MZvc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FD0E2242A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka6rc-0003GF-NH
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 19:41:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35326)
+	id 1ka6rh-0003Rm-Es
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 19:41:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6mz-0006I4-V5
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56807)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6n1-0006JS-Hw
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53543)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6mx-0004oy-CZ
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:37 -0500
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6mx-0004ot-Cu
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:36:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1604450194;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GGcU+WiqYF3cUrhrW7XyOR5inrltfoG0DI+PJ1gIrXQ=;
- b=OmRf2EQu+cuZgVnGPu6kVlkwJQaTwMEka5L74TmTq11lFujNbrxNihrYxxW9Q3obmNxTZc
- RDM0FGDxuGejwCp4EZLV9SE6mAvWe59WnBJF6T/M9zze/ASOP/f05NidCA3oSxIPBnKlbV
- j6+aDCH/vzTPMspsRbfCHr8jJfMKtrQ=
+ bh=9cPHbgqyv+0Pkq8TWRjZx8HPizlCf0BBMFHwPUW/NYk=;
+ b=YQv2MZvc3R4gR+i4QK5YBEUAhoUcgoVsZeg8csPzDtrcj1V9gGvLfOezJzcWPkQpJmHF7W
+ aImZgYpnnQy1dD2JF3y36E6GrTJypaWEt50/txMkYhDecuL4Hl4pIgEwdWV9V33OSzoUvN
+ WB0DRBwcMH5icWyOO8sQS+RYDSn80Lk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-CXKWxVIJMkiP9Z5JPaeMZA-1; Tue, 03 Nov 2020 19:36:32 -0500
-X-MC-Unique: CXKWxVIJMkiP9Z5JPaeMZA-1
+ us-mta-575-u5dDua1nPxKqVerEolyyxg-1; Tue, 03 Nov 2020 19:36:32 -0500
+X-MC-Unique: u5dDua1nPxKqVerEolyyxg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B240876E3A
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:36:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E8781015ED6
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:36:26 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-97.rdu2.redhat.com [10.10.119.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 875DF55766;
- Wed,  4 Nov 2020 00:36:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2649255766;
+ Wed,  4 Nov 2020 00:36:25 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/72] scripts/qom-fuse: add static type hints
-Date: Tue,  3 Nov 2020 19:35:02 -0500
-Message-Id: <20201104003602.1293560-13-jsnow@redhat.com>
+Subject: [PATCH v2 11/72] scripts/qom-fuse: ensure QOMFuse.read always returns
+ bytes
+Date: Tue,  3 Nov 2020 19:35:01 -0500
+Message-Id: <20201104003602.1293560-12-jsnow@redhat.com>
 In-Reply-To: <20201104003602.1293560-1-jsnow@redhat.com>
 References: <20201104003602.1293560-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -68,8 +69,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
@@ -93,138 +94,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>,
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>,
  Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Because fusepy does not have type hints, add some targeted warning
-suppressions.
-
-NOTE: Prior to this change, running 'mypy qemu' from the python
-directory worked OK, but only coincidentally. Going forward, you will
-need to run 'mypy -p qemu' instead. These invocation forms will be
-codified in a CI test soon.
+- Use FuseOSError to signal ENOENT instead of returning it
+- Wrap qom-get in str(), as we don't always know its type
+- The empty return should be b'', not ''.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- python/setup.cfg     |  8 ++++++++
- scripts/qmp/qom-fuse | 26 +++++++++++++++++---------
- 2 files changed, 25 insertions(+), 9 deletions(-)
+ scripts/qmp/qom-fuse | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/python/setup.cfg b/python/setup.cfg
-index c963d05527aa..831555552f16 100644
---- a/python/setup.cfg
-+++ b/python/setup.cfg
-@@ -47,6 +47,14 @@ python_version = 3.6
- warn_unused_configs = True
- namespace_packages = True
- 
-+[mypy-qemu.qmp.qom_fuse]
-+# fusepy has no type stubs:
-+allow_subclassing_any = True
-+
-+[mypy-fuse]
-+# fusepy has no type stubs:
-+ignore_missing_imports = True
-+
- [pylint.messages control]
- # Disable the message, report, category or checker with the given id(s). You
- # can either give multiple identifiers separated by comma (,) or put this
 diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
-index b120b93391ba..22be36634967 100755
+index b1030273efaa..b120b93391ba 100755
 --- a/scripts/qmp/qom-fuse
 +++ b/scripts/qmp/qom-fuse
-@@ -39,7 +39,14 @@ from errno import ENOENT, EPERM
- import os
- import stat
- import sys
--from typing import Dict
-+from typing import (
-+    IO,
-+    Dict,
-+    Iterator,
-+    Mapping,
-+    Optional,
-+    Union,
-+)
+@@ -128,19 +128,19 @@ class QOMFuse(QOMCommand, Operations):
  
- import fuse
- from fuse import FUSE, FuseOSError, Operations
-@@ -84,7 +91,7 @@ class QOMFuse(QOMCommand, Operations):
-         self.fuse = FUSE(self, self.mount, foreground=True)
-         return 0
- 
--    def get_ino(self, path):
-+    def get_ino(self, path: str) -> int:
-         """Get an inode number for a given QOM path."""
-         if path in self.ino_map:
-             return self.ino_map[path]
-@@ -92,7 +99,7 @@ class QOMFuse(QOMCommand, Operations):
-         self.ino_count += 1
-         return self.ino_map[path]
- 
--    def is_object(self, path):
-+    def is_object(self, path: str) -> bool:
-         """Is the given QOM path an object?"""
-         try:
-             self.qom_list(path)
-@@ -100,7 +107,7 @@ class QOMFuse(QOMCommand, Operations):
-         except QMPResponseError:
-             return False
- 
--    def is_property(self, path):
-+    def is_property(self, path: str) -> bool:
-         """Is the given QOM path a property?"""
-         path, prop = path.rsplit('/', 1)
-         if path == '':
-@@ -113,7 +120,7 @@ class QOMFuse(QOMCommand, Operations):
-         except QMPResponseError:
-             return False
- 
--    def is_link(self, path):
-+    def is_link(self, path: str) -> bool:
-         """Is the given QOM path a link?"""
-         path, prop = path.rsplit('/', 1)
-         if path == '':
-@@ -126,7 +133,7 @@ class QOMFuse(QOMCommand, Operations):
-         except QMPResponseError:
-             return False
- 
--    def read(self, path, size, offset, fh):
-+    def read(self, path: str, size: int, offset: int, fh: IO[bytes]) -> bytes:
+     def read(self, path, size, offset, fh):
          if not self.is_property(path):
-             raise FuseOSError(ENOENT)
+-            return -ENOENT
++            raise FuseOSError(ENOENT)
  
-@@ -144,7 +151,7 @@ class QOMFuse(QOMCommand, Operations):
+         path, prop = path.rsplit('/', 1)
+         if path == '':
+             path = '/'
+         try:
+-            data = self.qmp.command('qom-get', path=path, property=prop)
++            data = str(self.qmp.command('qom-get', path=path, property=prop))
+             data += '\n'  # make values shell friendly
+         except QMPResponseError as err:
+             raise FuseOSError(EPERM) from err
+ 
+         if offset > len(data):
+-            return ''
++            return b''
  
          return bytes(data[offset:][:size], encoding='utf-8')
  
--    def readlink(self, path):
-+    def readlink(self, path: str) -> Union[bool, str]:
-         if not self.is_link(path):
-             return False
-         path, prop = path.rsplit('/', 1)
-@@ -152,7 +159,8 @@ class QOMFuse(QOMCommand, Operations):
-         return prefix + str(self.qmp.command('qom-get', path=path,
-                                              property=prop))
- 
--    def getattr(self, path, fh=None):
-+    def getattr(self, path: str,
-+                fh: Optional[IO[bytes]] = None) -> Mapping[str, object]:
-         if self.is_link(path):
-             value = {
-                 'st_mode': 0o755 | stat.S_IFLNK,
-@@ -196,7 +204,7 @@ class QOMFuse(QOMCommand, Operations):
-             raise FuseOSError(ENOENT)
-         return value
- 
--    def readdir(self, path, fh):
-+    def readdir(self, path: str, fh: IO[bytes]) -> Iterator[str]:
-         yield '.'
-         yield '..'
-         for item in self.qom_list(path):
 -- 
 2.26.2
 
