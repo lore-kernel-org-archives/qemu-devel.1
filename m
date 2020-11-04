@@ -2,66 +2,96 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F37C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B2F6C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 06:19:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88BDC21556
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:50:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88BDC21556
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id A6473208C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 06:19:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KY8xyjfD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6473208C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaBgR-0000tI-5G
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:50:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41330)
+	id 1kaC8N-00061G-Fz
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 01:19:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kaBfa-0000LW-It; Wed, 04 Nov 2020 00:49:18 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2483)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kaBfW-00077H-On; Wed, 04 Nov 2020 00:49:18 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
- by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4CQwgw2crRzVknV;
- Wed,  4 Nov 2020 13:49:00 +0800 (CST)
-Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.225]) by
- DGGEMM401-HUB.china.huawei.com ([10.3.20.209]) with mapi id 14.03.0487.000;
- Wed, 4 Nov 2020 13:49:02 +0800
-From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org"
- <qemu-trivial@nongnu.org>, "lvivier@redhat.com" <lvivier@redhat.com>
-Subject: RE: [PATCH RESEND v2 0/7] some memleak trivial patchs
-Thread-Topic: [PATCH RESEND v2 0/7] some memleak trivial patchs
-Thread-Index: AQHWqQOAYexAkoH4WUOcMVYmxKZpOamv9+ywgAeRBtA=
-Date: Wed, 4 Nov 2020 05:49:01 +0000
-Message-ID: <7412CDE03601674DA8197E2EBD8937E83BA2B5E7@dggemm531-mbx.china.huawei.com>
-References: <20201023061218.2080844-1-kuhn.chenqun@huawei.com> 
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.185.149]
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kaC7D-00056d-2W
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 01:17:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48179)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kaC7A-0000PG-A5
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 01:17:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604470665;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xfkrGv1aZf1IL5GXKFktkszgcVsO83XbXo4z4Vxwg7M=;
+ b=KY8xyjfDfl/Vag8NSCRlwiqg0hhZVHvSW0rFOg6Q6V/sSyX5jrMbySL/NaG3PZkGt1l6W9
+ fpIvcOrWGPQfEqmIqhB/5E618U+sCA0v/ypUnZNFRTApA7rUDG1WPKlIB/9sHLRM9JPPMM
+ uFHthFJuSIWGvTWb8DwzoJTds72MHPQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-10-2YpDW0klNAusxWLWodXMPg-1; Wed, 04 Nov 2020 01:17:44 -0500
+X-MC-Unique: 2YpDW0klNAusxWLWodXMPg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5825A801FDA;
+ Wed,  4 Nov 2020 06:17:42 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-151.ams2.redhat.com [10.36.112.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E59F75B4D7;
+ Wed,  4 Nov 2020 06:17:28 +0000 (UTC)
+Subject: Re: [PATCH-for-5.2 2/3] gitlab-ci: Add a job to cover the
+ --without-default-devices config
+To: Stefano Stabellini <sstabellini@kernel.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20201103164604.2692357-1-philmd@redhat.com>
+ <20201103164604.2692357-3-philmd@redhat.com>
+ <20201103165247.GT205187@redhat.com>
+ <7654e063-98d3-84e0-8116-5a1b41d14636@redhat.com>
+ <21e90ddb-fe8a-c780-2741-9b7a2f7f1c9a@redhat.com>
+ <alpine.DEB.2.21.2011031722100.3264@sstabellini-ThinkPad-T480s>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9ac5e985-a701-f357-29fb-ef7975f5f2c2@redhat.com>
+Date: Wed, 4 Nov 2020 07:17:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.187;
- envelope-from=kuhn.chenqun@huawei.com; helo=szxga01-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 00:49:08
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <alpine.DEB.2.21.2011031722100.3264@sstabellini-ThinkPad-T480s>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,56 +104,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pannengyuan <pannengyuan@huawei.com>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>, ganqixin <ganqixin@huawei.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ David Hildenbrand <david@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGluZyENCg0KSGkgTGF1cmVudCwNCiAgVGhlc2UgcGF0Y2hlcyBoYXZlIGJlZW4gcmV2aWV3ZWQg
-YnkgbWFueSBwZW9wbGUgMiBtb250aHMgYWdvLiANCkNvdWxkIHlvdSBoZWxwIGFkZCB0aGVtIHRv
-IHRoZSB0cml2aWFsIGJyYW5jaD8NCg0KIFBhbiBOZW5neXVhbiAoNik6DQogICBxZ2EvY2hhbm5l
-bC1wb3NpeDogUGx1ZyBtZW1vcnkgbGVhayBpbiBnYV9jaGFubmVsX3dyaXRlX2FsbCgpDQogICBl
-bGYyZG1wL3FlbXVfZWxmOiBQbHVnIG1lbWxlYWsgaW4gUUVNVV9FbGZfaW5pdA0KICAgZWxmMmRt
-cC9wZGI6IFBsdWcgbWVtbGVhayBpbiBwZGJfaW5pdF9mcm9tX2ZpbGUNCiAgIG1pZ3JhdGlvbi9j
-b2xvOiBQbHVnIG1lbWxlYWtzIGluIGNvbG9fcHJvY2Vzc19pbmNvbWluZ190aHJlYWQNCiAgIGJs
-b2NrZGV2OiBGaXggYSBtZW1sZWFrIGluIGRyaXZlX2JhY2t1cF9wcmVwYXJlKCkNCiAgIGJsb2Nr
-L2ZpbGUtcG9zaXg6IGZpeCBhIHBvc3NpYmxlIHVuZGVmaW5lZCBiZWhhdmlvcg0KDQpUaGFua3Oj
-rA0KQ2hlbiBRdW4NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBDaGVu
-cXVuIChrdWhuKQ0KPiBTZW50OiBGcmlkYXksIE9jdG9iZXIgMzAsIDIwMjAgNjoyMyBQTQ0KPiBU
-bzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBxZW11LXRyaXZpYWxAbm9uZ251Lm9yZw0KPiBDYzog
-UGFubmVuZ3l1YW4gPHBhbm5lbmd5dWFuQGh1YXdlaS5jb20+OyBsdml2aWVyQHJlZGhhdC5jb207
-DQo+IFpoYW5naGFpbGlhbmcgPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT47IGdhbnFp
-eGluDQo+IDxnYW5xaXhpbkBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSRTogW1BBVENIIFJFU0VO
-RCB2MiAwLzddIHNvbWUgbWVtbGVhayB0cml2aWFsIHBhdGNocw0KPiANCj4gUGluZyENCj4gDQo+
-IEhpIGFsbCwNCj4gICBUaGUgcGF0Y2hlMiB+NyBoYXZlIGJlZW4gcmV2aWV3ZWQgZm9yIHNvbWUg
-dGltZS4NCj4gQ291bGQgc29tZW9uZSBwbGVhc2UgcGljayBpdCB1cKO/DQo+IA0KPiBUaGFua3Ms
-DQo+IENoZW4gUXVuDQo+IA0KPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gRnJv
-bTogQ2hlbnF1biAoa3VobikNCj4gPiBTZW50OiBGcmlkYXksIE9jdG9iZXIgMjMsIDIwMjAgMjox
-MiBQTQ0KPiA+IFRvOiBxZW11LWRldmVsQG5vbmdudS5vcmc7IHFlbXUtdHJpdmlhbEBub25nbnUu
-b3JnDQo+ID4gQ2M6IFBhbm5lbmd5dWFuIDxwYW5uZW5neXVhbkBodWF3ZWkuY29tPjsgbHZpdmll
-ckByZWRoYXQuY29tOw0KPiA+IFpoYW5naGFpbGlhbmcgPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVh
-d2VpLmNvbT47IGdhbnFpeGluDQo+ID4gPGdhbnFpeGluQGh1YXdlaS5jb20+OyBDaGVucXVuIChr
-dWhuKSA8a3Vobi5jaGVucXVuQGh1YXdlaS5jb20+DQo+ID4gU3ViamVjdDogW1BBVENIIFJFU0VO
-RCB2MiAwLzddIHNvbWUgbWVtbGVhayB0cml2aWFsIHBhdGNocw0KPiA+DQo+ID4gSGkgYWxsLA0K
-PiA+DQo+ID4gICBIZXJlIGFyZSBzb21lIG1lbW9yeSBsZWFrIHBhdGNoZXMgcmVwb3J0ZWQgYnkg
-RXVsZXJSb2JvdC4NCj4gPiBTb21lIHBhdGNoIHN1Ym1pc3Npb25zIGhhdmUgYmVlbiB1bmF0dGVu
-ZGVkIGZvciBhIHdoaWxlIGFuZCBJIHJlc2VuZCB0aGVtLg0KPiA+DQo+ID4gVGhhbmtzLA0KPiA+
-IENoZW4gUXVuDQo+ID4NCj4gPg0KPiA+IENoZW4gUXVuICgxKToNCj4gPiAgIHRlc3RzL21pZ3Jh
-dGlvbjogZml4IG1lbWxlYWsgaW4gd2FpdF9jb21tYW5kL3dhaXRfY29tbWFuZF9mZA0KPiA+DQo+
-ID4gUGFuIE5lbmd5dWFuICg2KToNCj4gPiAgIHFnYS9jaGFubmVsLXBvc2l4OiBQbHVnIG1lbW9y
-eSBsZWFrIGluIGdhX2NoYW5uZWxfd3JpdGVfYWxsKCkNCj4gPiAgIGVsZjJkbXAvcWVtdV9lbGY6
-IFBsdWcgbWVtbGVhayBpbiBRRU1VX0VsZl9pbml0DQo+ID4gICBlbGYyZG1wL3BkYjogUGx1ZyBt
-ZW1sZWFrIGluIHBkYl9pbml0X2Zyb21fZmlsZQ0KPiA+ICAgbWlncmF0aW9uL2NvbG86IFBsdWcg
-bWVtbGVha3MgaW4gY29sb19wcm9jZXNzX2luY29taW5nX3RocmVhZA0KPiA+ICAgYmxvY2tkZXY6
-IEZpeCBhIG1lbWxlYWsgaW4gZHJpdmVfYmFja3VwX3ByZXBhcmUoKQ0KPiA+ICAgYmxvY2svZmls
-ZS1wb3NpeDogZml4IGEgcG9zc2libGUgdW5kZWZpbmVkIGJlaGF2aW9yDQo+ID4NCj4gPiAgYmxv
-Y2svZmlsZS1wb3NpeC5jICAgICAgICAgICAgICB8ICAyICstDQo+ID4gIGJsb2NrZGV2LmMgICAg
-ICAgICAgICAgICAgICAgICAgfCAgMSArDQo+ID4gIGNvbnRyaWIvZWxmMmRtcC9wZGIuYyAgICAg
-ICAgICAgfCAgMSArDQo+ID4gIGNvbnRyaWIvZWxmMmRtcC9xZW11X2VsZi5jICAgICAgfCAgMSAr
-DQo+ID4gIG1pZ3JhdGlvbi9jb2xvLmMgICAgICAgICAgICAgICAgfCAgNSArKysrLQ0KPiA+ICBx
-Z2EvY2hhbm5lbC1wb3NpeC5jICAgICAgICAgICAgIHwgIDYgKysrKystDQo+ID4gIHRlc3RzL3F0
-ZXN0L21pZ3JhdGlvbi1oZWxwZXJzLmMgfCAxNiArKysrKysrKysrKystLS0tDQo+ID4gIDcgZmls
-ZXMgY2hhbmdlZCwgMjUgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IC0t
-DQo+ID4gMi4yMy4wDQoNCg==
+On 04/11/2020 03.27, Stefano Stabellini wrote:
+[...]
+> Actually I care about Xen and 9pfs support, it is one of the few
+> combinations that I use regularly and it is even enabled in the Xilinx
+> product I look after. But admittedly I don't test QEMU master as much as
+> I should. With the recent changes to the build system it is not very
+> suprising that there are some issues. It would be great to have a Xen
+> and 9pfs test in the gitlab CI-loop.
+> 
+> 
+> FYI I tried to build the latest QEMU on Alpine Linux 3.12 ARM64 and I
+> get:
+> 
+>   ninja: unknown tool 'query'
+> 
+> Even after rebuilding ninja master by hand. Any ideas? I don't know much
+> about ninja.
+> 
+> 
+> So I gave up on that and I spinned up a Debian Buster x86 container for
+> this build. That one got past the "ninja: unknown tool 'query'" error.
+> The build completed without problems to the end.
+> 
+> Either way I can't reproduce the build error above.
+
+Did you run "configure" with "--without-default-devices" ?
+
+ Thomas
+
+
 
