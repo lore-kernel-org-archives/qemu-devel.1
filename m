@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1716C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E22C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:02:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B5B3223C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:01:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3E8F223AB
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:02:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gq9T5R9V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B5B3223C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i9ZcCXTk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E8F223AB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka7BV-0001DH-6Q
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 20:01:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35758)
+	id 1ka7C2-000293-2U
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 20:02:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nV-0006rD-SC
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57631)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nU-0006ob-Ue
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40826)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nT-0004ue-4h
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:09 -0500
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nR-0004uJ-Uv
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604450226;
+ s=mimecast20190719; t=1604450224;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zxjLjpJdipkVXuG2hbACyf4YwvY0FTbyUiG6pFbjAhk=;
- b=Gq9T5R9VJVAdGI+rjPrn88UCIBUSrAFWNyE+GbkW1Pel+yRf1Rm26cV7CPdQJkbe2YFdbK
- KNRMLDUnJNYQt58vhJgaEvGocne8em5uJe/pDgZEpGMDOmK9m9luRcL3df4k2lQn1RVTUJ
- UaARLbB3lWjxrhsk0caV+9XCZXIOz3A=
+ bh=La8LA7rAWBOZRtdJ7hAQXXLbNavMknquY2yV0eFl5mM=;
+ b=i9ZcCXTkG2FR1PsAcwfW4sLHGJxAO35e/ltzMRrPYMap+Y6NP2X1L5j4KLBSPfhLK8424A
+ Matfh54lFQQbOosJkZnP9cj8ln3Qd64nXBJ6daqWjsfPC4N5d4AiQ4ECDqB8qQrPGncEXC
+ 9Z3saEev7na8E+R765CcYHyp8spwPxE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-uN1R2NECPxSO-TJlnaZbew-1; Tue, 03 Nov 2020 19:37:04 -0500
-X-MC-Unique: uN1R2NECPxSO-TJlnaZbew-1
+ us-mta-436-53BI0lz9M4SGp9hs7n25dA-1; Tue, 03 Nov 2020 19:37:03 -0500
+X-MC-Unique: 53BI0lz9M4SGp9hs7n25dA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90DC31891E92
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:37:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7139F1891E82
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:37:02 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-97.rdu2.redhat.com [10.10.119.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B3C9555766;
- Wed,  4 Nov 2020 00:37:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AAB5055766;
+ Wed,  4 Nov 2020 00:37:01 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 44/72] scripts/qmp-shell: use isinstance() instead of type()
-Date: Tue,  3 Nov 2020 19:35:34 -0500
-Message-Id: <20201104003602.1293560-45-jsnow@redhat.com>
+Subject: [PATCH v2 43/72] scripts/qmp-shell: remove if-raise-else patterns
+Date: Tue,  3 Nov 2020 19:35:33 -0500
+Message-Id: <20201104003602.1293560-44-jsnow@redhat.com>
 In-Reply-To: <20201104003602.1293560-1-jsnow@redhat.com>
 References: <20201104003602.1293560-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -101,29 +101,40 @@ Sender: "Qemu-devel"
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qmp/qmp-shell | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/qmp/qmp-shell | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index 47863a604f51..0cd3ed7d43c7 100755
+index b3ab735397d4..47863a604f51 100755
 --- a/scripts/qmp/qmp-shell
 +++ b/scripts/qmp/qmp-shell
-@@ -215,13 +215,13 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-             for path in optpath[:-1]:
-                 curpath.append(path)
-                 obj = parent.get(path, {})
--                if type(obj) is not dict:
-+                if not isinstance(obj, dict):
+@@ -224,8 +224,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+                 if type(parent[optpath[-1]]) is dict:
                      msg = 'Cannot use "{:s}" as both leaf and non-leaf key'
                      raise QMPShellError(msg.format('.'.join(curpath)))
-                 parent[path] = obj
-                 parent = obj
-             if optpath[-1] in parent:
--                if type(parent[optpath[-1]]) is dict:
-+                if isinstance(parent[optpath[-1]], dict):
-                     msg = 'Cannot use "{:s}" as both leaf and non-leaf key'
-                     raise QMPShellError(msg.format('.'.join(curpath)))
-                 raise QMPShellError(f'Cannot set "{key}" multiple times')
+-                else:
+-                    raise QMPShellError(f'Cannot set "{key}" multiple times')
++                raise QMPShellError(f'Cannot set "{key}" multiple times')
+             parent[optpath[-1]] = value
+ 
+     def __build_cmd(self, cmdline):
+@@ -329,13 +328,14 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+         except EOFError:
+             print()
+             return False
++
+         if cmdline == '':
+             for event in self.get_events():
+                 print(event)
+             self.clear_events()
+             return True
+-        else:
+-            return self._execute_cmd(cmdline)
++
++        return self._execute_cmd(cmdline)
+ 
+     def set_verbosity(self, verbose):
+         self._verbose = verbose
 -- 
 2.26.2
 
