@@ -2,75 +2,93 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72FAAC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 02:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2679C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 02:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEB0E216C4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 02:28:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 148EA2236F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 02:50:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wbd2Wmcx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEB0E216C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H2E2Yv7/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 148EA2236F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka8X6-0004Kj-Rz
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 21:28:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54162)
+	id 1ka8sk-0008Ho-1G
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 21:50:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1ka8WJ-0003u6-OV; Tue, 03 Nov 2020 21:27:31 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43460)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1ka8WH-00011c-Qr; Tue, 03 Nov 2020 21:27:31 -0500
-Received: from sstabellini-ThinkPad-T480s (c-24-130-65-46.hsd1.ca.comcast.net
- [24.130.65.46])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1ka8ro-0007oY-4W
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 21:49:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41945)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1ka8rj-0003gX-Nl
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 21:49:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604458177;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JuHKpx6igcSueLfvDTw4ZVsDWSY+pVFG8HmNO4Bdxow=;
+ b=H2E2Yv7/b8dhNNml4KFxPiXKsSjjqfP6bPE7FVLjQdPrtX275t8dfBvtSJ+aqLxORAQeEC
+ RwCBYaR9CPyx2yaUJTsV2djJLaiwK9NudH+HJ+b4fqk+fmavRTvycN/e1t/wojTONj9iEy
+ qEnwASDr2hB0rcimPzYW8LfScIwdU3I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-PeSt_EJrNw-RFGKrcVo70A-1; Tue, 03 Nov 2020 21:49:34 -0500
+X-MC-Unique: PeSt_EJrNw-RFGKrcVo70A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id F3F2C21534;
- Wed,  4 Nov 2020 02:27:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604456846;
- bh=AAO/693nsK4aj5g61yL0xiPaCLcEqYbqVqiD/UMxyDg=;
- h=Date:From:To:cc:Subject:In-Reply-To:References:From;
- b=Wbd2WmcxvzgXxQuvpgP0ltdv3CQkkb4HZwVP1XvmO1qWWyKPjV4NuF2TFZU0Y/GeV
- A//QEjWq1xPg0Ygi3BWhqDBQ+b07XyL1toATNnFX3u9EFSEyBVe1uFRMJT8qBKJskk
- HjFjiw1L4lmc/SsHy9PgS7i6m2Dc2aVkkf1ePccA=
-Date: Tue, 3 Nov 2020 18:27:18 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.2 2/3] gitlab-ci: Add a job to cover the
- --without-default-devices config
-In-Reply-To: <21e90ddb-fe8a-c780-2741-9b7a2f7f1c9a@redhat.com>
-Message-ID: <alpine.DEB.2.21.2011031722100.3264@sstabellini-ThinkPad-T480s>
-References: <20201103164604.2692357-1-philmd@redhat.com>
- <20201103164604.2692357-3-philmd@redhat.com>
- <20201103165247.GT205187@redhat.com>
- <7654e063-98d3-84e0-8116-5a1b41d14636@redhat.com>
- <21e90ddb-fe8a-c780-2741-9b7a2f7f1c9a@redhat.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B583803F42;
+ Wed,  4 Nov 2020 02:49:33 +0000 (UTC)
+Received: from [10.72.13.133] (ovpn-13-133.pek2.redhat.com [10.72.13.133])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2A0395D9CC;
+ Wed,  4 Nov 2020 02:49:27 +0000 (UTC)
+Subject: Re: [RFC PATCH 1/6] net: Added SetSteeringEBPF method for
+ NetClientState.
+To: Andrew Melnychenko <andrew@daynix.com>, mst@redhat.com
+References: <20201102185115.7425-1-andrew@daynix.com>
+ <20201102185115.7425-2-andrew@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b94d69ef-8067-9bc9-aaae-2bca88e5d9ba@redhat.com>
+Date: Wed, 4 Nov 2020 10:49:26 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323329-2447170-1604453887=:3264"
-Content-ID: <alpine.DEB.2.21.2011031752410.3264@sstabellini-ThinkPad-T480s>
-Received-SPF: pass client-ip=198.145.29.99;
- envelope-from=sstabellini@kernel.org; helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 21:27:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <20201102185115.7425-2-andrew@daynix.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 00:03:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,86 +102,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- David Hildenbrand <david@redhat.com>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: yan@daynix.com, yuri.benditovich@daynix.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
 
---8323329-2447170-1604453887=:3264
-Content-Type: text/plain; CHARSET=UTF-8
-Content-Transfer-Encoding: 8BIT
-Content-ID: <alpine.DEB.2.21.2011031752411.3264@sstabellini-ThinkPad-T480s>
+On 2020/11/3 上午2:51, Andrew Melnychenko wrote:
+> From: Andrew <andrew@daynix.com>
+>
+> For now, that method supported only by Linux TAP.
+> Linux TAP uses TUNSETSTEERINGEBPF ioctl.
+> TUNSETSTEERINGBPF was added 3 years ago.
+> Qemu checks if it was defined before using.
+>
+> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+> ---
+>   include/net/net.h |  2 ++
+>   net/tap-bsd.c     |  5 +++++
+>   net/tap-linux.c   | 19 +++++++++++++++++++
+>   net/tap-solaris.c |  5 +++++
+>   net/tap-stub.c    |  5 +++++
+>   net/tap.c         |  9 +++++++++
+>   net/tap_int.h     |  1 +
+>   7 files changed, 46 insertions(+)
+>
+> diff --git a/include/net/net.h b/include/net/net.h
+> index 897b2d7595..d8a41fb010 100644
+> --- a/include/net/net.h
+> +++ b/include/net/net.h
+> @@ -60,6 +60,7 @@ typedef int (SetVnetBE)(NetClientState *, bool);
+>   typedef struct SocketReadState SocketReadState;
+>   typedef void (SocketReadStateFinalize)(SocketReadState *rs);
+>   typedef void (NetAnnounce)(NetClientState *);
+> +typedef bool (SetSteeringEBPF)(NetClientState *, int);
+>   
+>   typedef struct NetClientInfo {
+>       NetClientDriver type;
+> @@ -81,6 +82,7 @@ typedef struct NetClientInfo {
+>       SetVnetLE *set_vnet_le;
+>       SetVnetBE *set_vnet_be;
+>       NetAnnounce *announce;
+> +    SetSteeringEBPF *set_steering_ebpf;
+>   } NetClientInfo;
+>   
+>   struct NetClientState {
+> diff --git a/net/tap-bsd.c b/net/tap-bsd.c
+> index 77aaf674b1..4f64f31e98 100644
+> --- a/net/tap-bsd.c
+> +++ b/net/tap-bsd.c
+> @@ -259,3 +259,8 @@ int tap_fd_get_ifname(int fd, char *ifname)
+>   {
+>       return -1;
+>   }
+> +
+> +int tap_fd_set_steering_ebpf(int fd, int prog_fd)
+> +{
+> +    return -1;
+> +}
+> diff --git a/net/tap-linux.c b/net/tap-linux.c
+> index b0635e9e32..196373019f 100644
+> --- a/net/tap-linux.c
+> +++ b/net/tap-linux.c
+> @@ -31,6 +31,7 @@
+>   
+>   #include <net/if.h>
+>   #include <sys/ioctl.h>
+> +#include <linux/if_tun.h> /* TUNSETSTEERINGEBPF */
+>   
+>   #include "qapi/error.h"
+>   #include "qemu/error-report.h"
+> @@ -316,3 +317,21 @@ int tap_fd_get_ifname(int fd, char *ifname)
+>       pstrcpy(ifname, sizeof(ifr.ifr_name), ifr.ifr_name);
+>       return 0;
+>   }
+> +
+> +int tap_fd_set_steering_ebpf(int fd, int prog_fd)
+> +{
+> +#ifdef TUNSETSTEERINGEBPF
 
-On Tue, 3 Nov 2020, Philippe Mathieu-Daudé wrote:
-> I forgot to Cc the 9pfs & Xen maintainers, doing it now ;)
-> 
-> On 11/3/20 6:01 PM, Philippe Mathieu-Daudé wrote:
-> > On 11/3/20 5:52 PM, Daniel P. Berrangé wrote:
-> >> On Tue, Nov 03, 2020 at 05:46:03PM +0100, Philippe Mathieu-Daudé wrote:
-> >>> We test './configure --without-default-devices' since commit
-> >>> 20885b5b169 (".travis.yml: test that no-default-device builds
-> >>> do not regress") in Travis-CI.
-> >>>
-> >>> As we prefer to use GitLab-CI, add the equivalent job there.
-> >>>
-> >>> One minor difference: the GitLab Ubuntu docker image has the
-> >>> Xen devel packages installed. As it is automatically selected,
-> >>> we need to disable it with the --disable-xen option, else the
-> >>> build fails:
-> >>>
-> >>>   /usr/bin/ld: libcommon.fa.p/hw_xen_xen-legacy-backend.c.o: in function `xen_be_register_common':
-> >>>   hw/xen/xen-legacy-backend.c:754: undefined reference to `xen_9pfs_ops'
-> >>>   /usr/bin/ld: libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x8): undefined reference to `local_ops'
-> >>>   /usr/bin/ld: libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x20): undefined reference to `synth_ops'
-> >>>   /usr/bin/ld: libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x38): undefined reference to `proxy_ops'
-> >>>   collect2: error: ld returned 1 exit status
-> >>
-> >> Surely this is a build bug we need to fix rather than ignore in CI ?
-> > 
-> > Well it predates this series, so nobody really cared
-> > (thus I wonder if it makes sense to invest resources
-> > there).
-> > 
-> > Anyway I can have a look after 5.2-rc1.
 
-Actually I care about Xen and 9pfs support, it is one of the few
-combinations that I use regularly and it is even enabled in the Xilinx
-product I look after. But admittedly I don't test QEMU master as much as
-I should. With the recent changes to the build system it is not very
-suprising that there are some issues. It would be great to have a Xen
-and 9pfs test in the gitlab CI-loop.
+I'm not sure how much this can help.
+
+But looking at tap-linux.h, I wonder do we need to pull TUN/TAP uapi 
+headers.
+
+Thanks
 
 
-FYI I tried to build the latest QEMU on Alpine Linux 3.12 ARM64 and I
-get:
+> +    if (ioctl(fd, TUNSETSTEERINGEBPF, (void *) &prog_fd) != 0) {
+> +        error_report("Issue while setting TUNSETSTEERINGEBPF:"
+> +                    " %s with fd: %d, prog_fd: %d",
+> +                    strerror(errno), fd, prog_fd);
+> +
+> +       return -1;
+> +    }
+> +
+> +    return 0;
+> +#else
+> +    error_report("TUNSETSTEERINGEBPF is not supported");
+> +    return -1;
+> +#endif
+> +}
+> diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+> index 0475a58207..d85224242b 100644
+> --- a/net/tap-solaris.c
+> +++ b/net/tap-solaris.c
+> @@ -255,3 +255,8 @@ int tap_fd_get_ifname(int fd, char *ifname)
+>   {
+>       return -1;
+>   }
+> +
+> +int tap_fd_set_steering_ebpf(int fd, int prog_fd)
+> +{
+> +    return -1;
+> +}
+> diff --git a/net/tap-stub.c b/net/tap-stub.c
+> index de525a2e69..a0fa25804b 100644
+> --- a/net/tap-stub.c
+> +++ b/net/tap-stub.c
+> @@ -85,3 +85,8 @@ int tap_fd_get_ifname(int fd, char *ifname)
+>   {
+>       return -1;
+>   }
+> +
+> +int tap_fd_set_steering_ebpf(int fd, int prog_fd)
+> +{
+> +    return -1;
+> +}
+> diff --git a/net/tap.c b/net/tap.c
+> index c46ff66184..81f50017bd 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -337,6 +337,14 @@ static void tap_poll(NetClientState *nc, bool enable)
+>       tap_write_poll(s, enable);
+>   }
+>   
+> +static bool tap_set_steering_ebpf(NetClientState *nc, int prog_fd)
+> +{
+> +    TAPState *s = DO_UPCAST(TAPState, nc, nc);
+> +    assert(nc->info->type == NET_CLIENT_DRIVER_TAP);
+> +
+> +    return tap_fd_set_steering_ebpf(s->fd, prog_fd) == 0;
+> +}
+> +
+>   int tap_get_fd(NetClientState *nc)
+>   {
+>       TAPState *s = DO_UPCAST(TAPState, nc, nc);
+> @@ -362,6 +370,7 @@ static NetClientInfo net_tap_info = {
+>       .set_vnet_hdr_len = tap_set_vnet_hdr_len,
+>       .set_vnet_le = tap_set_vnet_le,
+>       .set_vnet_be = tap_set_vnet_be,
+> +    .set_steering_ebpf = tap_set_steering_ebpf,
+>   };
+>   
+>   static TAPState *net_tap_fd_init(NetClientState *peer,
+> diff --git a/net/tap_int.h b/net/tap_int.h
+> index 225a49ea48..547f8a5a28 100644
+> --- a/net/tap_int.h
+> +++ b/net/tap_int.h
+> @@ -44,5 +44,6 @@ int tap_fd_set_vnet_be(int fd, int vnet_is_be);
+>   int tap_fd_enable(int fd);
+>   int tap_fd_disable(int fd);
+>   int tap_fd_get_ifname(int fd, char *ifname);
+> +int tap_fd_set_steering_ebpf(int fd, int prog_fd);
+>   
+>   #endif /* NET_TAP_INT_H */
 
-  ninja: unknown tool 'query'
-
-Even after rebuilding ninja master by hand. Any ideas? I don't know much
-about ninja.
-
-
-So I gave up on that and I spinned up a Debian Buster x86 container for
-this build. That one got past the "ninja: unknown tool 'query'" error.
-The build completed without problems to the end.
-
-Either way I can't reproduce the build error above.
---8323329-2447170-1604453887=:3264--
 
