@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7CB2C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42332C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:10:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F96D223C7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:10:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D44BA223C7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 01:10:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iiemx1/n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F96D223C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dx89vIXZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D44BA223C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ka7JJ-0004As-Dx
-	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 20:10:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35956)
+	id 1ka7JL-0004GC-UR
+	for qemu-devel@archiver.kernel.org; Tue, 03 Nov 2020 20:10:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nt-0007Lv-In
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46837)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nT-0006kJ-F5
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26234)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6np-0004xG-Fd
- for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:33 -0500
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1ka6nR-0004uB-Eg
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 19:37:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604450246;
+ s=mimecast20190719; t=1604450224;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=W2iHjqkIKG0cOWnHmRr1gY05wStFxbfX6F6YUEQDMNg=;
- b=Iiemx1/n1ABYKFexztEC52s6chDUD9YwQxuTi22pZkkgIQh00Fjkn8P9p4LehYYVixk7o8
- fw/JwjRjtk/JLxdHe28KZPNbzUVsSI8V0Khl9BOScMiPCQ44M3/0TRrPkiR7xByfFGCv8Y
- bfzN/rs+m5a1qM3gq9eWGCyvFq87p3E=
+ bh=pySCMETq1QtWaiErDZTOM4dTWAaBXBhNlXBJldhFyVE=;
+ b=Dx89vIXZ950WnXVbHwPQAKAwbh9b/p1ZmjvdUZdRLpGF9Ymcen2CRWGL8QSujdTy2+XVnP
+ COMNo9iz4IKEuYKCdIs2KYE0owiJ0h9M19bzu24IBQR5Hjh4o1CHEL8i3c9+t0l8VsSQQk
+ ABdjgIvDhq8FR2WXifwExKm2ly1f2WA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-572-Co7zQxJaPVawPMw0uyVL-g-1; Tue, 03 Nov 2020 19:37:25 -0500
-X-MC-Unique: Co7zQxJaPVawPMw0uyVL-g-1
+ us-mta-476-Bki5Nd_EPkatA2IraqDxyA-1; Tue, 03 Nov 2020 19:37:02 -0500
+X-MC-Unique: Bki5Nd_EPkatA2IraqDxyA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AAA18030B1
- for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:37:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F393108BD07
+ for <qemu-devel@nongnu.org>; Wed,  4 Nov 2020 00:37:01 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-119-97.rdu2.redhat.com [10.10.119.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C976F55766;
- Wed,  4 Nov 2020 00:37:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA76155766;
+ Wed,  4 Nov 2020 00:37:00 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 58/72] scripts/qmp-shell: Accept SocketAddrT instead of
- string
-Date: Tue,  3 Nov 2020 19:35:48 -0500
-Message-Id: <20201104003602.1293560-59-jsnow@redhat.com>
+Subject: [PATCH v2 42/72] scripts/qmp-shell: explicitly chain exception context
+Date: Tue,  3 Nov 2020 19:35:32 -0500
+Message-Id: <20201104003602.1293560-43-jsnow@redhat.com>
 In-Reply-To: <20201104003602.1293560-1-jsnow@redhat.com>
 References: <20201104003602.1293560-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -100,55 +99,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Don't extend QEMUMonitorProtocol but change the argument types; move the
-string parsing just outside of the class.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- scripts/qmp/qmp-shell | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ scripts/qmp/qmp-shell | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index 2d0e85b5f723..b465c7f9e2d6 100755
+index 6ad9384c1804..b3ab735397d4 100755
 --- a/scripts/qmp/qmp-shell
 +++ b/scripts/qmp/qmp-shell
-@@ -130,9 +130,9 @@ class FuzzyJSON(ast.NodeTransformer):
- # TODO: QMPShell's interface is a bit ugly (eg. _fill_completion() and
- #       _execute_cmd()). Let's design a better one.
- class QMPShell(qmp.QEMUMonitorProtocol):
--    def __init__(self, address: str, pretty: bool = False,
--                 verbose: bool = False):
--        super().__init__(self.parse_address(address))
-+    def __init__(self, address: qmp.SocketAddrT,
-+                 pretty: bool = False, verbose: bool = False):
-+        super().__init__(address)
-         self._greeting: Optional[QMPMessage] = None
-         self._completer = QMPCompleter()
-         self._pretty = pretty
-@@ -347,7 +347,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
- 
- 
- class HMPShell(QMPShell):
--    def __init__(self, address: str,
-+    def __init__(self, address: qmp.SocketAddrT,
-                  pretty: bool = False, verbose: bool = False):
-         super().__init__(address, pretty, verbose)
-         self.__cpu_index = 0
-@@ -450,11 +450,13 @@ def main() -> None:
- 
-     shell_class = HMPShell if args.hmp else QMPShell
-     try:
--        qemu = shell_class(args.qmp_server, args.pretty, args.verbose)
-+        address = shell_class.parse_address(args.qmp_server)
-     except qmp.QMPBadPortError:
-         parser.error(f"Bad port number: {args.qmp_server}")
-         return  # pycharm doesn't know error() is noreturn
- 
-+    qemu = shell_class(address, args.pretty, args.verbose)
-+
-     try:
-         qemu.connect(negotiate=not args.skip_negotiation)
-     except qmp.QMPConnectError:
+@@ -138,8 +138,8 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+         if len(addr) == 2:
+             try:
+                 port = int(addr[1])
+-            except ValueError:
+-                raise QMPShellBadPort
++            except ValueError as err:
++                raise QMPShellBadPort from err
+             return addr[0], port
+         # socket path
+         return arg
 -- 
 2.26.2
 
