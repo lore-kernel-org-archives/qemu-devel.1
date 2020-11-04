@@ -4,68 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 483FFC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A12F5C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:17:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCD8F2064C
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:17:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EFC7F2064C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 16:17:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LnkEGWBj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD8F2064C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aDqbaKmR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFC7F2064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaLTf-0007e4-S5
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:17:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42444)
+	id 1kaLTp-000863-TP
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 11:17:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLFN-0002kb-Ti
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60752)
+ id 1kaLFU-00033e-RJ
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22503)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kaLFL-0005e1-U2
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:02:53 -0500
+ id 1kaLFP-0005f5-2B
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 11:03:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604505770;
+ s=mimecast20190719; t=1604505774;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=g4QmvrMlj+iLH18/CA4NzjeA5an0Jr4EgVc4cml3ftg=;
- b=LnkEGWBjao1bZNPvv5zHSR+MQdJM87Wt+5RUy15DK8ukytbrDk1EB6vILvb5htb+jPCEN8
- wzlN/KNjqI7/XQVCEi6NxXUTwMfVBuCUTe/zHFtPZtndZaJ5qb9x9yqaDAcQ5steJquEoH
- UIF54seHw7C42HUSp/gALb/11X1gDvo=
+ bh=VlFRwt8OIy6a5qSZ8j2nB9K/LvlPasl/8PYZPuHbUtM=;
+ b=aDqbaKmRMoLpWyLUjiqrsYAmae/gNKaz1xHkYcAqYYc5CQFY5gD3Vpka97GMANsrTYdZlp
+ sygeDAtT7o1XDQx9NnKWa8xnAFwRhVTk/axcP10JrfR0Z0CYrPS+1+1awBeWf+dCBwmcMS
+ Ypchr0otrgOSEdnSumAYP0gda4IVAgQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-522-gwn6WpJXNtW8Vh9aIXZPTQ-1; Wed, 04 Nov 2020 11:02:49 -0500
-X-MC-Unique: gwn6WpJXNtW8Vh9aIXZPTQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-304-dbA46SjHNYObLs4NGivbww-1; Wed, 04 Nov 2020 11:02:52 -0500
+X-MC-Unique: dbA46SjHNYObLs4NGivbww-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 945CB10A4D71;
- Wed,  4 Nov 2020 16:02:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90464106B307;
+ Wed,  4 Nov 2020 16:01:46 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3ED4C60BFA;
- Wed,  4 Nov 2020 16:02:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 557D773676;
+ Wed,  4 Nov 2020 16:01:46 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 39/44] qdev: PROP_* macros
-Date: Wed,  4 Nov 2020 11:00:16 -0500
-Message-Id: <20201104160021.2342108-40-ehabkost@redhat.com>
+Subject: [PATCH v2 23/44] qdev: Make PropertyInfo.create return ObjectProperty*
+Date: Wed,  4 Nov 2020 11:00:00 -0500
+Message-Id: <20201104160021.2342108-24-ehabkost@redhat.com>
 In-Reply-To: <20201104160021.2342108-1-ehabkost@redhat.com>
 References: <20201104160021.2342108-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -82,8 +82,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- UPPERCASE_50_75=0.008 autolearn=no autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,86 +105,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The new helper macros are just wrappers to DEFINE_PROP_* that can
-be used directly as arguments to object_class_property_add_field().
+Returning ObjectProperty* will be useful for new property
+registration code that will add additional callbacks
+to ObjectProperty after registering it.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-This is a new patch added in v2 of the series
+Changes v1 -> v2:
+* Redone patch on top of additional changes in series v2
+* Commit message reword
 ---
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Daniel P. Berrangé" <berrange@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- include/hw/qdev-properties.h | 54 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+ include/hw/qdev-properties.h |  3 ++-
+ hw/core/qdev-properties.c    | 12 ++++++------
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 0a44a91e6e..89c820eeb7 100644
+index ab9c538ba4..aae882317a 100644
 --- a/include/hw/qdev-properties.h
 +++ b/include/hw/qdev-properties.h
-@@ -173,6 +173,60 @@ extern const PropertyInfo prop_info_link;
- #define DEFINE_PROP_END_OF_LIST()               \
-     {}
+@@ -34,7 +34,8 @@ struct PropertyInfo {
+     const QEnumLookup *enum_table;
+     int (*print)(Object *obj, Property *prop, char *dest, size_t len);
+     void (*set_default_value)(ObjectProperty *op, const Property *prop);
+-    void (*create)(ObjectClass *oc, const char *name, Property *prop);
++    ObjectProperty *(*create)(ObjectClass *oc, const char *name,
++                              Property *prop);
+     ObjectPropertyAccessor *get;
+     ObjectPropertyAccessor *set;
+     ObjectPropertyRelease *release;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index ff36eb250e..510b3f3fb5 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -821,13 +821,13 @@ const PropertyInfo qdev_prop_size = {
  
-+/*
-+ * The PROP_* macros can be used as arguments for
-+ * object_class_property_add_field().  They will evaluate to a
-+ * pointer to a static variable.
-+ */
-+
-+#define FIELD_PROP(def) \
-+    ({ static Property _p = def; &p; })
-+
-+#define PROP_SIGNED(...) \
-+    FIELD_PROP(DEFINE_PROP_SIGNED(NULL, __VA_ARGS__))
-+#define PROP_SIGNED_NODEFAULT(...) \
-+    FIELD_PROP(DEFINE_PROP_SIGNED_NODEFAULT(NULL, __VA_ARGS__))
-+#define PROP_BIT(...) \
-+    FIELD_PROP(DEFINE_PROP_BIT(NULL, __VA_ARGS__))
-+#define PROP_UNSIGNED(...) \
-+    FIELD_PROP(DEFINE_PROP_UNSIGNED(NULL, __VA_ARGS__))
-+#define PROP_UNSIGNED_NODEFAULT(...) \
-+    FIELD_PROP(DEFINE_PROP_UNSIGNED_NODEFAULT(NULL, __VA_ARGS__))
-+#define PROP_BIT64(...) \
-+    FIELD_PROP(DEFINE_PROP_BIT64(NULL, __VA_ARGS__))
-+#define PROP_BOOL(...) \
-+    FIELD_PROP(DEFINE_PROP_BOOL(NULL, __VA_ARGS__))
-+#define PROP_ARRAY(...) \
-+    FIELD_PROP(DEFINE_PROP_ARRAY(NULL, __VA_ARGS__))
-+#define PROP_LINK(...) \
-+    FIELD_PROP(DEFINE_PROP_LINK(NULL, __VA_ARGS__))
-+#define PROP_UINT8(...) \
-+    FIELD_PROP(DEFINE_PROP_UINT8(NULL, __VA_ARGS__))
-+#define PROP_UINT16(...) \
-+    FIELD_PROP(DEFINE_PROP_UINT16(NULL, __VA_ARGS__))
-+#define PROP_UINT32(...) \
-+    FIELD_PROP(DEFINE_PROP_UINT32(NULL, __VA_ARGS__))
-+#define PROP_INT32(...) \
-+    FIELD_PROP(DEFINE_PROP_INT32(NULL, __VA_ARGS__))
-+#define PROP_UINT64(...) \
-+    FIELD_PROP(DEFINE_PROP_UINT64(NULL, __VA_ARGS__))
-+#define PROP_INT64(...) \
-+    FIELD_PROP(DEFINE_PROP_INT64(NULL, __VA_ARGS__))
-+#define PROP_SIZE(...) \
-+    FIELD_PROP(DEFINE_PROP_SIZE(NULL, __VA_ARGS__))
-+#define PROP_STRING(...) \
-+    FIELD_PROP(DEFINE_PROP_STRING(NULL, __VA_ARGS__))
-+#define PROP_ON_OFF_AUTO(...) \
-+    FIELD_PROP(DEFINE_PROP_ON_OFF_AUTO(NULL, __VA_ARGS__))
-+#define PROP_SIZE32(...) \
-+    FIELD_PROP(DEFINE_PROP_SIZE32(NULL, __VA_ARGS__))
-+#define PROP_UUID(...) \
-+    FIELD_PROP(DEFINE_PROP_UUID(NULL, __VA_ARGS__))
-+#define PROP_UUID_NODEFAULT(...) \
-+    FIELD_PROP(DEFINE_PROP_UUID_NODEFAULT(NULL, __VA_ARGS__))
-+#define PROP_END_OF_LIST(...) \
-+    FIELD_PROP(DEFINE_PROP_END_OF_LIST(NULL, __VA_ARGS__))
-+
- /**
-  * object_class_property_add_field: Add a field property to object class
-  * @oc: object class
+ /* --- object link property --- */
+ 
+-static void create_link_property(ObjectClass *oc, const char *name,
+-                                 Property *prop)
++static ObjectProperty *create_link_property(ObjectClass *oc, const char *name,
++                                            Property *prop)
+ {
+-    object_class_property_add_link(oc, name, prop->link_type,
+-                                   prop->offset,
+-                                   qdev_prop_allow_set_link_before_realize,
+-                                   OBJ_PROP_LINK_STRONG);
++    return object_class_property_add_link(oc, name, prop->link_type,
++                                          prop->offset,
++                                          qdev_prop_allow_set_link_before_realize,
++                                          OBJ_PROP_LINK_STRONG);
+ }
+ 
+ const PropertyInfo qdev_prop_link = {
 -- 
 2.28.0
 
