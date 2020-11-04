@@ -2,86 +2,101 @@ Return-Path: <SRS0=hH57=EK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1611EC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B59FC4742C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:17:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 751F620BED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:16:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35E3A22243
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Nov 2020 05:17:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cDqtQCie"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 751F620BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ald0BJOg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35E3A22243
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaBA7-0000ll-FE
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:16:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60154)
+	id 1kaBAp-0001Xq-7s
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 00:17:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kaAp4-00046m-KW; Tue, 03 Nov 2020 23:55:02 -0500
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:44705)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kaAp2-0005jA-MK; Tue, 03 Nov 2020 23:55:02 -0500
-Received: by mail-il1-x141.google.com with SMTP id z2so18188604ilh.11;
- Tue, 03 Nov 2020 20:54:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=J4efl48tawioznZ2bjfbrXOXeSNn+t0icjBdX9B6f+U=;
- b=cDqtQCiebZkY7y+G8m8tJqiHZN+7SWja/wS4spxmlfG5FRn0lZ0M7qAQ84ws+G4N1f
- QN6LT8GHG4V7AKx8hRf0k4YNOepU49dr5O9ZyqtofW2PsE1CEU0uoc5LQ6l9hhry2SMY
- VjExQeflSrcEB6My1MNCH/RxCqQOud5NnX+iR4JgK2L+nriSLJZ1LUX1UZ4tEaGVIIwj
- LnSVmbpi/UqGAqCoco2wbEiaDLrPQYNYm5c+7QLAIJ605vFUg53U8FUjTv777pSQbWuK
- nQ7f4hy46Z6tPRJgyHzyhwOTBCNyg4pdqITwVUQnnNA21VKye8HixG6z9l7cETDxtoQ7
- 0Oig==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaApJ-0004R9-12
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:55:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29079)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kaApA-0005oH-Ll
+ for qemu-devel@nongnu.org; Tue, 03 Nov 2020 23:55:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604465707;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=CO5kV6TOgl7VkllXO+Cj7QHVQ3FQj45OIYdaYC1hBZU=;
+ b=ald0BJOg2uufUkPLARaWt7iOQvxpWHWrG74+7S+gVTeqcPDshlg8P7pXGy7tN5C1BGNtvk
+ bMC155H8euP56FVYjFi3UDa83a9lfz1pH+M1S/zRn3bOiy+ywiyPtsT2hjenzjeBGeGI0n
+ V66Gj9flVCGCv7ROIb71Dkx3zJYFJ7E=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-32-maGUCr2INZKC-8hmwcHBnQ-1; Tue, 03 Nov 2020 23:51:30 -0500
+X-MC-Unique: maGUCr2INZKC-8hmwcHBnQ-1
+Received: by mail-wr1-f72.google.com with SMTP id t14so8789124wrs.2
+ for <qemu-devel@nongnu.org>; Tue, 03 Nov 2020 20:51:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=J4efl48tawioznZ2bjfbrXOXeSNn+t0icjBdX9B6f+U=;
- b=uVL7yD2OXZsasA7gHZAhnl3HiI4xa5Sh0QuXs4ecrnF3oUDeUJW9kMc0jD88G06qzw
- VlUoln+DLmp/xFn7USavmCubjzCh4KjUOiqVXqT7R/XOw6MNaDuiKPYz95HlyqBYvQP8
- hbVed3rC87bl7vA8zl1+j4L0aYSA0r8YkehE68gSdDBSzbD/LMsLGTo1xFcPv8iygrQX
- /GT7zSUhqzLFpfvQTjEQCm2CJU4C/OJG75jWnsa2AMlPVQtdcD4bEdQyATHcHiQ9U3HP
- OER7MiRLPr+BjVrCMVm9vMibRFL+slxMLJaTsF0eixoLCiX+3oajnalLY3C35aHnQKMI
- /Jjg==
-X-Gm-Message-State: AOAM532cDJmrUnEOxqh7rGobIbycu2vhcG1CebgvTPz/dWBrAmm1v1Do
- PXokrYm51UZYlU0xJbF6wHW+hFiTwdhmMrEbOmk=
-X-Google-Smtp-Source: ABdhPJyKwrnd+1hYzDRH/bDVmNKpJHO6MC7KXGBfAL9bySApLa6YbIXRlb+/0xKcv8cwWqe4x94zWH3kzT4WgMjbjxA=
-X-Received: by 2002:a92:d991:: with SMTP id r17mr15433131iln.227.1604465695987; 
- Tue, 03 Nov 2020 20:54:55 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=CO5kV6TOgl7VkllXO+Cj7QHVQ3FQj45OIYdaYC1hBZU=;
+ b=bNI64ZUKfYQFMRwJbfhl1PxS/iYjEUiJkZCTzhJZax8Cc6D4cEIHnV7ilEcYG2pmNt
+ HOsKwK0mXkX4f04sTcbdptq7mV+BK44kEG8ipH43KnCFBSXhmqvyUmhhiMC3WNGUflO9
+ fJjq6aXXcpHv3TmaBWX00j9N/Mk27BliKDZvTYHCyC02afF6k+78xKd0uMwoBJJr5QBa
+ KJm6wrHHxz0IfUp8lFAW/bG2N/R+uYR4DAIuOYjpXHFIzcAF/Tdi9G5PuxpST9IrziDt
+ OsMWw4pZ/yvy5uhQnOM7ryn+QOmNk9VAWpSIUjxAk14pPlHNTcfW7piMqqHmmtmjI0yA
+ LKnQ==
+X-Gm-Message-State: AOAM530oRd1do1TOQcXuy3ohFxY/fwhWMCxGRqj+HvKfohWa7yUblLWC
+ MFTYTrWqTqEm9RqCiQs0fps8BlWwoH0k8eYhTz4+ADLTHZ5M6PF4LujHB7LsGluLbYu1o5rTE38
+ ry2+MQubDqkwDRl0=
+X-Received: by 2002:adf:fb0f:: with SMTP id c15mr28598133wrr.86.1604465488159; 
+ Tue, 03 Nov 2020 20:51:28 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwRZPLaryJFJHgZvyaU93cZcFvJtW3aI4hv8+EdSZMLKtsAUr6L2VfA3B/J0sMJZrQFpRpAJw==
+X-Received: by 2002:adf:fb0f:: with SMTP id c15mr28598127wrr.86.1604465488045; 
+ Tue, 03 Nov 2020 20:51:28 -0800 (PST)
+Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
+ by smtp.gmail.com with ESMTPSA id b14sm907479wrx.35.2020.11.03.20.51.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Nov 2020 20:51:27 -0800 (PST)
+Date: Tue, 3 Nov 2020 23:51:25 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 16/38] virtio-iommu: Call memory notifiers in attach/detach
+Message-ID: <20201104044937.226370-17-mst@redhat.com>
+References: <20201104044937.226370-1-mst@redhat.com>
 MIME-Version: 1.0
-References: <cover.1604432950.git.alistair.francis@wdc.com>
- <5f25069661040bb96f945358bd7fa047f5b462ce.1604432950.git.alistair.francis@wdc.com>
- <29320e1d-6abf-a6bb-fc6e-43a3b17fca36@linaro.org>
-In-Reply-To: <29320e1d-6abf-a6bb-fc6e-43a3b17fca36@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 3 Nov 2020 20:42:59 -0800
-Message-ID: <CAKmqyKNmXR3bvf-Dvx6mfbxymwqppBEzPkAsY7A4utuEXE-t=w@mail.gmail.com>
-Subject: Re: [PATCH v3 2/7] target/riscv: Add a virtualised MMU Mode
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201104044937.226370-1-mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/03 22:09:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,33 +109,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Bharat Bhushan <bbhushan2@marvell.com>, Eric Auger <eric.auger@redhat.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 3, 2020 at 12:20 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 11/3/20 11:50 AM, Alistair Francis wrote:
-> > @@ -30,6 +30,10 @@ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
-> >  #ifdef CONFIG_USER_ONLY
-> >      return 0;
-> >  #else
-> > +    if (riscv_cpu_virt_enabled(env)) {
-> > +        return env->priv | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
-> > +    }
->
-> Still setting this bit here, incorrectly.
+From: Bharat Bhushan <bbhushan2@marvell.com>
 
-Argh! I must have dreamed fixing it. Sending a new version now.
+Call the memory notifiers when attaching an endpoint to a domain, to
+replay existing mappings, and when detaching the endpoint, to remove all
+mappings.
 
-Alistair
+Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Message-Id: <20201030180510.747225-5-jean-philippe@linaro.org>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/virtio-iommu.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
->
->
-> r~
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index 7dd15c5eac..7b64892351 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -170,11 +170,39 @@ static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr virt_start,
+     memory_region_notify_iommu(mr, 0, entry);
+ }
+ 
++static gboolean virtio_iommu_notify_unmap_cb(gpointer key, gpointer value,
++                                             gpointer data)
++{
++    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
++    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
++
++    virtio_iommu_notify_unmap(mr, interval->low, interval->high);
++
++    return false;
++}
++
++static gboolean virtio_iommu_notify_map_cb(gpointer key, gpointer value,
++                                           gpointer data)
++{
++    VirtIOIOMMUMapping *mapping = (VirtIOIOMMUMapping *) value;
++    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
++    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
++
++    virtio_iommu_notify_map(mr, interval->low, interval->high,
++                            mapping->phys_addr, mapping->flags);
++
++    return false;
++}
++
+ static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
+ {
++    VirtIOIOMMUDomain *domain = ep->domain;
++
+     if (!ep->domain) {
+         return;
+     }
++    g_tree_foreach(domain->mappings, virtio_iommu_notify_unmap_cb,
++                   ep->iommu_mr);
+     QLIST_REMOVE(ep, next);
+     ep->domain = NULL;
+ }
+@@ -317,6 +345,10 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+ 
+     ep->domain = domain;
+ 
++    /* Replay domain mappings on the associated memory region */
++    g_tree_foreach(domain->mappings, virtio_iommu_notify_map_cb,
++                   ep->iommu_mr);
++
+     return VIRTIO_IOMMU_S_OK;
+ }
+ 
+-- 
+MST
+
 
