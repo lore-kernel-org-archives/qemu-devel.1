@@ -2,73 +2,92 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2C6C00A89
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 11:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D07CC00A89
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 11:41:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4392206FB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 11:40:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4392206FB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 93FBB206FB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 11:41:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="esFmml6p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93FBB206FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kadcz-0000fh-HX
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 06:40:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35492)
+	id 1kade1-0001fW-Cz
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 06:41:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kadcG-0000Ab-0M
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 06:39:44 -0500
-Received: from 10.mo52.mail-out.ovh.net ([87.98.187.244]:58026)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kadcD-0003mV-CM
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 06:39:43 -0500
-Received: from mxplan5.mail.ovh.net (unknown [10.108.4.25])
- by mo52.mail-out.ovh.net (Postfix) with ESMTPS id 508A9203C6F;
- Thu,  5 Nov 2020 12:39:35 +0100 (CET)
-Received: from kaod.org (37.59.142.104) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 5 Nov 2020
- 12:39:35 +0100
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R0050d476141-e52d-4a33-90f3-ef1df65c1582,
- 5D04B6D4EAACA18D9EDEF493C42F41A1D3896549) smtp.auth=groug@kaod.org
-Date: Thu, 5 Nov 2020 12:39:34 +0100
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v2 3/4] spapr/xive: Allocate IPIs independently from the
- other sources
-Message-ID: <20201105123934.50ad1c39@bahia.lan>
-In-Reply-To: <2d837671-ec7a-2eb8-c9f3-10d031ee4fde@kaod.org>
-References: <20200820134547.2355743-1-clg@kaod.org>
- <20200820134547.2355743-4-clg@kaod.org>
- <2d837671-ec7a-2eb8-c9f3-10d031ee4fde@kaod.org>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kaddL-00017T-Rw
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 06:40:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20089)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kaddJ-0004Ds-DP
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 06:40:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604576447;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=4AtYW7TPmsC7S4rait9mV57GDUU+FIyWwhrLxATm3jw=;
+ b=esFmml6pp0M23l2vh5UAtq5ZuZKVmlV1guEjqHGiHIaBygN1QnCcIt3EvWn0THVQ7urXZ2
+ nlEhTH2n9xF16zOoOT4FX3q7AQzV7yvHIbLoR4MlX7JV71sJj5uMvw+gxhY7oFDX37GAp9
+ IuMfkDcWS5EdvxPP0xagQBNLJeNqh+Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-_Ku6eqWdOT-mwHI_qGGRSg-1; Thu, 05 Nov 2020 06:40:44 -0500
+X-MC-Unique: _Ku6eqWdOT-mwHI_qGGRSg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B1D25F9EA;
+ Thu,  5 Nov 2020 11:40:42 +0000 (UTC)
+Received: from localhost (ovpn-114-186.ams2.redhat.com [10.36.114.186])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A5C707367B;
+ Thu,  5 Nov 2020 11:40:38 +0000 (UTC)
+Date: Thu, 5 Nov 2020 11:40:37 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: VFIO Migration
+Message-ID: <20201105114037.GC462479@stefanha-x1.localdomain>
+References: <20201102111153.GC42093@stefanha-x1.localdomain>
+ <20201103121709.GD3566@work-vm>
+ <20201103152752.GC253848@stefanha-x1.localdomain>
+ <20201103184951.GM3566@work-vm>
+ <20201104073636.GB390503@stefanha-x1.localdomain>
+ <20201104101423.GB3896@work-vm>
+ <20201104164744.GC425016@stefanha-x1.localdomain>
+ <20201104173202.GG3896@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [37.59.142.104]
-X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: f47443bf-172f-4617-88e5-124134312b44
-X-Ovh-Tracer-Id: 16462626965528746278
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedruddtjedgfeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpedtgfelhfeiheetjeejgeevgeelkeduveekheejudfgjefffeehueeukefgfffhgeenucffohhmrghinheplhgruhhntghhphgrugdrnhgvthenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
-Received-SPF: pass client-ip=87.98.187.244; envelope-from=groug@kaod.org;
- helo=10.mo52.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 06:39:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+In-Reply-To: <20201104173202.GG3896@work-vm>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="69pVuxX8awAiJ7fD"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 22:46:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,201 +101,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Gustavo Romero <gromero@linux.ibm.com>,
- Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: John G Johnson <john.g.johnson@oracle.com>, mtsirkin@redhat.com,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ quintela@redhat.com, Jason Wang <jasowang@redhat.com>,
+ Felipe Franciosi <felipe@nutanix.com>, Kirti Wankhede <kwankhede@nvidia.com>,
+ qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Nov 2020 09:37:27 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+--69pVuxX8awAiJ7fD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On 8/20/20 3:45 PM, C=C3=A9dric Le Goater wrote:
-> > The vCPU IPIs are now allocated in kvmppc_xive_cpu_connect() when the
-> > vCPU connects to the KVM device and not when all the sources are reset
-> > in kvmppc_xive_source_reset()
+On Wed, Nov 04, 2020 at 05:32:02PM +0000, Dr. David Alan Gilbert wrote:
+> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > Michael replied in another sub-thread wondering if versions are really
+> > necessary since tools do the migration checks. Let's try dropping
+> > versions to simplify things. We can bring them back if needed later.
 >=20
-> This patch is introducing a regression when vsmt is in used.
->=20
+> What does a user facing tool do?  If I say I want one of these NICs
+> and I'm on the latest QEMU machine type, who sets all these parameters?
 
-Well, it isn't exactly when vsmt is used, it is when vsmt is set
-to a different value than the one which is passed to -smp threads,
-otherwise you always get consecutive vcpu ids.
+The machine type is orthogonal since QEMU doesn't know about every
+possible VFIO device. The device is like a PCI adapter that is added to
+a physical machine aftermarket, it's not part of the base machine's
+specs.
 
->   https://bugs.launchpad.net/qemu/+bug/1900241
->=20
+The migration tool queries the parameters from the source device.
+VFIO/mdev will provide sysfs attrs. For vfio-user I'm not sure whether
+to print the parameters during device instantiation, require a
+VFIO-compatible FUSE directory, or to use a query-migration-params RPC
+command.
 
-In this report we have threads=3D1, so depending on vsmt this gives
-the following vcpu ids:
+Let's discuss this more when the next revision of the document is sent
+out, because it modifies the approach so that migration parameters are
+logically separate from device configuration parameters. That changes
+things a bit.
 
--M vsmt=3D1 -smp 8,cores=3D8,threads=3D1
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D0 vcpu_id=3D0
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D1 vcpu_id=3D1
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D2 vcpu_id=3D2
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D3 vcpu_id=3D3
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D4 vcpu_id=3D4
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D5 vcpu_id=3D5
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D6 vcpu_id=3D6
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D7 vcpu_id=3D7
+Stefan
 
--M vsmt=3D2 -smp 8,cores=3D8,threads=3D1
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D0 vcpu_id=3D0
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D1 vcpu_id=3D2
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D2 vcpu_id=3D4
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D3 vcpu_id=3D6
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D4 vcpu_id=3D8
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D5 vcpu_id=3D10
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D6 vcpu_id=3D12
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D7 vcpu_id=3D14
+--69pVuxX8awAiJ7fD
+Content-Type: application/pgp-signature; name="signature.asc"
 
--M vsmt=3D4 -smp 8,cores=3D8,threads=3D1=20
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D0 vcpu_id=3D0
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D1 vcpu_id=3D4
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D2 vcpu_id=3D8
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D3 vcpu_id=3D12
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D4 vcpu_id=3D16
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D5 vcpu_id=3D20
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D6 vcpu_id=3D24
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D7 vcpu_id=3D28
+-----BEGIN PGP SIGNATURE-----
 
--M vsmt=3D8 -smp 8,cores=3D8,threads=3D1=20
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D0 vcpu_id=3D0
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D1 vcpu_id=3D8
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D2 vcpu_id=3D16
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D3 vcpu_id=3D24
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D4 vcpu_id=3D32
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D5 vcpu_id=3D40
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D6 vcpu_id=3D48
-kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D7 vcpu_id=3D56
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+j5LUACgkQnKSrs4Gr
+c8hHTggAjE2oMLFVAmoNr11D54ao1A2QybD+psxdSNS5uQcu6MSRJIjLC59QkX9E
+8T1vZzxZay1W+mQPzrdBwItkYIA2YQkrtpjum/fDD0uqCbgCXfvM00kDXb2u235J
+lor+Eh+nBLc8yEwT6yREIu9rJ5KOJ+kFCdzJfuBHLBzQlph+g1nWrTcNnXkuwfCp
+8gSBtdfePI+Q3GxZDsFjXIuG3b9TrKV9Y0lsLIRG6u+hl0y1oh3MkFYiGPyWD8UN
+BclNh/D2vKF4CkDUPEUoRbQjV0yuvfzTEwczBmW6dkL15ERvguR6utzwsnCPva7d
+qU/xGbWAcxiv8MbErY42RwzwqSisXw==
+=O6RZ
+-----END PGP SIGNATURE-----
 
-> when the OS boots, H_INT_SET_SOURCE_CONFIG fails with EINVAL, which=20
-> should mean that the IPI is not created at the host/KVM level.
->=20
+--69pVuxX8awAiJ7fD--
 
-[...]
-
-> > +static int kvmppc_xive_reset_ipi(SpaprXive *xive, CPUState *cs, Error =
-**errp)
-> > +{
-> > +    unsigned long ipi =3D kvm_arch_vcpu_id(cs);
->=20
-> ( I am wondering if this is the correct id to use ? )
->=20
-
-Setting the ipi to the vcpu id seems to assume that the vcpu ids are
-consecutive, which is definitely not the case when vsmt !=3D threads
-as explained above.
-
-Passing cs->cpu_index would provide consecutive ids but I'm not
-sure this is a correct fix. I gave a try : all the vCPUs get
-online in the guest as expected but something goes wrong when
-terminating QEMU:
-
-[ 5557.599881] WARNING: CPU: 40 PID: 59101 at arch/powerpc/kvm/book3s_xive_=
-native.c:259 xive_native_esb_fault+0xe4/0x240 [kvm]
-[ 5557.599897] Modules linked in: xt_CHECKSUM ipt_MASQUERADE xt_conntrack i=
-pt_REJECT nf_reject_ipv4 nft_compat nft_counter nft_chain_nat nf_nat nf_con=
-ntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink tun bridge stp llc=
- nfsv3 nfs_acl rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd gra=
-ce fscache kvm_hv kvm i2c_dev sunrpc ext4 mbcache jbd2 xts vmx_crypto ofpar=
-t ipmi_powernv ipmi_devintf powernv_flash ipmi_msghandler mtd ibmpowernv op=
-al_prd at24 uio_pdrv_genirq uio ip_tables xfs libcrc32c sd_mod sg ast i2c_a=
-lgo_bit drm_vram_helper drm_ttm_helper ttm drm_kms_helper syscopyarea sysfi=
-llrect sysimgblt fb_sys_fops drm ahci libahci tg3 libata drm_panel_orientat=
-ion_quirks dm_mirror dm_region_hash dm_log dm_mod
-[ 5557.600010] CPU: 40 PID: 59101 Comm: qemu-system-ppc Kdump: loaded Taint=
-ed: G        W        --------- -  - 4.18.0-240.el8.ppc64le #1
-[ 5557.600041] NIP:  c00800000e949fac LR: c00000000044b164 CTR: c00800000e9=
-49ec8
-[ 5557.600060] REGS: c000001f69617840 TRAP: 0700   Tainted: G        W     =
-   --------- -  -  (4.18.0-240.el8.ppc64le)
-[ 5557.600089] MSR:  9000000000029033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 440442=
-82  XER: 00000000
-[ 5557.600110] CFAR: c00000000044b160 IRQMASK: 0=20
-[ 5557.600110] GPR00: c00000000044b164 c000001f69617ac0 c00800000e96e000 c0=
-00001f69617c10=20
-[ 5557.600110] GPR04: 05faa2b21e000080 0000000000000000 0000000000000005 ff=
-ffffffffffffff=20
-[ 5557.600110] GPR08: 0000000000000000 0000000000000001 0000000000000000 00=
-00000000000001=20
-[ 5557.600110] GPR12: c00800000e949ec8 c000001ffffd3400 0000000000000000 00=
-00000000000000=20
-[ 5557.600110] GPR16: 0000000000000000 0000000000000000 0000000000000000 00=
-00000000000000=20
-[ 5557.600110] GPR20: 0000000000000000 0000000000000000 c000001f5c065160 c0=
-00000001c76f90=20
-[ 5557.600110] GPR24: c000001f06f20000 c000001f5c065100 0000000000000008 c0=
-00001f0eb98c78=20
-[ 5557.600110] GPR28: c000001dcab40000 c000001dcab403d8 c000001f69617c10 00=
-00000000000011=20
-[ 5557.600255] NIP [c00800000e949fac] xive_native_esb_fault+0xe4/0x240 [kvm]
-[ 5557.600274] LR [c00000000044b164] __do_fault+0x64/0x220
-[ 5557.600298] Call Trace:
-[ 5557.600302] [c000001f69617ac0] [0000000137a5dc20] 0x137a5dc20 (unreliabl=
-e)
-[ 5557.600320] [c000001f69617b50] [c00000000044b164] __do_fault+0x64/0x220
-[ 5557.600337] [c000001f69617b90] [c000000000453838] do_fault+0x218/0x930
-[ 5557.600355] [c000001f69617bf0] [c000000000456f50] __handle_mm_fault+0x35=
-0/0xdf0
-[ 5557.600373] [c000001f69617cd0] [c000000000457b1c] handle_mm_fault+0x12c/=
-0x310
-[ 5557.600393] [c000001f69617d10] [c00000000007ef44] __do_page_fault+0x264/=
-0xbb0
-[ 5557.600411] [c000001f69617df0] [c00000000007f8c8] do_page_fault+0x38/0xd0
-[ 5557.600429] [c000001f69617e30] [c00000000000a714] handle_page_fault+0x18=
-/0x38
-[ 5557.600438] Instruction dump:
-[ 5557.600444] 40c2fff0 7c2004ac 2fa90000 409e0118 73e90001 41820080 e8bd00=
-08 7c2004ac=20
-[ 5557.600455] 7ca90074 39400000 915c0000 7929d182 <0b090000> 2fa50000 419e=
-0080 e89e0018=20
-[ 5557.600485] ---[ end trace 66c6ff034c53f64f ]---
-[ 5557.600509] xive-kvm: xive_native_esb_fault: accessing invalid ESB page =
-for source 8 !
-
-So it looks like something needs to be done in the XIVE KVM device anyway.
-
-[...]
-
-> >  static int kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
-> >  {
-> >      SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
-> >      int i;
-> > =20
-> > -    for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> > +    /*
-> > +     * Skip the vCPU IPIs. These are created/reset when the vCPUs are
-> > +     * connected in kvmppc_xive_cpu_connect()
-> > +     */
-> > +    for (i =3D SPAPR_XIRQ_BASE; i < xsrc->nr_irqs; i++) {
->=20
-> This change skips the range [ 0x0 ... 0x1000 ] and relies on the presenter
-> to create the vCPU IPIs at the KVM level. But spapr_irq_init() could have=
-=20
-> claimed more in :=20
->=20
->         /* Enable the CPU IPIs */
->         for (i =3D 0; i < nr_servers; ++i) {
->             SpaprInterruptControllerClass *sicc
->                 =3D SPAPR_INTC_GET_CLASS(spapr->xive);
->=20
->             if (sicc->claim_irq(SPAPR_INTC(spapr->xive), SPAPR_IRQ_IPI + =
-i,
->                                 false, errp) < 0) {
->                 return;
->             }
->         }
->=20
-
-This doesn't reach the XIVE KVM device when running in dual mode because
-it doesn't exist yet.
-
-> I think this is what is happening with vsmt. However, I don't know how to
-> fix it :/
->=20
-> Thanks,
->=20
-> C.
->=20
 
