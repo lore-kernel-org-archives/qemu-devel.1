@@ -2,67 +2,82 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B43AC00A89
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A679BC00A89
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:21:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3CEA2071A
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:18:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3CEA2071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 04CA420786
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:21:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04CA420786
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kabPs-0001FV-RF
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 04:18:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37848)
+	id 1kabSs-0002dV-1N
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 04:21:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <longpeng2@huawei.com>)
- id 1kabPA-0000oZ-R8
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:18:04 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2330)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <longpeng2@huawei.com>)
- id 1kabP8-0003Fv-0W
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:18:04 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CRdGJ6fLNzkdBW;
- Thu,  5 Nov 2020 17:17:44 +0800 (CST)
-Received: from DESKTOP-27KDQMV.china.huawei.com (10.174.151.207) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 5 Nov 2020 17:17:41 +0800
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
-To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH] migration: handle CANCELLING state in migration_completion()
-Date: Thu, 5 Nov 2020 17:17:26 +0800
-Message-ID: <20201105091726.148-1-longpeng2@huawei.com>
-X-Mailer: git-send-email 2.25.0.windows.1
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kabRz-0001un-B6
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:20:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51018)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kabRx-0004PC-CB
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:20:59 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kabRu-0002bs-HW
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 09:20:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 780672E8139
+ for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 09:20:54 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.151.207]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190; envelope-from=longpeng2@huawei.com;
- helo=szxga04-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 04:17:52
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Nov 2020 09:11:53 -0000
+From: Thomas Huth <1781463@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=Davidof130@gmail.com; 
+X-Launchpad-Bug-Tags: abs amiko emulation firmware qemu receiver
+ satelitereceiver stb
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: screamfox th-huth
+X-Launchpad-Bug-Reporter: David Martins (screamfox)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <153142289132.32266.13097437819271021346.malonedeb@wampee.canonical.com>
+Message-Id: <160456751340.13412.13399101976405980582.malone@gac.canonical.com>
+Subject: [Bug 1781463] Re: qemu don't start *.abs firmware files
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
+X-Launchpad-Hash: 77bfeb2a61d485f8ec0a1e7789cdd6ad5bd13490
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 04:11:06
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,50 +86,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: longpeng2@huawei.com, arei.gonglei@huawei.com, huangzhichao@huawei.com,
- qemu-devel@nongnu.org
+Reply-To: Bug 1781463 <1781463@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following sequence may cause the VM abort during migration:
+As far as I understand the original description, this was about running
+an arbitrary firmware in QEMU that has been written for a board that we
+do not support in QEMU? This can not work. A machine consists of a CPU
+and various devices that are on board, so you can only run the software
+that has been written for the CPU and the corresponding devices. If I've
+got you right, you want to run some software for a board that we do not
+model in QEMU, so it just can't work since the required devices are not
+emulated. Thus I'm closing this as "Invalid" now ... unless I've
+misunderstood your description, then please complain and we can open the
+ticket again.
 
-1. RUN_STATE_RUNNING,MIGRATION_STATUS_ACTIVE
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-2. before call migration_completion(), we send migrate_cancel
-   QMP command, the state machine is changed to:
-     RUN_STATE_RUNNING,MIGRATION_STATUS_CANCELLING
+-- =
 
-3. call migration_completion(), and the state machine is
-   switch to: RUN_STATE_RUNNING,MIGRATION_STATUS_COMPLETED
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1781463
 
-4. call migration_iteration_finish(), because the migration
-   status is COMPLETED, so it will try to set the runstate
-   to POSTMIGRATE, but RUNNING-->POSTMIGRATE is an invalid
-   transition, so abort().
+Title:
+  qemu don't start *.abs firmware files
 
-The migration_completion() should not change the migration state
-to COMPLETED if it is already changed to CANCELLING.
+Status in QEMU:
+  Invalid
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
----
- migration/migration.c | 2 ++
- 1 file changed, 2 insertions(+)
+Bug description:
+  Hello Devs,
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 3263aa5..b11a2bd 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3061,6 +3061,8 @@ static void migration_completion(MigrationState *s)
- 
-         qemu_savevm_state_complete_postcopy(s->to_dst_file);
-         trace_migration_completion_postcopy_end_after_complete();
-+    } else if (s->state == MIGRATION_STATUS_CANCELLING) {
-+        goto fail;
-     }
- 
-     /*
--- 
-1.8.3.1
+  I'm here to report this bug/issue because i'm using Win64 Qemu but i
+  can't start a *.abs firmware at normally this firmware is based in
+  Linux Kernel and this type of firmware is made for STB Receivers,
 
+  So this is all information i provide to get support.
+
+  Files extracted by ( binwalk -e )
+
+  =
+
+  Terminal output:
+
+  # binwalk -e AMIKO_HD8150_2.4.43_emu.abs
+
+  DECIMAL       HEXADECIMAL     DESCRIPTION
+
+  -------------------------------------------------------------------------=
+-------
+  196736        0x30080         LZMA compressed data, properties: 0x6C, dic=
+tionary size: 8388608 bytes, uncompressed size: 11883876 bytes
+  3866752       0x3B0080        LZMA compressed data, properties: 0x6C, dic=
+tionary size: 8388608 bytes, uncompressed size: 3255512 bytes
+  5636224       0x560080        LZMA compressed data, properties: 0x6C, dic=
+tionary size: 8388608 bytes, uncompressed size: 87904 bytes
+
+  =
+
+  Files extracted with ALI TOOLS or Ali FirmwareDecriptor.
+
+  Windows files output:
+
+  Software used: Ali Main Code Decrypter 8.9
+
+  Files unpacked:
+
+  bootloader
+  MemCfg
+  maincode(AV)
+  seecode
+  default_lang
+  cipluskey
+  countryband
+  logo_user
+  logo_menu
+  logo_radio
+  logo_boot
+  patch
+  defaultdb(PRC)
+  userdb(64+64)
+
+  =
+
+  Terminal OUTPUT:
+
+  # hexdump -C
+
+  part of file
+
+  =
+
+  00b51a30  00 00 00 00 4c 69 62 63  6f 72 65 20 76 65 72 73  |....Libcore =
+vers|
+  00b51a40  69 6f 6e 20 31 33 2e 31  36 2e 30 40 53 44 4b 34  |ion 13.16.0@=
+SDK4|
+  00b51a50  2e 30 66 61 2e 31 33 2e  31 36 5f 32 30 31 36 31  |.0fa.13.16_2=
+0161|
+  00b51a60  30 31 39 28 67 63 63 20  76 65 72 73 69 6f 6e 20  |019(gcc vers=
+ion |
+  00b51a70  33 2e 34 2e 34 20 6d 69  70 73 73 64 65 2d 36 2e  |3.4.4 mipssd=
+e-6.|
+  00b51a80  30 36 2e 30 31 2d 32 30  30 37 30 34 32 30 29 28  |06.01-200704=
+20)(|
+  00b51a90  41 64 6d 69 6e 69 73 74  72 61 74 6f 72 40 20 46  |Administrato=
+r@ F|
+  00b51aa0  72 69 2c 20 4a 75 6c 20  32 38 2c 20 32 30 31 37  |ri, Jul 28, =
+2017|
+  00b51ab0  20 31 32 3a 35 33 3a 32  38 20 41 4d 29 0a 00 00  | 12:53:28 AM=
+)...|
+  00b51ac0  44 4d 58 5f 53 33 36 30  31 5f 30 00 00 a1 03 18  |DMX_S3601_0.=
+....|
+
+  =
+
+  When I use readelf it says files isn't an ELF file, so i can't run it lik=
+e a kernel (Bootloader,Maincode, and etc. )
+
+  so this is the cmd output when i use qemu Win64 (I don't whant to use
+  linux to do the emulation about this *.abs extension firmware so
+  please help me for win64 version from Qemu)
+
+  CMD OUTPUT:
+
+   C:\Program Files\qemu>qemu-system-mips.exe -machine mips -cpu
+  mips32r6-generic -drive
+  file=3DC:\30080.bin,index=3D0,media=3Ddisk,format=3Draw
+
+  qemu-system-mips.exe: warning: could not load MIPS bios
+  'mips_bios.bin'
+
+  I also tried a lot of diferents qemu-system... and a lot of diferent
+  configs like -machine -cpu -kernel -driver root=3D -PFLASH and etc...
+  and nothing hapenned
+
+  How can i reproduce this issue ? =
+
+  Reply:. =
+
+
+  Donwload *.abs firmware in amikoreceiver.com (only *.abs) and download
+  AliDekompressor in http://www.satedu.cba.pl/
+
+  Direct tools:
+
+  FirmwareDecrypter_v8.9.zip :
+
+  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DFirmw=
+areDecrypter_v8.9.zip&directory=3DTest%20Folder&
+
+  Ali__tools_Console_v4.0__CRC_FIXER.rar :
+
+  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DAli__=
+tools_Console_v4.0__CRC_FIXER.rar&directory=3DTest%20Folder&
+
+  =
+
+  so if Qemu can explain how can i fix this issue this can be highly helpfu=
+ll.
+
+  With my best regards,
+  David Martins =
+
+  Screamfox
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1781463/+subscriptions
 
