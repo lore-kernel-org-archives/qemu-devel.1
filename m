@@ -2,85 +2,86 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B018AC4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 18:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D67C55179
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 18:48:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F276C2078E
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 18:24:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AF69221F8
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 18:48:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6q/iy7X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F276C2078E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wb9TNr0E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AF69221F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kajw0-0005v2-Te
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 13:24:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42530)
+	id 1kakJ0-0002uQ-DI
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 13:48:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kajtb-0004UO-3k
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 13:22:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32417)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kakI6-0002S8-Ed
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 13:47:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56137)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kajtZ-0000Q7-Cf
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 13:22:02 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kakI1-0003dW-Ia
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 13:47:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604600520;
+ s=mimecast20190719; t=1604602035;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KnMaZkv3W6gaIRG/dzv0b6+7NentBy2KxL5qwy1GjUs=;
- b=Q6q/iy7XDzs1z9+wxanlK5IPCDSfgAzEWGeSEW7LWDDp+ijH8bk1AgGegGNOMODAs4vugr
- FDeOwlz6dZnsT6H8K7n3aIhaURt47n0R0e5OGteTBtuSK2xsabnu7MK3dG/tukuyhfPCxR
- GerHMozwFz2WJbvqqt2S1OGuY12hkQk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-541-DC43t2c9NCOx4SByNLD28Q-1; Thu, 05 Nov 2020 13:21:56 -0500
-X-MC-Unique: DC43t2c9NCOx4SByNLD28Q-1
-Received: by mail-wr1-f72.google.com with SMTP id u1so1067024wri.6
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 10:21:56 -0800 (PST)
+ bh=gymYpe+op2KEM+Ps+oRafXBrmFgAlplrrKUwf0lvO5k=;
+ b=Wb9TNr0Ers56uuSGa5ig4f1B3n5nx9At9t63QCJYJvVYX1ce5l2hJo5gxn1ngaBSvijNSW
+ mVVAvz2PlKwycQde5q08htkVq4OhwFc4UVUC6ddjNbAlvDhWMa/tW+XtU7SrXiPw5YlgyP
+ RkhSt593RKsBb1MQ/+i0TiK6K/ATGbs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-101-wRYUXxB7OkazfsaBzAHlAA-1; Thu, 05 Nov 2020 13:47:12 -0500
+X-MC-Unique: wRYUXxB7OkazfsaBzAHlAA-1
+Received: by mail-wr1-f69.google.com with SMTP id m20so1068222wrb.21
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 10:47:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=KnMaZkv3W6gaIRG/dzv0b6+7NentBy2KxL5qwy1GjUs=;
- b=jCbiI2t/0RHC6PHGIHfwNTS9+Q7KDYh4xwtKV65kbSNNXIZhcg7BQeSPlN4YMnjXZB
- PMJLLt4niO8JKUYNsenv9wMtELO8HXbiLaJXZq554OF0ExUqNowapk/P9+qw4TEMtL0n
- jv1oIyVdnYvDM0l0ABuOcLld8AdTgAhmN+9rpQCl4eCsI6CyPlFNFB8U3rQbAKyrQG2z
- W3M415ApAc0nzqCPmtsIJenJEcm8xChyXJqssrYdTeS2na9wph29BbeOE9ETnDbSoGRn
- s27paM7UdAkCRKK67RTXY/X4igAnAbmNV3eK476I9K6d/75+20F/Mlt3HN/Xsl19RPzB
- qcgg==
-X-Gm-Message-State: AOAM533hFEiG+aTYk/TWBCDBMsPjhCB1sECKiSasg/nGy8Yfwkra3Sgh
- 7CeILpPsMDPn14yEW/fcTfwIU3S8JaLt8wZRcILotT/BiCUzV5pwthGeW32hxWUgVbjPZ08JRyu
- Yqk5OV3oKR3ttauc=
-X-Received: by 2002:adf:9544:: with SMTP id 62mr4439394wrs.223.1604600515506; 
- Thu, 05 Nov 2020 10:21:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxCtiutTK97367qERZfWBYbwN59984NQ6kHj8Xfl3gmmV0Qoymsun8p4W6U0pacKOpeYii0KQ==
-X-Received: by 2002:adf:9544:: with SMTP id 62mr4439373wrs.223.1604600515318; 
- Thu, 05 Nov 2020 10:21:55 -0800 (PST)
+ bh=gymYpe+op2KEM+Ps+oRafXBrmFgAlplrrKUwf0lvO5k=;
+ b=XX6AOoLVIEnGZnpk3Gb7QItOmmQ/VYFEJ3euL5LqQ59Ev3E3xmSHfWcZiMGhTg360P
+ 1FKQbpOhDGlOKJwo4mQQUBDxwY1yyLpbMTUCt97RQEkuah55T+wY9TQgqMllaET7bQ3o
+ EIt3xX2cp3+ZZEaUucdlt+uyHDbZQJzam64dlKuQp7k7HRs4QFI7JVolK4GLWOzS7t2c
+ 2csFoxNWM2JcTt1gXEY5TAGpi1ikLb22QmaCUYx3eCAkYUV4NBzcvqodvrJY4ZZYXG5s
+ u+i+XTAeftQngs5n2w7fI1u5SpuLh79UDdNN5MckflsHPW5FKS1PLiFa0FpaqIxwOHG+
+ 0QRw==
+X-Gm-Message-State: AOAM530vVYySWkJlTo7xzq7l/0o6y5E2mkX11pUSavNNVBrqfXLAuIX4
+ WhBUtqDhod548kkQlaL97rVA3iReI58ZS7sxBVvS9QP9TuDqphPJERuI/1J8LltrxyCPvhY5rU7
+ 6LPjf+G208q3jv2I=
+X-Received: by 2002:adf:f285:: with SMTP id k5mr4543033wro.299.1604602031123; 
+ Thu, 05 Nov 2020 10:47:11 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy6SiDJEH8bnGvlpIlzVFUkZN9yCp9a7K3ua4PSWNmYZPUMdgFzefLnB18DV7sFcgf0UooBog==
+X-Received: by 2002:adf:f285:: with SMTP id k5mr4543007wro.299.1604602030859; 
+ Thu, 05 Nov 2020 10:47:10 -0800 (PST)
 Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id f7sm3801959wrx.64.2020.11.05.10.21.54
+ by smtp.gmail.com with ESMTPSA id v9sm3695027wrp.11.2020.11.05.10.47.09
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 05 Nov 2020 10:21:54 -0800 (PST)
+ Thu, 05 Nov 2020 10:47:10 -0800 (PST)
 Subject: Re: [RFC PATCH 09/15] meson.build: introduce CONFIG_XEN_HVM flag
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20201105175153.30489-1-alex.bennee@linaro.org>
  <20201105175153.30489-10-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e0874fca-45e2-522a-d958-b4fc8a5ce8f2@redhat.com>
-Date: Thu, 5 Nov 2020 19:21:53 +0100
+Message-ID: <746b9511-afed-1a23-dd8d-937fb9c1fa91@redhat.com>
+Date: Thu, 5 Nov 2020 19:47:08 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
@@ -138,7 +139,37 @@ On 11/5/20 6:51 PM, Alex Bennée wrote:
 >  meson.build   | 6 +++++-
 >  accel/Kconfig | 3 +++
 >  2 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/meson.build b/meson.build
+> index 58e95227ea..46e4c2fc3a 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -83,6 +83,7 @@ endif
+>  if cpu in ['x86', 'x86_64']
+>    accelerator_targets += {
+>      'CONFIG_HAX': ['i386-softmmu', 'x86_64-softmmu'],
+> +    'CONFIG_XEN_HVM': ['i386-softmmu', 'x86_64-softmmu'],
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I'm confused while looking at
+https://wiki.xen.org/wiki/Xen_Project_Software_Overview#ARM_Hosts
+
+Maybe it makes sense to add both CONFIG_XEN_PV /
+CONFIG_XEN_HVM accelerators?
+
+>      'CONFIG_HVF': ['x86_64-softmmu'],
+>      'CONFIG_WHPX': ['i386-softmmu', 'x86_64-softmmu'],
+>    }
+> @@ -204,6 +205,9 @@ if not get_option('kvm').disabled() and targetos == 'linux'
+>  endif
+>  if not get_option('xen').disabled() and 'CONFIG_XEN_BACKEND' in config_host
+>    accelerators += 'CONFIG_XEN'
+> +  if host_machine.cpu() == 'x86_64'
+
+Are you sure it is restricted to 64-bit host? I can't find
+the reference.
+
+> +    accelerators += 'CONFIG_XEN_HVM'
+> +  endif
+>    have_xen_pci_passthrough = not get_option('xen_pci_passthrough').disabled() and targetos == 'linux'
 
 
