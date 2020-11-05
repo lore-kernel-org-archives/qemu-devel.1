@@ -2,98 +2,78 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7561C4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4B68C4742C
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:30:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 180002083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:30:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 103A820786
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:30:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+fWdaJ5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 180002083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GvRbibFY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 103A820786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kagHO-00063E-Sv
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 09:30:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42720)
+	id 1kagHm-0006Y2-Lf
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 09:30:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kagFq-0004TN-1o
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:28:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25895)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kagEl-00036L-De
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:27:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56458)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kagFn-00043J-Mx
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:28:45 -0500
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kagEj-0003iy-K6
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:27:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604586522;
+ s=mimecast20190719; t=1604586456;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1JrqMR42wthF6XW+e2mzn6VUVWmFWeb1d+kdctR7h3I=;
- b=Y+fWdaJ5DvQ3Ks5eNvfeLCmbrdOq7QpWfTCMfHU336PDZdQWuZ+G497kaa4C0JPYecbhyJ
- iO9nb9yKbqBfE5a14qUEZJXGaMQRa9VLa1RZgK4oJuYeHOAvAzAil+6DT6TcHF19HptlHT
- n9SPDn+lYKLPipTrJw3zmuKICafxuPE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-z6JzhcYcOYqW1uDHOuUICg-1; Thu, 05 Nov 2020 09:28:40 -0500
-X-MC-Unique: z6JzhcYcOYqW1uDHOuUICg-1
-Received: by mail-wm1-f72.google.com with SMTP id c10so684226wmh.6
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 06:28:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1JrqMR42wthF6XW+e2mzn6VUVWmFWeb1d+kdctR7h3I=;
- b=OmDeTmbzD9z+leHj3Qmc9WLpaEvmU/M/iJUoWxbEMlIvltMo/0Mn9hBl4PvyxnTrOC
- MrrSqeWwGJvn63Rx/HsVNWflyz18Kv1wWrTg/gZPzFrSElUBqYkSXGLgU79+EgGcmSxV
- 7GXA5/2mFxqoy0pFQGO4BkbnoMTchjTyjS4rKuJU/a5Fam8YhQ6KopOOjFIYIdMjreHP
- IWoFzej1bTKn1g90lsSQejwrZ2WPjCQT+ZQvVgV6MPxo9OLjiLo+jhcBUMm/Z1sF7w6T
- EDHGMKTKEQb81PXyJcBjVwtzGHGO3Pskip0q1Wxjd8K5bW+Ay06rz+KLrTsCacG2of0M
- TSag==
-X-Gm-Message-State: AOAM532PMnIdueHvUFBpOVFgBjLji3gb3KjnPK40mJUCu4SYvI/nl2kE
- b4CuQ/qY/qTGkamwDvf483LyCb5DMJe/p3zdR8EnPHG/CTSaA+44NpjKzRpqLLKoCnVpVylmqeu
- 0QYEs5kzlCA9CeSM=
-X-Received: by 2002:a05:600c:2282:: with SMTP id
- 2mr3248214wmf.154.1604586518463; 
- Thu, 05 Nov 2020 06:28:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzfGpEXYubYBTsPorqQiJhFOnXzW13I9wIp7aDW9lJzbJtOwR0ng8QfVG0q2+Egf4+JkrjxSg==
-X-Received: by 2002:a05:600c:2282:: with SMTP id
- 2mr3248202wmf.154.1604586518355; 
- Thu, 05 Nov 2020 06:28:38 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id b1sm3080669wmd.43.2020.11.05.06.28.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 05 Nov 2020 06:28:37 -0800 (PST)
-Subject: Re: [PATCH 5/6] xhci: fix guest triggerable assert
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20201105134112.25119-1-kraxel@redhat.com>
- <20201105134112.25119-6-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b9ce6e4c-2ae4-2c18-fa3b-2f1a0713dd15@redhat.com>
-Date: Thu, 5 Nov 2020 15:28:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ bh=qAcxVrJzljDRrn3EsYDcI0495qT8KRNfd4NFuKZhc2o=;
+ b=GvRbibFYOjKTVwI+CcfNYheGshuVavzOlLj4fUS3Cyn8ONGovJNXbel3qrcPtb9PvcMaSI
+ T6OQaeUTlE2dtJoG8UtLOe8gjR3KT2V2r603LHtsNEtLyzPSedBMiOcriZLwbVM6652Gx6
+ LU8BXOV31hA+unWG1qfQfCcJDL1dF6g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-128-uEB-qt5EPtmQVJpqRlVP1g-1; Thu, 05 Nov 2020 09:27:33 -0500
+X-MC-Unique: uEB-qt5EPtmQVJpqRlVP1g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEBF987951E
+ for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 14:27:32 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7D0625DA78;
+ Thu,  5 Nov 2020 14:27:32 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/2] qemu-option: move help handling to get_opt_name_value
+Date: Thu,  5 Nov 2020 09:27:30 -0500
+Message-Id: <20201105142731.623428-2-pbonzini@redhat.com>
+In-Reply-To: <20201105142731.623428-1-pbonzini@redhat.com>
+References: <20201105142731.623428-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201105134112.25119-6-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 22:46:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -102,9 +82,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,20 +96,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: berrange@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/5/20 2:41 PM, Gerd Hoffmann wrote:
-> We didn't start any work yet so we can just return
-> at that point instead of asserting.
-> 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1883732
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/usb/hcd-xhci.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+Right now, help options are parsed normally and then checked
+specially in opt_validate. but only if coming from
+qemu_opts_parse or qemu_opts_parse_noisily.
+Move the check from opt_validate to the common workhorses
+of qemu_opts_parse and qemu_opts_parse_noisily, opts_do_parse
+and get_opt_name_value.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+As a result, opts_parse and opts_do_parse do not return an error anymore
+when help is requested---just like qemu_opts_parse_noisily.
+
+This will come in handy in the next patch, which will
+raise a warning for "-object memory-backend-ram,share"
+("flag" option with no =on/=off part) but not for
+"-object memory-backend-ram,help".
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ util/qemu-option.c | 40 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index acefbc23fa..61fc96f9dd 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -504,17 +504,13 @@ static QemuOpt *opt_create(QemuOpts *opts, const char *name, char *value,
+     return opt;
+ }
+ 
+-static bool opt_validate(QemuOpt *opt, bool *help_wanted,
+-                         Error **errp)
++static bool opt_validate(QemuOpt *opt, Error **errp)
+ {
+     const QemuOptDesc *desc;
+ 
+     desc = find_desc_by_name(opt->opts->list->desc, opt->name);
+     if (!desc && !opts_accepts_any(opt->opts)) {
+         error_setg(errp, QERR_INVALID_PARAMETER, opt->name);
+-        if (help_wanted && is_help_option(opt->name)) {
+-            *help_wanted = true;
+-        }
+         return false;
+     }
+ 
+@@ -531,7 +527,7 @@ bool qemu_opt_set(QemuOpts *opts, const char *name, const char *value,
+ {
+     QemuOpt *opt = opt_create(opts, name, g_strdup(value), false);
+ 
+-    if (!opt_validate(opt, NULL, errp)) {
++    if (!opt_validate(opt, errp)) {
+         qemu_opt_del(opt);
+         return false;
+     }
+@@ -767,16 +763,18 @@ void qemu_opts_print(QemuOpts *opts, const char *separator)
+ 
+ static const char *get_opt_name_value(const char *params,
+                                       const char *firstname,
++                                      bool *help_wanted,
+                                       char **name, char **value)
+ {
+-    const char *p, *pe, *pc;
+-
+-    pe = strchr(params, '=');
+-    pc = strchr(params, ',');
++    const char *p;
++    size_t len;
+ 
+-    if (!pe || (pc && pc < pe)) {
++    len = strcspn(params, "=,");
++    if (params[len] != '=') {
+         /* found "foo,more" */
+-        if (firstname) {
++        if (help_wanted && starts_with_help_option(params) == len) {
++            *help_wanted = true;
++        } else if (firstname) {
+             /* implicitly named first option */
+             *name = g_strdup(firstname);
+             p = get_opt_value(params, value);
+@@ -814,7 +812,10 @@ static bool opts_do_parse(QemuOpts *opts, const char *params,
+     QemuOpt *opt;
+ 
+     for (p = params; *p;) {
+-        p = get_opt_name_value(p, firstname, &option, &value);
++        p = get_opt_name_value(p, firstname, help_wanted, &option, &value);
++        if (help_wanted && *help_wanted) {
++            return false;
++        }
+         firstname = NULL;
+ 
+         if (!strcmp(option, "id")) {
+@@ -825,7 +826,7 @@ static bool opts_do_parse(QemuOpts *opts, const char *params,
+ 
+         opt = opt_create(opts, option, value, prepend);
+         g_free(option);
+-        if (!opt_validate(opt, help_wanted, errp)) {
++        if (!opt_validate(opt, errp)) {
+             qemu_opt_del(opt);
+             return false;
+         }
+@@ -840,7 +841,7 @@ static char *opts_parse_id(const char *params)
+     char *name, *value;
+ 
+     for (p = params; *p;) {
+-        p = get_opt_name_value(p, NULL, &name, &value);
++        p = get_opt_name_value(p, NULL, NULL, &name, &value);
+         if (!strcmp(name, "id")) {
+             g_free(name);
+             return value;
+@@ -856,11 +857,10 @@ bool has_help_option(const char *params)
+ {
+     const char *p;
+     char *name, *value;
+-    bool ret;
++    bool ret = false;
+ 
+     for (p = params; *p;) {
+-        p = get_opt_name_value(p, NULL, &name, &value);
+-        ret = is_help_option(name);
++        p = get_opt_name_value(p, NULL, &ret, &name, &value);
+         g_free(name);
+         g_free(value);
+         if (ret) {
+@@ -946,10 +946,10 @@ QemuOpts *qemu_opts_parse_noisily(QemuOptsList *list, const char *params,
+     bool help_wanted = false;
+ 
+     opts = opts_parse(list, params, permit_abbrev, false, &help_wanted, &err);
+-    if (err) {
++    if (!opts) {
++        assert(!!err + !!help_wanted == 1);
+         if (help_wanted) {
+             qemu_opts_print_help(list, true);
+-            error_free(err);
+         } else {
+             error_report_err(err);
+         }
+-- 
+2.26.2
+
 
 
