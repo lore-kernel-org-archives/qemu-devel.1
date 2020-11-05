@@ -2,91 +2,93 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97FCDC55179
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09904C4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:55:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C67E7221FA
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:49:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4665D21D81
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:55:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxWrUOuy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C67E7221FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXyA/fmO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4665D21D81
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kagaL-0003Rz-Ig
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 09:49:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46438)
+	id 1kagfP-0006LI-MC
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 09:55:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kagUT-0007kB-SC
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:43:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36400)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kagUP-0001IM-MT
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:43:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604587428;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sp2UqcGaK7QCnYU9Q9T9G+DuCqCtag4Fab3IQM54tr4=;
- b=TxWrUOuyJxgoG+ZGAYXoT/xvAWHOfoTR45Ns26AzC8OR7NKUlH5+TURK0UqXPc722bXniW
- /iSQx9qxFPTFmzYeSqiBXRg113uKDCErZ99JIyO3oU21Qybs9Exiv8nC3jzpMjmx+g8puV
- AC4Z2p3m0R9BeiZ1xo19zwCKzjOCcCE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-eBBPzJqFMva0ahLLIC1N8A-1; Thu, 05 Nov 2020 09:43:47 -0500
-X-MC-Unique: eBBPzJqFMva0ahLLIC1N8A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56C51807339;
- Thu,  5 Nov 2020 14:43:45 +0000 (UTC)
-Received: from gondolin (ovpn-112-138.ams2.redhat.com [10.36.112.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1354C5D9D5;
- Thu,  5 Nov 2020 14:43:41 +0000 (UTC)
-Date: Thu, 5 Nov 2020 15:43:39 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.2 v3 1/4] s390x: fix build for
- --without-default-devices
-Message-ID: <20201105154339.6314b227.cohuck@redhat.com>
-In-Reply-To: <20201105130113.4bacf2c0.cohuck@redhat.com>
-References: <20201104115706.3101190-1-philmd@redhat.com>
- <20201104115706.3101190-2-philmd@redhat.com>
- <20201104182547.5ae54d3f.cohuck@redhat.com>
- <394ea3ee-fdef-e25b-4419-3b1bf51a48cc@redhat.com>
- <20201105130113.4bacf2c0.cohuck@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <thatlemon@gmail.com>)
+ id 1kageo-0005vf-0l
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:54:34 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:36622)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <thatlemon@gmail.com>)
+ id 1kagel-0005Gk-Qm
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:54:33 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id x7so2113264wrl.3
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 06:54:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=to:cc:from:subject:message-id:date:user-agent:mime-version
+ :content-language:content-transfer-encoding;
+ bh=4+u4YMgDgUVFIAFu1azoEzrYkuhRgW3jWIiyqbzplY0=;
+ b=WXyA/fmOQ1g7C7fvoV1MtfWC05/7e21QACPEg9Ta+JyaU5iRsjboHUojZph2QvCZbK
+ jq0JjHtTIdNHI3VV1osP0yKWO6XIpU5fSaBSu8k6riFk/7tmamYMXdYx6Mzzhx0ChpNS
+ 7SA23srhNPKXFbykoj2yRZZHkm5KfmmY3s5e3FuCo9hxfm7Ol4OqewCJH8klkqr7KNAi
+ yyktf4yDQLSE3IhrFRIaObvFl8hs+ea7JhioJmhZC5czR5oMERRZ/6Zcj9s0JccrGsoI
+ 0bsUu4RUhQNCsg6G92Z+id276OoRRA3ZtTArfNhaJD3wBxjLdSN0nvsHB5X6EjEWgHKU
+ ZO8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+ :mime-version:content-language:content-transfer-encoding;
+ bh=4+u4YMgDgUVFIAFu1azoEzrYkuhRgW3jWIiyqbzplY0=;
+ b=hl4FSWvspHpsGJrHQKLypKR3g6+R52THsO0w1ACz9rITunUHTEM7bq/AxolyKvSkOC
+ 0y+AOkkUuhJrhoGcjdeXU4BnAANe+Y8HtXXJEQifK7w63Q4OA+zy8+xp2JTkhrN7poRn
+ H5htlZPsctiWEpF8WORB4e1Bol6HT+H9Qr5JclWMEzZXIrUmy74p8LfrZ9jiG1sqXt1C
+ wUF21Y5JmjG1/uuUPAeNIpaVCoNdfx7SouwRgv7+qKZsRQCbUPSw5Y0EwzLRMy9XH8Km
+ ++QzFRcUBWgqkjAnvE5d7alY9q1jNWouglYUzhvQnFD8VydxPmtPBAVMm+0lyPVIWNuC
+ Fkvw==
+X-Gm-Message-State: AOAM5310BXRpUI6SdjbWMRLQYAzc6cJBKP+HkYIhRu0nlVawrkTl1UCX
+ yRXmZ97OAbzt1OOVUFWM+injR58ctRg=
+X-Google-Smtp-Source: ABdhPJxYJ9/kUUdpCUZ+Y3KU5gvmqvW4qnkkTVmuYIQl9x/Lj18IZzXqel8nqKqPqQ93qrakTJT6uA==
+X-Received: by 2002:a5d:4448:: with SMTP id x8mr2897325wrr.364.1604588069639; 
+ Thu, 05 Nov 2020 06:54:29 -0800 (PST)
+Received: from [192.168.1.103] ([151.33.227.77])
+ by smtp.gmail.com with ESMTPSA id z5sm2852186wrw.87.2020.11.05.06.54.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Nov 2020 06:54:29 -0800 (PST)
+To: Laurent Vivier <laurent@vivier.eu>
+From: LemonBoy <thatlemon@gmail.com>
+Subject: [PATCH] linux-user: Correct definition of stack_t
+Message-ID: <bf2b4da4-385d-a0f7-7915-4f31fa797898@gmail.com>
+Date: Thu, 5 Nov 2020 15:54:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 22:46:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=thatlemon@gmail.com; helo=mail-wr1-x42f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,65 +101,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, Greg Kurz <groug@kaod.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Nov 2020 13:01:13 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+From 914c30863b45d6fcd3e2fc83929bcac546be1555 Mon Sep 17 00:00:00 2001
+From: LemonBoy <thatlemon@gmail.com>
+Date: Thu, 5 Nov 2020 15:48:24 +0100
+Subject: [PATCH] linux-user: Correct definition of stack_t
 
-> On Thu, 5 Nov 2020 12:58:01 +0100
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
->=20
-> > Hi Cornelia,
-> >=20
-> > On 11/4/20 6:25 PM, Cornelia Huck wrote: =20
-> > > On Wed,  4 Nov 2020 12:57:03 +0100
-> > > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> > >    =20
-> > >> From: Cornelia Huck <cohuck@redhat.com>
-> > >>
-> > >> s390-pci-vfio.c calls into the vfio code, so we need it to be
-> > >> built conditionally on vfio (which implies CONFIG_LINUX).
-> > >>
-> > >> Reported-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > >> Fixes: cd7498d07fbb ("s390x/pci: Add routine to get the vfio dma ava=
-ilable count")
-> > >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > >> Message-Id: <20201103123237.718242-1-cohuck@redhat.com>
-> > >> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > >> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > >> Acked-by: Greg Kurz <groug@kaod.org>
-> > >> Tested-by: Greg Kurz <groug@kaod.org>
-> > >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > >> ---
-> > >>  include/hw/s390x/s390-pci-vfio.h | 3 ++-
-> > >>  hw/s390x/meson.build             | 2 +-
-> > >>  2 files changed, 3 insertions(+), 2 deletions(-)   =20
-> > >=20
-> > > I think you're missing Matt's r-b?
-> > >=20
-> > > Do you plan to send this, or should I include it on my s390-fixes
-> > > branch?   =20
-> >=20
-> > I plan to send a pull request with gitlab patches (or maybe
-> > they will go via Alex's testing tree) but not soon. If you
-> > are preparing s390-fixes patches, please go ahead taking this
-> > one (I only included to have the series build succeed). =20
->=20
-> Thanks, I plan to prepare a pull req this week, so I'll just go ahead
-> and include it.
+Some platforms used the wrong definition of stack_t where the flags and
+size fields were swapped or where the flags field had type ulong instead
+of int.
 
-Queued to s390-fixes now (with Matt's r-b included).
+Due to the presence of padding space in the structure and the prevalence
+of little-endian machines this problem went unnoticed for a long time.
+
+The type definitions have been cross-checked with the ones defined in
+the Linux kernel v5.9, plus some older versions for a few architecture
+that have been removed and Xilinx's kernel fork for NiosII [1].
+
+The microblaze header and the bsd-user ones remain unchanged as I don't
+know if they are wrong or not.
+
+[1] https://github.com/Xilinx/linux-xlnx/blob/master/arch/nios2/include/uapi/asm/signal.h
+
+Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+---
+ linux-user/alpha/target_signal.h  | 3 +--
+ linux-user/arm/target_signal.h    | 6 +++---
+ linux-user/cris/target_signal.h   | 6 +++---
+ linux-user/hppa/target_signal.h   | 2 +-
+ linux-user/i386/target_signal.h   | 6 +++---
+ linux-user/m68k/target_signal.h   | 6 +++---
+ linux-user/mips/target_signal.h   | 6 +++---
+ linux-user/mips64/target_signal.h | 7 +++----
+ linux-user/nios2/target_signal.h  | 5 +++--
+ linux-user/ppc/target_signal.h    | 6 +++---
+ linux-user/s390x/target_signal.h  | 2 +-
+ linux-user/sh4/target_signal.h    | 6 +++---
+ linux-user/sparc/target_signal.h  | 6 +++---
+ linux-user/x86_64/target_signal.h | 6 +++---
+ 14 files changed, 36 insertions(+), 37 deletions(-)
+
+diff --git a/linux-user/alpha/target_signal.h b/linux-user/alpha/target_signal.h
+index cd63d59fde..b83797281c 100644
+--- a/linux-user/alpha/target_signal.h
++++ b/linux-user/alpha/target_signal.h
+@@ -42,8 +42,7 @@
+ 
+ typedef struct target_sigaltstack {
+     abi_ulong ss_sp;
+-    int32_t ss_flags;
+-    int32_t dummy;
++    abi_int ss_flags;
+     abi_ulong ss_size;
+ } target_stack_t;
+ 
+diff --git a/linux-user/arm/target_signal.h b/linux-user/arm/target_signal.h
+index ea123c40f3..0998dd6dfa 100644
+--- a/linux-user/arm/target_signal.h
++++ b/linux-user/arm/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/cris/target_signal.h b/linux-user/cris/target_signal.h
+index 1cb5548f85..495a142896 100644
+--- a/linux-user/cris/target_signal.h
++++ b/linux-user/cris/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_ulong ss_size;
+-	abi_long ss_flags;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/hppa/target_signal.h b/linux-user/hppa/target_signal.h
+index c2a0102ed7..c52a3ea579 100644
+--- a/linux-user/hppa/target_signal.h
++++ b/linux-user/hppa/target_signal.h
+@@ -44,7 +44,7 @@
+ 
+ typedef struct target_sigaltstack {
+     abi_ulong ss_sp;
+-    int32_t ss_flags;
++    abi_int ss_flags;
+     abi_ulong ss_size;
+ } target_stack_t;
+ 
+diff --git a/linux-user/i386/target_signal.h b/linux-user/i386/target_signal.h
+index f55e78fd33..50361af874 100644
+--- a/linux-user/i386/target_signal.h
++++ b/linux-user/i386/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/m68k/target_signal.h b/linux-user/m68k/target_signal.h
+index 314e808844..d096544ef8 100644
+--- a/linux-user/m68k/target_signal.h
++++ b/linux-user/m68k/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/mips/target_signal.h b/linux-user/mips/target_signal.h
+index 66e1ad44a6..fa4084a99d 100644
+--- a/linux-user/mips/target_signal.h
++++ b/linux-user/mips/target_signal.h
+@@ -45,9 +45,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_long ss_sp;
+-	abi_ulong ss_size;
+-	abi_long ss_flags;
++    abi_ulong ss_sp;
++    abi_ulong ss_size;
++    abi_int ss_flags;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/mips64/target_signal.h b/linux-user/mips64/target_signal.h
+index 753e91fbd6..799f7a668c 100644
+--- a/linux-user/mips64/target_signal.h
++++ b/linux-user/mips64/target_signal.h
+@@ -45,12 +45,11 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_long ss_sp;
+-	abi_ulong ss_size;
+-	abi_int ss_flags;
++    abi_ulong ss_sp;
++    abi_ulong ss_size;
++    abi_int ss_flags;
+ } target_stack_t;
+ 
+-
+ /*
+  * sigaltstack controls
+  */
+diff --git a/linux-user/nios2/target_signal.h b/linux-user/nios2/target_signal.h
+index fe48721b3d..aebf749f12 100644
+--- a/linux-user/nios2/target_signal.h
++++ b/linux-user/nios2/target_signal.h
+@@ -4,11 +4,12 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-    abi_long ss_sp;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
+     abi_ulong ss_size;
+-    abi_long ss_flags;
+ } target_stack_t;
+ 
++
+ /* sigaltstack controls  */
+ #define TARGET_SS_ONSTACK     1
+ #define TARGET_SS_DISABLE     2
+diff --git a/linux-user/ppc/target_signal.h b/linux-user/ppc/target_signal.h
+index 4453e2e7ef..72fcdd9bfa 100644
+--- a/linux-user/ppc/target_signal.h
++++ b/linux-user/ppc/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	int ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/s390x/target_signal.h b/linux-user/s390x/target_signal.h
+index b58bc7c20f..bbfc464d44 100644
+--- a/linux-user/s390x/target_signal.h
++++ b/linux-user/s390x/target_signal.h
+@@ -3,7 +3,7 @@
+ 
+ typedef struct target_sigaltstack {
+     abi_ulong ss_sp;
+-    int ss_flags;
++    abi_int ss_flags;
+     abi_ulong ss_size;
+ } target_stack_t;
+ 
+diff --git a/linux-user/sh4/target_signal.h b/linux-user/sh4/target_signal.h
+index 434970a990..d7309b7136 100644
+--- a/linux-user/sh4/target_signal.h
++++ b/linux-user/sh4/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/sparc/target_signal.h b/linux-user/sparc/target_signal.h
+index 5cc40327d2..1b10d1490f 100644
+--- a/linux-user/sparc/target_signal.h
++++ b/linux-user/sparc/target_signal.h
+@@ -42,9 +42,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/x86_64/target_signal.h b/linux-user/x86_64/target_signal.h
+index 4c4380f7b9..4ea74f20dd 100644
+--- a/linux-user/x86_64/target_signal.h
++++ b/linux-user/x86_64/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+-- 
+2.27.0
 
 
