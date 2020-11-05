@@ -2,118 +2,88 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D415C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4DA2C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:38:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58368206CA
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:29:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0638C20704
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:38:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aJa/NDFh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58368206CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t+RIH6xx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0638C20704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kankp-0001Zd-D1
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 17:29:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40216)
+	id 1kaopn-0005Mw-KB
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 18:38:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1kand6-0000sG-TL
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 17:21:16 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5796
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1kand3-0004IK-Jg
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 17:21:16 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0A5M2G3A152546
- for <qemu-devel@nongnu.org>; Thu, 5 Nov 2020 17:21:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=RVgVX22wUUBmoZ3wdqFVy3xBom1l+qRdXCb7k8nqonw=;
- b=aJa/NDFh8M+EstfHjdIlo1vV/YswYbYg/cg/ajkWQGvGBs9MKyq8ueRO2yawd6/5acn/
- VUJayxFIf4lGcAUeI+B4UwpJUSylnUWMgMpYwuqhmoxnyhptEuhEVERgJbcJgrX959fb
- hg8oZ4nZ9jfDfH8LqPzTYRh7LeZD0CLftRLFuZkr/iKt8druGI3OkOAJ7lxzJtsYo0Z/
- blEFQIzV6LFdzjcH0BIW5Hjnx8lvqVV8STIvLCHpmEdTqRYwgQdon9bABwmSYue9nSZ1
- uWcKHMrUC353HYmuAgYyq1Rk11PeNLrpgFGIv8DMLaLQuQra2eQG6RCjfwP+YAwDLSR4 kQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 34mnyhq4f5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 17:21:08 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A5MJpKK021946
- for <qemu-devel@nongnu.org>; Thu, 5 Nov 2020 17:19:51 -0500
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0b-001b2d01.pphosted.com with ESMTP id 34mnyhq4ae-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Nov 2020 17:19:51 -0500
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A5MFOm6000664;
- Thu, 5 Nov 2020 22:19:19 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com
- (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
- by ppma01wdc.us.ibm.com with ESMTP id 34h0253hva-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Nov 2020 22:19:19 +0000
-Received: from b03ledav003.gho.boulder.ibm.com
- (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0A5MJIiv24379668
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 5 Nov 2020 22:19:18 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 909DA6A04F;
- Thu,  5 Nov 2020 22:19:18 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 103C36A047;
- Thu,  5 Nov 2020 22:19:18 +0000 (GMT)
-Received: from Buonos-Thinkpad-X1.ibm.com (unknown [9.65.222.173])
- by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu,  5 Nov 2020 22:19:17 +0000 (GMT)
-From: Daniele Buono <dbuono@linux.vnet.ibm.com>
-To: dbuono@linux.vnet.ibm.com, qemu-devel@nongnu.org
-Subject: [PATCH v3 3/9] hw/usb: reorder fields in UASStatus
-Date: Thu,  5 Nov 2020 17:18:59 -0500
-Message-Id: <20201105221905.1350-4-dbuono@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201105221905.1350-1-dbuono@linux.vnet.ibm.com>
-References: <20201105221905.1350-1-dbuono@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kaoob-0004t4-Ip
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:37:13 -0500
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:46592)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kaooX-0004Zl-O1
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:37:13 -0500
+Received: by mail-ej1-x641.google.com with SMTP id w13so5095576eju.13
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 15:37:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7Ws0N4H3e3IXPjz5uj3/DEyDWDmAgXLDdeUZPy7wlc4=;
+ b=t+RIH6xxIj5vf3Bd8g74sJN04NSRLLfPXeQNCZ3jseZ2NTWfCaL9UHDGWCluSBg7Iz
+ CC+g5x4DNuEa9tkn0gcaiYr/Lom1w4dLZoUJihHnQ1SzTfGDudLCKm9TEBFpg+nyst09
+ TPdfZbskQx2yTyJJWg0yawA8eJyIk8o5hYTdzeNx4Dsbj+gxdRGO+rrzAbLHiuMN3IXd
+ w7ud2n0YFgb4TXE+VDIQENIVDboV6gLsz2sitlEldt14U6/o0XSKWPwXQquqyC7AKq3x
+ ESorAgACwJKxsc9pZ1fB4zz4ROlY95RHWsbOq9RIXEufIRu1Gi/qDj+xQU3veFkKFuGR
+ IeQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7Ws0N4H3e3IXPjz5uj3/DEyDWDmAgXLDdeUZPy7wlc4=;
+ b=TetcHGn1lDTDyClPRYOykUNpn08gHWjYhFlJt1OvHYcbZ4/VUztX5p8MTfhKv3Gyy/
+ UV/K/wDZCstybBVyX3O0DjumX0Fv2dgWv4Ih3Fil+HkO/c8QfUvP34WlHLaOCDEhJWds
+ tZEeEJj0e5cj9AUu95ZY9GDz/uDulNnJLJHytjJZhAiy6KYyeCI2UI6hHDWsEXnFVmUH
+ WwT8D11g3IJ7aWpvjhWzTbFoNyQoWUUntj081Q+PB2VhaTX34UsnBdjL3NedOFSNp552
+ GEIaMC8RHZw6jg5npoHi5dCxm1mqFP+GKGFSfOvLMWAt7spgxuqhfM0Pd5+3SZrlN6Re
+ vu9g==
+X-Gm-Message-State: AOAM532o23d5DN2fRsqsqYx3le74cwtZ3BebPs1Eszm/lN9ETZIh+xs5
+ V241+RaBNUYu8yP9irAtckIGuwPbRoyJuPOPoV0KTw==
+X-Google-Smtp-Source: ABdhPJydGkkTWT/1M+vrM70cW6lP6l+X751B5P+4YIrvaKbkrVXiLNOlz9DktxHr0iYjsREyxFkOiKT0vVOJHa+CyFE=
+X-Received: by 2002:a17:906:2bc4:: with SMTP id
+ n4mr4656189ejg.407.1604619427888; 
+ Thu, 05 Nov 2020 15:37:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312, 18.0.737
- definitions=2020-11-05_15:2020-11-05,
- 2020-11-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 spamscore=0 phishscore=0 impostorscore=0
- lowpriorityscore=0 mlxlogscore=999 mlxscore=0 adultscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011050139
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 17:19:18
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+References: <20201105212314.9628-1-peter.maydell@linaro.org>
+ <20201105212314.9628-2-peter.maydell@linaro.org>
+ <6bdc7371-58a8-a4a8-a948-8e7fce921fdb@linaro.org>
+In-Reply-To: <6bdc7371-58a8-a4a8-a948-8e7fce921fdb@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Nov 2020 23:36:56 +0000
+Message-ID: <CAFEAcA8R45sv+EbeqOBdkbT7buzvFbugBdro1MxfTKw2NrD4oQ@mail.gmail.com>
+Subject: Re: [PATCH for-5.2 1/3] linux-user/sparc: Fix errors in
+ target_ucontext structures
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,46 +96,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Giuseppe Musacchio <thatlemon@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The UASStatus data structure has a variable sized field inside of type uas_iu,
-that however is not placed at the end of the data structure.
+On Thu, 5 Nov 2020 at 22:15, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 11/5/20 1:23 PM, Peter Maydell wrote:
+> > +} __attribute__((aligned(16)));
+>
+> Hmph, 96 uses of the attribute directly, 20 uses of QEMU_ALIGNED.  I suppose we
+> should just remove the wrapper...
 
-This placement triggers a warning with clang 11, and while not a bug right now,
-(the status is never a uas_iu_command, which is the variable-sized case),
-it could become one in the future.
+Oops, I forget about that. We're better at adhering to use
+of QEMU_SENTINEL and QEMU_NORETURN, at least. And a fair
+chunk of those 96 are in code-that's-not-ours like the
+headers imported from Linux or the pc-bios/s390-ccw code.
 
-../qemu-base/hw/usb/dev-uas.c:157:31: error: field 'status' with variable sized type 'uas_iu' not at the end of a struct or class is a GNU extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
-    uas_iu                    status;
-                              ^
-1 error generated.
+I'm in two minds here -- the wrappers look less clunky than
+the __attribute__ syntax, but on the other hand "there is
+only one way this can be written" results in less inconsistency
+than "there are two ways".
 
-Fix this by moving uas_iu at the end of the struct
-
-Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
----
- hw/usb/dev-uas.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/usb/dev-uas.c b/hw/usb/dev-uas.c
-index cec071d96c..5ef3f4fec9 100644
---- a/hw/usb/dev-uas.c
-+++ b/hw/usb/dev-uas.c
-@@ -154,9 +154,9 @@ struct UASRequest {
- 
- struct UASStatus {
-     uint32_t                  stream;
--    uas_iu                    status;
-     uint32_t                  length;
-     QTAILQ_ENTRY(UASStatus)   next;
-+    uas_iu                    status;
- };
- 
- /* --------------------------------------------------------------------- */
--- 
-2.17.1
-
+thanks
+-- PMM
 
