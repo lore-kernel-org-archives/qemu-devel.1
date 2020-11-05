@@ -2,87 +2,74 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B1DC00A89
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 11:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2C6C00A89
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 11:40:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB88B2083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 11:34:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FRK3rPfO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB88B2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4392206FB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 11:40:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4392206FB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kadWw-0007Dr-MO
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 06:34:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34392)
+	id 1kadcz-0000fh-HX
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 06:40:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kadVJ-0006Er-RX; Thu, 05 Nov 2020 06:32:33 -0500
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:41819)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kadVH-0001Cf-Hz; Thu, 05 Nov 2020 06:32:33 -0500
-Received: by mail-lf1-x143.google.com with SMTP id 126so1780083lfi.8;
- Thu, 05 Nov 2020 03:32:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=FMB7cXJW+C6FuDYDCv8B0L3Qpa3D7BkJ2aEOqX+Xmy8=;
- b=FRK3rPfOIKN24nS3laP8nch8k65k5Vw7I2P/DsK3acoZhYJKf045BEjsfc/LI2wbJb
- 8qOa5X3nfwqZAYCoknIzHAZCfSc20/y0hNSZv3O51n6W1Tytj4HBWL265CenOX06upSf
- 7GRJ6d2VFz0yz+wC/5ULjfnnDi8nvWVmTA4Eb11gB72jdqBm5a34OhUKRuBHTy5BqG28
- gy/dOslm/mlZJ1vhgWAwY3VZ2pHR0Lt4/rSmd3svn8VBEHFoLiEBS5aQwH0WrSTUwEbu
- pLmrwrYNIT51SiDvceQeFU+PXGfBDFeQatzk+5zp5qN6MIaez9BxPOnvTXSTzTQ7dp86
- 4CQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=FMB7cXJW+C6FuDYDCv8B0L3Qpa3D7BkJ2aEOqX+Xmy8=;
- b=Zss2GdTlBbmNVyjXyeEYswfM59mrhRqI3sJmST8VTj7W9DLxYWxmofe4stKZnWineM
- P0anqa/6ve0tQkiBL8y+MBvFvk3rL8S0D5FwB4J0sBrKPIRE0F135StO/J/6D0P1TY1U
- Dpp6r4VMIZr9pppqDP7mzh1ovPo7S4TQhA1h/JMF+DbDLRVKJ0ki/BPYc/+YpR1J2YXH
- qSuosfL0o0OMY6EcuXCTg+vVG9/ODArIFwoG00WxvI0A5yDO40217I2VgB3l9QW3FuPN
- NuOveRzBwUMV8nR8ZYRvUhJhwR5p334BpJhgM4OPYx7E3E3XLL0Lwi2xaAZUVPfDMMKG
- gyXQ==
-X-Gm-Message-State: AOAM532dAl3G5XGaCiFjZ6/knScwAIVttfLdw3kzzks6G3jNbM8xs3S9
- xxSgy7LopGZXzz1XwXWscWS/Gyqqo2Ye1TrnQb4=
-X-Google-Smtp-Source: ABdhPJybvwctCM9ELGIDXn3IoYddIB/Q6E4RkoVa+FZhpaDYLJEUwdCxVTW6cRZTe4xM5R63H7SBMAW5T4w/NxkiEw4=
-X-Received: by 2002:ac2:54ab:: with SMTP id w11mr773495lfk.50.1604575948053;
- Thu, 05 Nov 2020 03:32:28 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kadcG-0000Ab-0M
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 06:39:44 -0500
+Received: from 10.mo52.mail-out.ovh.net ([87.98.187.244]:58026)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kadcD-0003mV-CM
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 06:39:43 -0500
+Received: from mxplan5.mail.ovh.net (unknown [10.108.4.25])
+ by mo52.mail-out.ovh.net (Postfix) with ESMTPS id 508A9203C6F;
+ Thu,  5 Nov 2020 12:39:35 +0100 (CET)
+Received: from kaod.org (37.59.142.104) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 5 Nov 2020
+ 12:39:35 +0100
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-104R0050d476141-e52d-4a33-90f3-ef1df65c1582,
+ 5D04B6D4EAACA18D9EDEF493C42F41A1D3896549) smtp.auth=groug@kaod.org
+Date: Thu, 5 Nov 2020 12:39:34 +0100
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2 3/4] spapr/xive: Allocate IPIs independently from the
+ other sources
+Message-ID: <20201105123934.50ad1c39@bahia.lan>
+In-Reply-To: <2d837671-ec7a-2eb8-c9f3-10d031ee4fde@kaod.org>
+References: <20200820134547.2355743-1-clg@kaod.org>
+ <20200820134547.2355743-4-clg@kaod.org>
+ <2d837671-ec7a-2eb8-c9f3-10d031ee4fde@kaod.org>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20201013001545.1958-1-luoyonggang@gmail.com>
- <20201013001545.1958-2-luoyonggang@gmail.com>
- <9582005a-1248-6a6b-060f-b0da597bc9c9@redhat.com>
-In-Reply-To: <9582005a-1248-6a6b-060f-b0da597bc9c9@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Thu, 5 Nov 2020 19:32:17 +0800
-Message-ID: <CAE2XoE_Mvtgnva3r6nMDq1P9D6iA9uUPP7sh20RLaC8zdYrTow@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] block: Fixes nfs compiling error on msys2/mingw
-To: Max Reitz <mreitz@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000066213305b35a73a8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::143;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x143.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [37.59.142.104]
+X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: f47443bf-172f-4617-88e5-124134312b44
+X-Ovh-Tracer-Id: 16462626965528746278
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedruddtjedgfeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpedtgfelhfeiheetjeejgeevgeelkeduveekheejudfgjefffeehueeukefgfffhgeenucffohhmrghinheplhgruhhntghhphgrugdrnhgvthenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
+Received-SPF: pass client-ip=87.98.187.244; envelope-from=groug@kaod.org;
+ helo=10.mo52.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 06:39:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,155 +82,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- Peter Lieven <pl@kamp.de>, qemu-level <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: qemu-ppc@nongnu.org, Gustavo Romero <gromero@linux.ibm.com>,
+ Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000066213305b35a73a8
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Thu, 5 Nov 2020 09:37:27 +0100
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-On Thu, Nov 5, 2020 at 7:29 PM Max Reitz <mreitz@redhat.com> wrote:
->
-> On 13.10.20 02:15, Yonggang Luo wrote:
-> > These compiling errors are fixed:
-> > ../block/nfs.c:27:10: fatal error: poll.h: No such file or directory
-> >     27 | #include <poll.h>
-> >        |          ^~~~~~~~
-> > compilation terminated.
-> >
-> > ../block/nfs.c:63:5: error: unknown type name 'blkcnt_t'
-> >     63 |     blkcnt_t st_blocks;
-> >        |     ^~~~~~~~
-> > ../block/nfs.c: In function 'nfs_client_open':
-> > ../block/nfs.c:550:27: error: 'struct _stat64' has no member named
-'st_blocks'
-> >    550 |     client->st_blocks =3D st.st_blocks;
-> >        |                           ^
-> > ../block/nfs.c: In function 'nfs_get_allocated_file_size':
-> > ../block/nfs.c:751:41: error: 'struct _stat64' has no member named
-'st_blocks'
-> >    751 |     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
-> >        |                                         ^
-> > ../block/nfs.c: In function 'nfs_reopen_prepare':
-> > ../block/nfs.c:805:31: error: 'struct _stat64' has no member named
-'st_blocks'
-> >    805 |         client->st_blocks =3D st.st_blocks;
-> >        |                               ^
-> > ../block/nfs.c: In function 'nfs_get_allocated_file_size':
-> > ../block/nfs.c:752:1: error: control reaches end of non-void function
-[-Werror=3Dreturn-type]
-> >    752 | }
-> >        | ^
-> >
-> > On msys2/mingw, there is no st_blocks in struct _stat64 yet, we disable
-the usage of it
-> > on msys2/mingw, and create a typedef long long blkcnt_t; for further
-implementation
-> >
-> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > ---
-> >   block/nfs.c | 15 +++++++++++++++
-> >   1 file changed, 15 insertions(+)
-> >
-> > diff --git a/block/nfs.c b/block/nfs.c
-> > index f86e660374..cf8795fb49 100644
-> > --- a/block/nfs.c
-> > +++ b/block/nfs.c
->
-> [...]
->
-> > @@ -51,6 +53,10 @@
-> >   #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
-> >   #define QEMU_NFS_MAX_DEBUG_LEVEL 2
-> >
-> > +#if defined(_WIN32)
-> > +typedef long long blkcnt_t;
->
-> This makes me uneasy.  Is there a guarantee that this type will never be
-> defined in a mingw environment (which would then result in a new compile
-> error)?
-That's be sure, mingw is compat with msvcrt.dll, so  blkcnt_t  are always
-not defined.
+> On 8/20/20 3:45 PM, C=C3=A9dric Le Goater wrote:
+> > The vCPU IPIs are now allocated in kvmppc_xive_cpu_connect() when the
+> > vCPU connects to the KVM device and not when all the sources are reset
+> > in kvmppc_xive_source_reset()
+>=20
+> This patch is introducing a regression when vsmt is in used.
+>=20
 
->
-> Can=E2=80=99t we just give NFSClient.st_blocks a different type, i.e. uin=
-t64_t?
->
-> Apart from that, looks good to me.
->
+Well, it isn't exactly when vsmt is used, it is when vsmt is set
+to a different value than the one which is passed to -smp threads,
+otherwise you always get consecutive vcpu ids.
 
+>   https://bugs.launchpad.net/qemu/+bug/1900241
+>=20
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+In this report we have threads=3D1, so depending on vsmt this gives
+the following vcpu ids:
 
---00000000000066213305b35a73a8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+-M vsmt=3D1 -smp 8,cores=3D8,threads=3D1
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D0 vcpu_id=3D0
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D1 vcpu_id=3D1
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D2 vcpu_id=3D2
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D3 vcpu_id=3D3
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D4 vcpu_id=3D4
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D5 vcpu_id=3D5
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D6 vcpu_id=3D6
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D7 vcpu_id=3D7
 
-<div dir=3D"ltr"><br><br>On Thu, Nov 5, 2020 at 7:29 PM Max Reitz &lt;<a hr=
-ef=3D"mailto:mreitz@redhat.com">mreitz@redhat.com</a>&gt; wrote:<br>&gt;<br=
->&gt; On 13.10.20 02:15, Yonggang Luo wrote:<br>&gt; &gt; These compiling e=
-rrors are fixed:<br>&gt; &gt; ../block/nfs.c:27:10: fatal error: poll.h: No=
- such file or directory<br>&gt; &gt; =C2=A0 =C2=A0 27 | #include &lt;poll.h=
-&gt;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0^~~~~~~~<br>&gt; &gt; compilation terminated.<br>&gt; &gt;<br>&gt; &g=
-t; ../block/nfs.c:63:5: error: unknown type name &#39;blkcnt_t&#39;<br>&gt;=
- &gt; =C2=A0 =C2=A0 63 | =C2=A0 =C2=A0 blkcnt_t st_blocks;<br>&gt; &gt; =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 ^~~~~~~~<br>&gt; &gt; ../block/nfs.=
-c: In function &#39;nfs_client_open&#39;:<br>&gt; &gt; ../block/nfs.c:550:2=
-7: error: &#39;struct _stat64&#39; has no member named &#39;st_blocks&#39;<=
-br>&gt; &gt; =C2=A0 =C2=A0550 | =C2=A0 =C2=A0 client-&gt;st_blocks =3D st.s=
-t_blocks;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^<br>=
-&gt; &gt; ../block/nfs.c: In function &#39;nfs_get_allocated_file_size&#39;=
-:<br>&gt; &gt; ../block/nfs.c:751:41: error: &#39;struct _stat64&#39; has n=
-o member named &#39;st_blocks&#39;<br>&gt; &gt; =C2=A0 =C2=A0751 | =C2=A0 =
-=C2=A0 return (task.ret &lt; 0 ? task.ret : st.st_blocks * 512);<br>&gt; &g=
-t; =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 ^<br>&gt; &gt; ../block/nfs.c: In function &#39;nf=
-s_reopen_prepare&#39;:<br>&gt; &gt; ../block/nfs.c:805:31: error: &#39;stru=
-ct _stat64&#39; has no member named &#39;st_blocks&#39;<br>&gt; &gt; =C2=A0=
- =C2=A0805 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 client-&gt;st_blocks =3D st.st_blo=
-cks;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 ^<br>&gt; &gt; ../block/nfs.c: In function &#39;nfs_get_allocated_file_=
-size&#39;:<br>&gt; &gt; ../block/nfs.c:752:1: error: control reaches end of=
- non-void function [-Werror=3Dreturn-type]<br>&gt; &gt; =C2=A0 =C2=A0752 | =
-}<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0| ^<br>&gt; &gt;<br>&gt; &gt; On =
-msys2/mingw, there is no st_blocks in struct _stat64 yet, we disable the us=
-age of it<br>&gt; &gt; on msys2/mingw, and create a typedef long long blkcn=
-t_t; for further implementation<br>&gt; &gt;<br>&gt; &gt; Signed-off-by: Yo=
-nggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com">luoyonggang@gmail.c=
-om</a>&gt;<br>&gt; &gt; ---<br>&gt; &gt; =C2=A0 block/nfs.c | 15 ++++++++++=
-+++++<br>&gt; &gt; =C2=A0 1 file changed, 15 insertions(+)<br>&gt; &gt;<br>=
-&gt; &gt; diff --git a/block/nfs.c b/block/nfs.c<br>&gt; &gt; index f86e660=
-374..cf8795fb49 100644<br>&gt; &gt; --- a/block/nfs.c<br>&gt; &gt; +++ b/bl=
-ock/nfs.c<br>&gt;<br>&gt; [...]<br>&gt;<br>&gt; &gt; @@ -51,6 +53,10 @@<br>=
-&gt; &gt; =C2=A0 #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE=
-)<br>&gt; &gt; =C2=A0 #define QEMU_NFS_MAX_DEBUG_LEVEL 2<br>&gt; &gt; =C2=
-=A0 <br>&gt; &gt; +#if defined(_WIN32)<br>&gt; &gt; +typedef long long blkc=
-nt_t;<br>&gt;<br>&gt; This makes me uneasy.=C2=A0 Is there a guarantee that=
- this type will never be<br>&gt; defined in a mingw environment (which woul=
-d then result in a new compile<br>&gt; error)?<div> That&#39;s be sure, min=
-gw is compat with msvcrt.dll, so=C2=A0
+-M vsmt=3D2 -smp 8,cores=3D8,threads=3D1
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D0 vcpu_id=3D0
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D1 vcpu_id=3D2
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D2 vcpu_id=3D4
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D3 vcpu_id=3D6
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D4 vcpu_id=3D8
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D5 vcpu_id=3D10
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D6 vcpu_id=3D12
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D7 vcpu_id=3D14
 
-blkcnt_t=C2=A0 are always not defined.</div><div><br>&gt;<br>&gt; Can=E2=80=
-=99t we just give NFSClient.st_blocks a different type, i.e. uint64_t?<div>=
-&gt;<br>&gt; Apart from that, looks good to me.<br>&gt;<br><br><br>--<br>=
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=
-=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo<=
-/div></div></div>
+-M vsmt=3D4 -smp 8,cores=3D8,threads=3D1=20
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D0 vcpu_id=3D0
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D1 vcpu_id=3D4
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D2 vcpu_id=3D8
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D3 vcpu_id=3D12
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D4 vcpu_id=3D16
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D5 vcpu_id=3D20
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D6 vcpu_id=3D24
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D7 vcpu_id=3D28
 
---00000000000066213305b35a73a8--
+-M vsmt=3D8 -smp 8,cores=3D8,threads=3D1=20
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D0 vcpu_id=3D0
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D1 vcpu_id=3D8
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D2 vcpu_id=3D16
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D3 vcpu_id=3D24
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D4 vcpu_id=3D32
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D5 vcpu_id=3D40
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D6 vcpu_id=3D48
+kvmppc_xive_reset_ipi_on_cpu: cpu_index=3D7 vcpu_id=3D56
+
+> when the OS boots, H_INT_SET_SOURCE_CONFIG fails with EINVAL, which=20
+> should mean that the IPI is not created at the host/KVM level.
+>=20
+
+[...]
+
+> > +static int kvmppc_xive_reset_ipi(SpaprXive *xive, CPUState *cs, Error =
+**errp)
+> > +{
+> > +    unsigned long ipi =3D kvm_arch_vcpu_id(cs);
+>=20
+> ( I am wondering if this is the correct id to use ? )
+>=20
+
+Setting the ipi to the vcpu id seems to assume that the vcpu ids are
+consecutive, which is definitely not the case when vsmt !=3D threads
+as explained above.
+
+Passing cs->cpu_index would provide consecutive ids but I'm not
+sure this is a correct fix. I gave a try : all the vCPUs get
+online in the guest as expected but something goes wrong when
+terminating QEMU:
+
+[ 5557.599881] WARNING: CPU: 40 PID: 59101 at arch/powerpc/kvm/book3s_xive_=
+native.c:259 xive_native_esb_fault+0xe4/0x240 [kvm]
+[ 5557.599897] Modules linked in: xt_CHECKSUM ipt_MASQUERADE xt_conntrack i=
+pt_REJECT nf_reject_ipv4 nft_compat nft_counter nft_chain_nat nf_nat nf_con=
+ntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink tun bridge stp llc=
+ nfsv3 nfs_acl rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd gra=
+ce fscache kvm_hv kvm i2c_dev sunrpc ext4 mbcache jbd2 xts vmx_crypto ofpar=
+t ipmi_powernv ipmi_devintf powernv_flash ipmi_msghandler mtd ibmpowernv op=
+al_prd at24 uio_pdrv_genirq uio ip_tables xfs libcrc32c sd_mod sg ast i2c_a=
+lgo_bit drm_vram_helper drm_ttm_helper ttm drm_kms_helper syscopyarea sysfi=
+llrect sysimgblt fb_sys_fops drm ahci libahci tg3 libata drm_panel_orientat=
+ion_quirks dm_mirror dm_region_hash dm_log dm_mod
+[ 5557.600010] CPU: 40 PID: 59101 Comm: qemu-system-ppc Kdump: loaded Taint=
+ed: G        W        --------- -  - 4.18.0-240.el8.ppc64le #1
+[ 5557.600041] NIP:  c00800000e949fac LR: c00000000044b164 CTR: c00800000e9=
+49ec8
+[ 5557.600060] REGS: c000001f69617840 TRAP: 0700   Tainted: G        W     =
+   --------- -  -  (4.18.0-240.el8.ppc64le)
+[ 5557.600089] MSR:  9000000000029033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 440442=
+82  XER: 00000000
+[ 5557.600110] CFAR: c00000000044b160 IRQMASK: 0=20
+[ 5557.600110] GPR00: c00000000044b164 c000001f69617ac0 c00800000e96e000 c0=
+00001f69617c10=20
+[ 5557.600110] GPR04: 05faa2b21e000080 0000000000000000 0000000000000005 ff=
+ffffffffffffff=20
+[ 5557.600110] GPR08: 0000000000000000 0000000000000001 0000000000000000 00=
+00000000000001=20
+[ 5557.600110] GPR12: c00800000e949ec8 c000001ffffd3400 0000000000000000 00=
+00000000000000=20
+[ 5557.600110] GPR16: 0000000000000000 0000000000000000 0000000000000000 00=
+00000000000000=20
+[ 5557.600110] GPR20: 0000000000000000 0000000000000000 c000001f5c065160 c0=
+00000001c76f90=20
+[ 5557.600110] GPR24: c000001f06f20000 c000001f5c065100 0000000000000008 c0=
+00001f0eb98c78=20
+[ 5557.600110] GPR28: c000001dcab40000 c000001dcab403d8 c000001f69617c10 00=
+00000000000011=20
+[ 5557.600255] NIP [c00800000e949fac] xive_native_esb_fault+0xe4/0x240 [kvm]
+[ 5557.600274] LR [c00000000044b164] __do_fault+0x64/0x220
+[ 5557.600298] Call Trace:
+[ 5557.600302] [c000001f69617ac0] [0000000137a5dc20] 0x137a5dc20 (unreliabl=
+e)
+[ 5557.600320] [c000001f69617b50] [c00000000044b164] __do_fault+0x64/0x220
+[ 5557.600337] [c000001f69617b90] [c000000000453838] do_fault+0x218/0x930
+[ 5557.600355] [c000001f69617bf0] [c000000000456f50] __handle_mm_fault+0x35=
+0/0xdf0
+[ 5557.600373] [c000001f69617cd0] [c000000000457b1c] handle_mm_fault+0x12c/=
+0x310
+[ 5557.600393] [c000001f69617d10] [c00000000007ef44] __do_page_fault+0x264/=
+0xbb0
+[ 5557.600411] [c000001f69617df0] [c00000000007f8c8] do_page_fault+0x38/0xd0
+[ 5557.600429] [c000001f69617e30] [c00000000000a714] handle_page_fault+0x18=
+/0x38
+[ 5557.600438] Instruction dump:
+[ 5557.600444] 40c2fff0 7c2004ac 2fa90000 409e0118 73e90001 41820080 e8bd00=
+08 7c2004ac=20
+[ 5557.600455] 7ca90074 39400000 915c0000 7929d182 <0b090000> 2fa50000 419e=
+0080 e89e0018=20
+[ 5557.600485] ---[ end trace 66c6ff034c53f64f ]---
+[ 5557.600509] xive-kvm: xive_native_esb_fault: accessing invalid ESB page =
+for source 8 !
+
+So it looks like something needs to be done in the XIVE KVM device anyway.
+
+[...]
+
+> >  static int kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
+> >  {
+> >      SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
+> >      int i;
+> > =20
+> > -    for (i =3D 0; i < xsrc->nr_irqs; i++) {
+> > +    /*
+> > +     * Skip the vCPU IPIs. These are created/reset when the vCPUs are
+> > +     * connected in kvmppc_xive_cpu_connect()
+> > +     */
+> > +    for (i =3D SPAPR_XIRQ_BASE; i < xsrc->nr_irqs; i++) {
+>=20
+> This change skips the range [ 0x0 ... 0x1000 ] and relies on the presenter
+> to create the vCPU IPIs at the KVM level. But spapr_irq_init() could have=
+=20
+> claimed more in :=20
+>=20
+>         /* Enable the CPU IPIs */
+>         for (i =3D 0; i < nr_servers; ++i) {
+>             SpaprInterruptControllerClass *sicc
+>                 =3D SPAPR_INTC_GET_CLASS(spapr->xive);
+>=20
+>             if (sicc->claim_irq(SPAPR_INTC(spapr->xive), SPAPR_IRQ_IPI + =
+i,
+>                                 false, errp) < 0) {
+>                 return;
+>             }
+>         }
+>=20
+
+This doesn't reach the XIVE KVM device when running in dual mode because
+it doesn't exist yet.
+
+> I think this is what is happening with vsmt. However, I don't know how to
+> fix it :/
+>=20
+> Thanks,
+>=20
+> C.
+>=20
 
