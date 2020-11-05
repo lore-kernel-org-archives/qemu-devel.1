@@ -2,85 +2,96 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 332D1C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 20:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3028FC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 20:39:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E76F20729
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 20:09:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65EE520724
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 20:39:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PRWsXhWl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E76F20729
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KBE5qr1U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65EE520724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kalZp-0000iA-9e
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 15:09:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38458)
+	id 1kam28-0000a0-DC
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 15:39:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <waynli329@gmail.com>)
- id 1kalYz-0000FR-04
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 15:08:53 -0500
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:46992)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kam0j-0008Ml-Jx
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 15:37:33 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55779)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <waynli329@gmail.com>)
- id 1kalYx-00055G-7x
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 15:08:52 -0500
-Received: by mail-io1-xd42.google.com with SMTP id s24so3059059ioj.13
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 12:08:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Uav1qfF4vwn4Mc7nA+c6c/bniBOR0INDtwn8rFKB9Qg=;
- b=PRWsXhWlI/ltuH/yDZn2y6L/sZmYbPE/EDTarJUhGkVaJQC1fdrSacL3em9scRGJgG
- OqDR+9WuUASF8V5rvIZm4NdxZ9/bYPDCnrUcWM8JyDXV8VCm/SQkxrMfZjjHyEXAaW7G
- m9LG7WbB9gY+kiIa695ks4rBic57sJyNQCycXR/r42j5fxkd7MmRkkxYH5Q1kWZr6huC
- 7iFAlF/i5sxqnUB5xlyjTZasDY3nGb6TTE07M6hC6c4ppSXC9tH3FCQ09vF0uPPNsxP8
- l2/EoncLw4yZ36AWeXCTCQSQE1Oop+K9PZs8rDz1zjXdz4STXjwn8wIV25CMsIX9aE1j
- PJDQ==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kam0e-0008E1-A9
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 15:37:31 -0500
+Received: by mail-wm1-x343.google.com with SMTP id c9so2875638wml.5
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 12:37:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=xCIhabTLUBg9b2F7/G8U0+TS+Nq9BOCBDpSUH7XtqwY=;
+ b=KBE5qr1UhhrswhyHfQ6vtOYVXFs1KGKOPX25nan6brCgJYgxzjkW09oZVJrvpctyjn
+ Drrb2eqxjlXIyDP/kRl3HjnU/U1h4EP03hpmRVgtq1/xqonlGDj94/VB/W1adVQgYrIn
+ 9uTcKOmXip6V1J8LvNRa5z+XGDtZrGR92qz6VRlTM/QbmEqSRUfW5sD6TGlw5rKJrUse
+ sDur0pTP5GofhWSwemHt+b55vgirR4C7N5ix9zugTm13U0FyfTS2/fLaopk1u2kiT3gD
+ Hu6TrNcTl8P3aPaKfJU3V5+xD4E132O3LgPS8DyoKbU65a26byTSHih1ZJd2ebnHnVze
+ IEdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Uav1qfF4vwn4Mc7nA+c6c/bniBOR0INDtwn8rFKB9Qg=;
- b=P775zneWDxqiqOyTS3Ah928Gc/cnO33Ab0HozgIkzwzEJJEI+6RhZgaxs1cJ/UL4XG
- Y6naRxgoOvUnegYzNqCit8IGvGNzmJuBYJ0EasC1podzZ/GjYlsVurpr0hi22+m43AZU
- 6GunzR6p3KxBfu1kuVjaWK2FDX5zkPZPQ2hK3IcMD6A7/ifTE8Plc/QIjdGl2EqJzavD
- UQ52NjHp3JW3LfFtsSFQu3sGrRxFMZ3grhOydjpqwSc5fJLumDVjBN4DQQiKU1kWXQPy
- 8S8+lo1KchFiSJPGfUwYgIpo00jumEZxVcgAG9yBwZ35TeJPYbcUyP9gd7CpTVoyq8Mg
- ekyA==
-X-Gm-Message-State: AOAM533OztFRKk8DlBWD4ObPok1eDycshYvx3jH5czCN5wOPYb5S8TUy
- zYzUTzyakNM7U80eYDh1sHj5ZFFzB7FjlPetdrs=
-X-Google-Smtp-Source: ABdhPJxsUY9BM4xElhMxIDm+/wLO7G+6IlBHmdg+fx5l3k/D4I7pcWXlZFVA9n8ojinUjpVFasg1SaB/RapKTh+Yfl4=
-X-Received: by 2002:a02:ce83:: with SMTP id y3mr3572807jaq.31.1604606928171;
- Thu, 05 Nov 2020 12:08:48 -0800 (PST)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=xCIhabTLUBg9b2F7/G8U0+TS+Nq9BOCBDpSUH7XtqwY=;
+ b=d3WSbPeqI9uMLnOTlbk2WRFp8osYxcfE5A2EgEhyj17MCv/sdMJZ14gE0zzUZCkoGD
+ B55D0vkVjj4/Rb8YVrGZmvdrhIDQEyd1vGDcT42lvwcQXaHLJ4QVeYoP93YKLb7WHnE3
+ UU6rSJGnU50eLvPb+Unq3kqDCJ4bB+fyHq++2iz4gtvG5hZScIJgMu4Lagsb562e3Xev
+ kXn4qi3/9h8gpWm8LU5LiHENdVslbc3t29+gRD7RTIAEPY7EGmcBGLbPk1Rv/4lqL6NA
+ tfjT0n7KUmR/KzDqVBVeJperiU/f9sGryZ+qr2Gc+gWcdSejycyRunQuhqV4K3cxzusO
+ YTWw==
+X-Gm-Message-State: AOAM532mfmUpbmg/YkA0WLvFr31ewMG68Oh6x5opFCHCxI2KeOwYgaIo
+ Ic7ZBfh3A0WbHUcTqS7xtnJPmw==
+X-Google-Smtp-Source: ABdhPJyrhdJG5TQk0EnkvwpqiSSIs7D7IQ5Qp0yhcGm9QCg+4/jWTTn3vNTxVwE3NM8zbtmJev2tzg==
+X-Received: by 2002:a1c:c912:: with SMTP id f18mr4679164wmb.150.1604608646741; 
+ Thu, 05 Nov 2020 12:37:26 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x81sm4272751wmg.5.2020.11.05.12.37.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Nov 2020 12:37:25 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C416F1FF7E;
+ Thu,  5 Nov 2020 20:37:24 +0000 (GMT)
+References: <20201105175153.30489-1-alex.bennee@linaro.org>
+ <20201105175153.30489-2-alex.bennee@linaro.org>
+ <ea13af19-9ec7-3d91-e7b8-b4f59aa4cf1d@redhat.com>
+User-agent: mu4e 1.5.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [RFC PATCH 01/15] hw/board: promote fdt from ARM
+ VirtMachineState to MachineState
+In-reply-to: <ea13af19-9ec7-3d91-e7b8-b4f59aa4cf1d@redhat.com>
+Date: Thu, 05 Nov 2020 20:37:24 +0000
+Message-ID: <877dqzbkvv.fsf@linaro.org>
 MIME-Version: 1.0
-References: <CAM2K0npECL3MpdkXH99htxGdTUTyC47PtnGAT4nkazpV6_rUPA@mail.gmail.com>
- <20201105195851.GC3187@work-vm>
-In-Reply-To: <20201105195851.GC3187@work-vm>
-From: Wayne Li <waynli329@gmail.com>
-Date: Thu, 5 Nov 2020 14:08:37 -0600
-Message-ID: <CAM2K0nqaeGjGh++YNoPJ+4_LrnMsgk_B7L-V-gsPGap7=_1GMQ@mail.gmail.com>
-Subject: Re: QEMU RAM allocation function fails
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=waynli329@gmail.com; helo=mail-io1-xd42.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -95,109 +106,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, julien@xen.org,
+ Eduardo Habkost <ehabkost@redhat.com>, masami.hiramatsu@linaro.org,
+ andre.przywara@arm.com, stefano.stabellini@linaro.org, qemu-devel@nongnu.org,
+ takahiro.akashi@linaro.org, "open
+ list:Virt" <qemu-arm@nongnu.org>, stefano.stabellini@xilinx.com,
+ stratos-dev@op-lists.linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The RAM region was just too big.  I made it smaller and the VM didn't
-crash and moved past that point.
 
-On Thu, Nov 5, 2020 at 1:58 PM Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> On 11/5/20 6:51 PM, Alex Benn=C3=A9e wrote:
+>> The use of FDT's is quite common across our various platforms. To
+>> allow the generic loader to tweak it we need to make it available in
+>> the generic state. This creates the field and migrates the initial
+>> user to use the generic field. Other boards will be updated in later
+>> patches.
+>>=20
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Message-Id: <20201021170842.25762-2-alex.bennee@linaro.org>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 >
-> * Wayne Li (waynli329@gmail.com) wrote:
-> > Dear QEMU list members,
-> >
-> > We developed a virtual machine that runs on QEMU.  This virtual
-> > machine is pretty much an emulated P4080 processor with some
-> > peripherals attached.  Initializing one of these peripherals, i.e. the
-> > RAM, seems to be having problems.  I use the function
-> > "memory_region_init_ram" to initialize the RAM and farther down the
-> > call stack I see that the "qemu_ram_alloc" function returns an address
-> > of 0 proving the RAM allocation wasn't successful.  Here is the block
-> > of code in question copied from the file memory.c:
-> >
-> > void memory_region_init_ram_shared_nomigrate(MemoryRegion *mr,
-> >                                              Object *owner,
-> >                                              const char *name,
-> >                                              uint64_t size,
-> >                                              bool share,
-> >                                              Error **errp)
-> > {
-> >     memory_region_init(mr, owner, name, size);
-> >     mr->ram = true;
-> >     mr->terminates = true;
-> >     mr->destructor = memory_region_destructor_ram;
-> >     mr->ram_block = qemu_ram_alloc(size, share, mr, errp);
-> >     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-> > }
-> >
-> > Tracing farther into the "qemu_ram_alloc" function reveals that the
-> > function fails because inside the "qemu_ram_alloc_internal" function
-> > in file exec.c, the function "ram_block_add" fails.  Interestingly, a
-> > local_err object is populated here and the msg field in this object is
-> > populated with the String "cannot set up guest memory 'ram0': Invalid
-> > argument".  Here is the block of code in question copied from the file
-> > exec.c:
+> Two S-o-b better than one!
+
+Hmm I wonder what happened there? I'm sure b4 applied that patches for
+me.
+
 >
-> I'm surprised something didn't print that message out for you - most
-> callers pass something like &error_fatal at the end and it should print
-> it I think.
+>> ---
+>>  include/hw/arm/virt.h |   1 -
+>>  include/hw/boards.h   |   1 +
+>>  hw/arm/virt.c         | 322 ++++++++++++++++++++++--------------------
+>>  3 files changed, 170 insertions(+), 154 deletions(-)
 >
-> >
-> > RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, ram_addr_t max_size,
-> >                                   void (*resized)(const char*,
-> >                                                   uint64_t length,
-> >                                                   void *host),
-> >                                   void *host, bool resizeable, bool share,
-> >                                   MemoryRegion *mr, Error **errp)
-> > {
-> >     RAMBlock *new_block;
-> >     Error *local_err = NULL;
-> >
-> >     size = HOST_PAGE_ALIGN(size);
-> >     max_size = HOST_PAGE_ALIGN(max_size);
-> >     new_block = g_malloc0(sizeof(*new_block));
-> >     new_block->mr = mr;
-> >     new_block->resized = resized;
-> >     new_block->used_length = size;
-> >     new_block->max_length = max_size;
-> >     assert(max_size >= size);
-> >     new_block->fd = -1;
-> >     new_block->page_size = getpagesize();
-> >     new_block->host = host;
-> >     if (host) {
-> >         new_block->flags |= RAM_PREALLOC;
-> >     }
-> >     if (resizeable) {
-> >         new_block->flags |= RAM_RESIZEABLE;
-> >     }
-> >     ram_block_add(new_block, &local_err, share);
-> >     if (local_err) {
-> >         g_free(new_block);
-> >         error_propagate(errp, local_err);
-> >         return NULL;
-> >     }
-> >     return new_block;
-> > }
-> >
-> > Anyway, our VM runs fine until it tries to access the RAM region so
-> > this is a pretty critical problem for us to solve.  Does anyone know
-> > much about these QEMU functions?  What could be causing these RAM
-> > initialzation functions to fail in this way?
->
-> You're going the right way - keep following it; that 'cannot set up
-> guest memory' string is only in one place; softmmu/physmem.c - so
-> the phys_mem_alloc must have failed.  That suggests either your
-> max_length or your align requirements are wrong; but keep following
-> it along.
->
-> Dave
->
-> > -Thanks, Wayne Li
-> >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+
+--=20
+Alex Benn=C3=A9e
 
