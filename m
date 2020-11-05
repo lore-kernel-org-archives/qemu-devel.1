@@ -2,76 +2,79 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6396CC4742C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBE3C4742C
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:51:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E1A020756
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:47:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B10E3206A1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:51:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ItsoJKzB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E1A020756
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Njglza2J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B10E3206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaoyr-0008Ds-9f
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 18:47:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60714)
+	id 1kap2d-0000wA-JB
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 18:51:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kaoxf-0007fI-JW
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:46:38 -0500
-Received: from mail-ej1-x62e.google.com ([2a00:1450:4864:20::62e]:46875)
+ id 1kap1l-0000VQ-Cx
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:50:49 -0500
+Received: from mail-ed1-x52b.google.com ([2a00:1450:4864:20::52b]:33307)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kaoxN-0005yJ-Jv
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:46:29 -0500
-Received: by mail-ej1-x62e.google.com with SMTP id w13so5119009eju.13
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 15:46:16 -0800 (PST)
+ id 1kap1j-0006N7-Mg
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:50:49 -0500
+Received: by mail-ed1-x52b.google.com with SMTP id v4so3424967edi.0
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 15:50:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tiC+tztL0+pKnyq6+BMpYKlDBghPae5NUlBdt/xJ3dA=;
- b=ItsoJKzBR+GZ4OC4d3qIlAm9yRMh3Wajhpd5LM6DcSN2FyPsFxmUSkO8IGmkU0aav+
- ZIVpgcGrJiveyrs6Y4/eqHIneTNQ7U06yW3Obe17scPe5amh7KSl5U479sgr0RvUbgp/
- LykwzZKhNjV8mTzb4nxHK3OGPd+TBzILJAhRXV/tz0/08Q7KTGhDFC26lcllszRCkEVm
- OoTuX+zIBukblvnC9BXX2pqbvbP/xlUQ7lgVCYS5axv/y96HpNnOpg5m1FNVEIVQ6+W1
- Q33r7ph1XZv6mMkk3BLnSI1GQAeMTzNus3ruGW3ZCSb86KRoKsO5Hm7WRdtpUQG84nIs
- BZGQ==
+ :cc:content-transfer-encoding;
+ bh=cOB0e/40E6PoIaQbb5Bd5TbOYgiNXc0Lru8syMdSSI4=;
+ b=Njglza2Jwut3YCxiX8j/xnbCXk94PeWGpIBAiNQm6cfPdMlcsXXpb2GNvDkTyF/gMq
+ tkjBdmuIixgBeMtqDmpeANSUMn1V8bjdYh6pC47vLt3uDjL35iAsyswUhHIt1s455xzr
+ PR+6vJCkTUvhB1uQV8icbnaDpeqNPa55VOBOk0UigevSks6qCu9XlsVKaxajmPHuL9ON
+ 5ML6aq4Vhue4aI7iXkpbfHRcTlp3+b9ueiIAQjkqSfmuR4zKV/M7FFCs/Gc0uhLQAUqv
+ t6YyQz5XqpC9FvUek6FEI9UBwWSsRxrsRMrOyYNwMijbNN9EW4xlWmYKES4qAw4lVp8W
+ OEVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tiC+tztL0+pKnyq6+BMpYKlDBghPae5NUlBdt/xJ3dA=;
- b=CfoovDKSebA7jKjWXNwrSJYvV4kini2CExKk01y0fjoV0k332xOoncdFxNm3RpszAw
- snnyN4arIqT1c1UgxGyzZBtl5OOJN3fR2BMXJIcZkSE3TxTdQrddWQOnJWsmS1gTkPuK
- LFkQ6Aj6TRzsPinWRDmE+It687MliiU3ksncFqDbHIdtBqPeWKDdAbwxI8Tipo5wa04i
- Cdb2TjR3iDPTHaPYUm9NSLcVxTk5ImNV95Gzeyzv5pF174qnrEb0cFGH8MNHFLsvPz6S
- Oglku8X2tWJPlyDRYH2jur3miKLT1GxCqRGTeQcW2xu6LDpA9Tj2E4ajR6n04lzz9MVY
- tYPw==
-X-Gm-Message-State: AOAM531FTD/wxT7q6DJi0h8sZMLn/6TuENfz7aN3rJaxZVvhhQTB8kMf
- fpEvcOhjKCSGG8nhC8MMCHmbIfqdtbQfhUkgQ2it4Q==
-X-Google-Smtp-Source: ABdhPJyEXYjlbk8cZUcCqM8PKK5WiNq9yhMJD+Mpx7WwHnsdmM/n4uk0d5XyKXuXD/ygcUKWRxZSC2/auzhHqH3XjJ0=
-X-Received: by 2002:a17:907:9e3:: with SMTP id ce3mr4927397ejc.4.1604619975127; 
- Thu, 05 Nov 2020 15:46:15 -0800 (PST)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=cOB0e/40E6PoIaQbb5Bd5TbOYgiNXc0Lru8syMdSSI4=;
+ b=bkQPDXM6ttLUrTTR1ELlUdtBQYSPkLtJ1/K2ZemLRGTfVnq+oAfMrHi7XlN8FBInIL
+ 0Mito2IdgnomZIhhkVKoXeI89c7KXQ1lptlyekO1ZX3l6a4vSeYKr4dwmBqWIWRPTAZO
+ mcKdcCIIb0xYSm4FtetreaACDVZUnMuPXUHWrwdYZPQf//cn1FO2e8zPsXSEgFVPtkmn
+ tBV2j+afhBa0v1On+/2y/x0EJkKhI3L/NQoZzTyyhdF+/buy2G5LhaWObF/P5C3tyIyq
+ QzlHYcQqcR1nJnt9jf1usFr0H3mbtQOhO///yGEbgeGP1gGO+jl2n2kBsWzz1Mspuqjj
+ YGpw==
+X-Gm-Message-State: AOAM5327SrJ8qM9AGbP/hJ9PSAoEncVLAOm8fXBWinzaHN02i77SPd8U
+ QtibEBsl6t6nWGggz99ZiXyeWDGpEOFXmqU7SkOYGQ==
+X-Google-Smtp-Source: ABdhPJxQssuWLqAIJPSuzWAb7UMlS6iGmUf5XKvCf4Zf11liPzRcZJsNKo0xxSe1kD3MvMV3sg85yaHxDXK+zPXydYg=
+X-Received: by 2002:aa7:df82:: with SMTP id b2mr5105509edy.251.1604620246095; 
+ Thu, 05 Nov 2020 15:50:46 -0800 (PST)
 MIME-Version: 1.0
-References: <20201105034919.393653-1-david@gibson.dropbear.id.au>
-In-Reply-To: <20201105034919.393653-1-david@gibson.dropbear.id.au>
+References: <20201103024343.894221-1-michael.roth@amd.com>
+ <20201103024343.894221-7-michael.roth@amd.com>
+In-Reply-To: <20201103024343.894221-7-michael.roth@amd.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Nov 2020 23:46:04 +0000
-Message-ID: <CAFEAcA9AhEoYL+NApMDpH7dWHKBoRs98B0z20mCb6-_FCYuFRQ@mail.gmail.com>
-Subject: Re: [PULL 0/3] ppc-for-5.2 patch queue 2020-11-05
-To: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 5 Nov 2020 23:50:35 +0000
+Message-ID: <CAFEAcA8U=B1gg-mqFOPtLdbu3KdbgSkrirRAvCrmX4LRdXejZw@mail.gmail.com>
+Subject: Re: [PULL v3 06/12] qga: add implementation of guest-get-disks for
+ Linux
+To: Michael Roth <michael.roth@amd.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::62e;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62e.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::52b;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,45 +96,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Greg Kurz <groug@kaod.org>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Nov 2020 at 03:49, David Gibson <david@gibson.dropbear.id.au> wrote:
+On Tue, 3 Nov 2020 at 02:45, Michael Roth <michael.roth@amd.com> wrote:
 >
-> The following changes since commit 3c8c36c9087da957f580a9bb5ebf7814a753d1c6:
+> From: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 >
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20201104-pull-request' into staging (2020-11-04 16:52:17 +0000)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/dgibson/qemu.git tags/ppc-for-5.2-20201105
->
-> for you to fetch changes up to f29b959dc6871c9d8df781d1bedcfaebc76d5565:
->
->   spapr: Convert hpt_prepare_thread() to use qemu_try_memalign() (2020-11-05 12:18:48 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue for 2020-11-05
->
-> A small PR this time, one bugfix, one removal of minor dead code, one
-> warning suppression.
->
-> ----------------------------------------------------------------
-> Chen Qun (1):
->       target/ppc/excp_helper: Add a fallthrough for fix compiler warning
->
-> Greg Kurz (2):
->       spapr: Drop dead code in spapr_reallocate_hpt()
->       spapr: Convert hpt_prepare_thread() to use qemu_try_memalign()
+> The command lists all disks (real and virtual) as well as disk
+> partitions. For each disk the list of dependent disks is also listed and
+> /dev path is used as a handle so it can be matched with "name" field of
+> other returned disk entries. For disk partitions the "dependents" list
+> is populated with the the parent device for easier tracking of
+> hierarchy.
+
+Hi; Coverity points out a resource leak in this function
+(CID 1436130):
 
 
-Applied, thanks.
+> +GuestDiskInfoList *qmp_guest_get_disks(Error **errp)
+> +{
+> +    GuestDiskInfoList *item, *ret =3D NULL;
+> +    GuestDiskInfo *disk;
+> +    DIR *dp =3D NULL;
+> +    struct dirent *de =3D NULL;
+> +
+> +    g_debug("listing /sys/block directory");
+> +    dp =3D opendir("/sys/block");
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
+Here we opendir()...
 
+> +    if (dp =3D=3D NULL) {
+> +        error_setg_errno(errp, errno, "Can't open directory \"/sys/block=
+\"");
+> +        return NULL;
+> +    }
+> +    while ((de =3D readdir(dp)) !=3D NULL) {
+            [stuff]
+> +    }
+> +    return ret;
+
+...but we forget to closedir() it again.
+
+> +}
+
+thanks
 -- PMM
 
