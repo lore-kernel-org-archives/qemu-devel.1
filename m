@@ -2,99 +2,80 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CF2C4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F0CC4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:42:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B74A420782
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:40:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/o79OJK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B74A420782
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B4A87206FA
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:42:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4A87206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kahMq-0006rR-46
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:40:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60282)
+	id 1kahOw-00006v-Hz
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:42:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kahME-0006QJ-Sj
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:39:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33960)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kahMC-0003iL-TK
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:39:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604590764;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3fLCt09UHL5vonyTfq6valUwcAl6RlQninwjo9OsfrE=;
- b=Y/o79OJKkggom6QtlPQ6AsWN0gVcYBooZ3CyF6qtFgkqBICKBA6u56VPUIP5Tk9d0AbfFI
- 2n6Doz/PmwkrRl0jWol3TmbaS9MesqrZvbkjeXTB63A3KaRHK46Ogr5N3iAfLiflZAH6wz
- jXWrqkIg7rCuGsRcZNn4J981t92VOnA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-Wm4mvU0YOvGQD5z0kAsJUQ-1; Thu, 05 Nov 2020 10:39:21 -0500
-X-MC-Unique: Wm4mvU0YOvGQD5z0kAsJUQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1D62101962C;
- Thu,  5 Nov 2020 15:39:19 +0000 (UTC)
-Received: from [10.3.114.103] (ovpn-114-103.phx2.redhat.com [10.3.114.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E24D860C17;
- Thu,  5 Nov 2020 15:39:18 +0000 (UTC)
-Subject: Re: [PATCH] block: Fix integer promotion error in bdrv_getlength()
-To: Max Reitz <mreitz@redhat.com>, Tuguoyi <tu.guoyi@h3c.com>,
- Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-References: <c0d398ea9d7141bcbb9b3746f97852b4@h3c.com>
- <bb1cfa18-badd-75af-587e-bd476544ddd2@redhat.com>
- <703e17a1-544f-4e5e-a431-6e20d4a04974@redhat.com>
- <f5218bd4-72f3-cf55-af2e-08e609413acf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <92c8524f-a43e-0f48-3bfc-6433968e18b1@redhat.com>
-Date: Thu, 5 Nov 2020 09:39:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kahO8-0007uT-K7
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:41:26 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33678)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kahO2-0004Uy-Ky
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:41:24 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kahNy-0004Xp-QT
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 15:41:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4B0822E813C
+ for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 15:41:14 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <f5218bd4-72f3-cf55-af2e-08e609413acf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Nov 2020 15:27:02 -0000
+From: Stefan Hajnoczi <1902975@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jwatt stefanha
+X-Launchpad-Bug-Reporter: Jonathan Watt (jwatt)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <160454282468.18214.12996715197345700286.malonedeb@wampee.canonical.com>
+Message-Id: <160459002296.28553.1066123514177529831.malone@chaenomeles.canonical.com>
+Subject: [Bug 1902975] Re: qemu.org/docs/ contains some old docs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
+X-Launchpad-Hash: e97f711f3530e9aa04c1a78a1eb5af62a4738c1d
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 10:41:15
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,28 +84,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chengchiwen <chengchiwen@h3c.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Wangyong <wang.yongD@h3c.com>
+Reply-To: Bug 1902975 <1902975@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/5/20 7:26 AM, Max Reitz wrote:
+Thanks the stale files have been removed.
 
->> I actually preferred the v1 solution, rather than this v2, as it avoided
->> a cast.
-> 
-> I don’t, because it doesn’t make the ?: go away, so I prefer the less
-> invasive version.
-> 
-> If you want to send your suggested version (that drops both ?:), I’m
-> happy to take that instead.
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-Will do.
+-- =
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1902975
 
+Title:
+  qemu.org/docs/ contains some old docs
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  When I searched for QEMU docs in a search engine I ended up on this
+  page:
+
+  https://www.qemu.org/docs/master/qemu-doc.html
+
+  That is 4.2.50 documentation. It took me some time to realize that
+  there is actually 5.1.50 documentation under
+  https://www.qemu.org/docs/master/ and that the 4.2 documentation is
+  out of date.
+
+  Presumably this file is cruft that was left over from a previous build
+  of the website and something like a `make clean` is required?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1902975/+subscriptions
 
