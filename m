@@ -5,84 +5,84 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B2F6C4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 18:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AA37C55178
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 18:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D47A32087D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 18:04:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D24F2087D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 18:06:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g8P4hbsq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D47A32087D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y8VYfJKI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D24F2087D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kajd1-0008Cl-Am
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 13:04:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34672)
+	id 1kajeH-0000w9-3a
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 13:06:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kajQs-0004Lo-RA
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 12:52:22 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37350)
+ id 1kajR3-0004Xt-Uv
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 12:52:34 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41101)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kajQq-0004sD-Vw
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 12:52:22 -0500
-Received: by mail-wr1-x441.google.com with SMTP id w1so2797783wrm.4
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 09:52:20 -0800 (PST)
+ id 1kajR2-0004t8-8q
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 12:52:33 -0500
+Received: by mail-wr1-x444.google.com with SMTP id x12so2780636wrm.8
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 09:52:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JUuYXLxqbj/H11iBsBJrgBGgIp9/33Tos9HDbHcOfOU=;
- b=g8P4hbsq5PR4eAB+DvQTRsfkEr4tBEie9gVWObcgehdg2yM0l3T593yMa+2qa5JirD
- lIY+2XM7Uol+Mxus6oNXCWMPlw7xSgGUmts5qZGdvQnyAJk0XU9zCvS01VAsmLr9p49K
- 8qyP5uvdVfO+AbFb/CosYdv1jvmhGRLs+wNxlji0AgL8rvrtgxs6TnEEgBRIJtIuL1C0
- EUJV9PQlP4iJ136z6x5DsocG7gpdshLYBrsMFMIKAlhdl0JDuPp1a+QwpYo7bgKEoHD3
- 9piheMQRo0PCa2Ynprw4KAGJzuZgVybMebhD32FSQUmDJZSAndp5pWnB83y1+qqn6rRX
- RSmA==
+ bh=S2GIs58/W24s0fp90d9pmy8FUWIlpMCzYhDdwe9s8Gc=;
+ b=y8VYfJKIVgovo9dlAt6OJzV2fWsBxN2k3Qtrdb4hD1XgOw6zMwhgc41Dig59hy8yaH
+ O1kh16ITKRkR907lC8Js4Ia8jgKPNg5sUs0krQPcEwDAT3Z2C5HTiuetC+S36lkiAVZx
+ bofeE7M1HpcodfKTdRNYMmbUyAPkKzHAI6Ed7yK0gieBk6E84RYpJpRJTVzlnKDN04D8
+ qCxKR2hB3CbQkoutSoQqNta1PJIj1EpW8SSRQAaCqvWCSV3wgJ0heclI8x2ItRF6Wbwj
+ 9iR7hjEF4+AEsU0s00PT1p1dLSfHDo0bEiAnjgxIl+uKkXsN91x13BMkXwgi4KWwluWx
+ j0dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=JUuYXLxqbj/H11iBsBJrgBGgIp9/33Tos9HDbHcOfOU=;
- b=VMGzaxXZZBR73p569Z/OtE9X0WUK9x0VSE0lcPEmhk8arr0qk9Xf3rl5ZLQY1lh7az
- hecoRcgoLbtEUld8Ae2lEDP1EjCc69W4rTsFSVIDzPM65+RXBESzCVzsnoeU5P1SHvL/
- H5uzh+dibxDqz7K56xrFuX1qcwOOppDIZmr7qgCd3zyx3rao7wOYH+gQadN2HzQut5mZ
- XOhBjK61QjxXeaRSNuIqpvYNxdRaewRar0WIvsKJ3Wn12Fh+RjwQE2wbuthUBdQSPeyF
- PIhBsvHgQjj+BNavkgknW44kocoJsTr2oTZnGRYP3RZvh655uobbu6ccv5jn/4Fk3bQw
- gI2A==
-X-Gm-Message-State: AOAM531xL5YJUSiQyBCLqtmKXX5TFFOLjgP+BHRhL9/fNcHd8FLVz32b
- WQgmtAD/CftH/xfsB0cNhXSu4w==
-X-Google-Smtp-Source: ABdhPJwHXfld+0PUDho8ID5T7Nhk3axT7fNwmvX3sF2CfB/4JpG/XC46ClFAF1NNuoGZtb2cxqvaUA==
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr4345020wro.393.1604598739653; 
- Thu, 05 Nov 2020 09:52:19 -0800 (PST)
+ bh=S2GIs58/W24s0fp90d9pmy8FUWIlpMCzYhDdwe9s8Gc=;
+ b=P7gR26+FNcJNW+rjszal3V07/aNRGnzTG66LeEPPb2qrLZfNHJsC5CD6sDyu45JKlJ
+ ilsMo6zNwepTk/Dwc/GTK98ciwLmf/aTQP+s8/55ZyP3jVGMZF/kVmyXqkdAEJ+o/0qw
+ TSYAIaR4X+UiMORfTid8/42T/pQ6eszi/p2M6o1MAC4Uy7MScAl8RsO4yPfJxe/cBoie
+ TCm3nlMolXMQGKNmgbq+TH8EoEsskKXKEsnFefCWxkOonDu3zatjEl16om1zr8UkynzH
+ QbdqUxAZOO18UmSvdscsVMZgjeLfCun78JJRcGYXMkc2pOVXEyhJUXg+giX3g5hq3bw5
+ 8sjQ==
+X-Gm-Message-State: AOAM530ElV2N7FAJGOmbENIYB/SLtBlFGG+Tp1xNp59I9bJZT7ngt3X4
+ A3SoW7ZDuuejQHuXr+xNkD7y9A==
+X-Google-Smtp-Source: ABdhPJxUNz66xbbtM4Jjtwf6tt59B2TjgPZjQafK+I+tj512i1f7vkBJ0d6klAGbXLkJQvMTFOkFIg==
+X-Received: by 2002:adf:e443:: with SMTP id t3mr4398348wrm.14.1604598750991;
+ Thu, 05 Nov 2020 09:52:30 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d3sm3965139wrg.16.2020.11.05.09.52.01
+ by smtp.gmail.com with ESMTPSA id e6sm3707860wrs.7.2020.11.05.09.52.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Nov 2020 09:52:08 -0800 (PST)
+ Thu, 05 Nov 2020 09:52:15 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A7A381FF99;
+ by zen.linaroharston (Postfix) with ESMTP id D505B1FF9B;
  Thu,  5 Nov 2020 17:51:54 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 10/15] meson.build: clean-up summary reporting of XEN and
- it's features
-Date: Thu,  5 Nov 2020 17:51:48 +0000
-Message-Id: <20201105175153.30489-11-alex.bennee@linaro.org>
+Subject: [RFC PATCH 12/15] stubs/xen-hw-stub: drop
+ xenstore_store_pv_console_info stub
+Date: Thu,  5 Nov 2020 17:51:50 +0000
+Message-Id: <20201105175153.30489-13-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201105175153.30489-1-alex.bennee@linaro.org>
 References: <20201105175153.30489-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,53 +104,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: julien@xen.org, masami.hiramatsu@linaro.org, andre.przywara@arm.com,
- stefano.stabellini@linaro.org, takahiro.akashi@linaro.org,
- stefano.stabellini@xilinx.com,
+Cc: Stefano Stabellini <sstabellini@kernel.org>, julien@xen.org,
+ masami.hiramatsu@linaro.org, Paul Durrant <paul@xen.org>,
+ andre.przywara@arm.com, stefano.stabellini@linaro.org,
+ takahiro.akashi@linaro.org,
+ "open list:X86 Xen CPUs" <xen-devel@lists.xenproject.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, stefano.stabellini@xilinx.com,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  stratos-dev@op-lists.linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Report XEN support along with the rest of the accelerators. Repurposed
-the existing Xen support line to display details about the control API
-version and the additional enabled features.
+We should never build something that calls this without having it.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- meson.build | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ stubs/xen-hw-stub.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/meson.build b/meson.build
-index 46e4c2fc3a..79b74fbda7 100644
---- a/meson.build
-+++ b/meson.build
-@@ -2078,8 +2078,15 @@ if vnc.found()
-   summary_info += {'VNC JPEG support':  jpeg.found()}
-   summary_info += {'VNC PNG support':   png.found()}
- endif
--summary_info += {'xen support':       config_host.has_key('CONFIG_XEN_BACKEND')}
- if config_host.has_key('CONFIG_XEN_BACKEND')
-+  xen_features = ['backend']
-+  if config_all.has_key('CONFIG_XEN_HVM')
-+    xen_features += 'HVM'
-+  endif
-+  if config_all.has_key('CONFIG_XEN_PCI_PASSTHROUGH')
-+    xen_features += 'PCI Passthrough'
-+  endif
-+  summary_info += {'xen features':      ' '.join(xen_features)}
-   summary_info += {'xen ctrl version':  config_host['CONFIG_XEN_CTRL_INTERFACE_VERSION']}
- endif
- summary_info += {'brlapi support':    config_host.has_key('CONFIG_BRLAPI')}
-@@ -2092,6 +2099,7 @@ summary_info += {'Linux io_uring support': config_host.has_key('CONFIG_LINUX_IO_
- summary_info += {'ATTR/XATTR support': config_host.has_key('CONFIG_ATTR')}
- summary_info += {'Install blobs':     get_option('install_blobs')}
- summary_info += {'KVM support':       config_all.has_key('CONFIG_KVM')}
-+summary_info += {'XEN support':       config_all.has_key('CONFIG_XEN')}
- summary_info += {'HAX support':       config_all.has_key('CONFIG_HAX')}
- summary_info += {'HVF support':       config_all.has_key('CONFIG_HVF')}
- summary_info += {'WHPX support':      config_all.has_key('CONFIG_WHPX')}
+diff --git a/stubs/xen-hw-stub.c b/stubs/xen-hw-stub.c
+index 2ea8190921..15f3921a76 100644
+--- a/stubs/xen-hw-stub.c
++++ b/stubs/xen-hw-stub.c
+@@ -10,10 +10,6 @@
+ #include "hw/xen/xen.h"
+ #include "hw/xen/xen-x86.h"
+ 
+-void xenstore_store_pv_console_info(int i, Chardev *chr)
+-{
+-}
+-
+ int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num)
+ {
+     return -1;
 -- 
 2.20.1
 
