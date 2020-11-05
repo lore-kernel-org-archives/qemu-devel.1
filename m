@@ -2,87 +2,99 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC75C00A89
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F82C00A89
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:56:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4918D20679
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 256DE20719
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:56:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="yBDG2sVe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4918D20679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W5PG91fm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256DE20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kablg-0007qz-7r
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 04:41:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41464)
+	id 1kac0G-0001dV-Vk
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 04:56:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1kabks-0007Ma-0W
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:40:30 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:32848)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1kabkq-0003Il-7Q
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:40:29 -0500
-Received: by mail-ot1-x342.google.com with SMTP id i18so865246ots.0
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 01:40:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dQooAPuqESekVraoH6cKv9hp3PmfBpUoswYbcTiPVTc=;
- b=yBDG2sVelpo1y+FwELesMmZsZTw3R7o5e4h716d3cKuprV34gN+1f8vZWh0Hxf3PXX
- b905egYy3u4RR9Gkz7NTPmlSj5SnZA1WJmA6CXGIV0DWuHkknhLpMu9LVvru82D9vJRY
- ekXh4I/3htRHd/KznvLgb42msUfRPHuwrVbLoTtF0bBn1nDps1lqJygmvloICd2/WlH8
- w2fAJ/4sLSsqPCHJGTWmnsjblIShqeaGygmPDYw3CHTJ23iVUpdx61as6NM7UYtykI1A
- u/dmj9HSyAsmcRsIUCaauIvc1evHb0KnBD7BJzx7MvVy1WfZbuB5ZJ4JEoWvmyGnbYu1
- rZvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=dQooAPuqESekVraoH6cKv9hp3PmfBpUoswYbcTiPVTc=;
- b=Phfkt73yQPt89u/u6BQ8EyG9ZulMEJno6+W9Ng1KH/umH0HWdcHdJtsDpmUokyYpNK
- rQBMojU7OU+LNj/nV4QsEpHN/JAuX+xyAHU9+BqnV1HcYVbcvdatz3Km85l4ON0Ru1UJ
- eEhroXKYz4hiuJrZ0njvNv8yihrpNKitwj3nqE6WRuXXX4Dd0zQk8GGLpPSuTdoctNx5
- Zk5yKE+E8mMl7LqQ7K1UdhzgE/AUzMewECKfyENmXhXiM7Mlc6dxzqsJYp8CMSy3FXSC
- A+mzz7L7JYVavgqQtyU6Pgr2mlGkKgVgEjjZkZi+Hggcc9w+Ql18KK8NKsC4hSmruWgl
- 5Oww==
-X-Gm-Message-State: AOAM533u2DDznAUqZ2Oe6EKPTHEyLPjKQuBmW6+x/riF5f7tKXjVLhaI
- XA58SzUyoAFkg1PXtsREO3njLU7snYG9zAr4emH7MA==
-X-Google-Smtp-Source: ABdhPJx6iKHxBSxIpDuyMjGhcBYj/UXKf7Ev2G9XE51zglV+vqjKSiHMHTHG6DI7w/ufPOKl9ryxraYRFqUY/JRQuxM=
-X-Received: by 2002:a9d:61:: with SMTP id 88mr1023134ota.109.1604569226847;
- Thu, 05 Nov 2020 01:40:26 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kabzC-00018O-Cv
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:55:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26343)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kabz8-0008M5-49
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:55:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604570112;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mbjuLUC72ODNQj+c4JLPv3UqTW/NG6Jf4EQHuhS3nzU=;
+ b=W5PG91fmAHpjXRYlhS2E5XJFSpaQI2AonkCW1MX/g8EPSVhtzYp7ygiOkeh13ByrY8LxNW
+ jHXFAZ5eSAC4rO4YhiLQ90KVeFTet/y5u/KxitxdSwp2n+X6K8dj1YT6lEqhIOn/LqXhJG
+ zXE67IdddCtvWR8uQYRxpDN9cde5zTA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-Y4BXMsYVOHCjTe0dxSHnQA-1; Thu, 05 Nov 2020 04:55:05 -0500
+X-MC-Unique: Y4BXMsYVOHCjTe0dxSHnQA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CADF10B9CAA;
+ Thu,  5 Nov 2020 09:55:04 +0000 (UTC)
+Received: from redhat.com (ovpn-115-13.ams2.redhat.com [10.36.115.13])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BA2019930;
+ Thu,  5 Nov 2020 09:55:01 +0000 (UTC)
+Date: Thu, 5 Nov 2020 09:54:58 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: Migrating to the gitlab issue tracker
+Message-ID: <20201105095458.GD630142@redhat.com>
+References: <CAKmqyKOY+5WcxUg3Rvq2t3vYWOHrHQdhcv8PkiqZX2zVMdqJ3Q@mail.gmail.com>
+ <3713093e-bf3b-bf23-a8d0-70fe429032ba@redhat.com>
+ <c7308133-cf29-8668-f781-6d025eb16722@redhat.com>
+ <3d9b264a-5e1f-b936-8455-bafc6b89ebe5@redhat.com>
+ <20201030092324.GC99222@redhat.com>
+ <CAFEAcA_8PKkfeninOXCzPdtY7WVHnC7Pkon758zXe7h9MzS+aw@mail.gmail.com>
+ <20201030101013.GG99222@redhat.com>
+ <CAFEAcA9crYaa8-guWkYFDYgEi8=gH3xaXraD7iWZMHM6vryAtw@mail.gmail.com>
+ <c75f91b7-6972-9e48-efa9-49792fc011d2@redhat.com>
+ <37a00b98-428b-d1ca-79c2-7846ccfda651@redhat.com>
 MIME-Version: 1.0
-References: <20201102185115.7425-1-andrew@daynix.com>
- <20201102185115.7425-7-andrew@daynix.com>
- <af85ed7a-1394-e1a4-e224-6ad232328800@redhat.com>
-In-Reply-To: <af85ed7a-1394-e1a4-e224-6ad232328800@redhat.com>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Thu, 5 Nov 2020 11:40:15 +0200
-Message-ID: <CAOEp5Oe+W3qcN1Tfa3Z-Nb7+yxmy-G0FVZJU=ejZA8th92P3-w@mail.gmail.com>
-Subject: Re: [RFC PATCH 6/6] docs: Added eBPF documentation.
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000c8c12905b358e200"
-Received-SPF: none client-ip=2607:f8b0:4864:20::342;
- envelope-from=yuri.benditovich@daynix.com; helo=mail-ot1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <37a00b98-428b-d1ca-79c2-7846ccfda651@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 22:46:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,128 +107,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, Andrew Melnychenko <andrew@daynix.com>,
- qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ John Snow <jsnow@redhat.com>, Alistair Francis <alistair23@gmail.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c8c12905b358e200
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Thu, Nov 05, 2020 at 07:14:47AM +0100, Thomas Huth wrote:
+> On 05/11/2020 01.06, John Snow wrote:
+> > On 10/30/20 6:57 AM, Peter Maydell wrote:
+> >> On Fri, 30 Oct 2020 at 10:10, Daniel P. Berrangé <berrange@redhat.com> wrote:
+> >>> This
+> >>> makes it more appealing to leave existing bugs in the LP tracker until
+> >>> they are resolved, auto-closed, or there is a compelling reason to move
+> >>> to gitlab.
+> >>
+> >> The compelling reason is that there is no way that I want to
+> >> have to consult two entirely separate bug tracking systems
+> >> to see what our reported bugs are. We must have an entry
+> >> in the new BTS for every 'live' bug, whether it was originally
+> >> reported to LP or to gitlab.
+> [...]
+> > OK. I will try to investigate using the Launchpad API to pull our
+> > existing information, and then using the Gitlab API to re-create them. 
+> 
+> Before we migrate hundreds of bugs around, I think we should first check
+> which ones are stale, and which are still valid. So for all bugs that are in
+> "New" state and older than, let's say 2 years, I think we should add a
+> message a la:
+> 
+>  The QEMU project is currently considering to move its bug tracking to
+> another system. For this we need to know which bugs are still valid and
+> which could be closed already. Thus we are setting all older bugs to
+> "Incomplete" now. If you still think this bug report here is valid, then
+> please switch the state back to "New" within the next 60 days, otherwise
+> this report will be marked as "Expired". Thank you and sorry for the
+> inconvenience.
+> 
+> Then set the state to "Incomplete" and wait and see how many bugs expire in
+> 60 days.
 
-On Thu, Nov 5, 2020 at 5:56 AM Jason Wang <jasowang@redhat.com> wrote:
+This sounds like a good idea.
 
->
-> On 2020/11/3 =E4=B8=8A=E5=8D=882:51, Andrew Melnychenko wrote:
-> > From: Andrew<andrew@daynix.com>
-> >
-> > Also, added maintainers information.
-> >
-> > Signed-off-by: Yuri Benditovich<yuri.benditovich@daynix.com>
-> > Signed-off-by: Andrew Melnychenko<andrew@daynix.com>
-> > ---
-> >   MAINTAINERS       |   6 +++
-> >   docs/ebpf.rst     |  29 +++++++++++
-> >   docs/ebpf_rss.rst | 129 +++++++++++++++++++++++++++++++++++++++++++++=
-+
-> >   3 files changed, 164 insertions(+)
-> >   create mode 100644 docs/ebpf.rst
-> >   create mode 100644 docs/ebpf_rss.rst
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 2c22bbca5a..464b3f3c95 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -3111,6 +3111,12 @@ S: Maintained
-> >   F: hw/semihosting/
-> >   F: include/hw/semihosting/
-> >
-> > +EBPF:
-> > +M: Andrew Melnychenko<andrew@daynix.com>
-> > +M: Yuri Benditovich<yuri.benditovich@daynix.com>
-> > +S: Maintained
-> > +F: ebpf/*
-> > +
->
->
-> If it's possible, I would like to be one of the maintainer or at least
-> reviewer :)
->
-> With pleasure. We did not know who would want to maintain eBPF related
-things, so we added ourselves as maintainers.
-If you agree, we'll place you as a maintainer and ourselves as reviewers to
-be informed about changes before they happen.
+I would further suggest that for bugs older than 5 years, we just close
+them straightaway and skip this message. Users can always re-open or
+re-file the bug in the very unlikely case they still care after 5 years.
+We have some bugs that date from 2010, and just doesn't seem like we will
+ever address those even if the user responded to the message by setting
+it back to "New".
 
-Thanks
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-
-
-> Thanks
->
->
-
---000000000000c8c12905b358e200
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Nov 5, 2020 at 5:56 AM Jason =
-Wang &lt;<a href=3D"mailto:jasowang@redhat.com">jasowang@redhat.com</a>&gt;=
- wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
-0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br>
-On 2020/11/3 =E4=B8=8A=E5=8D=882:51, Andrew Melnychenko wrote:<br>
-&gt; From: Andrew&lt;<a href=3D"mailto:andrew@daynix.com" target=3D"_blank"=
->andrew@daynix.com</a>&gt;<br>
-&gt;<br>
-&gt; Also, added maintainers information.<br>
-&gt;<br>
-&gt; Signed-off-by: Yuri Benditovich&lt;<a href=3D"mailto:yuri.benditovich@=
-daynix.com" target=3D"_blank">yuri.benditovich@daynix.com</a>&gt;<br>
-&gt; Signed-off-by: Andrew Melnychenko&lt;<a href=3D"mailto:andrew@daynix.c=
-om" target=3D"_blank">andrew@daynix.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 =C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A06 +++<=
-br>
-&gt;=C2=A0 =C2=A0docs/ebpf.rst=C2=A0 =C2=A0 =C2=A0|=C2=A0 29 +++++++++++<br=
->
-&gt;=C2=A0 =C2=A0docs/ebpf_rss.rst | 129 ++++++++++++++++++++++++++++++++++=
-++++++++++++<br>
-&gt;=C2=A0 =C2=A03 files changed, 164 insertions(+)<br>
-&gt;=C2=A0 =C2=A0create mode 100644 docs/ebpf.rst<br>
-&gt;=C2=A0 =C2=A0create mode 100644 docs/ebpf_rss.rst<br>
-&gt;<br>
-&gt; diff --git a/MAINTAINERS b/MAINTAINERS<br>
-&gt; index 2c22bbca5a..464b3f3c95 100644<br>
-&gt; --- a/MAINTAINERS<br>
-&gt; +++ b/MAINTAINERS<br>
-&gt; @@ -3111,6 +3111,12 @@ S: Maintained<br>
-&gt;=C2=A0 =C2=A0F: hw/semihosting/<br>
-&gt;=C2=A0 =C2=A0F: include/hw/semihosting/<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt; +EBPF:<br>
-&gt; +M: Andrew Melnychenko&lt;<a href=3D"mailto:andrew@daynix.com" target=
-=3D"_blank">andrew@daynix.com</a>&gt;<br>
-&gt; +M: Yuri Benditovich&lt;<a href=3D"mailto:yuri.benditovich@daynix.com"=
- target=3D"_blank">yuri.benditovich@daynix.com</a>&gt;<br>
-&gt; +S: Maintained<br>
-&gt; +F: ebpf/*<br>
-&gt; +<br>
-<br>
-<br>
-If it&#39;s possible, I would like to be one of the maintainer or at least =
-<br>
-reviewer :)<br>
-<br></blockquote><div>With pleasure. We did not know who would want to main=
-tain eBPF related things, so we added ourselves as maintainers.</div><div>I=
-f you agree, we&#39;ll place you as a maintainer and ourselves as reviewers=
- to be informed about changes before they happen.</div><div><br></div><div>=
-Thanks</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
-;padding-left:1ex">
-Thanks<br>
-<br>
-</blockquote></div></div>
-
---000000000000c8c12905b358e200--
 
