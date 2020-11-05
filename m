@@ -2,93 +2,96 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B021FC388F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AAB8C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:21:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0840A20719
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:21:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8F4F206D4
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:21:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="StgBQOuD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0840A20719
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="N01ua3Jk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8F4F206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kand6-00008W-Vg
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 17:21:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39894)
+	id 1kandj-0000cy-Dl
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 17:21:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1kanbK-0006x1-FC; Thu, 05 Nov 2020 17:19:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11906)
+ id 1kanbY-0007FP-Sz
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 17:19:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31766)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1kanbI-00040a-NZ; Thu, 05 Nov 2020 17:19:26 -0500
+ id 1kanbV-00041K-Gq
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 17:19:40 -0500
 Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0A5M329H049101; Thu, 5 Nov 2020 17:19:23 -0500
+ 0A5M33Lb049144; Thu, 5 Nov 2020 17:19:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=f6D21Gd3sWqQXZmuk8zlfTHG3FzoNxQSDYZK3fctaUU=;
- b=StgBQOuDHB3VsBMRsNMNmyjs6BlWGvRqwGQoDwOUPeUeDrk/IHd5OV8MUKgUPjGj/9rg
- 1sp26ZUoNyNbI5Xwo9MILOemSkK0uVhmVOc+Sq1vGBImm1iSvVhop8kLa6yO71MY8ZFX
- QANUO/x/Rtg9RecwgMllLJsI+rW5JLXG0bsQPX7z+qRS2myX8Dj7MhLPPUHSyM4EpXVk
- vz5jkKs7q7oTuu36x6LrEZK5UhxtWucD+MgIW5M8S+jmdZPVplaHMBw0eVfcf1R4el8V
- 4YOJB1QWxeEsI8blp2dtc5N2WAvh2920Pnp19cJyVC6dM4Ll5oFC/bOQWG1p6EPUBgRB 7Q== 
+ content-type : content-transfer-encoding; s=pp1;
+ bh=odZCzxgTRcMQ2DchUfi6h89JAhOqzq/bzlVGfblpgig=;
+ b=N01ua3JkhZdEcnf7irIc25Sw8oIKQKQpkwO0lxwXEgJxdU79kVZitSyyL4NWYPXSIGlw
+ nbNcQUa9PnTTAm2fvCEJmtrmXrFb4migkc0PppU50QTrL7fbG1eAwJuir/vMJo96MTkL
+ /RGn8TqBNsOcTnqDF2rcy3X3uYegUTXxzG6sgqZW9z/khQKgtb5qiQ2mF8VEbynVHAGU
+ ZdP13RTlcuutfksVV5S2xLMQWJvBvVOUiCSIOhKCjLte4PilwuZqazYwuBBv02u/KxkA
+ 9svPs/xLdqlurFp38n0p2Kb8+w03GD/SabEOOD1X5E8MEyvnBolT3c8jOb0LOE/+1lHV wg== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34m8wwb1wd-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34m8wwb21g-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Nov 2020 17:19:23 -0500
+ Thu, 05 Nov 2020 17:19:35 -0500
 Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A5M36hv049462;
- Thu, 5 Nov 2020 17:19:22 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34m8wwb1w2-1
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A5M3XN1051075;
+ Thu, 5 Nov 2020 17:19:35 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34m8wwb21a-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Nov 2020 17:19:22 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A5MCkou007790;
- Thu, 5 Nov 2020 22:19:21 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma05wdc.us.ibm.com with ESMTP id 34h09nke70-1
+ Thu, 05 Nov 2020 17:19:34 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A5MBpab000532;
+ Thu, 5 Nov 2020 22:19:34 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma04dal.us.ibm.com with ESMTP id 34h02mgc1j-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Nov 2020 22:19:21 +0000
+ Thu, 05 Nov 2020 22:19:34 +0000
 Received: from b03ledav003.gho.boulder.ibm.com
  (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0A5MJEbX15335972
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0A5MJOL811403792
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 5 Nov 2020 22:19:15 GMT
+ Thu, 5 Nov 2020 22:19:24 GMT
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 74F986A047;
- Thu,  5 Nov 2020 22:19:20 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id EB54C6A051;
+ Thu,  5 Nov 2020 22:19:32 +0000 (GMT)
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8B81E6A04D;
- Thu,  5 Nov 2020 22:19:19 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 58AC26A047;
+ Thu,  5 Nov 2020 22:19:32 +0000 (GMT)
 Received: from Buonos-Thinkpad-X1.ibm.com (unknown [9.65.222.173])
  by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu,  5 Nov 2020 22:19:19 +0000 (GMT)
+ Thu,  5 Nov 2020 22:19:32 +0000 (GMT)
 From: Daniele Buono <dbuono@linux.vnet.ibm.com>
 To: dbuono@linux.vnet.ibm.com, qemu-devel@nongnu.org
-Subject: [PATCH v3 4/9] s390x: Avoid variable size warning in ipl.h
-Date: Thu,  5 Nov 2020 17:19:00 -0500
-Message-Id: <20201105221905.1350-5-dbuono@linux.vnet.ibm.com>
+Subject: [PATCH v3 7/9] cfi: Initial support for cfi-icall in QEMU
+Date: Thu,  5 Nov 2020 17:19:03 -0500
+Message-Id: <20201105221905.1350-8-dbuono@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201105221905.1350-1-dbuono@linux.vnet.ibm.com>
 References: <20201105221905.1350-1-dbuono@linux.vnet.ibm.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312, 18.0.737
@@ -96,7 +99,7 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312, 18.0.737
  2020-11-05 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  clxscore=1015 mlxscore=0
- lowpriorityscore=0 adultscore=0 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 adultscore=0 impostorscore=0 suspectscore=2
  phishscore=0 bulkscore=0 malwarescore=0 spamscore=0 mlxlogscore=999
  priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2009150000 definitions=main-2011050141
@@ -122,69 +125,304 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- "open list:S390-ccw boot" <qemu-s390x@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-S390IPLState contains two IplParameterBlock, which may in turn have
-either a IPLBlockPV or a IplBlockFcp, both ending with a variable
-sized field (an array).
+LLVM/Clang, supports runtime checks for forward-edge Control-Flow
+Integrity (CFI).
 
-This causes a warning with clang 11 or greater, which checks that
-variable sized type are only allocated at the end of the struct:
+CFI on indirect function calls (cfi-icall) ensures that, in indirect
+function calls, the function called is of the right signature for the
+pointer type defined at compile time.
 
-In file included from ../qemu-cfi-v3/target/s390x/diag.c:21:
-../qemu-cfi-v3/hw/s390x/ipl.h:161:23: error: field 'iplb' with variable sized type 'IplParameterBlock' (aka 'union IplParameterBlock') not at the end of a struct or class is a GNU extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
-    IplParameterBlock iplb;
-                      ^
-../qemu-cfi-v3/hw/s390x/ipl.h:162:23: error: field 'iplb_pv' with variable sized type 'IplParameterBlock' (aka 'union IplParameterBlock') not at the end of a struct or class is a GNU extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
-    IplParameterBlock iplb_pv;
+For this check to work, the code must always respect the function
+signature when using function pointer, the function must be defined
+at compile time, and be compiled with link-time optimization.
 
-In this case, however, the warning is a false positive, because
-IPLBlockPV and IplBlockFcp are allocated in a union wrapped at 4K,
-making the union non-variable sized.
+This rules out, for example, shared libraries that are dynamically loaded
+(given that functions are not known at compile time), and code that is
+dynamically generated at run-time.
 
-Fix the warning by turning the two variable sized arrays into arrays
-of size 0. This avoids the compiler error and should produce the
-same code.
+This patch:
+
+1) Introduces the CONFIG_CFI flag to support cfi in QEMU
+
+2) Introduces a decorator to allow the definition of "sensitive"
+functions, where a non-instrumented function may be called at runtime
+through a pointer. The decorator will take care of disabling cfi-icall
+checks on such functions, when cfi is enabled.
+
+3) Marks functions currently in QEMU that exhibit such behavior,
+in particular:
+- The function in TCG that calls pre-compiled TBs
+- The function in TCI that interprets instructions
+- Functions in the plugin infrastructures that jump to callbacks
+- Functions in util that directly call a signal handler
 
 Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
+Acked-by: Alex Bennée <alex.bennee@linaro.org> for plugins
 ---
-There is the possibility of removing  IplBlockFcp from
-IplParameterBlock, since it is not actually used.
-This would also allow to entirely remove the definition of
-IplBlockFcp, but we may want to keep it for completeness.
+ accel/tcg/cpu-exec.c    | 11 +++++++++++
+ include/qemu/compiler.h | 12 ++++++++++++
+ plugins/core.c          | 37 +++++++++++++++++++++++++++++++++++++
+ plugins/loader.c        |  7 +++++++
+ tcg/tci.c               |  7 +++++++
+ util/main-loop.c        | 11 +++++++++++
+ util/oslib-posix.c      | 11 +++++++++++
+ 7 files changed, 96 insertions(+)
 
- hw/s390x/ipl.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index 9e90169695..dfc6dfd89c 100644
---- a/hw/s390x/ipl.h
-+++ b/hw/s390x/ipl.h
-@@ -32,7 +32,7 @@ struct IPLBlockPV {
-     uint32_t num_comp;          /* 0x74 */
-     uint64_t pv_header_addr;    /* 0x78 */
-     uint64_t pv_header_len;     /* 0x80 */
--    struct IPLBlockPVComp components[];
-+    struct IPLBlockPVComp components[0];
- } QEMU_PACKED;
- typedef struct IPLBlockPV IPLBlockPV;
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 58aea605d8..ffe0e1e3fb 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -26,6 +26,7 @@
+ #include "exec/exec-all.h"
+ #include "tcg/tcg.h"
+ #include "qemu/atomic.h"
++#include "qemu/compiler.h"
+ #include "sysemu/qtest.h"
+ #include "qemu/timer.h"
+ #include "qemu/rcu.h"
+@@ -144,6 +145,16 @@ static void init_delay_params(SyncClocks *sc, const CPUState *cpu)
+ #endif /* CONFIG USER ONLY */
  
-@@ -63,7 +63,7 @@ struct IplBlockFcp {
-     uint64_t br_lba;
-     uint32_t scp_data_len;
-     uint8_t  reserved6[260];
--    uint8_t  scp_data[];
-+    uint8_t  scp_data[0];
- } QEMU_PACKED;
- typedef struct IplBlockFcp IplBlockFcp;
+ /* Execute a TB, and fix up the CPU state afterwards if necessary */
++/*
++ * Disable CFI checks.
++ * TCG creates binary blobs at runtime, with the transformed code.
++ * A TB is a blob of binary code, created at runtime and called with an
++ * indirect function call. Since such function did not exist at compile time,
++ * the CFI runtime has no way to verify its signature and would fail.
++ * TCG is not considered a security-sensitive part of QEMU so this does not
++ * affect the impact of CFI in environment with high security requirements
++ */
++QEMU_DISABLE_CFI
+ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
+ {
+     CPUArchState *env = cpu->env_ptr;
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index c76281f354..c87c242063 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -243,4 +243,16 @@ extern void QEMU_NORETURN QEMU_ERROR("code path is reachable")
+ #define qemu_build_not_reached()  g_assert_not_reached()
+ #endif
  
++#ifdef CONFIG_CFI
++/*
++ * If CFI is enabled, use an attribute to disable cfi-icall on the following
++ * function
++ */
++#define QEMU_DISABLE_CFI __attribute__((no_sanitize("cfi-icall")))
++#else
++/* If CFI is not enabled, use an empty define to not change the behavior */
++#define QEMU_DISABLE_CFI
++#endif
++
++
+ #endif /* COMPILER_H */
+diff --git a/plugins/core.c b/plugins/core.c
+index 51bfc94787..87b823bbc4 100644
+--- a/plugins/core.c
++++ b/plugins/core.c
+@@ -31,6 +31,7 @@
+ #include "tcg/tcg-op.h"
+ #include "trace/mem-internal.h" /* mem_info macros */
+ #include "plugin.h"
++#include "qemu/compiler.h"
+ 
+ struct qemu_plugin_cb {
+     struct qemu_plugin_ctx *ctx;
+@@ -90,6 +91,12 @@ void plugin_unregister_cb__locked(struct qemu_plugin_ctx *ctx,
+     }
+ }
+ 
++/*
++ * Disable CFI checks.
++ * The callback function has been loaded from an external library so we do not
++ * have type information
++ */
++QEMU_DISABLE_CFI
+ static void plugin_vcpu_cb__simple(CPUState *cpu, enum qemu_plugin_event ev)
+ {
+     struct qemu_plugin_cb *cb, *next;
+@@ -111,6 +118,12 @@ static void plugin_vcpu_cb__simple(CPUState *cpu, enum qemu_plugin_event ev)
+     }
+ }
+ 
++/*
++ * Disable CFI checks.
++ * The callback function has been loaded from an external library so we do not
++ * have type information
++ */
++QEMU_DISABLE_CFI
+ static void plugin_cb__simple(enum qemu_plugin_event ev)
+ {
+     struct qemu_plugin_cb *cb, *next;
+@@ -128,6 +141,12 @@ static void plugin_cb__simple(enum qemu_plugin_event ev)
+     }
+ }
+ 
++/*
++ * Disable CFI checks.
++ * The callback function has been loaded from an external library so we do not
++ * have type information
++ */
++QEMU_DISABLE_CFI
+ static void plugin_cb__udata(enum qemu_plugin_event ev)
+ {
+     struct qemu_plugin_cb *cb, *next;
+@@ -325,6 +344,12 @@ void plugin_register_vcpu_mem_cb(GArray **arr,
+     dyn_cb->f.generic = cb;
+ }
+ 
++/*
++ * Disable CFI checks.
++ * The callback function has been loaded from an external library so we do not
++ * have type information
++ */
++QEMU_DISABLE_CFI
+ void qemu_plugin_tb_trans_cb(CPUState *cpu, struct qemu_plugin_tb *tb)
+ {
+     struct qemu_plugin_cb *cb, *next;
+@@ -339,6 +364,12 @@ void qemu_plugin_tb_trans_cb(CPUState *cpu, struct qemu_plugin_tb *tb)
+     }
+ }
+ 
++/*
++ * Disable CFI checks.
++ * The callback function has been loaded from an external library so we do not
++ * have type information
++ */
++QEMU_DISABLE_CFI
+ void
+ qemu_plugin_vcpu_syscall(CPUState *cpu, int64_t num, uint64_t a1, uint64_t a2,
+                          uint64_t a3, uint64_t a4, uint64_t a5,
+@@ -358,6 +389,12 @@ qemu_plugin_vcpu_syscall(CPUState *cpu, int64_t num, uint64_t a1, uint64_t a2,
+     }
+ }
+ 
++/*
++ * Disable CFI checks.
++ * The callback function has been loaded from an external library so we do not
++ * have type information
++ */
++QEMU_DISABLE_CFI
+ void qemu_plugin_vcpu_syscall_ret(CPUState *cpu, int64_t num, int64_t ret)
+ {
+     struct qemu_plugin_cb *cb, *next;
+diff --git a/plugins/loader.c b/plugins/loader.c
+index 8ac5dbc20f..fd491961de 100644
+--- a/plugins/loader.c
++++ b/plugins/loader.c
+@@ -32,6 +32,7 @@
+ #ifndef CONFIG_USER_ONLY
+ #include "hw/boards.h"
+ #endif
++#include "qemu/compiler.h"
+ 
+ #include "plugin.h"
+ 
+@@ -150,6 +151,12 @@ static uint64_t xorshift64star(uint64_t x)
+     return x * UINT64_C(2685821657736338717);
+ }
+ 
++/*
++ * Disable CFI checks.
++ * The install and version functions have been loaded from an external library
++ * so we do not have type information
++ */
++QEMU_DISABLE_CFI
+ static int plugin_load(struct qemu_plugin_desc *desc, const qemu_info_t *info)
+ {
+     qemu_plugin_install_func_t install;
+diff --git a/tcg/tci.c b/tcg/tci.c
+index 82039fd163..5d97b7c71c 100644
+--- a/tcg/tci.c
++++ b/tcg/tci.c
+@@ -31,6 +31,7 @@
+ #include "tcg/tcg.h"           /* MAX_OPC_PARAM_IARGS */
+ #include "exec/cpu_ldst.h"
+ #include "tcg/tcg-op.h"
++#include "qemu/compiler.h"
+ 
+ /* Marker for missing code. */
+ #define TODO() \
+@@ -475,6 +476,12 @@ static bool tci_compare64(uint64_t u0, uint64_t u1, TCGCond condition)
+ #endif
+ 
+ /* Interpret pseudo code in tb. */
++/*
++ * Disable CFI checks.
++ * One possible operation in the pseudo code is a call to binary code.
++ * Therefore, disable CFI checks in the interpreter function
++ */
++QEMU_DISABLE_CFI
+ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+ {
+     tcg_target_ulong regs[TCG_TARGET_NB_REGS];
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 6470f8eae3..6bfc7c46f5 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -33,6 +33,7 @@
+ #include "block/aio.h"
+ #include "qemu/error-report.h"
+ #include "qemu/queue.h"
++#include "qemu/compiler.h"
+ 
+ #ifndef _WIN32
+ #include <sys/wait.h>
+@@ -44,6 +45,16 @@
+  * use signalfd to listen for them.  We rely on whatever the current signal
+  * handler is to dispatch the signals when we receive them.
+  */
++/*
++ * Disable CFI checks.
++ * We are going to call a signal hander directly. Such handler may or may not
++ * have been defined in our binary, so there's no guarantee that the pointer
++ * used to set the handler is a cfi-valid pointer. Since the handlers are
++ * stored in kernel memory, changing the handler to an attacker-defined
++ * function requires being able to call a sigaction() syscall,
++ * which is not as easy as overwriting a pointer in memory.
++ */
++QEMU_DISABLE_CFI
+ static void sigfd_handler(void *opaque)
+ {
+     int fd = (intptr_t)opaque;
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index f15234b5c0..f1e2801b11 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -39,6 +39,7 @@
+ #include "qemu/thread.h"
+ #include <libgen.h>
+ #include "qemu/cutils.h"
++#include "qemu/compiler.h"
+ 
+ #ifdef CONFIG_LINUX
+ #include <sys/syscall.h>
+@@ -773,6 +774,16 @@ void qemu_free_stack(void *stack, size_t sz)
+     munmap(stack, sz);
+ }
+ 
++/*
++ * Disable CFI checks.
++ * We are going to call a signal hander directly. Such handler may or may not
++ * have been defined in our binary, so there's no guarantee that the pointer
++ * used to set the handler is a cfi-valid pointer. Since the handlers are
++ * stored in kernel memory, changing the handler to an attacker-defined
++ * function requires being able to call a sigaction() syscall,
++ * which is not as easy as overwriting a pointer in memory.
++ */
++QEMU_DISABLE_CFI
+ void sigaction_invoke(struct sigaction *action,
+                       struct qemu_signalfd_siginfo *info)
+ {
 -- 
 2.17.1
 
