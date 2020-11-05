@@ -2,88 +2,64 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F355C00A89
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:33:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C682BC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F0DA20756
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:33:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ge2PhYS5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F0DA20756
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4272F20782
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:33:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4272F20782
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaeS9-0006s1-Cr
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 07:33:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44974)
+	id 1kaeSM-00077t-Rp
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 07:33:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kaeOm-0002sz-8w
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 07:29:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57787)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kaeOg-0004rm-Jk
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 07:29:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604579385;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=td3LLZfOziubZsGkL7IXlrUFtRrI6rry0Ahjkf7+L80=;
- b=Ge2PhYS5GCILXCermBPSizY/5UOsxQJhT+q8SEFAo9vlR3IABjUq2vJ5ZNVEn3j0u0K//Y
- mWT4z6DE5oxNPGGvDatYQka0fgKMvwd76a8aZDz/VipiHjAqOLEXghbNu7JXHBN6Nn2/h+
- /Y1o8wU7fwEx6l3SN1TQ+svbJHGucCE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-SdB0Gv9oNxWjKycXOsgVhA-1; Thu, 05 Nov 2020 07:29:41 -0500
-X-MC-Unique: SdB0Gv9oNxWjKycXOsgVhA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BC7D107ACF6;
- Thu,  5 Nov 2020 12:29:40 +0000 (UTC)
-Received: from localhost (unknown [10.36.110.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 356B15C3E1;
- Thu,  5 Nov 2020 12:29:32 +0000 (UTC)
-From: marcandre.lureau@redhat.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/9] qapi: introduce IfPredicateList and IfAny
-Date: Thu,  5 Nov 2020 16:28:03 +0400
-Message-Id: <20201105122808.1182973-5-marcandre.lureau@redhat.com>
-In-Reply-To: <20201105122808.1182973-1-marcandre.lureau@redhat.com>
-References: <20201105122808.1182973-1-marcandre.lureau@redhat.com>
+ (Exim 4.90_1) (envelope-from <shiliyang@huawei.com>)
+ id 1kaeNj-0001cU-IK; Thu, 05 Nov 2020 07:28:47 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2441)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <shiliyang@huawei.com>)
+ id 1kaeNh-0004Zd-F1; Thu, 05 Nov 2020 07:28:47 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CRjVT40LwzLv6F;
+ Thu,  5 Nov 2020 20:28:33 +0800 (CST)
+Received: from [10.108.235.13] (10.108.235.13) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 5 Nov 2020 20:28:29 +0800
+From: shiliyang <shiliyang@huawei.com>
+Subject: [PATCH V2 4/4] bsd-user: do not use C99 // comments
+To: <qemu-devel@nongnu.org>, <philmd@redhat.com>, <pbonzini@redhat.com>,
+ <david@redhat.com>
+Message-ID: <3d09fce1-d7f2-6042-1019-73fe4c1b453c@huawei.com>
+Date: Thu, 5 Nov 2020 20:28:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=marcandre.lureau@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.108.235.13]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191; envelope-from=shiliyang@huawei.com;
+ helo=szxga05-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 07:27:48
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,70 +72,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: alex.chen@huawei.com, qemu-trivial@nongnu.org, hunongda@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+This patch fixes error messages found by checkpatch.pl:
+ERROR: do not use C99 // comments
 
-Based on IfAll, introduce a base class IfPredicateList, and add IfAny
-for 'any' conditions.
+Signed-off-by: Liyang Shi <shiliyang@huawei.com>
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi/common.py | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ bsd-user/elfload.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 01c4c0c878..8dc2824186 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -215,20 +215,32 @@ class IfOption(IfPredicate):
-         return self.option == other.option
- 
- 
--class IfAll(IfPredicate):
-+class IfPredicateList(IfPredicate):
-+    C_OP = ""
-+
-     def __init__(self, pred_list: Sequence[IfPredicate]):
-         self.pred_list = pred_list
- 
-     def cgen(self) -> str:
--        return " && ".join([p.cgen() for p in self.pred_list])
-+        op = " " + self.C_OP + " "
-+        return "(%s)" % op.join([p.cgen() for p in self.pred_list])
- 
-     def __bool__(self) -> bool:
-         return bool(self.pred_list)
- 
-     def __repr__(self) -> str:
--        return f"IfAll({self.pred_list})"
-+        ty = type(self)
-+        return f"{ty.__qualname__}({self.pred_list})"
- 
-     def __eq__(self, other: object) -> bool:
--        if not isinstance(other, IfAll):
-+        if not isinstance(other, type(self)):
-             return False
-         return self.pred_list == other.pred_list
-+
-+
-+class IfAll(IfPredicateList):
-+    C_OP = "&&"
-+
-+
-+class IfAny(IfPredicateList):
-+    C_OP = "||"
+diff --git a/bsd-user/elfload.c b/bsd-user/elfload.c
+index fab9da757c..ff571088f7 100644
+--- a/bsd-user/elfload.c
++++ b/bsd-user/elfload.c
+@@ -1010,7 +1010,7 @@ static const char *lookup_symbolxx(struct syminfo *s, target_ulong orig_addr)
+     struct elf_sym *syms = s->disas_symtab.elf64;
+ #endif
+
+-    // binary search
++    /* binary search */
+     struct elf_sym *sym;
+
+     sym = bsearch(&orig_addr, syms, s->disas_num_syms, sizeof(*syms), symfind);
+@@ -1092,7 +1092,7 @@ static void load_symbols(struct elfhdr *hdr, int fd)
+ #ifdef BSWAP_NEEDED
+         bswap_sym(syms + i);
+ #endif
+-        // Throw away entries which we do not need.
++        /* Throw away entries which we do not need. */
+         if (syms[i].st_shndx == SHN_UNDEF ||
+                 syms[i].st_shndx >= SHN_LORESERVE ||
+                 ELF_ST_TYPE(syms[i].st_info) != STT_FUNC) {
 -- 
-2.29.0
-
+2.29.1.59.gf9b6481aed
 
