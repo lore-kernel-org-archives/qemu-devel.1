@@ -2,92 +2,97 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 904B4C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 21:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6768AC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 21:28:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2F6B20735
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 21:26:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC50820728
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 21:28:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JtUfeBaf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2F6B20735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AG5XSINK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC50820728
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kammT-0005Ck-PU
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 16:26:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54652)
+	id 1kamnh-0006Zp-LU
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 16:28:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kamj8-0002nt-9r
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 16:23:26 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42560)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kamj5-0005Tf-A6
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 16:23:26 -0500
-Received: by mail-wr1-x443.google.com with SMTP id w14so3394714wrs.9
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 13:23:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=U8KdOlXXLYO3hwpDlX+ZEhUYjGxzebIeovcN6OjRKh4=;
- b=JtUfeBafB1Saa9/5UUEgPDrfD2799oLlSmNOMBeYSAz74HfSB8tfhPR04akGHpy7cC
- PFukcOeLDahImogqLaaFxwdbGS7ySjtdrkuY9s7/JYFqG+pAd6mgZAbDp3tKiUHUphdX
- qf2FxhFt9kzUoqNLrIg+pRyK5N8svpznlCDCyDU78RCTglAN+3tGhNmQmZ/V22Vic56k
- 7FtuzxG2pjgQF7UBHBMt0IQBgVRz79vli8KDpS0mHl3pnwlHpK/UepPoyPfeHxDJFFUy
- RQdPUS7gTWEKXiqq1jHy2txzjV1oUUyERUc3BI9ANAO0KQEgqSWii1oDdLLRMyjzV+x6
- VpCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=U8KdOlXXLYO3hwpDlX+ZEhUYjGxzebIeovcN6OjRKh4=;
- b=hYpVzJTlpiSWTWcHECOv4ZNpLc22fVNln/W2B7fxFwMtPt1jXpng4njUVOAeiUUaiC
- bphX1Fba8aB198DyuQTLlaiSIVzFQDjUEAcLfi3udce4gZWpIeue0e8bJ2PWXzZCz/cz
- u5wyvFpLGujWblgYVZKakDuTkfO9ph83qaobQEZxqIs3qyYMaqh0JUWCJu0JHEpF+QEY
- AWzaSu+OnHeEaZ/yvW9nVC6kebhibxpL+bWMkf1HZFiB8OhO3Lav5nx1hQzHA8bO3ZUf
- m9kEaqK47wV6z1oyM42yLtE7oKgn2vygQLuwbRoKNaCkm0coplyshZoZII3XR3ghhA1p
- 0HDQ==
-X-Gm-Message-State: AOAM531kil0Ml302Ihm4vMM93MhHpv6yshe95tdxuLUwIPuir2+dd9tY
- jGOyGkPXIxgGKCQhPXXQGXP6Q3MMF+53xw==
-X-Google-Smtp-Source: ABdhPJxYpn23cpDQHJLVI9g4osRK6O5+iMy7YSc6U2tnsvTzpRFi7/CvMXIYzuyO/tn5kbrBpHGnPA==
-X-Received: by 2002:a5d:4448:: with SMTP id x8mr4613841wrr.364.1604611399675; 
- Thu, 05 Nov 2020 13:23:19 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e25sm4861587wrc.76.2020.11.05.13.23.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Nov 2020 13:23:19 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.2 2/3] linux-user/sparc: Correct set/get_context
- handling of fp and i7
-Date: Thu,  5 Nov 2020 21:23:13 +0000
-Message-Id: <20201105212314.9628-3-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201105212314.9628-1-peter.maydell@linaro.org>
-References: <20201105212314.9628-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kammU-0005Z5-3k
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 16:26:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56650)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kammR-00060i-20
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 16:26:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604611609;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bkhL98HD3LvDSCuC/7RiV3e8n6DUmrXJ+lI4fOiIhck=;
+ b=AG5XSINKcKIS6VC6IiZe/wIOJ3VjqGrRpFjH5fKw5O4EXQ6pH+ccKHcy11+Wfd6H8vhb8n
+ mV9TIDtTzddQxEbZRetUm1Uhw57i8/0FSFMlpXet5aAbJco+TwPkH+SIuDTVhkkU9Ry3Rq
+ xEzVlD0kNJJRDBFtIwxN8Vth5s2yLS8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-r58erJB6N-iulZZsJdKieQ-1; Thu, 05 Nov 2020 16:26:47 -0500
+X-MC-Unique: r58erJB6N-iulZZsJdKieQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AF9218FE860;
+ Thu,  5 Nov 2020 21:26:46 +0000 (UTC)
+Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 999EA1002C27;
+ Thu,  5 Nov 2020 21:26:45 +0000 (UTC)
+Date: Thu, 5 Nov 2020 14:26:45 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v1] docs/devel: Add VFIO device migration documentation
+Message-ID: <20201105142645.2f5718b0@w520.home>
+In-Reply-To: <1d8ab1f9-8bf7-5f1f-ea3c-b23129492597@nvidia.com>
+References: <1603950791-27236-1-git-send-email-kwankhede@nvidia.com>
+ <20201029125221.69352b48.cohuck@redhat.com>
+ <9479dffd-e434-e336-6ed8-07fc2edd2453@nvidia.com>
+ <20201029130519.7eb1e704@w520.home>
+ <47f8ccea-f75a-dfb7-b646-28d5123b322f@nvidia.com>
+ <20201103132758.04b18f5c@w520.home>
+ <a27dee38-2fa9-a6ae-de30-eb7b57629393@nvidia.com>
+ <20201104054527.22bbace7@x1.home>
+ <6abf200c-972a-cbdb-8106-d197dccb780d@nvidia.com>
+ <20201105121150.44e347ed@w520.home>
+ <1d8ab1f9-8bf7-5f1f-ea3c-b23129492597@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,138 +105,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Giuseppe Musacchio <thatlemon@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: mcrossley@nvidia.com, cjia@nvidia.com, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, dnigam@nvidia.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Because QEMU's user-mode emulation just directly accesses guest CPU
-state, for SPARC the guest register window state is not the same in
-the sparc64_get_context() and sparc64_set_context() functions as it
-is for the real kernel's versions of those functions.  Specifically,
-for the kernel it has saved the user space state such that the O*
-registers go into a pt_regs struct as UREG_I*, and the I* registers
-have been spilled onto the userspace stack.  For QEMU, we haven't
-done that, so the guest's O* registers are still in WREG_O* and the
-I* registers in WREG_I*.
+On Fri, 6 Nov 2020 02:22:11 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-The code was already accessing the O* registers correctly for QEMU,
-but had copied the kernel code for accessing the I* registers off the
-userspace stack.  Replace this with direct accesses to fp and i7 in
-the CPU state, and add a comment explaining why we differ from the
-kernel code here.
+> On 11/6/2020 12:41 AM, Alex Williamson wrote:
+> > On Fri, 6 Nov 2020 00:29:36 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 11/4/2020 6:15 PM, Alex Williamson wrote:  
+> >>> On Wed, 4 Nov 2020 13:25:40 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>      
+> >>>> On 11/4/2020 1:57 AM, Alex Williamson wrote:  
+> >>>>> On Wed, 4 Nov 2020 01:18:12 +0530
+> >>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>>>         
+> >>>>>> On 10/30/2020 12:35 AM, Alex Williamson wrote:  
+> >>>>>>> On Thu, 29 Oct 2020 23:11:16 +0530
+> >>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>>>>>            
+> >>>>>>
+> >>>>>> <snip>
+> >>>>>>        
+> >>>>>>>>>> +System memory dirty pages tracking
+> >>>>>>>>>> +----------------------------------
+> >>>>>>>>>> +
+> >>>>>>>>>> +A ``log_sync`` memory listener callback is added to mark system memory pages  
+> >>>>>>>>>
+> >>>>>>>>> s/is added to mark/marks those/
+> >>>>>>>>>               
+> >>>>>>>>>> +as dirty which are used for DMA by VFIO device. Dirty pages bitmap is queried  
+> >>>>>>>>>
+> >>>>>>>>> s/by/by the/
+> >>>>>>>>> s/Dirty/The dirty/
+> >>>>>>>>>               
+> >>>>>>>>>> +per container. All pages pinned by vendor driver through vfio_pin_pages()  
+> >>>>>>>>>
+> >>>>>>>>> s/by/by the/
+> >>>>>>>>>               
+> >>>>>>>>>> +external API have to be marked as dirty during migration. When there are CPU
+> >>>>>>>>>> +writes, CPU dirty page tracking can identify dirtied pages, but any page pinned
+> >>>>>>>>>> +by vendor driver can also be written by device. There is currently no device  
+> >>>>>>>>>
+> >>>>>>>>> s/by/by the/ (x2)
+> >>>>>>>>>               
+> >>>>>>>>>> +which has hardware support for dirty page tracking. So all pages which are
+> >>>>>>>>>> +pinned by vendor driver are considered as dirty.
+> >>>>>>>>>> +Dirty pages are tracked when device is in stop-and-copy phase because if pages
+> >>>>>>>>>> +are marked dirty during pre-copy phase and content is transfered from source to
+> >>>>>>>>>> +destination, there is no way to know newly dirtied pages from the point they
+> >>>>>>>>>> +were copied earlier until device stops. To avoid repeated copy of same content,
+> >>>>>>>>>> +pinned pages are marked dirty only during stop-and-copy phase.  
+> >>>>>>>>
+> >>>>>>>>           
+> >>>>>>>>> Let me take a quick stab at rewriting this paragraph (not sure if I
+> >>>>>>>>> understood it correctly):
+> >>>>>>>>>
+> >>>>>>>>> "Dirty pages are tracked when the device is in the stop-and-copy phase.
+> >>>>>>>>> During the pre-copy phase, it is not possible to distinguish a dirty
+> >>>>>>>>> page that has been transferred from the source to the destination from
+> >>>>>>>>> newly dirtied pages, which would lead to repeated copying of the same
+> >>>>>>>>> content. Therefore, pinned pages are only marked dirty during the
+> >>>>>>>>> stop-and-copy phase." ?
+> >>>>>>>>>               
+> >>>>>>>>
+> >>>>>>>> I think above rephrase only talks about repeated copying in pre-copy
+> >>>>>>>> phase. Used "copied earlier until device stops" to indicate both
+> >>>>>>>> pre-copy and stop-and-copy till device stops.  
+> >>>>>>>
+> >>>>>>>
+> >>>>>>> Now I'm confused, I thought we had abandoned the idea that we can only
+> >>>>>>> report pinned pages during stop-and-copy.  Doesn't the device needs to
+> >>>>>>> expose its dirty memory footprint during the iterative phase regardless
+> >>>>>>> of whether that causes repeat copies?  If QEMU iterates and sees that
+> >>>>>>> all memory is still dirty, it may have transferred more data, but it
+> >>>>>>> can actually predict if it can achieve its downtime tolerances.  Which
+> >>>>>>> is more important, less data transfer or predictability?  Thanks,
+> >>>>>>>            
+> >>>>>>
+> >>>>>> Even if QEMU copies and transfers content of all sys mem pages during
+> >>>>>> pre-copy (worst case with IOMMU backed mdev device when its vendor
+> >>>>>> driver is not smart to pin pages explicitly and all sys mem pages are
+> >>>>>> marked dirty), then also its prediction about downtime tolerance will
+> >>>>>> not be correct, because during stop-and-copy again all pages need to be
+> >>>>>> copied as device can write to any of those pinned pages.  
+> >>>>>
+> >>>>> I think you're only reiterating my point.  If QEMU copies all of guest
+> >>>>> memory during the iterative phase and each time it sees that all memory
+> >>>>> is dirty, such as if CPUs or devices (including assigned devices) are
+> >>>>> dirtying pages as fast as it copies them (or continuously marks them
+> >>>>> dirty), then QEMU can predict that downtime will require copying all
+> >>>>> pages.  
+> >>>>
+> >>>> But as of now there is no way to know if device has dirtied pages during
+> >>>> iterative phase.  
+> >>>
+> >>>
+> >>> This claim doesn't make any sense, pinned pages are considered
+> >>> persistently dirtied, during the iterative phase and while stopped.
+> >>>
+> >>>        
+> >>>>> If instead devices don't mark dirty pages until the VM is
+> >>>>> stopped, then QEMU might iterate through memory copy and predict a short
+> >>>>> downtime because not much memory is dirty, only to be surprised that
+> >>>>> all of memory is suddenly dirty.  At that point it's too late, the VM
+> >>>>> is already stopped, the predicted short downtime takes far longer than
+> >>>>> expected.  This is exactly why we made the kernel interface mark pinned
+> >>>>> pages persistently dirty when it was proposed that we only report
+> >>>>> pinned pages once.  Thanks,
+> >>>>>         
+> >>>>
+> >>>> Since there is no way to know if device dirtied pages during iterative
+> >>>> phase, QEMU should query pinned pages in stop-and-copy phase.  
+> >>>
+> >>>
+> >>> As above, I don't believe this is true.
+> >>>
+> >>>      
+> >>>> Whenever there will be hardware support or some software mechanism to
+> >>>> report pages dirtied by device then we will add a capability bit in
+> >>>> migration capability and based on that capability bit qemu/user space
+> >>>> app should decide to query dirty pages in iterative phase.  
+> >>>
+> >>>
+> >>> Yes, we could advertise support for fine granularity dirty page
+> >>> tracking, but I completely disagree that we should consider pinned
+> >>> pages clean until suddenly exposing them as dirty once the VM is
+> >>> stopped.  Thanks,
+> >>>      
+> >>
+> >> Should QEMU copy dirtied pages twice, during iterative phase and then
+> >> when VM is stopped?  
+> > 
+> > I don't understand why this is controversial.  We cannot decide within
+> > the vfio device to only expose device dirtied pages in the final stage
+> > of migration.  It's not our job to minimize the number of pages copied
+> > beyond the hardware granularity.  If core QEMU migration code asks for
+> > dirty pages, we provide them, regardless of how many times we report a
+> > page as dirty.  So yes, if that migration code asks for dirty pages in
+> > the iterative stage and the stopped stage, we provide them both times.  
+> 
+> Isn't that would increase total migration time?
 
-This fix is sufficient to get bash to a shell prompt.
+As I explained, that's not a policy decision that we as a device within
+the VM should be making.  We do not have the visibility to determine
+how the footprint of our device will affect the migration and by
+preventing QEMU migration code from understanding the device footprint,
+we're creating a scenario where QEMU absolutely cannot predict the
+downtime.
+ 
+> > If someone wants to skip the iterative phase altogether, I imagine
+> > there are migration parameters that allow it, but we should not be
+> > determining that policy at the device level.  Thanks,
+> >   
+> 
+> What is that parameter? should that be documented here?
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I'm really pretty unsure about our handling of SPARC register
-windows here. This fix works, but should we instead be
-ensuring that the flush_windows() call cpu_loop() does
-before handling this trap has written the I* regs to the
-stack ???
----
- linux-user/sparc/signal.c | 47 ++++++++++++++++++---------------------
- 1 file changed, 22 insertions(+), 25 deletions(-)
+Dunno, but clearly we could pause the VM, migration, and resume on the
+target.  I imagine there are migration tuning parameters that might do
+essentially that automatically.  Thanks,
 
-diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-index 57ea1593bfc..c315704b389 100644
---- a/linux-user/sparc/signal.c
-+++ b/linux-user/sparc/signal.c
-@@ -403,7 +403,6 @@ void sparc64_set_context(CPUSPARCState *env)
-     struct target_ucontext *ucp;
-     target_mc_gregset_t *grp;
-     abi_ulong pc, npc, tstate;
--    abi_ulong fp, i7, w_addr;
-     unsigned int i;
- 
-     ucp_addr = env->regwptr[WREG_O0];
-@@ -447,6 +446,15 @@ void sparc64_set_context(CPUSPARCState *env)
-     __get_user(env->gregs[5], (&(*grp)[SPARC_MC_G5]));
-     __get_user(env->gregs[6], (&(*grp)[SPARC_MC_G6]));
-     __get_user(env->gregs[7], (&(*grp)[SPARC_MC_G7]));
-+
-+    /*
-+     * Note that unlike the kernel, we didn't need to mess with the
-+     * guest register window state to save it into a pt_regs to run
-+     * the kernel. So for us the guest's O regs are still in WREG_O*
-+     * (unlike the kernel which has put them in UREG_I* in a pt_regs)
-+     * and the fp and i7 are still in WREG_I6 and WREG_I7 and don't
-+     * need to be written back to userspace memory.
-+     */
-     __get_user(env->regwptr[WREG_O0], (&(*grp)[SPARC_MC_O0]));
-     __get_user(env->regwptr[WREG_O1], (&(*grp)[SPARC_MC_O1]));
-     __get_user(env->regwptr[WREG_O2], (&(*grp)[SPARC_MC_O2]));
-@@ -456,18 +464,9 @@ void sparc64_set_context(CPUSPARCState *env)
-     __get_user(env->regwptr[WREG_O6], (&(*grp)[SPARC_MC_O6]));
-     __get_user(env->regwptr[WREG_O7], (&(*grp)[SPARC_MC_O7]));
- 
--    __get_user(fp, &(ucp->tuc_mcontext.mc_fp));
--    __get_user(i7, &(ucp->tuc_mcontext.mc_i7));
-+    __get_user(env->regwptr[WREG_FP], &(ucp->tuc_mcontext.mc_fp));
-+    __get_user(env->regwptr[WREG_I7], &(ucp->tuc_mcontext.mc_i7));
- 
--    w_addr = TARGET_STACK_BIAS + env->regwptr[WREG_O6];
--    if (put_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
--                 abi_ulong) != 0) {
--        goto do_sigsegv;
--    }
--    if (put_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
--                 abi_ulong) != 0) {
--        goto do_sigsegv;
--    }
-     /* FIXME this does not match how the kernel handles the FPU in
-      * its sparc64_set_context implementation. In particular the FPU
-      * is only restored if fenab is non-zero in:
-@@ -501,7 +500,6 @@ void sparc64_get_context(CPUSPARCState *env)
-     struct target_ucontext *ucp;
-     target_mc_gregset_t *grp;
-     target_mcontext_t *mcp;
--    abi_ulong fp, i7, w_addr;
-     int err;
-     unsigned int i;
-     target_sigset_t target_set;
-@@ -553,6 +551,15 @@ void sparc64_get_context(CPUSPARCState *env)
-     __put_user(env->gregs[5], &((*grp)[SPARC_MC_G5]));
-     __put_user(env->gregs[6], &((*grp)[SPARC_MC_G6]));
-     __put_user(env->gregs[7], &((*grp)[SPARC_MC_G7]));
-+
-+    /*
-+     * Note that unlike the kernel, we didn't need to mess with the
-+     * guest register window state to save it into a pt_regs to run
-+     * the kernel. So for us the guest's O regs are still in WREG_O*
-+     * (unlike the kernel which has put them in UREG_I* in a pt_regs)
-+     * and the fp and i7 are still in WREG_I6 and WREG_I7 and don't
-+     * need to be fished out of userspace memory.
-+     */
-     __put_user(env->regwptr[WREG_O0], &((*grp)[SPARC_MC_O0]));
-     __put_user(env->regwptr[WREG_O1], &((*grp)[SPARC_MC_O1]));
-     __put_user(env->regwptr[WREG_O2], &((*grp)[SPARC_MC_O2]));
-@@ -562,18 +569,8 @@ void sparc64_get_context(CPUSPARCState *env)
-     __put_user(env->regwptr[WREG_O6], &((*grp)[SPARC_MC_O6]));
-     __put_user(env->regwptr[WREG_O7], &((*grp)[SPARC_MC_O7]));
- 
--    w_addr = TARGET_STACK_BIAS + env->regwptr[WREG_O6];
--    fp = i7 = 0;
--    if (get_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
--                 abi_ulong) != 0) {
--        goto do_sigsegv;
--    }
--    if (get_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
--                 abi_ulong) != 0) {
--        goto do_sigsegv;
--    }
--    __put_user(fp, &(mcp->mc_fp));
--    __put_user(i7, &(mcp->mc_i7));
-+    __put_user(env->regwptr[WREG_FP], &(mcp->mc_fp));
-+    __put_user(env->regwptr[WREG_I7], &(mcp->mc_i7));
- 
-     {
-         uint32_t *dst = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
--- 
-2.20.1
+Alex
 
 
