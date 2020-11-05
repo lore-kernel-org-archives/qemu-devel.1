@@ -2,87 +2,69 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83088C4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 17:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B8DC55178
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 17:15:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3A5A20867
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 17:13:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UxNKhS1R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3A5A20867
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4867A20936
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 17:15:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4867A20936
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaiot-0000zm-G3
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 12:13:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52220)
+	id 1kaiqh-0003Fo-6j
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 12:14:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kaigs-0001qq-MB
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 12:04:50 -0500
-Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:33603)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kaigq-00072x-0F
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 12:04:49 -0500
-Received: by mail-ed1-x533.google.com with SMTP id v4so2317132edi.0
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 09:04:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=mQyCua0h3UomvintUsOTYbWQgEYfCyzV14qDkLAEeNA=;
- b=UxNKhS1RhrXkHgPCxTXm/19Xoyh9GqLOilYPoKEiBEiDNA6VLGHxF934dRZgOjZ0pZ
- 8N2ZE41NNQe/WpFJTKb673XCwcoHZQl2wfw7pBP637rqxh2Jn9apwZdqpvyae7XF8KAr
- ajBKifoqcouWcHeRJALdHfpdLyCnKTsRviZYgC6kTTDWjiKF6YNp4nAeczpwLJjLNi7v
- VfKRqJvWxBlFAZ90Nn7A3gpoSZeZIhjesB5IKxVN1iMX45nTZdtYmWMFZ3JCrXkodMBZ
- j437iXuG8+rlH3gwhbhkKTwkrCy35sLtvmCFDi4ti2nOsB+4Dib4P5Uf3neL6K3hCrOi
- KoIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mQyCua0h3UomvintUsOTYbWQgEYfCyzV14qDkLAEeNA=;
- b=ue7YI+dyMGmCnA5Iy3GDuq4P09OHyPmPnRAfGR0A4oxx8NmZ1/iKNuV1DTpB9dc9jU
- fT6Nyi27o1jRjAsl4IT6w5fZ69rlCrs7hGtfxymqtFsfNsj/5bdPfv0efM5Ixl1kNPI3
- IgEzEf7WpaYvUUPR3hKF5FkNmheYcVmRZBniuSG12tAx4x4B7OZycYvOk/ouFyetOrJc
- K9CGEG3QAKLnR/BW8RqoOQZBnTDmHpTnMJMWkJ/TOk+uOoJUfebwuQR6CjdAKqidwjBw
- /pqAolqGXNmtCn9j8cknFZ0L0BoF+eemcdnw31hhjsPoPdsx1hvO4n73C/rgQNp37YsI
- OfEw==
-X-Gm-Message-State: AOAM530Ifzjmgg7VljkqBrdhPJ27LpaE68RamxqHGqp6XIVzqMUpzlcX
- PZR5IbcVv68MmIiyt8pCszrNvPibV//WQCbqW+IERw==
-X-Google-Smtp-Source: ABdhPJyPKqLZnsA72dLd5a6WF92gjoABPZyGFi7x9ihzDRRy6UG8+3W/Hh5o193nqFZkMQutzFIWy9Y0DFWdewMNSng=
-X-Received: by 2002:aa7:df82:: with SMTP id b2mr3442630edy.251.1604595885917; 
- Thu, 05 Nov 2020 09:04:45 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <jonathan.cameron@huawei.com>)
+ id 1kaipH-0001ro-0B
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 12:13:31 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2048)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jonathan.cameron@huawei.com>)
+ id 1kaipE-0008Gh-4B
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 12:13:30 -0500
+Received: from fraeml704-chm.china.huawei.com (unknown [172.18.147.226])
+ by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4CRqn54jrnz67Hpt;
+ Fri,  6 Nov 2020 01:11:37 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml704-chm.china.huawei.com (10.206.15.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Thu, 5 Nov 2020 18:13:12 +0100
+Received: from lhrphicprd00229.huawei.com (10.123.41.22) by
+ lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.1913.5; Thu, 5 Nov 2020 17:13:12 +0000
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH] hw/arm/virt enable support for virtio-mem
+Date: Fri, 6 Nov 2020 01:11:44 +0800
+Message-ID: <20201105171144.560612-1-Jonathan.Cameron@huawei.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-References: <CAJ+F1CJ7KpB8C6-_+Gdh6twqjjRMweERUapw4tfjKyMqa6AM0w@mail.gmail.com>
- <CAFEAcA86UyXfir3JA3E2vuJNZBGOhbxzvomemaCLg6uwOB3c8Q@mail.gmail.com>
- <20201105163605.GX47859@linux.fritz.box>
-In-Reply-To: <20201105163605.GX47859@linux.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Nov 2020 17:04:34 +0000
-Message-ID: <CAFEAcA_ff6bRythvzJWs0McUSz3=2=1=hV9wX_BTv00jPfSHsw@mail.gmail.com>
-Subject: Re: Documents not in sphinx toctree
-To: Jens Freimann <jfreimann@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::533;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x533.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.123.41.22]
+X-ClientProxiedBy: lhreml705-chm.china.huawei.com (10.201.108.54) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=185.176.79.56;
+ envelope-from=jonathan.cameron@huawei.com; helo=frasgout.his.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 12:13:13
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,55 +78,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>,
- QEMU <qemu-devel@nongnu.org>, Sergio Lopez <slp@redhat.com>,
- Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ David Hildenbrand <david@redhat.com>, linuxarm@huawei.com,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Nov 2020 at 16:36, Jens Freimann <jfreimann@redhat.com> wrote:
->
-> On Thu, Nov 05, 2020 at 04:19:00PM +0000, Peter Maydell wrote:
-> >On Thu, 5 Nov 2020 at 16:14, Marc-Andr=C3=A9 Lureau
-> ><marcandre.lureau@gmail.com> wrote:
-> >> By running sphinx over the docs/ directory (like readthedocs.org presu=
-mably does), it finds a couple of rst documents that are not referenced:
-> >> - cpu-hotplug.rst
-> >> - microvm.rst
-> >> - pr-manager.rst
-> >> - virtio-net-failover.rst
->
-> Given the current structure of the content in
-> https://qemu.readthedocs.io/en/latest/,
-> would adding this as a new bullet in "QEMU System Emulation User=E2=80=99=
-s
-> Guide" be the right thing to do?
+Basically a cut and paste job from the x86 support with the exception of
+needing a larger block size as the Memory Block Size (MIN_SECTION_SIZE)
+on ARM64 in Linux is 1G.
 
-Adding which?
+Tested:
+* In full emulation and with KVM on an arm64 server.
+* cold and hotplug for the virtio-mem-pci device.
+* Wide range of memory sizes, added at creation and later.
+* Fairly basic memory usage of memory added.  Seems to function as normal.
+* NUMA setup with virtio-mem-pci devices on each node.
+* Simple migration test.
 
-For cpu-hotplug.rst:
- I guess the system manual. The document has a bit of a
- "tutorial" feel which doesn't entirely fit the rest of the
- manuals.
+Related kernel patch just enables the Kconfig item for ARM64 as an
+alternative to x86 in drivers/virtio/Kconfig
 
-For microvm.rst:
- docs/system/target-i386.rst should be split into
- documentation for each of the machine models separately
- (as a list of links to docs in docs/system/i386/, similar
- to the structure of target-arm.rst and docs/system/arm/).
- Then microvm.rst can go into docs/system/i386.
+The original patches from David Hildenbrand stated that he thought it should
+work for ARM64 but it wasn't enabled in the kernel [1]
+It appears he was correct and everything 'just works'.
 
-For pr-manager.rst:
- The parts that are documenting the qemu-pr-helper invocation
- should turn into a docs/tools/ manpage for it.
- The other parts should go in the system manual I guess.
+The build system related stuff is intended to ensure virtio-mem support is
+not built for arm32 (build will fail due no defined block size).
+If there is a more elegant way to do this, please point me in the right
+direction.
 
-For virtio-net-failover.rst:
- Should go under the "Network emulation" part of the system
- manual, I think.
+[1] https://lore.kernel.org/linux-mm/20191212171137.13872-1-david@redhat.com/
 
-thanks
--- PMM
+Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+---
+ default-configs/devices/aarch64-softmmu.mak |  1 +
+ hw/arm/Kconfig                              |  1 +
+ hw/arm/virt.c                               | 64 ++++++++++++++++++++-
+ hw/virtio/Kconfig                           |  4 ++
+ hw/virtio/virtio-mem.c                      |  2 +
+ 5 files changed, 71 insertions(+), 1 deletion(-)
+
+diff --git a/default-configs/devices/aarch64-softmmu.mak b/default-configs/devices/aarch64-softmmu.mak
+index 958b1e08e4..31d6128a29 100644
+--- a/default-configs/devices/aarch64-softmmu.mak
++++ b/default-configs/devices/aarch64-softmmu.mak
+@@ -6,3 +6,4 @@ include arm-softmmu.mak
+ CONFIG_XLNX_ZYNQMP_ARM=y
+ CONFIG_XLNX_VERSAL=y
+ CONFIG_SBSA_REF=y
++CONFIG_ARCH_VIRTIO_MEM_SUPPORTED=y
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index fdf4464b94..eeae77eee9 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -20,6 +20,7 @@ config ARM_VIRT
+     select PLATFORM_BUS
+     select SMBIOS
+     select VIRTIO_MMIO
++    select VIRTIO_MEM_SUPPORTED if ARCH_VIRTIO_MEM_SUPPORTED
+     select ACPI_PCI
+     select MEM_DEVICE
+     select DIMM
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 8abb385d4e..a9f927ce83 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -73,9 +73,11 @@
+ #include "hw/acpi/acpi.h"
+ #include "target/arm/internals.h"
+ #include "hw/mem/pc-dimm.h"
++#include "hw/mem/memory-device.h"
+ #include "hw/mem/nvdimm.h"
+ #include "hw/acpi/generic_event_device.h"
+ #include "hw/virtio/virtio-iommu.h"
++#include "hw/virtio/virtio-mem-pci.h"
+ #include "hw/char/pl011.h"
+ #include "qemu/guest-random.h"
+ 
+@@ -2286,6 +2288,34 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+                          dev, &error_abort);
+ }
+ 
++static void virt_virtio_md_pci_pre_plug(HotplugHandler *hotplug_dev,
++                                      DeviceState *dev, Error **errp)
++{
++    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
++    Error *local_err = NULL;
++
++    if (!hotplug_dev2 && dev->hotplugged) {
++        /*
++         * Without a bus hotplug handler, we cannot control the plug/unplug
++         * order. We should never reach this point when hotplugging,
++         * however, better add a safety net.
++         */
++        error_setg(errp, "hotplug of virtio-mem based memory devices not supported"
++                   " on this bus.");
++        return;
++    }
++    /*
++     * First, see if we can plug this memory device at all. If that
++     * succeeds, branch of to the actual hotplug handler.
++     */
++    memory_device_pre_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev), NULL,
++                           &local_err);
++    if (!local_err && hotplug_dev2) {
++        hotplug_handler_pre_plug(hotplug_dev2, dev, &local_err);
++    }
++    error_propagate(errp, local_err);
++}
++
+ static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+                                             DeviceState *dev, Error **errp)
+ {
+@@ -2293,6 +2323,8 @@ static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+ 
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+         virt_memory_pre_plug(hotplug_dev, dev, errp);
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
++        virt_virtio_md_pci_pre_plug(hotplug_dev, dev, errp);        
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
+         hwaddr db_start = 0, db_end = 0;
+         char *resv_prop_str;
+@@ -2322,6 +2354,27 @@ static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+     }
+ }
+ 
++static void virt_virtio_md_pci_plug(HotplugHandler *hotplug_dev,
++                                  DeviceState *dev, Error **errp)
++{
++    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
++    Error *local_err = NULL;
++
++    /*
++     * Plug the memory device first and then branch off to the actual
++     * hotplug handler. If that one fails, we can easily undo the memory
++     * device bits.
++     */
++    memory_device_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
++    if (hotplug_dev2) {
++        hotplug_handler_plug(hotplug_dev2, dev, &local_err);
++        if (local_err) {
++            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
++        }
++    }
++    error_propagate(errp, local_err);
++}
++
+ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+                                         DeviceState *dev, Error **errp)
+ {
+@@ -2336,6 +2389,9 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+         virt_memory_plug(hotplug_dev, dev, errp);
+     }
++    if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
++        virt_virtio_md_pci_plug(hotplug_dev, dev, errp);
++    }
+     if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
+         PCIDevice *pdev = PCI_DEVICE(dev);
+ 
+@@ -2363,6 +2419,11 @@ static void virt_dimm_unplug_request(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
++    if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
++        error_setg(&local_err,
++                   "virtio-mem based memory devices cannot be unplugged.");
++        goto out;
++    }
+     hotplug_handler_unplug_request(HOTPLUG_HANDLER(vms->acpi_dev), dev,
+                                    &local_err);
+ out:
+@@ -2413,7 +2474,8 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+                                                         DeviceState *dev)
+ {
+     if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
+-       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
++        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
++        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)){
+         return HOTPLUG_HANDLER(machine);
+     }
+     if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
+diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
+index 0eda25c4e1..00dbf2939e 100644
+--- a/hw/virtio/Kconfig
++++ b/hw/virtio/Kconfig
+@@ -48,6 +48,10 @@ config VIRTIO_PMEM
+     depends on VIRTIO_PMEM_SUPPORTED
+     select MEM_DEVICE
+ 
++config ARCH_VIRTIO_MEM_SUPPORTED
++    bool
++    default n
++
+ config VIRTIO_MEM_SUPPORTED
+     bool
+ 
+diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+index 7c8ca9f28b..c28f12547a 100644
+--- a/hw/virtio/virtio-mem.c
++++ b/hw/virtio/virtio-mem.c
+@@ -53,6 +53,8 @@
+  */
+ #if defined(TARGET_X86_64) || defined(TARGET_I386)
+ #define VIRTIO_MEM_USABLE_EXTENT (2 * (128 * MiB))
++#elif defined (TARGET_AARCH64)
++#define VIRTIO_MEM_USABLE_EXTENT (2 * (1024 * MiB))
+ #else
+ #error VIRTIO_MEM_USABLE_EXTENT not defined
+ #endif
+-- 
+2.19.1
+
 
