@@ -2,74 +2,84 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87B2EC388F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6396CC4742C
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:47:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1173220715
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:39:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1173220715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9E1A020756
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 23:47:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ItsoJKzB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E1A020756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaoqY-0006Fv-2g
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 18:39:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56204)
+	id 1kaoyr-0008Ds-9f
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 18:47:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1kaopz-0005iZ-Pz
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:38:39 -0500
-Received: from mga02.intel.com ([134.134.136.20]:61726)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1kaopw-0004go-Hn
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:38:39 -0500
-IronPort-SDR: aDLRRJnpr546baAbZbKJSbOXWwdf3nIIyJ/j+IGL/teiQddqA/SkxXSW6nnRo3mzdrdArN1Q/K
- rYI0z3hr9tOg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="156476851"
-X-IronPort-AV: E=Sophos;i="5.77,454,1596524400"; d="scan'208";a="156476851"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 05 Nov 2020 15:38:30 -0800
-IronPort-SDR: qNheFEMmUO3d32eqVGnbgI0ML20D9/ICLWbSFn92x4P3HgrE4S9aA0yzUJbW7mp2Vpd9RfiZJl
- S4c9e/VT645w==
-X-IronPort-AV: E=Sophos;i="5.77,454,1596524400"; d="scan'208";a="539608716"
-Received: from joy-optiplex-7040.sh.intel.com (HELO yzhao56-desk)
- ([10.239.13.16])
- by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 05 Nov 2020 15:38:27 -0800
-Date: Fri, 6 Nov 2020 07:37:03 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: VFIO Migration
-Message-ID: <20201105233702.GA1584@yzhao56-desk>
-References: <20201102111153.GC42093@stefanha-x1.localdomain>
- <20201102123823.066d156a@w520.home>
- <20201103110324.GA243332@stefanha-x1.localdomain>
- <20201103101305.10254ae4@w520.home>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kaoxf-0007fI-JW
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:46:38 -0500
+Received: from mail-ej1-x62e.google.com ([2a00:1450:4864:20::62e]:46875)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kaoxN-0005yJ-Jv
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 18:46:29 -0500
+Received: by mail-ej1-x62e.google.com with SMTP id w13so5119009eju.13
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 15:46:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=tiC+tztL0+pKnyq6+BMpYKlDBghPae5NUlBdt/xJ3dA=;
+ b=ItsoJKzBR+GZ4OC4d3qIlAm9yRMh3Wajhpd5LM6DcSN2FyPsFxmUSkO8IGmkU0aav+
+ ZIVpgcGrJiveyrs6Y4/eqHIneTNQ7U06yW3Obe17scPe5amh7KSl5U479sgr0RvUbgp/
+ LykwzZKhNjV8mTzb4nxHK3OGPd+TBzILJAhRXV/tz0/08Q7KTGhDFC26lcllszRCkEVm
+ OoTuX+zIBukblvnC9BXX2pqbvbP/xlUQ7lgVCYS5axv/y96HpNnOpg5m1FNVEIVQ6+W1
+ Q33r7ph1XZv6mMkk3BLnSI1GQAeMTzNus3ruGW3ZCSb86KRoKsO5Hm7WRdtpUQG84nIs
+ BZGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=tiC+tztL0+pKnyq6+BMpYKlDBghPae5NUlBdt/xJ3dA=;
+ b=CfoovDKSebA7jKjWXNwrSJYvV4kini2CExKk01y0fjoV0k332xOoncdFxNm3RpszAw
+ snnyN4arIqT1c1UgxGyzZBtl5OOJN3fR2BMXJIcZkSE3TxTdQrddWQOnJWsmS1gTkPuK
+ LFkQ6Aj6TRzsPinWRDmE+It687MliiU3ksncFqDbHIdtBqPeWKDdAbwxI8Tipo5wa04i
+ Cdb2TjR3iDPTHaPYUm9NSLcVxTk5ImNV95Gzeyzv5pF174qnrEb0cFGH8MNHFLsvPz6S
+ Oglku8X2tWJPlyDRYH2jur3miKLT1GxCqRGTeQcW2xu6LDpA9Tj2E4ajR6n04lzz9MVY
+ tYPw==
+X-Gm-Message-State: AOAM531FTD/wxT7q6DJi0h8sZMLn/6TuENfz7aN3rJaxZVvhhQTB8kMf
+ fpEvcOhjKCSGG8nhC8MMCHmbIfqdtbQfhUkgQ2it4Q==
+X-Google-Smtp-Source: ABdhPJyEXYjlbk8cZUcCqM8PKK5WiNq9yhMJD+Mpx7WwHnsdmM/n4uk0d5XyKXuXD/ygcUKWRxZSC2/auzhHqH3XjJ0=
+X-Received: by 2002:a17:907:9e3:: with SMTP id ce3mr4927397ejc.4.1604619975127; 
+ Thu, 05 Nov 2020 15:46:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201103101305.10254ae4@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=134.134.136.20; envelope-from=yan.y.zhao@intel.com;
- helo=mga02.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 18:38:31
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20201105034919.393653-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20201105034919.393653-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Nov 2020 23:46:04 +0000
+Message-ID: <CAFEAcA9AhEoYL+NApMDpH7dWHKBoRs98B0z20mCb6-_FCYuFRQ@mail.gmail.com>
+Subject: Re: [PULL 0/3] ppc-for-5.2 patch queue 2020-11-05
+To: David Gibson <david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62e;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,91 +93,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: John G Johnson <john.g.johnson@oracle.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, mtsirkin@redhat.com,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- quintela@redhat.com, Jason Wang <jasowang@redhat.com>,
- Felipe Franciosi <felipe@nutanix.com>, "Zeng, Xin" <xin.zeng@intel.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Kirti Wankhede <kwankhede@nvidia.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 03, 2020 at 10:13:05AM -0700, Alex Williamson wrote:
-> On Tue, 3 Nov 2020 11:03:24 +0000
-> Stefan Hajnoczi <stefanha@redhat.com> wrote:
+On Thu, 5 Nov 2020 at 03:49, David Gibson <david@gibson.dropbear.id.au> wrote:
+>
+> The following changes since commit 3c8c36c9087da957f580a9bb5ebf7814a753d1c6:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20201104-pull-request' into staging (2020-11-04 16:52:17 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/dgibson/qemu.git tags/ppc-for-5.2-20201105
+>
+> for you to fetch changes up to f29b959dc6871c9d8df781d1bedcfaebc76d5565:
+>
+>   spapr: Convert hpt_prepare_thread() to use qemu_try_memalign() (2020-11-05 12:18:48 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue for 2020-11-05
+>
+> A small PR this time, one bugfix, one removal of minor dead code, one
+> warning suppression.
+>
+> ----------------------------------------------------------------
+> Chen Qun (1):
+>       target/ppc/excp_helper: Add a fallthrough for fix compiler warning
+>
+> Greg Kurz (2):
+>       spapr: Drop dead code in spapr_reallocate_hpt()
+>       spapr: Convert hpt_prepare_thread() to use qemu_try_memalign()
 
-<...>
->  
-> > Management tools need to match the device model/configuration from the
-> > source device against the destination device. If the destination is
-> > capable of supporting the source's device model/configuration then
-> > migration can proceed safely.
-> > 
-> > Let's look at the case where we are migration from an older version of a
-> > device to a newer version. On the source we have:
-> > 
-> >   model = https://vendor-a.com/my-nic
-> > 
-> > On the destination we have:
-> > 
-> >   model = https://vendor-a.com/my-nic
-> >   rss = on
-> > 
-> > The two devices are incompatible because the destination exposes the RSS
-> > feature that is not present on the source. The RSS feature involves
-> > guest-visible hardware interface changes and a change to the device
-> > state representation. It is not safe to migrate!
-> > 
-> > In this case an extra configuration step is necessary so that the
-> > destination device can accept the device state from the source. The
-> > management tool invokes a vendor-specific tool to put the device into
-> > the right configuration:
-> > 
-> >   # vendor-tool set-migration-config --device 0000:00:04.0 \
-> >                                      --model https://vendor-a.com/my-nic
-> > 
-> > (This tool only succeeds when the device is bound to VFIO but not yet
-> > opened.)
-> > 
-> > The tool invokes ioctls on the vendor-specific VFIO driver that does two
-> > things:
-> > 1. Tells the device to present the old hardware interface without RSS
-> > 2. Uses the old device state representation without RSS support
-> > 
-> > Does this approach fit?
-> 
-> 
-> Should we not require that any sort of configuration like this occurs
-> through sysfs?  We must be able to create an instance with a specific
-> configuration without using vendor specific tools, therefore in the
-> worse case we should be able to remove and recreate an instance as we
-> desire without invoking vendor specific tools.  Thanks,
-> 
-hi Alex,
-could mdevctl serve as a general configuration tool to create/destroy/config
-mdev devices?
 
-I think previously the main debate is on what is an easy way for management
-tool to find and create a compatible target mdev device according to sysfs
-info of source mdev device, is it?
-as in [1], we have simplified the method to 1:1 matching of mdev_type
-in src and target. and we can further force it to be 1:1 matching of
-vendor_specific attributes (e.g. pci id) and dynamic resources
-(e.g. aggregator, fps,...) and have mdevctl to create a compatible target
-for management tools.
+Applied, thanks.
 
-Given management tools like openstack are still in their preliminary
-stage of supporting mdev devices, could we first settle down the
-compatibility sysfs protocol and treat mdevctl as userspace tool
-currently?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
-[1]: https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg03273.html
-
-Thanks
-Yan
+-- PMM
 
