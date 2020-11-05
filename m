@@ -2,82 +2,93 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DF2C4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E8BC4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:08:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 388A820715
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:08:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2713922203
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:08:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="gmBm+m8z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 388A820715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J149agkP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2713922203
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kagrr-0007Yy-5l
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:08:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53096)
+	id 1kags5-0007ul-3B
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:08:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kagqu-0006rj-5O; Thu, 05 Nov 2020 10:07:04 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:36935)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kagqr-0001H3-Nb; Thu, 05 Nov 2020 10:07:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=J80vtLgb+JbeRkicM5+Hda5f+1nTevLNRPjcN23fEMA=; b=gmBm+m8zcHwMHHa2fbyf7qSnpF
- VqVI9pndK0nmSyWd1OcYVa+E4ZG3spmnE6McjnIX7pDMi1/tkaq49cxQNyXHli4VPovL98u6KEzoL
- lhYH/Pq+xgBOQX6J2SOgcaaLLJhUGOvhrM6r3kZJI7hAeRxPMSkDH/tr6p9oRxFfq9QByss84EBv+
- z20eAc/cng1Ga7DI4JxnB0WoxobrUQnw/76hQgm3JkvfLLqBXjBBEexcVE+F4WEFJS+jta74cbxzM
- V5h9ikuPEZGVlopDEH9OTHCdzNCvmWLe1bfKu6wWWbiJItsB1r0w84DDsfsSgu2eVsDLfjIRboOPU
- H5cePrkw==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>,
- Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <philmd@redhat.com>,
- Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Paul Durrant <paul@xen.org>,
- Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH-for-5.2 v3 2/4] hw/9pfs: Fix Kconfig dependency problem
- between 9pfs and Xen
-Date: Thu, 05 Nov 2020 16:06:45 +0100
-Message-ID: <401148579.MYj8lGMC4g@silver>
-In-Reply-To: <2140852.vo20GZeEQY@silver>
-References: <20201104115706.3101190-1-philmd@redhat.com>
- <20201105132346.5e0adf94@bahia.lan> <2140852.vo20GZeEQY@silver>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kagrL-00074i-6u
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:07:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45244)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kagrF-0001QT-A5
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:07:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604588843;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=s5n4HmvUrb0nZvEFW+GeMdEHDZWEKh9JRjzXxw54Ifk=;
+ b=J149agkPLVeamM0n3Lg2K2osxzumzn3/A2ckyDAW/B+mplBv7iPhkfG+6r+QCSkcxMFp29
+ olGBCKWlFGeQJQd/PjYfBS0r4jaoP/hPGJFPh6pA89B6kbQpyYIcCtCzMy8nQKGF4fnchg
+ kSpGFBhQ+4S7VmNQcB3yMsWDopRMOnc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-0zgZkziIOWWuwXZlFwdLqg-1; Thu, 05 Nov 2020 10:07:19 -0500
+X-MC-Unique: 0zgZkziIOWWuwXZlFwdLqg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFA0C1006CA2;
+ Thu,  5 Nov 2020 15:07:17 +0000 (UTC)
+Received: from redhat.com (ovpn-115-13.ams2.redhat.com [10.36.115.13])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C06E6198D;
+ Thu,  5 Nov 2020 15:07:16 +0000 (UTC)
+Date: Thu, 5 Nov 2020 15:07:12 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Steven Sistare <steven.sistare@oracle.com>
+Subject: Re: [PATCH V2] vl: pause option
+Message-ID: <20201105150712.GO630142@redhat.com>
+References: <1604332203-435466-1-git-send-email-steven.sistare@oracle.com>
+ <d93b83ea-f31d-4e6b-2350-c6d4c9b71448@redhat.com>
+ <87imakby2n.fsf@linaro.org>
+ <db5462f0-f96f-2498-3aa3-ec322462ba22@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 10:06:59
+In-Reply-To: <db5462f0-f96f-2498-3aa3-ec322462ba22@oracle.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,82 +101,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 5. November 2020 13:28:31 CET Christian Schoenebeck wrote:
-> On Donnerstag, 5. November 2020 13:23:46 CET Greg Kurz wrote:
-> > On Thu, 5 Nov 2020 13:15:59 +0100
-> >=20
-> > Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
-> > > On 11/4/20 6:54 PM, Greg Kurz wrote:
-> > > > On Wed, 04 Nov 2020 13:18:09 +0100
-> > > >=20
-> > > > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > >> On Mittwoch, 4. November 2020 12:57:04 CET Philippe Mathieu-Daud=E9
->=20
-> wrote:
-> > > >>> Commit b2c00bce54c ("meson: convert hw/9pfs, cleanup") introduced
-> > > >>> CONFIG_9PFS (probably a wrong conflict resolution). This config is
-> > > >>> not used anywhere. Backends depend on CONFIG_FSDEV_9P which itself
-> > > >>> depends on CONFIG_VIRTFS.
-> > > >>>=20
-> > > >>> Remove the invalid CONFIG_9PFS and use CONFIG_FSDEV_9P instead, to
-> > > >>>=20
-> > > >>> fix the './configure --without-default-devices --enable-xen' buil=
-d:
-> > > >>>   /usr/bin/ld: libcommon.fa.p/hw_xen_xen-legacy-backend.c.o: in
-> > > >>>   function
-> > > >>>=20
-> > > >>> `xen_be_register_common': hw/xen/xen-legacy-backend.c:754: undefi=
-ned
-> > > >>> reference to `xen_9pfs_ops' /usr/bin/ld:
-> > > >>> libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x8): undefined
-> > > >>> reference to
-> > > >>> `local_ops' /usr/bin/ld:
-> > > >>> libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x20): undefined
-> > > >>> reference
-> > > >>> to `synth_ops' /usr/bin/ld:
-> > > >>> libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x38): undefined
-> > > >>> reference
-> > > >>> to `proxy_ops' collect2: error: ld returned 1 exit status
-> > > >>>=20
-> > > >>> Fixes: b2c00bce54c ("meson: convert hw/9pfs, cleanup")
-> > > >>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > >>> Acked-by: Greg Kurz <groug@kaod.org>
-> > > >>> Tested-by: Greg Kurz <groug@kaod.org>
-> > > >>> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > > >>=20
-> > > >> Acked-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > >=20
-> > > > Phil,
-> > > >=20
-> > > > Same questioning as Connie. Do you intend to get this merged or sho=
-uld
-> > > > Christian or I take care of that ?
-> > >=20
-> > > Same answer too =3D) If you are preparing a pull request, please go a=
-head!
-> >=20
-> > Heh I've just seen your answer.
-> >=20
-> > Christian,
-> >=20
-> > Maybe you can add this patch in your next PR ?
->=20
-> Yes, I will prepare a 9p PR today anyway, so I will include this patch.
->=20
-> Best regards,
-> Christian Schoenebeck
+On Thu, Nov 05, 2020 at 09:55:21AM -0500, Steven Sistare wrote:
+> On 11/4/2020 4:40 PM, Alex Bennée wrote:
+> > Eric Blake <eblake@redhat.com> writes:
+> >> On 11/2/20 9:50 AM, Steve Sistare wrote:
+> >>> Provide the -pause command-line parameter and the QEMU_PAUSE environment
+> >>> variable to pause QEMU during process startup using SIGSTOP and allow a
+> >>> developer to attach a debugger, or observe the process using tools such as
+> >>> strace.  Useful when the QEMU has been launched with some other entity, such
+> >>> as libvirt.  QEMU_PAUSE is checked in a constructor at the highest priority,
+> >>> and can be used to debug other constructors.  The -pause option is checked
+> >>> later, during argument processing in main, but is useful if passing an
+> >>> environment variable from a launcher to qemu is awkard.
+> >>>
+> >>> Usage: qemu -pause, or QEMU_PAUSE=1
+> >>> After attaching a debugger, send SIGCONT to the qemu process to continue.
+> >>
+> >> Changing behavior via a new environment variable is awkward.  What
+> >> happens, for example, if libvirt inherits this variable set, but is not
+> >> aware of its impact to alter how qemu starts up?  Can we get by with
+> >> ONLY a command line option?
+> >>
+> >> Also, how does this option differ from what we already have with qemu
+> >> --preconfig?
+> > 
+> > In the original discussion:
+> > 
+> >   Subject: [PATCH V1 12/32] vl: pause option
+> >   Date: Thu, 30 Jul 2020 08:14:16 -0700
+> >   Message-Id: <1596122076-341293-13-git-send-email-steven.sistare@oracle.com>
+> > 
+> > it seems the idea was to stop qemu as early as possible for debugging
+> > when launched by some other launcher which wasn't modifiable except by
+> > pass through configuration to QEMU's command line.
+> > 
+> > <snip>
+> > 
+> >> Isn't it always possible to provide a wrapper qemu process to be invoked
+> >> by whatever third-party management app (like libvirt), where your
+> >> wrapper then starts the real qemu under gdb to begin with, rather than
+> >> having to hack qemu itself to have a special start-up mode?
+> > 
+> > I agree - this feels like a bit of an over complication as a debug
+> > helper. How many times can a failure to launch by some binary blob not
+> > be debugged by either a gdb follow-fork or a copying of the command line
+> > and running gdb --args?
+> 
+> Follow fork is awkward and error prone when the launcher performs many forks before forking
+> qemu. gdb --args does not work when the launcher sets up an environment for qemu to run
+> in, pre-opening fd's being just one example.  For developers, often the "launcher" is a 
+> script that performs setup and passes the myriad qemu options.  Even in that case, it is
+> easier to add a flag or set an env var to enable debugging. The pause option is fast 
+> (for the user) and reliable.
 
-Queued on 9p.next:
-https://github.com/cschoenebeck/qemu/commits/9p.next
+What is your launcher ?  Are you using libvirt, or something else ?
 
-Thanks!
+If the goal is simply to make it easy to attach GDB right at the start of
+QEMU execution, then could this feature be supported by the launcher itself
+in an easier way.
 
-Best regards,
-Christian Schoenebeck
+eg, immediately before the execve(qemu, ....) syscall, the launcher can
+simply send SIGSTOP to itself.  You can now fire up GDB, attach to it,
+and be able to watch execution from the very momement of execve(),
+which is even earlier than this patch allows for, and still avoids the
+need to follow across forks. 
 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
