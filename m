@@ -2,71 +2,71 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 393E3C55179
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EAA8C4741F
 	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 13:50:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5CB02074B
+	by mail.kernel.org (Postfix) with ESMTPS id E9AE320759
 	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 13:50:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M/aewXUe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5CB02074B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gaPwhKOP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9AE320759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaff8-0008Ee-EU
+	id 1kaff8-0008IU-Md
 	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 08:50:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59002)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kafVz-0003uP-Nd
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 08:41:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24543)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kafW1-0003zR-M9
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 08:41:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54911)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kafVx-0004Bo-3G
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 08:41:23 -0500
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kafVz-0004D9-PP
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 08:41:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604583679;
+ s=mimecast20190719; t=1604583683;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/6uL0ifc3NOXN3CbpVzncRBe2N5ILAHhkVbRkNazYBs=;
- b=M/aewXUeFQBApWF/SQaFfwMaJsF0iPkTCVhxe37kMIPp7Gezwnr1Qu1wEOl/iobORabjDT
- oGwCoom/j0WlI8om3W5npZOL0BVJseaSUWH/Y2AUntGvz9MUKghLhA+GCxaJKD/cYTUrWw
- eNmS7q2Osa2FDVSZ0Gj13zZcmdXjWVI=
+ bh=MpTu7+pxv+zPUU9VW6IUZ+BpvlWuitvM343kAr6A2YE=;
+ b=gaPwhKOPbc8DqUsQzFclfUZf+ndIO2NvqUh/rr5GEHCiZaiST5XqwkzL59MlcmOFHlkYOH
+ dFWtucn5fP/8EdgoaIk4lsH5MEaftIOd3aYNB2bwrQcebDt5uLdVjSN55BMZ2KTIf4s5Ym
+ WKLD8+rhZyPYqXUzgubPR+qBnZMlED0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-4_vxVnc7ONCOoZ_h93DWfQ-1; Thu, 05 Nov 2020 08:41:17 -0500
-X-MC-Unique: 4_vxVnc7ONCOoZ_h93DWfQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-131-XcflAEQTMhqYEBNO-Atq7Q-1; Thu, 05 Nov 2020 08:41:18 -0500
+X-MC-Unique: XcflAEQTMhqYEBNO-Atq7Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0C3319080B9
- for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 13:41:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0B151009E26
+ for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 13:41:17 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 64BC255790;
- Thu,  5 Nov 2020 13:41:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7A7705D9D5;
+ Thu,  5 Nov 2020 13:41:17 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A68969B0C; Thu,  5 Nov 2020 14:41:12 +0100 (CET)
+ id CC6B09AFB; Thu,  5 Nov 2020 14:41:12 +0100 (CET)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/6] usb-storage: add commandlog property
-Date: Thu,  5 Nov 2020 14:41:08 +0100
-Message-Id: <20201105134112.25119-3-kraxel@redhat.com>
+Subject: [PATCH 6/6] xhci: move sanity checks
+Date: Thu,  5 Nov 2020 14:41:12 +0100
+Message-Id: <20201105134112.25119-7-kraxel@redhat.com>
 In-Reply-To: <20201105134112.25119-1-kraxel@redhat.com>
 References: <20201105134112.25119-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -101,56 +101,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add property so scsi command logging can be switched
-at runtime instead of compile time.
+The v variable goes negative for reg < 0x20.  Reorder the code
+to first sanity check then calculate v and assign intr to make
+sanity checkers happy.
 
+Buglink: https://bugs.launchpad.net/qemu/+bug/1902112
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/dev-storage.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/usb/hcd-xhci.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index e317cde8fd48..d5cc6137443c 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -25,8 +25,6 @@
- #include "qom/object.h"
- #include "trace.h"
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index d00bb0141dac..6dfb17cbe915 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3010,14 +3010,17 @@ static void xhci_runtime_write(void *ptr, hwaddr reg,
+                                uint64_t val, unsigned size)
+ {
+     XHCIState *xhci = ptr;
+-    int v = (reg - 0x20) / 0x20;
+-    XHCIInterrupter *intr = &xhci->intr[v];
++    XHCIInterrupter *intr;
++    int v;
++
+     trace_usb_xhci_runtime_write(reg, val);
  
--//#define DEBUG_MSD
--
- /* USB requests.  */
- #define MassStorageReset  0xff
- #define GetMaxLun         0xfe
-@@ -59,6 +57,7 @@ struct MSDState {
-     /* usb-storage only */
-     BlockConf conf;
-     uint32_t removable;
-+    bool commandlog;
-     SCSIDevice *scsi_dev;
- };
- typedef struct MSDState MSDState;
-@@ -451,9 +450,9 @@ static void usb_msd_handle_data(USBDevice *dev, USBPacket *p)
-             assert(le32_to_cpu(s->csw.residue) == 0);
-             s->scsi_len = 0;
-             s->req = scsi_req_new(scsi_dev, tag, cbw.lun, cbw.cmd, NULL);
--#ifdef DEBUG_MSD
--            scsi_req_print(s->req);
--#endif
-+            if (s->commandlog) {
-+                scsi_req_print(s->req);
-+            }
-             len = scsi_req_enqueue(s->req);
-             if (len) {
-                 scsi_req_continue(s->req);
-@@ -684,6 +683,7 @@ static Property msd_properties[] = {
-     DEFINE_BLOCK_PROPERTIES(MSDState, conf),
-     DEFINE_BLOCK_ERROR_PROPERTIES(MSDState, conf),
-     DEFINE_PROP_BIT("removable", MSDState, removable, 0, false),
-+    DEFINE_PROP_BOOL("commandlog", MSDState, commandlog, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
+     if (reg < 0x20) {
+         trace_usb_xhci_unimplemented("runtime write", reg);
+         return;
+     }
++    v = (reg - 0x20) / 0x20;
++    intr = &xhci->intr[v];
  
+     switch (reg & 0x1f) {
+     case 0x00: /* IMAN */
 -- 
 2.27.0
 
