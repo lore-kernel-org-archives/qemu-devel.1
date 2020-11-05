@@ -2,72 +2,75 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C03C2C4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:52:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA81EC55178
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:54:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AA5420782
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:52:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5631420782
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:54:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h4gesbGC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AA5420782
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yq9D0Vhd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5631420782
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kahZJ-00017c-5x
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:52:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34994)
+	id 1kahaR-0002Lo-BT
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:54:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35288)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kahXx-0008M2-Jz
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:51:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38885)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kahZA-00019c-UB
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:52:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39426)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kahXw-0008Ht-2E
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:51:33 -0500
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kahZ5-0000H2-GQ
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:52:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604591491;
+ s=mimecast20190719; t=1604591562;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=9wx9PY+GRkImCX9zjnpszUPN/ErsdlC5rR7ZwlPk4fI=;
- b=h4gesbGCpPEObN2eRzgPirDJh8UdV6quu1VpMZhoS5B6hFy3iSvaqmM9O5n7+0kLw2in+m
- W+HpE927MWLmwxc3i1laan5IYovOJ6Q4OYgWkzeMpSRw4u/JMTWMMz++Wew1Vzfp/gBml6
- nOXa+Be2DN4+V6mS1zLe40YiNPt8CrI=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=f1IsjEETTa+pJ7s7RpfH+uWZH/ki0r+YVl87rVRUGos=;
+ b=Yq9D0VhdiPppvVHDlXcjcwoiyfzBnseYXMddCQb35wDdPVk/ucqdz7Sk176IEWSK+OKPWi
+ FcMx/SgJskWGpVjwvWkRGyR+Frc933rVDEJ5BbPKa6hJmjbVvILIPFfzRv9Qa/xlgGEsPK
+ JYA1/szKZ0RRo16stR2e6KnEi6VVeG4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-43b9Id0tP5uwdp3vwg8_0Q-1; Thu, 05 Nov 2020 10:51:29 -0500
-X-MC-Unique: 43b9Id0tP5uwdp3vwg8_0Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-325-dUUJIbFIOSKqIQ4FDnIOUw-1; Thu, 05 Nov 2020 10:52:40 -0500
+X-MC-Unique: dUUJIbFIOSKqIQ4FDnIOUw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABA0242380;
- Thu,  5 Nov 2020 15:51:27 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-114-103.phx2.redhat.com [10.3.114.103])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CAE811002382;
- Thu,  5 Nov 2020 15:51:26 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4] block: Fix integer promotion error in bdrv_getlength()
-Date: Thu,  5 Nov 2020 09:51:22 -0600
-Message-Id: <20201105155122.60943-1-eblake@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 083018DF0AC;
+ Thu,  5 Nov 2020 15:52:39 +0000 (UTC)
+Received: from gondolin (ovpn-112-138.ams2.redhat.com [10.36.112.138])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 024FD5C5DE;
+ Thu,  5 Nov 2020 15:52:22 +0000 (UTC)
+Date: Thu, 5 Nov 2020 16:52:20 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [RFC v2] VFIO Migration
+Message-ID: <20201105165220.7ad2d1a6.cohuck@redhat.com>
+In-Reply-To: <20201105150902.GA472489@stefanha-x1.localdomain>
+References: <20201105150902.GA472489@stefanha-x1.localdomain>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -90,48 +93,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, chengchiwen@h3c.com, berto@igalia.com, tu.guoyi@h3c.com,
- "open list:Block layer core" <qemu-block@nongnu.org>, armbru@redhat.com,
- mreitz@redhat.com, wang.yongD@h3c.com
+Cc: John G Johnson <john.g.johnson@oracle.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, mtsirkin@redhat.com, "Daniel P.
+ =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, quintela@redhat.com,
+ Jason Wang <jasowang@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, "Zeng,
+ Xin" <xin.zeng@intel.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Christophe de Dinechin <dinechin@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Back in 2015, we attempted to fix error reporting for images that
-claimed to have more than INT64_MAX/512 sectors, but due to the type
-promotions caused by BDRV_SECTOR_SIZE being unsigned, this
-inadvertently forces all negative ret values to be slammed into -EFBIG
-rather than the original error.  While we're at it, we can avoid the
-confusing ?: by spelling the logic more directly.
+On Thu, 5 Nov 2020 15:09:02 +0000
+Stefan Hajnoczi <stefanha@redhat.com> wrote:
 
-Fixes: 4a9c9ea0d3
-Reported-by: Guoyi Tu <tu.guoyi@h3c.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+(...)
 
-diff --git a/block.c b/block.c
-index 56bacc9e9f13..2fd932154e12 100644
---- a/block.c
-+++ b/block.c
-@@ -5091,8 +5091,13 @@ int64_t bdrv_getlength(BlockDriverState *bs)
- {
-     int64_t ret = bdrv_nb_sectors(bs);
+<did not fully read through the v1 thread, so apologies if I missed
+something>
 
--    ret = ret > INT64_MAX / BDRV_SECTOR_SIZE ? -EFBIG : ret;
--    return ret < 0 ? ret : ret * BDRV_SECTOR_SIZE;
-+    if (ret < 0) {
-+        return ret;
-+    }
-+    if (ret > INT64_MAX / BDRV_SECTOR_SIZE) {
-+        return -EFBIG;
-+    }
-+    return ret * BDRV_SECTOR_SIZE;
- }
+> VFIO/mdev Devices
+> -----------------
+> TODO this is a first draft, more thought needed around enumerating supported
+> parameters, representing default values, etc
+> 
+> The following mdev type sysfs attrs are available for managing device
+> instances:
+> 
+>   /sys/.../<parent-device>/mdev_supported_types/<type-id>/
+>       create - writing a UUID to this file instantiates a device
+>       migration/ - migration related files
+>           model - unique device model string, e.g. vendor-a.com/my-nic
+> 
+> Device models supported by an mdev driver can be enumerated by reading the
+> migration/model attr for each <type-id>.
 
- /* return 0 as number of sectors if no device present or error */
--- 
-2.28.0
+IIUC, we're grouping together all users of a specific mdev_type, but
+support a variety of sub-configurations? Does that include parameters
+or not? If not, shouldn't we already be covered by mdev_type?
+
+> 
+> The following mdev device sysfs attrs relate to a specific device instance:
+> 
+>   /sys/.../<parent-device>/<uuid>/
+>       mdev_type/ - symlink to mdev type sysfs attrs, e.g. to fetch migration/model
+>       migration/ - migration related files
+>           applied - Write "1" to apply current migration parameter values or
+>                     "0" to reset migration parameter values to their defaults.
+>                     Parameters can only be applied or reset while the mdev is
+>                     not opened.
+>           params/ - migration parameters
+>               <my-param> - read/write migration parameter "my-param"
+>               ...
+> 
+> When the device is created the migration/applied attr is "0". Migration
+> parameters are accessible in migration/params/ and read 0 bytes because they
+> are at their default values.  At the point opening the mdev device will fail
+> because migration parameters must be applied first. Migration parameters can be
+> set to the desired values or left at their defaults. "1" must be written to
+> migration/applied before opening the mdev device.
+> 
+> If writing to a migration/params/<param> attr or setting migration/applied to
+> "1" fails, then the device implementation does not support the migration
+> parameters.
+> 
+> An open mdev device typically does not allow migration parameters to be changed
+> at runtime. However, certain migration/params attrs may allow writes at
+> runtime. Usually these migration parameters only affect the device state
+> representation and not the hardware interface. This makes it possible to
+> upgrade or downgrade the device state representation at runtime so that
+> migration is possible to newer or older device implementations.
+> 
+> An existing mdev device instance can be reused by closing the mdev device and
+> writing "0" to migration/applied. This resets parameters to their defaults so
+> that a new list of migration parameters can be applied.
+> 
+> The migration parameter list for an mdev device that is in operation can be
+> read from migration/params/. Parameters that read 0 bytes are at their default
+> value.
+
+I'm trying to figure out what that means for the mdevs I'm most
+familiar with, ccw and ap. Both of them currently support a single
+mdev_type.
+
+For ccw, there are some things that I could imagine as parameters, like
+the device number, or channel paths. Maybe we could include the channel
+path type (FICON, ...) in the migration device model? We should not
+include device numbers etc. in the device model.
+
+For ap, we have matrices covering tuples (APQNs) derived from a
+cross-product of card/domains configure via sysfs attributes. I think
+later modification of these is desired. I think we also might be able
+to mix-and-match different types within the same matrix, so not sure if
+we can put these into any device model. In fact, I'm a bit at a loss
+how the device model for ap would look like (other than simply
+'matrix'). Can we deal with dynamic parameters?
+
+(...)
 
 
