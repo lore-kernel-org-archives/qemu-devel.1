@@ -2,88 +2,65 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE3C9C4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 13:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A17BDC4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:05:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ABDB20739
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 13:55:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vs/oPZnX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ABDB20739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B771C20759
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 14:05:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B771C20759
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kafjm-0004mf-5I
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 08:55:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59074)
+	id 1kaftd-0005Pv-8u
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 09:05:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kafW4-00047G-Ia
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 08:41:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60820)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kafW2-0004Ek-Q3
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 08:41:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604583686;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=g9qB9M5UbWlBa/XA9Ac/BXwYxQBLDBW0bsz7tGE9puY=;
- b=Vs/oPZnXXey8ckClOWWwtDHRHsMBCZx6XudPuBO3/7bVcelhI1nWQSZfDlDGEWaIKVjN3x
- FYqUsx1copL3iU299z9lIiTU4XjTGYIjjDGAturdRSw1fS8qd0e6utRBUH5TUYGl00pwk/
- h+qoFy5h93j7RoE/dmW6a/bJ5aPGlFc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-Jcf6slSePtKkln8MVLpPJg-1; Thu, 05 Nov 2020 08:41:22 -0500
-X-MC-Unique: Jcf6slSePtKkln8MVLpPJg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 338771084C8B
- for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 13:41:21 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
- [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7926C19D6C;
- Thu,  5 Nov 2020 13:41:17 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id C30A09AF9; Thu,  5 Nov 2020 14:41:12 +0100 (CET)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 5/6] xhci: fix guest triggerable assert
-Date: Thu,  5 Nov 2020 14:41:11 +0100
-Message-Id: <20201105134112.25119-6-kraxel@redhat.com>
-In-Reply-To: <20201105134112.25119-1-kraxel@redhat.com>
-References: <20201105134112.25119-1-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
+ id 1kafr3-0002Uj-N9
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:03:10 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2333)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
+ id 1kafqy-0002rY-P9
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 09:03:09 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CRlb63bGXzkcG4;
+ Thu,  5 Nov 2020 22:02:42 +0800 (CST)
+Received: from [10.174.187.138] (10.174.187.138) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 5 Nov 2020 22:02:38 +0800
+Message-ID: <5FA405FE.1080604@huawei.com>
+Date: Thu, 5 Nov 2020 22:02:38 +0800
+From: AlexChen <alex.chen@huawei.com>
+User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
+ rv:17.0) Gecko/20130509 Thunderbird/17.0.6
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+To: <kraxel@redhat.com>
+Subject: [PATCH] usb/hcd-xhci: Fix an index-out-of-bounds in xhci_runtime_write
+ and xhci_runtime_read
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.138]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190; envelope-from=alex.chen@huawei.com;
+ helo=szxga04-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 07:27:41
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,36 +73,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We didn't start any work yet so we can just return
-at that point instead of asserting.
+Currently, the 'v' is not checked whether it is between 0 and 16,
+which may result in an out-of-bounds access to the array 'xhci->intr[]'.
+This is LP#1902112. Following is the reproducer provided in:
+-->https://bugs.launchpad.net/qemu/+bug/1902112
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1883732
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+=== Reproducer (build with --enable-sanitizers) ===
+export UBSAN_OPTIONS="print_stacktrace=1:silence_unsigned_overflow=1"
+cat << EOF | ./qemu-system-i386 -display none -machine\
+ accel=qtest, -m 512M -machine q35 -nodefaults -drive\
+ file=null-co://,if=none,format=raw,id=disk0 -device\
+ qemu-xhci,id=xhci -device usb-tablet,bus=xhci.0\
+ -device usb-bot -device usb-storage,drive=disk0\
+ -chardev null,id=cd0 -chardev null,id=cd1 -device\
+ usb-braille,chardev=cd0 -device usb-ccid -device\
+ usb-ccid -device usb-kbd -device usb-mouse -device\
+ usb-serial,chardev=cd1 -device usb-tablet -device\
+ usb-wacom-tablet -device usb-audio -qtest stdio
+outl 0xcf8 0x80000803
+outl 0xcfc 0x18caffff
+outl 0xcf8 0x80000810
+outl 0xcfc 0x555a2e46
+write 0x555a1004 0x4 0xe7b9aa7a
+EOF
+
+=== Stack Trace ===
+
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior ../hw/usb/hcd-xhci.c:3012:30 in
+../hw/usb/hcd-xhci.c:3012:30: runtime error: index -1 out of bounds for type 'XHCIInterrupter [16]'
+#0 0x55bd2e97c8b0 in xhci_runtime_write /src/qemu/hw/usb/hcd-xhci.c:3012:30
+#1 0x55bd2edfdd13 in memory_region_write_accessor /src/qemu/softmmu/memory.c:484:5
+#2 0x55bd2edfdb14 in access_with_adjusted_size /src/qemu/softmmu/memory.c:545:18
+#3 0x55bd2edfd54b in memory_region_dispatch_write /src/qemu/softmmu/memory.c:0:13
+#4 0x55bd2ed7fa46 in flatview_write_continue /src/qemu/softmmu/physmem.c:2767:23
+#5 0x55bd2ed7cac0 in flatview_write /src/qemu/softmmu/physmem.c:2807:14
+
+This patch fixes this bug.
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1902112
+Reported-by: Alexander Bulekov <alxndr@bu.edu>
+Signed-off-by: Alex Chen <alex.chen@huawei.com>
 ---
- hw/usb/hcd-xhci.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/usb/hcd-xhci.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 79ce5c4be6c4..d00bb0141dac 100644
+index 79ce5c4be6..50abef40ad 100644
 --- a/hw/usb/hcd-xhci.c
 +++ b/hw/usb/hcd-xhci.c
-@@ -1904,7 +1904,9 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, unsigned int streamid)
-         streamid = 0;
-         xhci_set_ep_state(xhci, epctx, NULL, EP_RUNNING);
-     }
--    assert(ring->dequeue != 0);
-+    if (!ring->dequeue) {
-+        return;
-+    }
- 
-     epctx->kick_active++;
-     while (1) {
--- 
-2.27.0
+@@ -2962,8 +2962,9 @@ static uint64_t xhci_runtime_read(void *ptr, hwaddr reg,
+ {
+     XHCIState *xhci = ptr;
+     uint32_t ret = 0;
++    int v = (reg - 0x20) / 0x20;
 
+-    if (reg < 0x20) {
++    if (reg < 0x20 || v < 0 || v >= XHCI_MAXINTRS) {
+         switch (reg) {
+         case 0x00: /* MFINDEX */
+             ret = xhci_mfindex_get(xhci) & 0x3fff;
+@@ -2973,7 +2974,6 @@ static uint64_t xhci_runtime_read(void *ptr, hwaddr reg,
+             break;
+         }
+     } else {
+-        int v = (reg - 0x20) / 0x20;
+         XHCIInterrupter *intr = &xhci->intr[v];
+         switch (reg & 0x1f) {
+         case 0x00: /* IMAN */
+@@ -3009,14 +3009,16 @@ static void xhci_runtime_write(void *ptr, hwaddr reg,
+ {
+     XHCIState *xhci = ptr;
+     int v = (reg - 0x20) / 0x20;
+-    XHCIInterrupter *intr = &xhci->intr[v];
++    XHCIInterrupter *intr;
+     trace_usb_xhci_runtime_write(reg, val);
+
+-    if (reg < 0x20) {
++    if (reg < 0x20 || v < 0 || v >= XHCI_MAXINTRS) {
+         trace_usb_xhci_unimplemented("runtime write", reg);
+         return;
+     }
+
++    intr = &xhci->intr[v];
++
+     switch (reg & 0x1f) {
+     case 0x00: /* IMAN */
+         if (val & IMAN_IP) {
+-- 
+2.19.1
 
