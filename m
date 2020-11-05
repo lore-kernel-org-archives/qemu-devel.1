@@ -2,98 +2,114 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E71C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C269C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:21:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE7952068E
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:16:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11A7520719
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 22:21:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t+Abl4zp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE7952068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O/JsoQbP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A7520719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kanYj-0005qq-Jf
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 17:16:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39048)
+	id 1kancs-0008JB-NA
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 17:21:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kanXm-0005O2-DM
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 17:15:47 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34382)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kanXj-0003kR-Jn
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 17:15:45 -0500
-Received: by mail-pg1-x544.google.com with SMTP id t14so2346651pgg.1
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 14:15:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=GcBcNRfJUezucSvg8wgF7t0aSV5KGLal68AET7W+8go=;
- b=t+Abl4zpvTh63tilk0dZqDtEPy08VP+07fVY1ugh+e+NZElGrMx1LrxqUkLQKw2nnW
- N8XoKbor6AsOnDGW0xlgPtPtBLwOpmh0nJS95YhVwiHGHCRVEAwDvMO8WGKIoJ/I6ac3
- +IZmzRhnYg1/uDKeUcOrbCma3xUbKO+bu524q/6IWLfHte7rdMFAVP7cM5r3tkslGyUv
- ZO6uANiBdp2NdhgEuhSb5DtZrp9Uw6OwqZ8Waqdui5jmTLEBPCkl6qQO5sa16T3C8Rq1
- F69oIbDO+1cEKvqHuhGS5mVaqhM1z9HZzQ8/bn4r/TUdhXAiHaXz+X9W8DOzXoDbJAh5
- Jbdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=GcBcNRfJUezucSvg8wgF7t0aSV5KGLal68AET7W+8go=;
- b=pjs3i7f3chGBDmtU3PCB651vJ1eU3X4zdK36Z6iEoh98/2u7smT118jW/YJQnkCdC0
- RqXiVpKWshIuiR+NaVPzUGrLyweH5zgu61Z0b/q8YpA6D7TWOBaHDX1Grim1kKPux8wt
- HJFbV7pXg8FzHAyBBYzQlwXTtFBPuFByNEJhPZXQNlsuiGfahJqByP9LUFR4YksTNCe3
- zu2SkimdkYmowAuA33Hs+FsT6tF1XJ0u56Jpi3AFw/9Z3jYxN3yeAGnCguzMPm2xe4YZ
- b6pJDiXwjNTagBlMb7yabNClGiDQXhwzlPs+WZQQCWfP8g9HqRGrMKsMpVVSo0NT2NE+
- Wi0w==
-X-Gm-Message-State: AOAM530tr5HUBDpXlUYF/svReX+W6gUgvk2EPSPJTmJbF00PPVwjrtW6
- ABeyRfXzfgqCl5aJvXEGwFFvCA==
-X-Google-Smtp-Source: ABdhPJxG3dTFJSnJB8JawzmcW6JqJoSUvx8cuNp4SQpWFphJChuBueFJcr7sUH+OH7xVLshcGjee1g==
-X-Received: by 2002:a17:90a:c683:: with SMTP id
- n3mr4395518pjt.163.1604614541780; 
- Thu, 05 Nov 2020 14:15:41 -0800 (PST)
-Received: from [172.16.1.221] (76-14-210-194.or.wavecable.com. [76.14.210.194])
- by smtp.gmail.com with ESMTPSA id gf17sm3153132pjb.15.2020.11.05.14.15.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 05 Nov 2020 14:15:41 -0800 (PST)
-Subject: Re: [PATCH for-5.2 1/3] linux-user/sparc: Fix errors in
- target_ucontext structures
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20201105212314.9628-1-peter.maydell@linaro.org>
- <20201105212314.9628-2-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6bdc7371-58a8-a4a8-a948-8e7fce921fdb@linaro.org>
-Date: Thu, 5 Nov 2020 14:15:38 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1kanbE-0006pU-L2
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 17:19:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21712)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1kanbC-0003zs-JV
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 17:19:20 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0A5M2mpS058692
+ for <qemu-devel@nongnu.org>; Thu, 5 Nov 2020 17:19:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=LNfIoY0vneDqIjZ/y7lK3irytyGGxH/3+M4yMt/zypg=;
+ b=O/JsoQbPdgCLIp26LoqU/g1I2+QkJxp6yHoJl4yVjRQaTIWPvI1zq3aqOVwErCBmNQ4Y
+ SAhJj0Gz8IoGgzg4nzl5b4lRpgp9HOLCTNCiGVo6GCqdttNREeN4IDn4MOvlMbqPrFgv
+ 1pJc+VtNdm5+hLnh0/PDytKHsDUPwoiTVCdRXqq7kQlKPMyZDp8Yr7K51yVo2tvk46Ie
+ XZ6cm0sbaEADbyiEnRTMGKT4SOdX65xMg0bealzbNMnjERVcAy4DGrnTsc7cmf5PyObE
+ XjyaUQaoI3b4epgttzoFInQyMF7Way75OJ5o3yaVd3xp+Rsv23oanemQjYiV8DTXSSNP XQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34mhxjtntp-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 17:19:15 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A5M325a063624
+ for <qemu-devel@nongnu.org>; Thu, 5 Nov 2020 17:19:15 -0500
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34mhxjtnt8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 05 Nov 2020 17:19:14 -0500
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A5MCkoq007790;
+ Thu, 5 Nov 2020 22:19:13 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma05wdc.us.ibm.com with ESMTP id 34h09nke68-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 05 Nov 2020 22:19:13 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0A5MJDRf12321492
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 5 Nov 2020 22:19:13 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 191CF6A04F;
+ Thu,  5 Nov 2020 22:19:13 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A66D96A04D;
+ Thu,  5 Nov 2020 22:19:12 +0000 (GMT)
+Received: from Buonos-Thinkpad-X1.ibm.com (unknown [9.65.222.173])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Thu,  5 Nov 2020 22:19:12 +0000 (GMT)
+From: Daniele Buono <dbuono@linux.vnet.ibm.com>
+To: dbuono@linux.vnet.ibm.com, qemu-devel@nongnu.org
+Subject: [PATCH v3 0/9] Add support for Control-Flow Integrity
+Date: Thu,  5 Nov 2020 17:18:56 -0500
+Message-Id: <20201105221905.1350-1-dbuono@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20201105212314.9628-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312, 18.0.737
+ definitions=2020-11-05_15:2020-11-05,
+ 2020-11-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0
+ lowpriorityscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=999
+ clxscore=1015 adultscore=0 impostorscore=0 bulkscore=0 spamscore=0
+ mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2011050141
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 17:19:16
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,36 +122,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Giuseppe Musacchio <thatlemon@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/5/20 1:23 PM, Peter Maydell wrote:
-> The various structs that make up the SPARC target_ucontext had some
-> errors:
->  * target structures must not include fields which are host pointers,
->    which might be the wrong size.  These should be abi_ulong instead
->  * because we don't have the 'long double' part of the mcfpu_fregs
->    union in our version of the target_mc_fpu struct, we need to
->    manually force it to be 16-aligned
-> 
-> In particular, the lack of 16-alignment caused sparc64_get_context()
-> and sparc64_set_context() to read and write all the registers at the
-> wrong offset, which triggered a guest glibc stack check in
-> siglongjmp:
->   *** longjmp causes uninitialized stack frame ***: terminated
-> when trying to run bash.
+This patch adds supports for Control-Flow Integrity checks
+on indirect function calls.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Requires the use of clang, and link-time optimizations
 
-> +} __attribute__((aligned(16)));
+Changes in v3:
 
-Hmph, 96 uses of the attribute directly, 20 uses of QEMU_ALIGNED.  I suppose we
-should just remove the wrapper...
+- clang 11+ warnings are now handled directly at the source,
+instead of disabling specific warnings for the whole code.
+Some more work may be needed here to polish the patch, I
+would kindly ask for a review from the corresponding
+maintainers
+- Remove configure-time checks for toolchain compatibility
+with LTO.
+- the decorator to disable cfi checks on functions has
+been renamed and moved to include/qemu/compiler.h
+- configure-time checks for cfi support and dependencies
+has been moved from configure to meson
 
+Link to v2: https://www.mail-archive.com/qemu-devel@nongnu.org/msg753675.html
+Link to v1: https://www.mail-archive.com/qemu-devel@nongnu.org/msg718786.html
 
-r~
+Daniele Buono (9):
+  fuzz: Make fork_fuzz.ld compatible with LLVM's LLD
+  s390x: fix clang 11 warnings in cpu_models.c
+  hw/usb: reorder fields in UASStatus
+  s390x: Avoid variable size warning in ipl.h
+  scsi: fix overflow in scsi_disk_new_request_dump
+  configure,meson: add option to enable LTO
+  cfi: Initial support for cfi-icall in QEMU
+  check-block: enable iotests with cfi-icall
+  configure/meson: support Control-Flow Integrity
+
+ accel/tcg/cpu-exec.c          | 11 +++++++++
+ configure                     | 26 ++++++++++++++++++++
+ hw/s390x/ipl.h                |  4 +--
+ hw/scsi/scsi-disk.c           |  4 +++
+ hw/usb/dev-uas.c              |  2 +-
+ include/qemu/compiler.h       | 12 +++++++++
+ meson.build                   | 46 +++++++++++++++++++++++++++++++++++
+ meson_options.txt             |  4 +++
+ plugins/core.c                | 37 ++++++++++++++++++++++++++++
+ plugins/loader.c              |  7 ++++++
+ target/s390x/cpu_models.c     |  8 +++---
+ tcg/tci.c                     |  7 ++++++
+ tests/check-block.sh          | 18 ++++++++------
+ tests/qtest/fuzz/fork_fuzz.ld | 12 ++++++++-
+ util/main-loop.c              | 11 +++++++++
+ util/oslib-posix.c            | 11 +++++++++
+ 16 files changed, 205 insertions(+), 15 deletions(-)
+
+-- 
+2.17.1
+
 
