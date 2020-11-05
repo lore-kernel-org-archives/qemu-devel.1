@@ -2,82 +2,95 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A679BC00A89
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3F6C4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:28:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04CA420786
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:21:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04CA420786
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8E3ED20936
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 09:28:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z0RkzlhE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E3ED20936
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kabSs-0002dV-1N
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 04:21:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38346)
+	id 1kabZR-00050j-CG
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 04:28:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kabRz-0001un-B6
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:20:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51018)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kabRx-0004PC-CB
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:20:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kabRu-0002bs-HW
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 09:20:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 780672E8139
- for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 09:20:54 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kabUP-0003Iu-CU
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:23:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45114)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kabUJ-00059a-NH
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 04:23:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604568201;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7B2ZskbvPbFLETwxQ8DCE8oN2CPYHqFwRVEUrmZ4OPo=;
+ b=Z0RkzlhEuVMtoCWrEVCCveuWttw9v+jdyp1OFI3K0Dsue5c1/nCT2JHzuF0w9Eps5BIqTJ
+ Wr+cXI+jNuBAr63RGCpyX7A/u7wfpt8wfTWeHAa3NmO74H3fij0UmzGJunzYo2kNc/Dy/g
+ kYW4lZFLFbcEsMqoAWeZCqinl4XbhcY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-TmybaICIPOS7bSmOcn5PdA-1; Thu, 05 Nov 2020 04:23:20 -0500
+X-MC-Unique: TmybaICIPOS7bSmOcn5PdA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86DAE1007464;
+ Thu,  5 Nov 2020 09:23:18 +0000 (UTC)
+Received: from starship (unknown [10.35.207.23])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 883FD100164C;
+ Thu,  5 Nov 2020 09:23:11 +0000 (UTC)
+Message-ID: <7d08dffcfaab921aaf13082d52d7cc6adbeccd93.camel@redhat.com>
+Subject: Re: [PATCH 1/5] file-posix: split hdev_refresh_limits from
+ raw_refresh_limits
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Tom Yan <tom.ty89@gmail.com>
+Date: Thu, 05 Nov 2020 11:23:10 +0200
+In-Reply-To: <CAGnHSEmDa4Sbv0D+RB8zz=o2C77ZdA-M13=bfbSZ+TZucNZpGw@mail.gmail.com>
+References: <20201104173217.417538-1-mlevitsk@redhat.com>
+ <20201104173217.417538-2-mlevitsk@redhat.com>
+ <CAGnHSEmDa4Sbv0D+RB8zz=o2C77ZdA-M13=bfbSZ+TZucNZpGw@mail.gmail.com>
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Nov 2020 09:11:53 -0000
-From: Thomas Huth <1781463@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=Davidof130@gmail.com; 
-X-Launchpad-Bug-Tags: abs amiko emulation firmware qemu receiver
- satelitereceiver stb
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: screamfox th-huth
-X-Launchpad-Bug-Reporter: David Martins (screamfox)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <153142289132.32266.13097437819271021346.malonedeb@wampee.canonical.com>
-Message-Id: <160456751340.13412.13399101976405980582.malone@gac.canonical.com>
-Subject: [Bug 1781463] Re: qemu don't start *.abs firmware files
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 77bfeb2a61d485f8ec0a1e7789cdd6ad5bd13490
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 04:11:06
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,173 +99,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1781463 <1781463@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
+ Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As far as I understand the original description, this was about running
-an arbitrary firmware in QEMU that has been written for a board that we
-do not support in QEMU? This can not work. A machine consists of a CPU
-and various devices that are on board, so you can only run the software
-that has been written for the CPU and the corresponding devices. If I've
-got you right, you want to run some software for a board that we do not
-model in QEMU, so it just can't work since the required devices are not
-emulated. Thus I'm closing this as "Invalid" now ... unless I've
-misunderstood your description, then please complain and we can open the
-ticket again.
+On Thu, 2020-11-05 at 13:44 +0800, Tom Yan wrote:
+> Actually I made a mistake in this. BLKSECTGET (the one in the block
+> layer) returns the number of "sectors", which is "defined" as 512-byte
+> block. So we shouldn't use BLKSSZGET here, but simply 512 (1 << 9).
+> See logical_to_sectors() in sd.h of the kernel.
+I see it now. I'll respin the patches in a few days I guess after the rest
+of the patches are reviewed.
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+Best regards,
+	Maxim Levitsky
 
--- =
+> 
+> On Thu, 5 Nov 2020 at 01:32, Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > From: Tom Yan <tom.ty89@gmail.com>
+> > 
+> > We can and should get max transfer length and max segments for all host
+> > devices / cdroms (on Linux).
+> > 
+> > Also use MIN_NON_ZERO instead when we clamp max transfer length against
+> > max segments.
+> > 
+> > Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  block/file-posix.c | 61 ++++++++++++++++++++++++++++++++++------------
+> >  1 file changed, 45 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/block/file-posix.c b/block/file-posix.c
+> > index c63926d592..6581f41b2b 100644
+> > --- a/block/file-posix.c
+> > +++ b/block/file-posix.c
+> > @@ -1162,6 +1162,12 @@ static void raw_reopen_abort(BDRVReopenState *state)
+> > 
+> >  static int sg_get_max_transfer_length(int fd)
+> >  {
+> > +    /*
+> > +     * BLKSECTGET for /dev/sg* character devices incorrectly returns
+> > +     * the max transfer size in bytes (rather than in blocks).
+> > +     * Also note that /dev/sg* doesn't support BLKSSZGET ioctl.
+> > +     */
+> > +
+> >  #ifdef BLKSECTGET
+> >      int max_bytes = 0;
+> > 
+> > @@ -1175,7 +1181,24 @@ static int sg_get_max_transfer_length(int fd)
+> >  #endif
+> >  }
+> > 
+> > -static int sg_get_max_segments(int fd)
+> > +static int get_max_transfer_length(int fd)
+> > +{
+> > +#if defined(BLKSECTGET) && defined(BLKSSZGET)
+> > +    int sect = 0;
+> > +    int ssz = 0;
+> > +
+> > +    if (ioctl(fd, BLKSECTGET, &sect) == 0 &&
+> > +        ioctl(fd, BLKSSZGET, &ssz) == 0) {
+> > +        return sect * ssz;
+> > +    } else {
+> > +        return -errno;
+> > +    }
+> > +#else
+> > +    return -ENOSYS;
+> > +#endif
+> > +}
+> > +
+> > +static int get_max_segments(int fd)
+> >  {
+> >  #ifdef CONFIG_LINUX
+> >      char buf[32];
+> > @@ -1230,23 +1253,29 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+> >  {
+> >      BDRVRawState *s = bs->opaque;
+> > 
+> > -    if (bs->sg) {
+> > -        int ret = sg_get_max_transfer_length(s->fd);
+> > +    raw_probe_alignment(bs, s->fd, errp);
+> > +    bs->bl.min_mem_alignment = s->buf_align;
+> > +    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
+> > +}
+> > 
+> > -        if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+> > -            bs->bl.max_transfer = pow2floor(ret);
+> > -        }
+> > +static void hdev_refresh_limits(BlockDriverState *bs, Error **errp)
+> > +{
+> > +    BDRVRawState *s = bs->opaque;
+> > 
+> > -        ret = sg_get_max_segments(s->fd);
+> > -        if (ret > 0) {
+> > -            bs->bl.max_transfer = MIN(bs->bl.max_transfer,
+> > -                                      ret * qemu_real_host_page_size);
+> > -        }
+> > +    int ret = bs->sg ? sg_get_max_transfer_length(s->fd) :
+> > +                       get_max_transfer_length(s->fd);
+> > +
+> > +    if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+> > +        bs->bl.max_transfer = pow2floor(ret);
+> >      }
+> > 
+> > -    raw_probe_alignment(bs, s->fd, errp);
+> > -    bs->bl.min_mem_alignment = s->buf_align;
+> > -    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
+> > +    ret = get_max_segments(s->fd);
+> > +    if (ret > 0) {
+> > +        bs->bl.max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
+> > +                                           ret * qemu_real_host_page_size);
+> > +    }
+> > +
+> > +    raw_refresh_limits(bs, errp);
+> >  }
+> > 
+> >  static int check_for_dasd(int fd)
+> > @@ -3600,7 +3629,7 @@ static BlockDriver bdrv_host_device = {
+> >      .bdrv_co_pdiscard       = hdev_co_pdiscard,
+> >      .bdrv_co_copy_range_from = raw_co_copy_range_from,
+> >      .bdrv_co_copy_range_to  = raw_co_copy_range_to,
+> > -    .bdrv_refresh_limits = raw_refresh_limits,
+> > +    .bdrv_refresh_limits = hdev_refresh_limits,
+> >      .bdrv_io_plug = raw_aio_plug,
+> >      .bdrv_io_unplug = raw_aio_unplug,
+> >      .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+> > @@ -3724,7 +3753,7 @@ static BlockDriver bdrv_host_cdrom = {
+> >      .bdrv_co_preadv         = raw_co_preadv,
+> >      .bdrv_co_pwritev        = raw_co_pwritev,
+> >      .bdrv_co_flush_to_disk  = raw_co_flush_to_disk,
+> > -    .bdrv_refresh_limits = raw_refresh_limits,
+> > +    .bdrv_refresh_limits = hdev_refresh_limits,
+> >      .bdrv_io_plug = raw_aio_plug,
+> >      .bdrv_io_unplug = raw_aio_unplug,
+> >      .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+> > --
+> > 2.26.2
+> > 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1781463
 
-Title:
-  qemu don't start *.abs firmware files
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Hello Devs,
-
-  I'm here to report this bug/issue because i'm using Win64 Qemu but i
-  can't start a *.abs firmware at normally this firmware is based in
-  Linux Kernel and this type of firmware is made for STB Receivers,
-
-  So this is all information i provide to get support.
-
-  Files extracted by ( binwalk -e )
-
-  =
-
-  Terminal output:
-
-  # binwalk -e AMIKO_HD8150_2.4.43_emu.abs
-
-  DECIMAL       HEXADECIMAL     DESCRIPTION
-
-  -------------------------------------------------------------------------=
--------
-  196736        0x30080         LZMA compressed data, properties: 0x6C, dic=
-tionary size: 8388608 bytes, uncompressed size: 11883876 bytes
-  3866752       0x3B0080        LZMA compressed data, properties: 0x6C, dic=
-tionary size: 8388608 bytes, uncompressed size: 3255512 bytes
-  5636224       0x560080        LZMA compressed data, properties: 0x6C, dic=
-tionary size: 8388608 bytes, uncompressed size: 87904 bytes
-
-  =
-
-  Files extracted with ALI TOOLS or Ali FirmwareDecriptor.
-
-  Windows files output:
-
-  Software used: Ali Main Code Decrypter 8.9
-
-  Files unpacked:
-
-  bootloader
-  MemCfg
-  maincode(AV)
-  seecode
-  default_lang
-  cipluskey
-  countryband
-  logo_user
-  logo_menu
-  logo_radio
-  logo_boot
-  patch
-  defaultdb(PRC)
-  userdb(64+64)
-
-  =
-
-  Terminal OUTPUT:
-
-  # hexdump -C
-
-  part of file
-
-  =
-
-  00b51a30  00 00 00 00 4c 69 62 63  6f 72 65 20 76 65 72 73  |....Libcore =
-vers|
-  00b51a40  69 6f 6e 20 31 33 2e 31  36 2e 30 40 53 44 4b 34  |ion 13.16.0@=
-SDK4|
-  00b51a50  2e 30 66 61 2e 31 33 2e  31 36 5f 32 30 31 36 31  |.0fa.13.16_2=
-0161|
-  00b51a60  30 31 39 28 67 63 63 20  76 65 72 73 69 6f 6e 20  |019(gcc vers=
-ion |
-  00b51a70  33 2e 34 2e 34 20 6d 69  70 73 73 64 65 2d 36 2e  |3.4.4 mipssd=
-e-6.|
-  00b51a80  30 36 2e 30 31 2d 32 30  30 37 30 34 32 30 29 28  |06.01-200704=
-20)(|
-  00b51a90  41 64 6d 69 6e 69 73 74  72 61 74 6f 72 40 20 46  |Administrato=
-r@ F|
-  00b51aa0  72 69 2c 20 4a 75 6c 20  32 38 2c 20 32 30 31 37  |ri, Jul 28, =
-2017|
-  00b51ab0  20 31 32 3a 35 33 3a 32  38 20 41 4d 29 0a 00 00  | 12:53:28 AM=
-)...|
-  00b51ac0  44 4d 58 5f 53 33 36 30  31 5f 30 00 00 a1 03 18  |DMX_S3601_0.=
-....|
-
-  =
-
-  When I use readelf it says files isn't an ELF file, so i can't run it lik=
-e a kernel (Bootloader,Maincode, and etc. )
-
-  so this is the cmd output when i use qemu Win64 (I don't whant to use
-  linux to do the emulation about this *.abs extension firmware so
-  please help me for win64 version from Qemu)
-
-  CMD OUTPUT:
-
-   C:\Program Files\qemu>qemu-system-mips.exe -machine mips -cpu
-  mips32r6-generic -drive
-  file=3DC:\30080.bin,index=3D0,media=3Ddisk,format=3Draw
-
-  qemu-system-mips.exe: warning: could not load MIPS bios
-  'mips_bios.bin'
-
-  I also tried a lot of diferents qemu-system... and a lot of diferent
-  configs like -machine -cpu -kernel -driver root=3D -PFLASH and etc...
-  and nothing hapenned
-
-  How can i reproduce this issue ? =
-
-  Reply:. =
-
-
-  Donwload *.abs firmware in amikoreceiver.com (only *.abs) and download
-  AliDekompressor in http://www.satedu.cba.pl/
-
-  Direct tools:
-
-  FirmwareDecrypter_v8.9.zip :
-
-  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DFirmw=
-areDecrypter_v8.9.zip&directory=3DTest%20Folder&
-
-  Ali__tools_Console_v4.0__CRC_FIXER.rar :
-
-  http://www.satedu.cba.pl/index.php?action=3Ddownloadfile&filename=3DAli__=
-tools_Console_v4.0__CRC_FIXER.rar&directory=3DTest%20Folder&
-
-  =
-
-  so if Qemu can explain how can i fix this issue this can be highly helpfu=
-ll.
-
-  With my best regards,
-  David Martins =
-
-  Screamfox
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1781463/+subscriptions
 
