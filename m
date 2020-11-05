@@ -2,91 +2,89 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A852C00A89
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B91BC00A89
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84AEE20782
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C261B20756
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:44:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jA9G98i2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84AEE20782
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hqtdG1PQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C261B20756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaebf-0001mA-De
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 07:43:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45426)
+	id 1kaed9-0003n2-NA
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 07:44:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kaeRJ-0005xD-SD; Thu, 05 Nov 2020 07:32:29 -0500
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:38690)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kaeRH-0005hD-J7; Thu, 05 Nov 2020 07:32:29 -0500
-Received: by mail-lf1-x144.google.com with SMTP id 74so2032660lfo.5;
- Thu, 05 Nov 2020 04:32:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=OuaZqXvoiuSD8H+L2psMT354MiiewCCwEhWx+mq7j3M=;
- b=jA9G98i2LmNQst2Dfp5/xhgZLnlf4DaBAXHEc2XBfxOUNqGlDUuDgxbu4sYBl2eDsU
- ytTwufpq6rFfaeSAe2xmDxd/KsjTah5Y6NIajqLJlHJyTYY8GvRw+hmS16VXxLkeQBxI
- GHIGxlx7GsiO32yTuSpH/GcSvwvHIOLNR2Sv76C5Z8ERMolbAVA80AwjEeHbd2wWIj/+
- Q5JC//iZqk4vgCEPpcC3L3ycjrvhz7DVhgT7t7TXm3ogg6atMthAFY4T3v+O791VlKmT
- unX5o7mPNRty3HgmGWBriMvDFz8x51/w6B/3cOmnMuwOefVOAyWaPNy/8Wcjqj6eF0qS
- J93w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=OuaZqXvoiuSD8H+L2psMT354MiiewCCwEhWx+mq7j3M=;
- b=qciJnXtvrkwv3yhqOrsbnCEMG+qgv7LaXmIEFuODdaUZId0ZfzXbEHCgYXZBLaxF4f
- 8TBnFSA/AfecO8TnQw8+k56CUizlx1jBj7QBej0e968SsvIW2Oxno+MbKmh3bsTNcPn8
- 2PEANlfWW+V5qO2Ej+i/Y7s3NRrDkIapbBAygI2pQwnitN3Giyot4fn1+C77l8o+c+Nz
- Mhjz25v6U3Mrv4PvvNXP0UaEzgP1Y9WS3gYVEBw7NoQNa3iJGHgWZbBxw3GFvcv0C4F2
- 3fUZdkjTu+dv7/kvIq+JsegIYrZN4alZgeYGinhYCYKBfWuz7RR9sTjHfjKrnvtncjzM
- ATHg==
-X-Gm-Message-State: AOAM530jOkaA0dLZQNKVyNkFT1Kx/vogPlsKIO1NOLBZCrXFQbmgOvZC
- ckZ5cnxuMEzcyUHsEVvwLcYRhgOJt4FM+vms6bg=
-X-Google-Smtp-Source: ABdhPJxNceSf3BnMwPjCICpWJ2NCKi2pEC4h5cEZswAX/skab3+wv8erjEv7YPGprTVfTrdpkDXFyUO6tWVN+ktsS+Y=
-X-Received: by 2002:a19:8a84:: with SMTP id m126mr848348lfd.377.1604579542210; 
- Thu, 05 Nov 2020 04:32:22 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kaePR-0003Po-Ln
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 07:30:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58821)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kaePN-000531-I5
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 07:30:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604579425;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XxqpAwNZSC20GvlcAbAEUY6jZ+u8+JNGSH8Z/mKsgcY=;
+ b=hqtdG1PQ/BmciEvGGPbjX/8664CQK+rLvpclLqa6tPt2ui9jdcV4y/HyKSvUPARjybPjhs
+ grRCttLqqwnXW/+fyitmh9SYfri9uTIHu2+GxOMB1KlQgsGz25dLAF02MqHTT2AQD9MInC
+ 5nLKRWSxWgJjd0YqNDDaUX+YGWlBLzA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-bJ-nhQZLNNWg1Sa5Tik1Eg-1; Thu, 05 Nov 2020 07:30:20 -0500
+X-MC-Unique: bJ-nhQZLNNWg1Sa5Tik1Eg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB5A68030B6;
+ Thu,  5 Nov 2020 12:30:19 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D73926CE52;
+ Thu,  5 Nov 2020 12:30:07 +0000 (UTC)
+From: marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 7/9] qapi: convert 'if' C expressions to the new literal
+ form
+Date: Thu,  5 Nov 2020 16:28:06 +0400
+Message-Id: <20201105122808.1182973-8-marcandre.lureau@redhat.com>
+In-Reply-To: <20201105122808.1182973-1-marcandre.lureau@redhat.com>
+References: <20201105122808.1182973-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20201013001545.1958-1-luoyonggang@gmail.com>
- <20201013001545.1958-2-luoyonggang@gmail.com>
- <9582005a-1248-6a6b-060f-b0da597bc9c9@redhat.com>
- <CAE2XoE_Mvtgnva3r6nMDq1P9D6iA9uUPP7sh20RLaC8zdYrTow@mail.gmail.com>
- <d74223f4-fb3f-c83c-99e9-6d525501dee8@redhat.com>
- <CAE2XoE8sJgjGEDygHO9EjYpUEH_YjiOgUhpD2==hJZrie4quLA@mail.gmail.com>
- <17916ea3-c1a2-0446-eb9b-337bb8e5a8d0@redhat.com>
-In-Reply-To: <17916ea3-c1a2-0446-eb9b-337bb8e5a8d0@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Thu, 5 Nov 2020 20:32:11 +0800
-Message-ID: <CAE2XoE_Rt9JgBOB=yWNdBWvJkBB4X6CVQLqGFFghjR1VZmHBug@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] block: Fixes nfs compiling error on msys2/mingw
-To: Max Reitz <mreitz@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000a09f5e05b35b49f7"
-Received-SPF: pass client-ip=2a00:1450:4864:20::144;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=marcandre.lureau@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,225 +97,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- Peter Lieven <pl@kamp.de>, qemu-level <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000a09f5e05b35b49f7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Updated with fixes.
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ qapi/machine-target.json | 20 ++++++++++++++++----
+ qapi/misc-target.json    | 13 ++++++++++++-
+ 2 files changed, 28 insertions(+), 5 deletions(-)
 
-On Thu, Nov 5, 2020 at 8:11 PM Max Reitz <mreitz@redhat.com> wrote:
->
-> On 05.11.20 12:46, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> >
-> >
-> > On Thu, Nov 5, 2020 at 7:44 PM Max Reitz <mreitz@redhat.com
-> > <mailto:mreitz@redhat.com>> wrote:
-> >  >
-> >  > On 05.11.20 12:32, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> >  > >
-> >  > >
-> >  > > On Thu, Nov 5, 2020 at 7:29 PM Max Reitz <mreitz@redhat.com
-> > <mailto:mreitz@redhat.com>
-> >  > > <mailto:mreitz@redhat.com <mailto:mreitz@redhat.com>>> wrote:
-> >  > >  >
-> >  > >  > On 13.10.20 02:15, Yonggang Luo wrote:
-> >  > >  > > These compiling errors are fixed:
-> >  > >  > > ../block/nfs.c:27:10: fatal error: poll.h: No such file or
-> > directory
-> >  > >  > >     27 | #include <poll.h>
-> >  > >  > >        |          ^~~~~~~~
-> >  > >  > > compilation terminated.
-> >  > >  > >
-> >  > >  > > ../block/nfs.c:63:5: error: unknown type name 'blkcnt_t'
-> >  > >  > >     63 |     blkcnt_t st_blocks;
-> >  > >  > >        |     ^~~~~~~~
-> >  > >  > > ../block/nfs.c: In function 'nfs_client_open':
-> >  > >  > > ../block/nfs.c:550:27: error: 'struct _stat64' has no member
-named
-> >  > > 'st_blocks'
-> >  > >  > >    550 |     client->st_blocks =3D st.st_blocks;
-> >  > >  > >        |                           ^
-> >  > >  > > ../block/nfs.c: In function 'nfs_get_allocated_file_size':
-> >  > >  > > ../block/nfs.c:751:41: error: 'struct _stat64' has no member
-named
-> >  > > 'st_blocks'
-> >  > >  > >    751 |     return (task.ret < 0 ? task.ret : st.st_blocks *
-> > 512);
-> >  > >  > >        |                                         ^
-> >  > >  > > ../block/nfs.c: In function 'nfs_reopen_prepare':
-> >  > >  > > ../block/nfs.c:805:31: error: 'struct _stat64' has no member
-named
-> >  > > 'st_blocks'
-> >  > >  > >    805 |         client->st_blocks =3D st.st_blocks;
-> >  > >  > >        |                               ^
-> >  > >  > > ../block/nfs.c: In function 'nfs_get_allocated_file_size':
-> >  > >  > > ../block/nfs.c:752:1: error: control reaches end of non-void
-> >  > > function [-Werror=3Dreturn-type]
-> >  > >  > >    752 | }
-> >  > >  > >        | ^
-> >  > >  > >
-> >  > >  > > On msys2/mingw, there is no st_blocks in struct _stat64 yet,
-we
-> >  > > disable the usage of it
-> >  > >  > > on msys2/mingw, and create a typedef long long blkcnt_t; for
-> >  > > further implementation
-> >  > >  > >
-> >  > >  > > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com
-> > <mailto:luoyonggang@gmail.com>
-> >  > > <mailto:luoyonggang@gmail.com <mailto:luoyonggang@gmail.com>>>
-> >  > >  > > ---
-> >  > >  > >   block/nfs.c | 15 +++++++++++++++
-> >  > >  > >   1 file changed, 15 insertions(+)
-> >  > >  > >
-> >  > >  > > diff --git a/block/nfs.c b/block/nfs.c
-> >  > >  > > index f86e660374..cf8795fb49 100644
-> >  > >  > > --- a/block/nfs.c
-> >  > >  > > +++ b/block/nfs.c
-> >  > >  >
-> >  > >  > [...]
-> >  > >  >
-> >  > >  > > @@ -51,6 +53,10 @@
-> >  > >  > >   #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
-> >  > >  > >   #define QEMU_NFS_MAX_DEBUG_LEVEL 2
-> >  > >  > >
-> >  > >  > > +#if defined(_WIN32)
-> >  > >  > > +typedef long long blkcnt_t;
-> >  > >  >
-> >  > >  > This makes me uneasy.  Is there a guarantee that this type will
-> > never be
-> >  > >  > defined in a mingw environment (which would then result in a ne=
-w
-> > compile
-> >  > >  > error)?
-> >  > > That's be sure, mingw is compat with msvcrt.dll, so blkcnt_t  are
-> > always
-> >  > > not defined.
-> >  >
-> >  > And there is no possibility of that being added in the future?
-> > If that's the case, what's the better option.
->
-> As I said, just making NFSClient.st_blocks a uint64_t.
->
-> Max
->
+diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+index fec3bb8679..f60dccad5d 100644
+--- a/qapi/machine-target.json
++++ b/qapi/machine-target.json
+@@ -213,7 +213,9 @@
+ ##
+ { 'struct': 'CpuModelExpansionInfo',
+   'data': { 'model': 'CpuModelInfo' },
+-  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM)' }
++  'if': { 'any': [ 'defined(TARGET_S390X)',
++                   'defined(TARGET_I386)',
++                   'defined(TARGET_ARM)'] } }
+ 
+ ##
+ # @query-cpu-model-expansion:
+@@ -252,7 +254,9 @@
+   'data': { 'type': 'CpuModelExpansionType',
+             'model': 'CpuModelInfo' },
+   'returns': 'CpuModelExpansionInfo',
+-  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM)' }
++  'if': { 'any': [ 'defined(TARGET_S390X)',
++                   'defined(TARGET_I386)',
++                   'defined(TARGET_ARM)' ] } }
+ 
+ ##
+ # @CpuDefinitionInfo:
+@@ -316,7 +320,11 @@
+             'typename': 'str',
+             '*alias-of' : 'str',
+             'deprecated' : 'bool' },
+-  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
++  'if': { 'any': [ 'defined(TARGET_PPC)',
++                   'defined(TARGET_ARM)',
++                   'defined(TARGET_I386)',
++                   'defined(TARGET_S390X)',
++                   'defined(TARGET_MIPS)' ] } }
+ 
+ ##
+ # @query-cpu-definitions:
+@@ -328,4 +336,8 @@
+ # Since: 1.2.0
+ ##
+ { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
+-  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
++  'if': { 'any': [ 'defined(TARGET_PPC)',
++                   'defined(TARGET_ARM)',
++                   'defined(TARGET_I386)',
++                   'defined(TARGET_S390X)',
++                   'defined(TARGET_MIPS)' ] } }
+diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+index 1e561fa97b..c1aa592137 100644
+--- a/qapi/misc-target.json
++++ b/qapi/misc-target.json
+@@ -23,7 +23,18 @@
+ ##
+ { 'event': 'RTC_CHANGE',
+   'data': { 'offset': 'int' },
+-  'if': 'defined(TARGET_ALPHA) || defined(TARGET_ARM) || defined(TARGET_HPPA) || defined(TARGET_I386) || defined(TARGET_MIPS) || defined(TARGET_MIPS64) || defined(TARGET_MOXIE) || defined(TARGET_PPC) || defined(TARGET_PPC64) || defined(TARGET_S390X) || defined(TARGET_SH4) || defined(TARGET_SPARC)' }
++  'if': { 'any': [ 'defined(TARGET_ALPHA)',
++                   'defined(TARGET_ARM)',
++                   'defined(TARGET_HPPA)',
++                   'defined(TARGET_I386)',
++                   'defined(TARGET_MIPS)',
++                   'defined(TARGET_MIPS64)',
++                   'defined(TARGET_MOXIE)',
++                   'defined(TARGET_PPC)',
++                   'defined(TARGET_PPC64)',
++                   'defined(TARGET_S390X)',
++                   'defined(TARGET_SH4)',
++                   'defined(TARGET_SPARC)' ] } }
+ 
+ ##
+ # @rtc-reset-reinjection:
+-- 
+2.29.0
 
-
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000a09f5e05b35b49f7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Updated with fixes.<br><br>On Thu, Nov 5, 2020 at 8:11 PM =
-Max Reitz &lt;<a href=3D"mailto:mreitz@redhat.com">mreitz@redhat.com</a>&gt=
-; wrote:<br>&gt;<br>&gt; On 05.11.20 12:46, =E7=BD=97=E5=8B=87=E5=88=9A(Yon=
-ggang Luo) wrote:<br>&gt; &gt;<br>&gt; &gt;<br>&gt; &gt; On Thu, Nov 5, 202=
-0 at 7:44 PM Max Reitz &lt;<a href=3D"mailto:mreitz@redhat.com">mreitz@redh=
-at.com</a><br>&gt; &gt; &lt;mailto:<a href=3D"mailto:mreitz@redhat.com">mre=
-itz@redhat.com</a>&gt;&gt; wrote:<br>&gt; &gt; =C2=A0&gt;<br>&gt; &gt; =C2=
-=A0&gt; On 05.11.20 12:32, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:=
-<br>&gt; &gt; =C2=A0&gt; &gt;<br>&gt; &gt; =C2=A0&gt; &gt;<br>&gt; &gt; =C2=
-=A0&gt; &gt; On Thu, Nov 5, 2020 at 7:29 PM Max Reitz &lt;<a href=3D"mailto=
-:mreitz@redhat.com">mreitz@redhat.com</a><br>&gt; &gt; &lt;mailto:<a href=
-=3D"mailto:mreitz@redhat.com">mreitz@redhat.com</a>&gt;<br>&gt; &gt; =C2=A0=
-&gt; &gt; &lt;mailto:<a href=3D"mailto:mreitz@redhat.com">mreitz@redhat.com=
-</a> &lt;mailto:<a href=3D"mailto:mreitz@redhat.com">mreitz@redhat.com</a>&=
-gt;&gt;&gt; wrote:<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt;<br>&gt; &gt; =C2=
-=A0&gt; &gt; =C2=A0&gt; On 13.10.20 02:15, Yonggang Luo wrote:<br>&gt; &gt;=
- =C2=A0&gt; &gt; =C2=A0&gt; &gt; These compiling errors are fixed:<br>&gt; =
-&gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; ../block/nfs.c:27:10: fatal error: pol=
-l.h: No such file or<br>&gt; &gt; directory<br>&gt; &gt; =C2=A0&gt; &gt; =
-=C2=A0&gt; &gt; =C2=A0 =C2=A0 27 | #include &lt;poll.h&gt;<br>&gt; &gt; =C2=
-=A0&gt; &gt; =C2=A0&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0^~~~~~~~<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; comp=
-ilation terminated.<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt;<br>&gt; &g=
-t; =C2=A0&gt; &gt; =C2=A0&gt; &gt; ../block/nfs.c:63:5: error: unknown type=
- name &#39;blkcnt_t&#39;<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; =C2=
-=A0 =C2=A0 63 | =C2=A0 =C2=A0 blkcnt_t st_blocks;<br>&gt; &gt; =C2=A0&gt; &=
-gt; =C2=A0&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 ^~~~~~~~<br>=
-&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; ../block/nfs.c: In function &#39;=
-nfs_client_open&#39;:<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; ../block=
-/nfs.c:550:27: error: &#39;struct _stat64&#39; has no member named<br>&gt; =
-&gt; =C2=A0&gt; &gt; &#39;st_blocks&#39;<br>&gt; &gt; =C2=A0&gt; &gt; =C2=
-=A0&gt; &gt; =C2=A0 =C2=A0550 | =C2=A0 =C2=A0 client-&gt;st_blocks =3D st.s=
-t_blocks;<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; =C2=A0 =C2=A0 =C2=A0=
- =C2=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 ^<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; ../=
-block/nfs.c: In function &#39;nfs_get_allocated_file_size&#39;:<br>&gt; &gt=
-; =C2=A0&gt; &gt; =C2=A0&gt; &gt; ../block/nfs.c:751:41: error: &#39;struct=
- _stat64&#39; has no member named<br>&gt; &gt; =C2=A0&gt; &gt; &#39;st_bloc=
-ks&#39;<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; =C2=A0 =C2=A0751 | =C2=
-=A0 =C2=A0 return (task.ret &lt; 0 ? task.ret : st.st_blocks *<br>&gt; &gt;=
- 512);<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^=
-<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; ../block/nfs.c: In function &=
-#39;nfs_reopen_prepare&#39;:<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; .=
-./block/nfs.c:805:31: error: &#39;struct _stat64&#39; has no member named<b=
-r>&gt; &gt; =C2=A0&gt; &gt; &#39;st_blocks&#39;<br>&gt; &gt; =C2=A0&gt; &gt=
-; =C2=A0&gt; &gt; =C2=A0 =C2=A0805 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 client-&gt=
-;st_blocks =3D st.st_blocks;<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^<br>&gt; &gt; =
-=C2=A0&gt; &gt; =C2=A0&gt; &gt; ../block/nfs.c: In function &#39;nfs_get_al=
-located_file_size&#39;:<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; ../blo=
-ck/nfs.c:752:1: error: control reaches end of non-void<br>&gt; &gt; =C2=A0&=
-gt; &gt; function [-Werror=3Dreturn-type]<br>&gt; &gt; =C2=A0&gt; &gt; =C2=
-=A0&gt; &gt; =C2=A0 =C2=A0752 | }<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &=
-gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0| ^<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; =
-&gt;<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; On msys2/mingw, there is =
-no st_blocks in struct _stat64 yet, we<br>&gt; &gt; =C2=A0&gt; &gt; disable=
- the usage of it<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; on msys2/ming=
-w, and create a typedef long long blkcnt_t; for<br>&gt; &gt; =C2=A0&gt; &gt=
-; further implementation<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt;<br>&g=
-t; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; Signed-off-by: Yonggang Luo &lt;<a =
-href=3D"mailto:luoyonggang@gmail.com">luoyonggang@gmail.com</a><br>&gt; &gt=
-; &lt;mailto:<a href=3D"mailto:luoyonggang@gmail.com">luoyonggang@gmail.com=
-</a>&gt;<br>&gt; &gt; =C2=A0&gt; &gt; &lt;mailto:<a href=3D"mailto:luoyongg=
-ang@gmail.com">luoyonggang@gmail.com</a> &lt;mailto:<a href=3D"mailto:luoyo=
-nggang@gmail.com">luoyonggang@gmail.com</a>&gt;&gt;&gt;<br>&gt; &gt; =C2=A0=
-&gt; &gt; =C2=A0&gt; &gt; ---<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; =
-=C2=A0 block/nfs.c | 15 +++++++++++++++<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0=
-&gt; &gt; =C2=A0 1 file changed, 15 insertions(+)<br>&gt; &gt; =C2=A0&gt; &=
-gt; =C2=A0&gt; &gt;<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; diff --git=
- a/block/nfs.c b/block/nfs.c<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; i=
-ndex f86e660374..cf8795fb49 100644<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; =
-&gt; --- a/block/nfs.c<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; +++ b/b=
-lock/nfs.c<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt;<br>&gt; &gt; =C2=A0&gt; =
-&gt; =C2=A0&gt; [...]<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt;<br>&gt; &gt; =
-=C2=A0&gt; &gt; =C2=A0&gt; &gt; @@ -51,6 +53,10 @@<br>&gt; &gt; =C2=A0&gt; =
-&gt; =C2=A0&gt; &gt; =C2=A0 #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / =
-NFS_BLKSIZE)<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; =C2=A0 #define QE=
-MU_NFS_MAX_DEBUG_LEVEL 2<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt;<br>&g=
-t; &gt; =C2=A0&gt; &gt; =C2=A0&gt; &gt; +#if defined(_WIN32)<br>&gt; &gt; =
-=C2=A0&gt; &gt; =C2=A0&gt; &gt; +typedef long long blkcnt_t;<br>&gt; &gt; =
-=C2=A0&gt; &gt; =C2=A0&gt;<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; This mak=
-es me uneasy.=C2=A0 Is there a guarantee that this type will<br>&gt; &gt; n=
-ever be<br>&gt; &gt; =C2=A0&gt; &gt; =C2=A0&gt; defined in a mingw environm=
-ent (which would then result in a new<br>&gt; &gt; compile<br>&gt; &gt; =C2=
-=A0&gt; &gt; =C2=A0&gt; error)?<br>&gt; &gt; =C2=A0&gt; &gt; That&#39;s be =
-sure, mingw is compat with msvcrt.dll, so blkcnt_t =C2=A0are<br>&gt; &gt; a=
-lways<br>&gt; &gt; =C2=A0&gt; &gt; not defined.<br>&gt; &gt; =C2=A0&gt;<br>=
-&gt; &gt; =C2=A0&gt; And there is no possibility of that being added in the=
- future?<br>&gt; &gt; If that&#39;s the case, what&#39;s the better option.=
-<br>&gt;<br>&gt; As I said, just making NFSClient.st_blocks a uint64_t.<br>=
-&gt;<br>&gt; Max<br>&gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<=
-br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div>
-
---000000000000a09f5e05b35b49f7--
 
