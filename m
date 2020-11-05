@@ -2,63 +2,81 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C331C4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DF2C4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ACBB21D81
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:05:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ACBB21D81
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 388A820715
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:08:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="gmBm+m8z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 388A820715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kagpn-0005rn-Dq
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:05:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52172)
+	id 1kagrr-0007Yy-5l
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:08:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kagnq-0003n2-Jf; Thu, 05 Nov 2020 10:03:55 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:2077)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kagqu-0006rj-5O; Thu, 05 Nov 2020 10:07:04 -0500
+Received: from lizzy.crudebyte.com ([91.194.90.13]:36935)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kagno-0008Ts-1I; Thu, 05 Nov 2020 10:03:54 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CRmxX1S3Dzhgf1;
- Thu,  5 Nov 2020 23:03:44 +0800 (CST)
-Received: from [10.174.187.138] (10.174.187.138) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 5 Nov 2020 23:03:36 +0800
-Message-ID: <5FA41448.4040404@huawei.com>
-Date: Thu, 5 Nov 2020 23:03:36 +0800
-From: AlexChen <alex.chen@huawei.com>
-User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
- rv:17.0) Gecko/20130509 Thunderbird/17.0.6
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kagqr-0001H3-Nb; Thu, 05 Nov 2020 10:07:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=J80vtLgb+JbeRkicM5+Hda5f+1nTevLNRPjcN23fEMA=; b=gmBm+m8zcHwMHHa2fbyf7qSnpF
+ VqVI9pndK0nmSyWd1OcYVa+E4ZG3spmnE6McjnIX7pDMi1/tkaq49cxQNyXHli4VPovL98u6KEzoL
+ lhYH/Pq+xgBOQX6J2SOgcaaLLJhUGOvhrM6r3kZJI7hAeRxPMSkDH/tr6p9oRxFfq9QByss84EBv+
+ z20eAc/cng1Ga7DI4JxnB0WoxobrUQnw/76hQgm3JkvfLLqBXjBBEexcVE+F4WEFJS+jta74cbxzM
+ V5h9ikuPEZGVlopDEH9OTHCdzNCvmWLe1bfKu6wWWbiJItsB1r0w84DDsfsSgu2eVsDLfjIRboOPU
+ H5cePrkw==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>,
+ Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <philmd@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Paul Durrant <paul@xen.org>,
+ Richard Henderson <rth@twiddle.net>
+Subject: Re: [PATCH-for-5.2 v3 2/4] hw/9pfs: Fix Kconfig dependency problem
+ between 9pfs and Xen
+Date: Thu, 05 Nov 2020 16:06:45 +0100
+Message-ID: <401148579.MYj8lGMC4g@silver>
+In-Reply-To: <2140852.vo20GZeEQY@silver>
+References: <20201104115706.3101190-1-philmd@redhat.com>
+ <20201105132346.5e0adf94@bahia.lan> <2140852.vo20GZeEQY@silver>
 MIME-Version: 1.0
-To: <stefanb@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>,
- <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] tests/qtest/tpm: Remove redundant check in the
- tpm_test_swtpm_test()
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.138]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=alex.chen@huawei.com;
- helo=szxga06-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 10:03:46
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 10:06:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -72,39 +90,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU <qemu-devel@nongnu.org>,
- zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 'addr' would not be NULL after checking 'succ' is valid,
-and it has been dereferenced in the previous code(args = g_strdup_printf()).
-So the check on 'addr' in the tpm_test_swtpm_test() is redundant. Remove it.
+On Donnerstag, 5. November 2020 13:28:31 CET Christian Schoenebeck wrote:
+> On Donnerstag, 5. November 2020 13:23:46 CET Greg Kurz wrote:
+> > On Thu, 5 Nov 2020 13:15:59 +0100
+> >=20
+> > Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
+> > > On 11/4/20 6:54 PM, Greg Kurz wrote:
+> > > > On Wed, 04 Nov 2020 13:18:09 +0100
+> > > >=20
+> > > > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > > >> On Mittwoch, 4. November 2020 12:57:04 CET Philippe Mathieu-Daud=E9
+>=20
+> wrote:
+> > > >>> Commit b2c00bce54c ("meson: convert hw/9pfs, cleanup") introduced
+> > > >>> CONFIG_9PFS (probably a wrong conflict resolution). This config is
+> > > >>> not used anywhere. Backends depend on CONFIG_FSDEV_9P which itself
+> > > >>> depends on CONFIG_VIRTFS.
+> > > >>>=20
+> > > >>> Remove the invalid CONFIG_9PFS and use CONFIG_FSDEV_9P instead, to
+> > > >>>=20
+> > > >>> fix the './configure --without-default-devices --enable-xen' buil=
+d:
+> > > >>>   /usr/bin/ld: libcommon.fa.p/hw_xen_xen-legacy-backend.c.o: in
+> > > >>>   function
+> > > >>>=20
+> > > >>> `xen_be_register_common': hw/xen/xen-legacy-backend.c:754: undefi=
+ned
+> > > >>> reference to `xen_9pfs_ops' /usr/bin/ld:
+> > > >>> libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x8): undefined
+> > > >>> reference to
+> > > >>> `local_ops' /usr/bin/ld:
+> > > >>> libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x20): undefined
+> > > >>> reference
+> > > >>> to `synth_ops' /usr/bin/ld:
+> > > >>> libcommon.fa.p/fsdev_qemu-fsdev.c.o:(.data.rel+0x38): undefined
+> > > >>> reference
+> > > >>> to `proxy_ops' collect2: error: ld returned 1 exit status
+> > > >>>=20
+> > > >>> Fixes: b2c00bce54c ("meson: convert hw/9pfs, cleanup")
+> > > >>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > >>> Acked-by: Greg Kurz <groug@kaod.org>
+> > > >>> Tested-by: Greg Kurz <groug@kaod.org>
+> > > >>> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > > >>=20
+> > > >> Acked-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > > >=20
+> > > > Phil,
+> > > >=20
+> > > > Same questioning as Connie. Do you intend to get this merged or sho=
+uld
+> > > > Christian or I take care of that ?
+> > >=20
+> > > Same answer too =3D) If you are preparing a pull request, please go a=
+head!
+> >=20
+> > Heh I've just seen your answer.
+> >=20
+> > Christian,
+> >=20
+> > Maybe you can add this patch in your next PR ?
+>=20
+> Yes, I will prepare a 9p PR today anyway, so I will include this patch.
+>=20
+> Best regards,
+> Christian Schoenebeck
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Alex Chen <alex.chen@huawei.com>
----
- tests/qtest/tpm-tests.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Queued on 9p.next:
+https://github.com/cschoenebeck/qemu/commits/9p.next
 
-diff --git a/tests/qtest/tpm-tests.c b/tests/qtest/tpm-tests.c
-index 70c80f8379..0da3a8a4df 100644
---- a/tests/qtest/tpm-tests.c
-+++ b/tests/qtest/tpm-tests.c
-@@ -70,10 +70,8 @@ void tpm_test_swtpm_test(const char *src_tpm_path, tx_func *tx,
-     qtest_end();
-     tpm_util_swtpm_kill(swtpm_pid);
+Thanks!
 
--    if (addr) {
--        g_unlink(addr->u.q_unix.path);
--        qapi_free_SocketAddress(addr);
--    }
-+    g_unlink(addr->u.q_unix.path);
-+    qapi_free_SocketAddress(addr);
- }
+Best regards,
+Christian Schoenebeck
 
- void tpm_test_swtpm_migration_test(const char *src_tpm_path,
--- 
-2.19.1
+
 
