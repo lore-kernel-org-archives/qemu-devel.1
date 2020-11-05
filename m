@@ -2,77 +2,76 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED060C4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87896C4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:17:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C5E820715
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:17:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E889920715
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:17:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tcgRlF5O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C5E820715
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hx1/opR+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E889920715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kah0w-00062E-9s
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:17:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55484)
+	id 1kah16-0006Jo-Sj
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:17:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kagzr-0004yc-8O
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:16:19 -0500
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:45272)
+ id 1kah0H-0005Ef-8T
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:16:45 -0500
+Received: from mail-ed1-x52b.google.com ([2a00:1450:4864:20::52b]:33616)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kagzn-0004R3-SQ
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:16:18 -0500
-Received: by mail-ed1-x541.google.com with SMTP id q3so1650507edr.12
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 07:16:15 -0800 (PST)
+ id 1kah0F-0004XH-JR
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:16:44 -0500
+Received: by mail-ed1-x52b.google.com with SMTP id v4so1940367edi.0
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 07:16:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=OLZ4e5HyXQunKoIuzJrv+QJGcGZe+iyKNDjNT81WyA8=;
- b=tcgRlF5OQnn06val58vb22g0L5QswlhFU/QaNyd1f1ro5CbRknh7ozkBEdsonIBIyI
- 5M8QTtmF93bCKACsE60SFz0/KVYZKC5yL97Ts/mpMtA/rv+QIEPNxLX0TtkTgZ6RcSAJ
- kCwcle7ZDllDY0BDkgogUVPxYOfkLJ/pJgANsSnPvBL+xxH7aLIeNu7Oui/as+6RpGQW
- k3qCGfvxK2jlU+z8jlq16DBk7hSpF+LhSG1byTzhLqev1lLlIGK33rZLXbP6bhEfmcLZ
- TcSGx/JhLmso2b3QIHMs+Sg+EZ4H2IDvU+xIvxyzQd/YwKO1o2F5PqwMw4xghYpX/+37
- KcgA==
+ :cc; bh=mlV7kGW2vHnpGkLyCYRGcedrRFN36q0G3IViCu0s0lM=;
+ b=hx1/opR+8nvJHGKAcVrbpS+doKROmdccNTE1JlY/R29QnlkS1z0M/8L+ItJTnhsBFV
+ W/eMXLy95CZnlD125NkXJ4Uxi/az6BvT8zL3z56OrzHVmp1fxjcnGH7hpU0NHlps87/N
+ aPQOMs+4a3oVXB6zEJmbdhZ0oS8DHm+bXkWFp0gP2AKEZQUXbSlNcGXtinbBmt1A0uou
+ kAqNfy30XEBBUIUqNVEp/zQOXp/R+nwjcWtS2m2zVaDb8IQ0L1rPLJXP7mtc6IpYHjZ4
+ 5WEub/m5y1mr5dSuoGiXV+FjzoNXy6S7DRCHTPJzi4v5NZ0LFl/ExMzj7mKb9/8qeW/d
+ DXRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=OLZ4e5HyXQunKoIuzJrv+QJGcGZe+iyKNDjNT81WyA8=;
- b=Dd3RciQV4o41rKy/mlo0iTXhO2ZRVVh60mkjZ7gnKKL3aSSq1r0xKHkmDAyUq+M6RR
- LOcqWug1shHdUA0yjOgRGDT/KTnhajAgjLB1WS5L/K/+DtZGRUpB6bX87+b7sPywwdkO
- qWRgIrkRs6Cugjb37nbqlV04uk7/sNZDQv9DIzRl1bvad/fTACu4gnttZYxGFYWyu47q
- /iGcL05CB1IiB6V8KPdW74RVQPWT9W0FCqVmRJk9oJ2FOrx11NfuDtLZotUBvHKa2FED
- K4Q4MKC2vfzInvcABTW52ERrYNe+DJj2YpwJu0wy9G2RYrygaK65CtIny8uV0NdyxzEW
- sMYA==
-X-Gm-Message-State: AOAM533FdtxdV30NcAlpRHkg+YFM0ol/lB9ee5c+GB7DnMyEInr41N2w
- owScNkNh34bZF+GZVPPqVSkbk6eHQbFtbfj1ejo4eA==
-X-Google-Smtp-Source: ABdhPJy5w5zsFOi5j3xB0p0Z9qZ6YMx3mcOSTt9hnWWBKMG+J+TxtEXQTSx+Ap77GjYNi2ndzjThxiu6DjAz2XmWsSc=
-X-Received: by 2002:a05:6402:4c6:: with SMTP id
- n6mr3139316edw.204.1604589374133; 
- Thu, 05 Nov 2020 07:16:14 -0800 (PST)
+ bh=mlV7kGW2vHnpGkLyCYRGcedrRFN36q0G3IViCu0s0lM=;
+ b=ddwW9R0PUU9Rd+Y6nqUftLY2bTti4dlWiN/QTNvEsrxuR6XsES6MSy1yCiArJHdfkz
+ TDgWNXrsvjO3RrPttS+bsYa1+QkDEJAYerxzzEy9RLfMdtuWbxTGZJYYilgCHytHERcn
+ 7GUyCIUtwG+Ummm7q9bLRkul3Zt2bTslWBMtSpJ/J/rSpxi+yHwFOkFCVoJvqanjdxhe
+ mhf0S1/HmAoHqZ9Ysx9PqcFKqtnYyuaVYskU2ef3t1bWm9GKzG6zyL0Kr9xw/t0a9EcS
+ sPFqrSOmZ8ckIfJn2zILv34wP3j4f9Ag/uxl0ynSgOy5y4tThl0cr8GRW/aS991lekZ8
+ azqw==
+X-Gm-Message-State: AOAM530uzOSBHwCO/URiufdz4xMqd3Or+sNj5QmfV6EY4ESW0rVRW70u
+ SeX6gYmhAlbun7tJHLaCCKfYZAGtqc1NlnJXg2zRBbBKbwY=
+X-Google-Smtp-Source: ABdhPJzwubnWvZNt1NxyEBmEaPXXWhcQlV9fYnvKmC6U3pBUQbBX3G+ruGFKY8AwNHMw8SRp6e1ERdazS9UgZBssipU=
+X-Received: by 2002:aa7:c9cb:: with SMTP id i11mr3164802edt.100.1604589402138; 
+ Thu, 05 Nov 2020 07:16:42 -0800 (PST)
 MIME-Version: 1.0
-References: <bf2b4da4-385d-a0f7-7915-4f31fa797898@gmail.com>
-In-Reply-To: <bf2b4da4-385d-a0f7-7915-4f31fa797898@gmail.com>
+References: <20201104170414.546578-1-pbonzini@redhat.com>
+In-Reply-To: <20201104170414.546578-1-pbonzini@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Nov 2020 15:16:02 +0000
-Message-ID: <CAFEAcA94OTo=FT6yWVod6SYNEzowQ9ee8kKcih=q1T7TTrYBBw@mail.gmail.com>
-Subject: Re: [PATCH] linux-user: Correct definition of stack_t
-To: LemonBoy <thatlemon@gmail.com>
+Date: Thu, 5 Nov 2020 15:16:30 +0000
+Message-ID: <CAFEAcA81o5jfPOoLL5nE4Y=5LRDE1DKbXLbBa0=GhE2L98wJPw@mail.gmail.com>
+Subject: Re: [PULL v2 00/20] Misc patches for QEMU 5.2-rc1
+To: Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::52b;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -94,46 +93,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Nov 2020 at 14:55, LemonBoy <thatlemon@gmail.com> wrote:
+On Wed, 4 Nov 2020 at 17:06, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> From 914c30863b45d6fcd3e2fc83929bcac546be1555 Mon Sep 17 00:00:00 2001
-> From: LemonBoy <thatlemon@gmail.com>
-> Date: Thu, 5 Nov 2020 15:48:24 +0100
-> Subject: [PATCH] linux-user: Correct definition of stack_t
+> The following changes since commit 83851c7c60c90e9fb6a23ff48076387a77bc33cd:
 >
-> Some platforms used the wrong definition of stack_t where the flags and
-> size fields were swapped or where the flags field had type ulong instead
-> of int.
-
-Coincidentally, I just noticed this yesterday (am in the middle of
-trying to debug why qemu-sparc64 crashes trying to start bash...)
-
-> Due to the presence of padding space in the structure and the prevalence
-> of little-endian machines this problem went unnoticed for a long time.
+>   Merge remote-tracking branch 'remotes/mdroth/tags/qga-pull-2020-10-27-v3-tag' into staging (2020-11-03 12:47:58 +0000)
 >
-> The type definitions have been cross-checked with the ones defined in
-> the Linux kernel v5.9, plus some older versions for a few architecture
-> that have been removed and Xilinx's kernel fork for NiosII [1].
+> are available in the Git repository at:
 >
-> The microblaze header and the bsd-user ones remain unchanged as I don't
-> know if they are wrong or not.
+>   https://gitlab.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 372bcb2585cd2f06a01f13b1a208370ccf7479cf:
+>
+>   qapi, qemu-options: make all parsing visitors parse boolean options the same (2020-11-04 12:00:40 -0500)
+>
+> ----------------------------------------------------------------
+> Doc and bug fixes
+>
 
-As far as I can tell, Microblaze doesn't define its own stack_t,
-so it must be using the asm-generic one,  so I think it also needs
-changing.
 
-> [1] https://github.com/Xilinx/linux-xlnx/blob/master/arch/nios2/include/uapi/asm/signal.h
+Applied, thanks.
 
-> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
-Other than also changing microblaze,
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
 -- PMM
 
