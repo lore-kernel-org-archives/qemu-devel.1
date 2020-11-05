@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA04C00A89
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 04:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 713D5C00A89
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 04:26:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C111C2067B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 04:26:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C111C2067B
+	by mail.kernel.org (Postfix) with ESMTPS id C6A1020704
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 04:26:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6A1020704
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaWr7-0006tQ-KX
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 23:26:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40170)
+	id 1kaWrE-00076G-Nc
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 23:26:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaWqJ-0005VZ-3S
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 23:25:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38028)
+ id 1kaWqP-0005aO-1b
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 23:25:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38248)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaWqG-0000At-UU
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 23:25:46 -0500
+ id 1kaWqM-0000DK-D9
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 23:25:52 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kaWqE-0002t7-MY
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 04:25:42 +0000
+ id 1kaWqK-00032I-14
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 04:25:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A80042E8130
- for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 04:25:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id EA4042E8055
+ for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 04:25:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Nov 2020 04:17:20 -0000
-From: Launchpad Bug Tracker <1715715@bugs.launchpad.net>
+Date: Thu, 05 Nov 2020 04:17:23 -0000
+From: Launchpad Bug Tracker <1708442@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
@@ -50,19 +50,19 @@ X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cbparker janitor mark-cave-ayland th-huth
-X-Launchpad-Bug-Reporter: Brad Parker (cbparker)
+X-Launchpad-Bug-Commenters: asmetanin eblake janitor th-huth
+X-Launchpad-Bug-Reporter: Andrey Smetanin (asmetanin)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <150480734842.32058.3488330551186130563.malonedeb@soybean.canonical.com>
-Message-Id: <160454984026.10129.11833851074669572793.malone@loganberry.canonical.com>
-Subject: [Bug 1715715] Re: [qemu-ppc] Segfault when booting from HD after
- MacOS9 install
+References: <150176232235.21421.11970305069558342885.malonedeb@wampee.canonical.com>
+Message-Id: <160454984324.10129.14811414527449815254.malone@loganberry.canonical.com>
+Subject: [Bug 1708442] Re: Crash(assert) during reading image from http url
+ through qemu-nbd
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 03f89532e383b4994b4a8b796ef43c075d659d3c
+X-Launchpad-Hash: c30ee16b24e9c365419320d575cd529e09198914
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 21:30:42
@@ -85,7 +85,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1715715 <1715715@bugs.launchpad.net>
+Reply-To: Bug 1708442 <1708442@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,106 +99,137 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715715
+https://bugs.launchpad.net/bugs/1708442
 
 Title:
-  [qemu-ppc] Segfault when booting from HD after MacOS9 install
+  Crash(assert) during reading  image from http url through qemu-nbd
 
 Status in QEMU:
   Expired
 
 Bug description:
-  I created an empty 128G qcow2 image and booted from a Mac OS 9.2.1
-  Install CD, in which I was able to install the OS successfully to the
-  hard drive. Upon reboot, this time from the hard drive directly, qemu-
-  system-ppc segfaults. Host system is Ubuntu 16.04.2 with latest qemu
-  commit.
+  Description:
+  During reading image from nbd device mounted by qemu-nbd server with url =
+backend I/O error happens
+  "blk_update_request: I/O error, dev nbd0, sector 42117" dmesg. After some=
+ investigation I found that qemu-nbd server aborts in aio_co_enter() assert=
+ in util/async.c:468.
 
-  qemu --version reports "2.10.50 (v2.10.0-244-gb07d1c2-dirty)", but I
-  used git commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built
-  with "./configure --target-list=3Dppc-softmmu --enable-debug --disable-
-  strip".
+  Steps to reproduce:
 
-  Here is the command-line arguments:
+  1) sudo go run qemu-nbd-bug-report/qemu-nbd-bug.go (see qemu-nbd-bug-
+  report.tar.gz)
 
-  qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env
-  'auto-boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtru=
-e'
-  -drive file=3D../os9.img,format=3Draw,media=3Dcdrom -drive
-  file=3DMacOS9.qcow2,format=3Dqcow2,media=3Ddisk -spice
-  port=3D5901,password=3DXXX -net nic,model=3Drtl8139 -net user -monitor st=
-dio
+  or try directly
 
-  And the GDB backtrace:
+  1) qemu-nbd -c /dev/nbd0 -r -v --aio=3Dnative -f qcow2 json:{"file.driver=
+":"http","file.url":"http://localhost:9666/image","file.readahead":3276800
+  2) try read whole nbd device while error "blk_update_request: I/O error, =
+dev nbd0, sector 42117" appears in dmesg
 
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  462         timer_mod_ns(ts, expire_time * ts->scale);
-  [Current thread is 1 (Thread 0x7f60e43cb700 (LWP 9853))]
+  Versions:
+
+  1) qemu built from sources(/configure --target-list=3Dx86_64-softmmu --di=
+sable-user --enable-curl --enable-linux-aio --enable-virtfs --enable-debug =
+--disable-pie
+  , top commit 5619c179057e24195ff19c8fe6d6a6cbcb16ed28):
+
+  qemu-nbd -v
+  qemu-nbd 2.9.90 (v2.10.0-rc0-67-g5619c17)
+
+  2) libcurl(built from sources, top commit
+  1767adf4399bb3be29121435e1bb1cc2bc05f7bf):
+
+  curl -V
+  curl 7.55.0-DEV (Linux) libcurl/7.55.0-DEV OpenSSL/1.0.2g zlib/1.2.8
+
+  Backtrace:
   (gdb) bt
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  #1  0x0000559065d63769 in openpic_tmr_set_tmr (tmr=3D0x5590676fa7e0, val=
-=3D96, enabled=3Dtrue) at hw/intc/openpic.c:861
-  #2  0x0000559065d63995 in openpic_tmr_write (opaque=3D0x5590676f71f0, add=
-r=3D16, val=3D96, len=3D4) at hw/intc/openpic.c:912
-  #3  0x0000559065b02811 in memory_region_write_accessor (mr=3D0x5590676f77=
-10, addr=3D32, value=3D0x7f60e43c7da8, size=3D4, shift=3D0, mask=3D42949672=
-95, attrs=3D...) at /home/bp/qemu/memory.c:529
-  #4  0x0000559065b02a29 in access_with_adjusted_size (addr=3D32, value=3D0=
-x7f60e43c7da8, size=3D1, access_size_min=3D4, access_size_max=3D4, access=
-=3D0x559065b02727 <memory_region_write_accessor>, mr=3D0x5590676f7710, attr=
-s=3D...) at /home/bp/qemu/memory.c:595
-  #5  0x0000559065b051eb in memory_region_dispatch_write (mr=3D0x5590676f77=
-10, addr=3D32, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:=
-1337
-  #6  0x0000559065aa3a36 in address_space_write_continue (as=3D0x559067614d=
-90, addr=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", le=
-n=3D1, addr1=3D32, l=3D1, mr=3D0x5590676f7710) at /home/bp/qemu/exec.c:2942
-  #7  0x0000559065aa3b84 in address_space_write (as=3D0x559067614d90, addr=
-=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=3D1) a=
-t /home/bp/qemu/exec.c:2987
-  #8  0x0000559065aa2ec0 in subpage_write (opaque=3D0x7f60c8275fc0, addr=3D=
-272, value=3D96, len=3D1, attrs=3D...) at /home/bp/qemu/exec.c:2565
-  #9  0x0000559065b02906 in memory_region_write_with_attrs_accessor (mr=3D0=
-x7f60c8275fc0, addr=3D272, value=3D0x7f60e43c7fc8, size=3D1, shift=3D0, mas=
-k=3D255, attrs=3D...) at /home/bp/qemu/memory.c:555
-  #10 0x0000559065b029d3 in access_with_adjusted_size (addr=3D272, value=3D=
-0x7f60e43c7fc8, size=3D1, access_size_min=3D1, access_size_max=3D8, access=
-=3D0x559065b02818 <memory_region_write_with_attrs_accessor>, mr=3D0x7f60c82=
-75fc0, attrs=3D...) at /home/bp/qemu/memory.c:590
-  #11 0x0000559065b0523a in memory_region_dispatch_write (mr=3D0x7f60c8275f=
-c0, addr=3D272, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c=
-:1344
-  #12 0x0000559065b175db in io_writex (env=3D0x7f60e43d42a0, iotlbentry=3D0=
-x7f60e43e8130, mmu_idx=3D3, val=3D96, addr=3D2147750160, retaddr=3D14005415=
-8295744, size=3D1) at /home/bp/qemu/accel/tcg/cputlb.c:807
-  #13 0x0000559065b18055 in io_writeb (env=3D0x7f60e43d42a0, mmu_idx=3D3, i=
-ndex=3D65, val=3D96 '`', addr=3D2147750160, retaddr=3D140054158295744) at /=
-home/bp/qemu/softmmu_template.h:265
-  #14 0x0000559065b181ea in helper_ret_stb_mmu (env=3D0x7f60e43d42a0, addr=
-=3D2147750160, val=3D96 '`', oi=3D3, retaddr=3D140054158295744) at /home/bp=
-/qemu/softmmu_template.h:300
-  #15 0x00007f60e65ac2c0 in code_gen_buffer ()
-  #16 0x0000559065b1ff26 in cpu_tb_exec (cpu=3D0x7f60e43cc010, itb=3D0x7f60=
-e65ac5c0 <code_gen_buffer+935318>) at /home/bp/qemu/accel/tcg/cpu-exec.c:166
-  #17 0x0000559065b20bfd in cpu_loop_exec_tb (cpu=3D0x7f60e43cc010, tb=3D0x=
-7f60e65ac5c0 <code_gen_buffer+935318>, last_tb=3D0x7f60e43c8678, tb_exit=3D=
-0x7f60e43c8674) at /home/bp/qemu/accel/tcg/cpu-exec.c:578
-  #18 0x0000559065b20eed in cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/qem=
-u/accel/tcg/cpu-exec.c:676
-  #19 0x0000559065aebc3d in tcg_cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp=
-/qemu/cpus.c:1270
-  #20 0x0000559065aebe64 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x7f60e43cc010=
-) at /home/bp/qemu/cpus.c:1365
-  #21 0x00007f60f56f06ba in start_thread (arg=3D0x7f60e43cb700) at pthread_=
-create.c:333
-  #22 0x00007f60f542682d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:109
-
-  Any idea what is going on?
+  #0  0x00007f7131426428 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
+unix/sysv/linux/raise.c:54
+  #1  0x00007f713142802a in __GI_abort () at abort.c:89
+  #2  0x00007f713141ebd7 in __assert_fail_base (fmt=3D<optimized out>, asse=
+rtion=3Dassertion@entry=3D0x54c924 "self !=3D co",
+  =C2=A0=C2=A0=C2=A0=C2=A0file=3Dfile@entry=3D0x54c871 "util/async.c", line=
+=3Dline@entry=3D468,
+  =C2=A0=C2=A0=C2=A0=C2=A0function=3Dfunction@entry=3D0x54c980 <__PRETTY_FU=
+NCTION__.24766> "aio_co_enter") at assert.c:92
+  #3  0x00007f713141ec82 in __GI___assert_fail (assertion=3D0x54c924 "self =
+!=3D co", file=3D0x54c871 "util/async.c", line=3D468,
+  =C2=A0=C2=A0=C2=A0=C2=A0function=3D0x54c980 <__PRETTY_FUNCTION__.24766> "=
+aio_co_enter") at assert.c:101
+  #4  0x00000000004fe6a2 in aio_co_enter (ctx=3D0xf0ddb0, co=3D0xf14650) at=
+ util/async.c:468
+  #5  0x00000000004fe637 in aio_co_wake (co=3D0xf14650) at util/async.c:456
+  #6  0x0000000000495c8a in curl_read_cb (ptr=3D0xf566d9, size=3D1, nmemb=
+=3D16135, opaque=3D0xf1cb90) at block/curl.c:275
+  #7  0x00007f713242ac24 in Curl_client_chop_write () from /usr/lib/x86_64-=
+linux-gnu/libcurl.so
+  #8  0x00007f713242ae03 in Curl_client_write () from /usr/lib/x86_64-linux=
+-gnu/libcurl.so
+  #9  0x00007f713244e1cf in readwrite_data () from /usr/lib/x86_64-linux-gn=
+u/libcurl.so
+  #10 0x00007f713244eb6f in Curl_readwrite () from /usr/lib/x86_64-linux-gn=
+u/libcurl.so
+  #11 0x00007f713245c1bb in multi_runsingle () from /usr/lib/x86_64-linux-g=
+nu/libcurl.so
+  #12 0x00007f713245d819 in multi_socket () from /usr/lib/x86_64-linux-gnu/=
+libcurl.so
+  #13 0x00007f713245e067 in curl_multi_socket_action () from /usr/lib/x86_6=
+4-linux-gnu/libcurl.so
+  #14 0x0000000000497555 in curl_setup_preadv (bs=3D0xf16820, acb=3D0x7f712=
+d379860) at block/curl.c:918
+  #15 0x00000000004975fb in curl_co_preadv (bs=3D0xf16820, offset=3D6556160=
+, bytes=3D512, qiov=3D0x7f712d379b40, flags=3D0) at block/curl.c:935
+  #16 0x000000000047730f in bdrv_driver_preadv (bs=3D0xf16820, offset=3D655=
+6160, bytes=3D512, qiov=3D0x7f712d379b40, flags=3D0) at block/io.c:836
+  #17 0x0000000000477c1f in bdrv_aligned_preadv (child=3D0xf1be20, req=3D0x=
+7f712d379a60, offset=3D6556160, bytes=3D512, align=3D1,
+  =C2=A0=C2=A0=C2=A0=C2=A0qiov=3D0x7f712d379b40, flags=3D0) at block/io.c:1=
+086
+  #18 0x0000000000478109 in bdrv_co_preadv (child=3D0xf1be20, offset=3D6556=
+160, bytes=3D512, qiov=3D0x7f712d379b40, flags=3D0) at block/io.c:1180
+  #19 0x0000000000437498 in qcow2_co_preadv (bs=3D0xf0fdc0, offset=3D215639=
+04, bytes=3D512, qiov=3D0x7f712d379e80, flags=3D0)
+  =C2=A0=C2=A0=C2=A0=C2=A0at block/qcow2.c:1812
+  #20 0x000000000047730f in bdrv_driver_preadv (bs=3D0xf0fdc0, offset=3D215=
+63904, bytes=3D512, qiov=3D0x7f712d379e80, flags=3D0)
+  =C2=A0=C2=A0=C2=A0=C2=A0at block/io.c:836
+  #21 0x0000000000477c1f in bdrv_aligned_preadv (child=3D0xf1c0d0, req=3D0x=
+7f712d379d30, offset=3D21563904, bytes=3D512, align=3D1,
+  =C2=A0=C2=A0=C2=A0=C2=A0qiov=3D0x7f712d379e80, flags=3D0) at block/io.c:1=
+086
+  #22 0x0000000000478109 in bdrv_co_preadv (child=3D0xf1c0d0, offset=3D2156=
+3904, bytes=3D512, qiov=3D0x7f712d379e80, flags=3D0)
+  =C2=A0=C2=A0=C2=A0=C2=A0at block/io.c:1180
+  #23 0x00000000004645ad in blk_co_preadv (blk=3D0xf1be90, offset=3D2156390=
+4, bytes=3D512, qiov=3D0x7f712d379e80, flags=3D0)
+  =C2=A0=C2=A0=C2=A0=C2=A0at block/block-backend.c:991
+  #24 0x00000000004646fa in blk_read_entry (opaque=3D0x7f712d379ea0) at blo=
+ck/block-backend.c:1038
+  #25 0x000000000046481c in blk_prw (blk=3D0xf1be90, offset=3D21563904,
+  ---Type <return> to continue, or q <return> to quit---
+  =C2=A0=C2=A0=C2=A0=C2=A0buf=3D0xf7f000 "2,NV\241t!\ti\312\vp\364\017Kl*\3=
+54\021\a\177\021\260\b\027\212\347\027\004\322\nG\340b\\\306pG\332\313\060\=
+341;\002\360\063L\240\027T \211\341\305\022=D0=90E\230\356D=C7=AE}\211\bx\0=
+16\a\b\313\350\316\064.\017\372\032-R\376z\261\263\350|cQ<\016S_L\340A\221\=
+366~L#\001+\271\204\065~\327\023\027I\211\343\361\276zT$4\336\273=CB=8F\353=
+=CA=AA\234\016_Z|TMk\"\370\002\363~\334\332.\a\375\265m=D3=8C{/%\304=D6=8E\=
+374sF<E\371\031o&\202\217\226\276>I\356\302\375F\340\332\324\021\202\232>\0=
+26\261\233\303tv\023\304\006\243\037\062B=CF=8F\b\324rs\360'"..., bytes=3D5=
+12, co_entry=3D0x4646aa <blk_read_entry>, flags=3D0) at block/block-backend=
+.c:1074
+  #26 0x0000000000464f81 in blk_pread (blk=3D0xf1be90, offset=3D21563904, b=
+uf=3D0xf7f000, count=3D512) at block/block-backend.c:1227
+  #27 0x00000000004906cb in nbd_trip (opaque=3D0xf5a940) at nbd/server.c:13=
+80
+  #28 0x000000000051c0a5 in coroutine_trampoline (i0=3D15812176, i1=3D0) at=
+ util/coroutine-ucontext.c:79
+  #29 0x00007f713143b5d0 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+  #30 0x00007f712d47a770 in ?? ()
+  #31 0x0000000000000000 in ?? ()
+  Backtrace stopped: Cannot access memory at address 0x7f712d37a000
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715715/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1708442/+subscriptions
 
