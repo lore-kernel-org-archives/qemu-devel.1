@@ -2,85 +2,93 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA81EC55178
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:54:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB50C4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:54:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5631420782
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:54:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9633120786
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 15:54:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yq9D0Vhd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5631420782
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mnbip4gb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9633120786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kahaR-0002Lo-BT
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:54:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35288)
+	id 1kahaZ-0002YB-KM
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 10:54:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kahZA-00019c-UB
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:52:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39426)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kahZ5-0000H2-GQ
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:52:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604591562;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=f1IsjEETTa+pJ7s7RpfH+uWZH/ki0r+YVl87rVRUGos=;
- b=Yq9D0VhdiPppvVHDlXcjcwoiyfzBnseYXMddCQb35wDdPVk/ucqdz7Sk176IEWSK+OKPWi
- FcMx/SgJskWGpVjwvWkRGyR+Frc933rVDEJ5BbPKa6hJmjbVvILIPFfzRv9Qa/xlgGEsPK
- JYA1/szKZ0RRo16stR2e6KnEi6VVeG4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-dUUJIbFIOSKqIQ4FDnIOUw-1; Thu, 05 Nov 2020 10:52:40 -0500
-X-MC-Unique: dUUJIbFIOSKqIQ4FDnIOUw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 083018DF0AC;
- Thu,  5 Nov 2020 15:52:39 +0000 (UTC)
-Received: from gondolin (ovpn-112-138.ams2.redhat.com [10.36.112.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 024FD5C5DE;
- Thu,  5 Nov 2020 15:52:22 +0000 (UTC)
-Date: Thu, 5 Nov 2020 16:52:20 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [RFC v2] VFIO Migration
-Message-ID: <20201105165220.7ad2d1a6.cohuck@redhat.com>
-In-Reply-To: <20201105150902.GA472489@stefanha-x1.localdomain>
-References: <20201105150902.GA472489@stefanha-x1.localdomain>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <thatlemon@gmail.com>)
+ id 1kahZJ-0001Lk-33
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:52:57 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34795)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <thatlemon@gmail.com>)
+ id 1kahZG-0000Jv-Tm
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 10:52:56 -0500
+Received: by mail-wr1-x442.google.com with SMTP id e6so2349388wro.1
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 07:52:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=to:cc:from:subject:message-id:date:user-agent:mime-version
+ :content-language:content-transfer-encoding;
+ bh=s8wazc77+ZcgHKV3m1P3LAIQ93INB85KM7Ik6EYQku8=;
+ b=Mnbip4gbKV3JV9xSiUE5LVQyYAnrBMymrIRB74s8Lkj1SwZSZjapO8rkZN9IoThWIL
+ aAe/CNuJ7jBYg+pfMEkr8kVTsxXRONojGGdBufanvomLWAh+RvaKM8H9JpCHakXyr3a7
+ XrXfnveTUu3+m0KnvIRDYUQSTsr1aryPTEfCK5nq2c+TPucjAHjisvFO/YNmIO5UvOeQ
+ NMDdIdzMFbH9l8u1YzT+ms/t5DBgje8m5j70mMNa7hfiwvi0FEPv77uDXFq7J+CDxbtX
+ oiBOQDTzOF7zwyDCMKndvICym2zbfW/1IZhC2FYEYs0+ujkBle6/iyWZp1ZY+pwcpPDS
+ YO+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+ :mime-version:content-language:content-transfer-encoding;
+ bh=s8wazc77+ZcgHKV3m1P3LAIQ93INB85KM7Ik6EYQku8=;
+ b=HqPzUIxD6l7lVKe91qSpa0M6ZPYO0RrHb7ZQctzalVXjIj69ObYHJF2BOfx7LGMh5n
+ 72Ze6Nbs09RwtHxn7IDXh7rZpPPtIjvtCifr1z2aC6xLMUjTMXxe9nQi1fnD18kNWhAj
+ nPy41k96y15c2lMtDrABCH2nkRX9Af9QlZcUrslN7xiS0+reanbzg4/g0p8vEGHIdYxw
+ ch+z9vcYysxdfoJJ6zgYCGkO6sTTMJey1w43hLKdwJJnK46fqgaBJbV9GR6BKIHZf3cO
+ JpghDO+Gj8s/LrCt8sNbaOZ2tZvxLLGnf88+C9rNixjz52BMvLMaZJnJTmaK1NtzU1+J
+ 1x+Q==
+X-Gm-Message-State: AOAM530HkcugwNHwQ0DNDp7YJmCwSsHwSez+fH9Hs6dPNUy9pg8z1Kdk
+ qudAbY+lBgTPe6ZnVHC9uro=
+X-Google-Smtp-Source: ABdhPJx0KYkys6b+NXequ2WpFP+qX/LddhI/6VcslS/7o91Dpx2y2+VdWhfrWf//672vXg93hhPMhA==
+X-Received: by 2002:adf:cd81:: with SMTP id q1mr3978796wrj.410.1604591573135; 
+ Thu, 05 Nov 2020 07:52:53 -0800 (PST)
+Received: from [192.168.1.103] ([151.33.227.77])
+ by smtp.gmail.com with ESMTPSA id t13sm3309178wru.67.2020.11.05.07.52.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Nov 2020 07:52:52 -0800 (PST)
+To: QEMU Developers <qemu-devel@nongnu.org>
+From: LemonBoy <thatlemon@gmail.com>
+Subject: [PATCH v2] linux-user: Correct definition of stack_t
+Message-ID: <e9d47692-ee92-009f-6007-0abc3f502b97@gmail.com>
+Date: Thu, 5 Nov 2020 16:52:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=thatlemon@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,106 +101,297 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John G Johnson <john.g.johnson@oracle.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, mtsirkin@redhat.com, "Daniel P.
- =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, quintela@redhat.com,
- Jason Wang <jasowang@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, "Zeng,
- Xin" <xin.zeng@intel.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Kirti Wankhede <kwankhede@nvidia.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Nov 2020 15:09:02 +0000
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
+Some platforms used the wrong definition of stack_t where the flags and
+size fields were swapped or where the flags field had type ulong instead
+of int.
 
-(...)
+Due to the presence of padding space in the structure and the prevalence
+of little-endian machines this problem went unnoticed for a long time.
 
-<did not fully read through the v1 thread, so apologies if I missed
-something>
+The type definitions have been cross-checked with the ones defined in
+the Linux kernel v5.9, plus some older versions for a few architecture
+that have been removed and Xilinx's kernel fork for NiosII [1].
 
-> VFIO/mdev Devices
-> -----------------
-> TODO this is a first draft, more thought needed around enumerating supported
-> parameters, representing default values, etc
-> 
-> The following mdev type sysfs attrs are available for managing device
-> instances:
-> 
->   /sys/.../<parent-device>/mdev_supported_types/<type-id>/
->       create - writing a UUID to this file instantiates a device
->       migration/ - migration related files
->           model - unique device model string, e.g. vendor-a.com/my-nic
-> 
-> Device models supported by an mdev driver can be enumerated by reading the
-> migration/model attr for each <type-id>.
+The bsd-user headers remain unchanged as I don't know if they are wrong
+or not.
 
-IIUC, we're grouping together all users of a specific mdev_type, but
-support a variety of sub-configurations? Does that include parameters
-or not? If not, shouldn't we already be covered by mdev_type?
+[1] https://github.com/Xilinx/linux-xlnx/blob/master/arch/nios2/include/uapi/asm/signal.h
 
-> 
-> The following mdev device sysfs attrs relate to a specific device instance:
-> 
->   /sys/.../<parent-device>/<uuid>/
->       mdev_type/ - symlink to mdev type sysfs attrs, e.g. to fetch migration/model
->       migration/ - migration related files
->           applied - Write "1" to apply current migration parameter values or
->                     "0" to reset migration parameter values to their defaults.
->                     Parameters can only be applied or reset while the mdev is
->                     not opened.
->           params/ - migration parameters
->               <my-param> - read/write migration parameter "my-param"
->               ...
-> 
-> When the device is created the migration/applied attr is "0". Migration
-> parameters are accessible in migration/params/ and read 0 bytes because they
-> are at their default values.  At the point opening the mdev device will fail
-> because migration parameters must be applied first. Migration parameters can be
-> set to the desired values or left at their defaults. "1" must be written to
-> migration/applied before opening the mdev device.
-> 
-> If writing to a migration/params/<param> attr or setting migration/applied to
-> "1" fails, then the device implementation does not support the migration
-> parameters.
-> 
-> An open mdev device typically does not allow migration parameters to be changed
-> at runtime. However, certain migration/params attrs may allow writes at
-> runtime. Usually these migration parameters only affect the device state
-> representation and not the hardware interface. This makes it possible to
-> upgrade or downgrade the device state representation at runtime so that
-> migration is possible to newer or older device implementations.
-> 
-> An existing mdev device instance can be reused by closing the mdev device and
-> writing "0" to migration/applied. This resets parameters to their defaults so
-> that a new list of migration parameters can be applied.
-> 
-> The migration parameter list for an mdev device that is in operation can be
-> read from migration/params/. Parameters that read 0 bytes are at their default
-> value.
+Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ linux-user/alpha/target_signal.h      | 3 +--
+ linux-user/arm/target_signal.h        | 6 +++---
+ linux-user/cris/target_signal.h       | 6 +++---
+ linux-user/hppa/target_signal.h       | 2 +-
+ linux-user/i386/target_signal.h       | 6 +++---
+ linux-user/m68k/target_signal.h       | 6 +++---
+ linux-user/microblaze/target_signal.h | 6 +++---
+ linux-user/mips/target_signal.h       | 6 +++---
+ linux-user/mips64/target_signal.h     | 7 +++----
+ linux-user/nios2/target_signal.h      | 5 +++--
+ linux-user/ppc/target_signal.h        | 6 +++---
+ linux-user/s390x/target_signal.h      | 2 +-
+ linux-user/sh4/target_signal.h        | 6 +++---
+ linux-user/sparc/target_signal.h      | 6 +++---
+ linux-user/x86_64/target_signal.h     | 6 +++---
+ 15 files changed, 39 insertions(+), 40 deletions(-)
 
-I'm trying to figure out what that means for the mdevs I'm most
-familiar with, ccw and ap. Both of them currently support a single
-mdev_type.
-
-For ccw, there are some things that I could imagine as parameters, like
-the device number, or channel paths. Maybe we could include the channel
-path type (FICON, ...) in the migration device model? We should not
-include device numbers etc. in the device model.
-
-For ap, we have matrices covering tuples (APQNs) derived from a
-cross-product of card/domains configure via sysfs attributes. I think
-later modification of these is desired. I think we also might be able
-to mix-and-match different types within the same matrix, so not sure if
-we can put these into any device model. In fact, I'm a bit at a loss
-how the device model for ap would look like (other than simply
-'matrix'). Can we deal with dynamic parameters?
-
-(...)
-
+diff --git a/linux-user/alpha/target_signal.h b/linux-user/alpha/target_signal.h
+index cd63d59fde..b83797281c 100644
+--- a/linux-user/alpha/target_signal.h
++++ b/linux-user/alpha/target_signal.h
+@@ -42,8 +42,7 @@
+ 
+ typedef struct target_sigaltstack {
+     abi_ulong ss_sp;
+-    int32_t ss_flags;
+-    int32_t dummy;
++    abi_int ss_flags;
+     abi_ulong ss_size;
+ } target_stack_t;
+ 
+diff --git a/linux-user/arm/target_signal.h b/linux-user/arm/target_signal.h
+index ea123c40f3..0998dd6dfa 100644
+--- a/linux-user/arm/target_signal.h
++++ b/linux-user/arm/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/cris/target_signal.h b/linux-user/cris/target_signal.h
+index 1cb5548f85..495a142896 100644
+--- a/linux-user/cris/target_signal.h
++++ b/linux-user/cris/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_ulong ss_size;
+-	abi_long ss_flags;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/hppa/target_signal.h b/linux-user/hppa/target_signal.h
+index c2a0102ed7..c52a3ea579 100644
+--- a/linux-user/hppa/target_signal.h
++++ b/linux-user/hppa/target_signal.h
+@@ -44,7 +44,7 @@
+ 
+ typedef struct target_sigaltstack {
+     abi_ulong ss_sp;
+-    int32_t ss_flags;
++    abi_int ss_flags;
+     abi_ulong ss_size;
+ } target_stack_t;
+ 
+diff --git a/linux-user/i386/target_signal.h b/linux-user/i386/target_signal.h
+index f55e78fd33..50361af874 100644
+--- a/linux-user/i386/target_signal.h
++++ b/linux-user/i386/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/m68k/target_signal.h b/linux-user/m68k/target_signal.h
+index 314e808844..d096544ef8 100644
+--- a/linux-user/m68k/target_signal.h
++++ b/linux-user/m68k/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/microblaze/target_signal.h b/linux-user/microblaze/target_signal.h
+index 08bcf24b9d..1c326296de 100644
+--- a/linux-user/microblaze/target_signal.h
++++ b/linux-user/microblaze/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_ulong ss_size;
+-	abi_long ss_flags;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/mips/target_signal.h b/linux-user/mips/target_signal.h
+index 66e1ad44a6..fa4084a99d 100644
+--- a/linux-user/mips/target_signal.h
++++ b/linux-user/mips/target_signal.h
+@@ -45,9 +45,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_long ss_sp;
+-	abi_ulong ss_size;
+-	abi_long ss_flags;
++    abi_ulong ss_sp;
++    abi_ulong ss_size;
++    abi_int ss_flags;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/mips64/target_signal.h b/linux-user/mips64/target_signal.h
+index 753e91fbd6..799f7a668c 100644
+--- a/linux-user/mips64/target_signal.h
++++ b/linux-user/mips64/target_signal.h
+@@ -45,12 +45,11 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_long ss_sp;
+-	abi_ulong ss_size;
+-	abi_int ss_flags;
++    abi_ulong ss_sp;
++    abi_ulong ss_size;
++    abi_int ss_flags;
+ } target_stack_t;
+ 
+-
+ /*
+  * sigaltstack controls
+  */
+diff --git a/linux-user/nios2/target_signal.h b/linux-user/nios2/target_signal.h
+index fe48721b3d..aebf749f12 100644
+--- a/linux-user/nios2/target_signal.h
++++ b/linux-user/nios2/target_signal.h
+@@ -4,11 +4,12 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-    abi_long ss_sp;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
+     abi_ulong ss_size;
+-    abi_long ss_flags;
+ } target_stack_t;
+ 
++
+ /* sigaltstack controls  */
+ #define TARGET_SS_ONSTACK     1
+ #define TARGET_SS_DISABLE     2
+diff --git a/linux-user/ppc/target_signal.h b/linux-user/ppc/target_signal.h
+index 4453e2e7ef..72fcdd9bfa 100644
+--- a/linux-user/ppc/target_signal.h
++++ b/linux-user/ppc/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	int ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/s390x/target_signal.h b/linux-user/s390x/target_signal.h
+index b58bc7c20f..bbfc464d44 100644
+--- a/linux-user/s390x/target_signal.h
++++ b/linux-user/s390x/target_signal.h
+@@ -3,7 +3,7 @@
+ 
+ typedef struct target_sigaltstack {
+     abi_ulong ss_sp;
+-    int ss_flags;
++    abi_int ss_flags;
+     abi_ulong ss_size;
+ } target_stack_t;
+ 
+diff --git a/linux-user/sh4/target_signal.h b/linux-user/sh4/target_signal.h
+index 434970a990..d7309b7136 100644
+--- a/linux-user/sh4/target_signal.h
++++ b/linux-user/sh4/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/sparc/target_signal.h b/linux-user/sparc/target_signal.h
+index 5cc40327d2..1b10d1490f 100644
+--- a/linux-user/sparc/target_signal.h
++++ b/linux-user/sparc/target_signal.h
+@@ -42,9 +42,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+diff --git a/linux-user/x86_64/target_signal.h b/linux-user/x86_64/target_signal.h
+index 4c4380f7b9..4ea74f20dd 100644
+--- a/linux-user/x86_64/target_signal.h
++++ b/linux-user/x86_64/target_signal.h
+@@ -4,9 +4,9 @@
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+-	abi_ulong ss_sp;
+-	abi_long ss_flags;
+-	abi_ulong ss_size;
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
+ } target_stack_t;
+ 
+ 
+-- 
+2.27.0
 
