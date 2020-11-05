@@ -2,90 +2,94 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B2BC4741F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 21:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A2DC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 21:36:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09CB920728
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 21:28:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B95C20728
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 21:36:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HMdI09Xs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09CB920728
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rcYsv42B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B95C20728
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kamoR-00073r-IU
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 16:28:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54656)
+	id 1kamw7-0001R0-4R
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 16:36:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kamj9-0002oP-B8
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 16:23:27 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40366)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kamv5-0000y1-JF
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 16:35:47 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43644)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kamj5-0005Tj-B4
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 16:23:27 -0500
-Received: by mail-wr1-x441.google.com with SMTP id 33so3397735wrl.7
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 13:23:21 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kamv3-00074c-Fh
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 16:35:47 -0500
+Received: by mail-pg1-x542.google.com with SMTP id r10so2248819pgb.10
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 13:35:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=MvkEJhOTTURl32F+uN0ekuj0WJYncaqeHJMVTEXiVk4=;
- b=HMdI09Xs/+trcFkmEhJq0dfdIe8E649T4Ov3fA9K/F5N6HBMQOEEiDs0Qxd8j0TWvs
- BKG+COYBtztDNpynLfJsFXuL6QflprNjTughelbUxsJWEBPW6FUOWflYM3b4fXyR2sQq
- mCTMi5+v7YBGbGBm5vuu55Z21buOJ3g2vxFJlY/n2cY3CT27qs9b/0Qrb1NGUTbBdpJN
- Z3wn/QY0ESNXFejfLIED4469WPjl1fKLYyAGWGGQaULrPAi4AHtZrVtEPQNlJQq6vXLM
- cjgRzoRnGtkYly5+h/4rr/nXZz476A6mYnxAlSrnZeOz1T1RUZTzmqkVUNwwvdlV7S9G
- 1W7w==
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=SIgKkYHZg4XIKAyBseWN99Uu7ZGCUOnYVwl7w9I+bmI=;
+ b=rcYsv42BVfjlUZ72R1T48CWasSI2rWY+FInDfM9JIe6z41Uf7thWugQrHia2by9xsV
+ flw+Q73Xx+5nmqwqV1hI3Kdx1Upzhg2ninro1VciS1JgOJFGiujOaQpP4PE29el+ugBG
+ luR3Eg0TY7TKpshwTPih4hMwCRAg+SRDex8FT5y82yWaanmkPwhBfTixtH3NxGNs800q
+ c8pkh9+xciuBa0hfAV5z5QjO2JWSPfub/GQ+ED4Itj80mDhlEw+iSsedwW6VlFEzqkX6
+ 88valk1glYI6yV1/g/bBbG4kWp7zHufD8o0BdQgrd0C+Jv4FB51CYQ6BhX63t94CmMC8
+ TtbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=MvkEJhOTTURl32F+uN0ekuj0WJYncaqeHJMVTEXiVk4=;
- b=Aq76iRaUbrPjWhTsyaA6gg8FLkaGiOIzUaxJ+AJsveRXfdg97+7iEkUBfLQ+1XUva0
- w+CiMuuf8BuAUacen0729zbmeIq5CSHZLo+fMqoAudRdE1Xh7qbKjVb/jeJQxs9GdvLo
- FNad/A5EX4qAmkbZqTXopLd4EivbIeELgJ/dSB1qX4i1+ruBOWQ9jbbhisTVLBJ+wt9h
- t4qnJNAkp78G+0OHm4y48yzIpIkmEyrBItKxZlqCMzVSTEuqiLd+w0/U5/AirflhXhTW
- gHzSGP3rlhhgqDbzWhVkoI3zf0ofmVni+LHsXcShrjigmrypM3+eYVCHOPBSJXtmTm3K
- ae8w==
-X-Gm-Message-State: AOAM530gQPf/nXEEiCvgkFvQ1IuOJUH/J4GHABHqcfIqLEOwVClTDwWG
- 8CkUWjVZHcAEu61F0MTRVpJfwU14HWy/Lg==
-X-Google-Smtp-Source: ABdhPJwXqA727fOm6dk3+A5Uvj4hJyAoKDWQPnwY9wfLO5yq2hQFTPbUgSgX4ZYlmzoCpRl0QFRR2Q==
-X-Received: by 2002:adf:80c8:: with SMTP id 66mr5252857wrl.415.1604611400761; 
- Thu, 05 Nov 2020 13:23:20 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e25sm4861587wrc.76.2020.11.05.13.23.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Nov 2020 13:23:20 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.2 3/3] linux-user/sparc: Don't zero high half of PC, NPC,
- PSR in sigreturn
-Date: Thu,  5 Nov 2020 21:23:14 +0000
-Message-Id: <20201105212314.9628-4-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201105212314.9628-1-peter.maydell@linaro.org>
-References: <20201105212314.9628-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SIgKkYHZg4XIKAyBseWN99Uu7ZGCUOnYVwl7w9I+bmI=;
+ b=V45MbATtQW5bwdnCVU2u4TcIbLyzF5G0jKCLPvkStMdoYPKbA0+qbZLGzmRXsMoC/x
+ ogmyVqCR8z281lhcF9nOwYFWO0VFc3fBc/lwRgzu9/mYFSkUULlD3rk7YIzmffeqTtKe
+ siixg0gcmJIjonSh/RKL+h3gq2sVj+tnaTkUeiG8BmHQgPIqFz5Y5DshP7+5S7/AKkN6
+ sC6mI4jw47kWs3UJ3mAHwK0bQ7qhyr5+7Z8q32lluBqwL9UBmrau/vt8TetBHdNFY8dd
+ ukzUeMA+tqeFV3SIHq3zjvrLSqNpSrHzWsDkQ43Mi7Cdobu5I4M5w8WzYEMbzTIWZ40s
+ QQZg==
+X-Gm-Message-State: AOAM532kajKJElOqzaETDj6CAKcSwkPWQ4w3dUZXPG1I8hCzEQPxlCDj
+ siGlrfl451Tpk6ri/wW6Ns4o37CfVtGC4Q==
+X-Google-Smtp-Source: ABdhPJzSEz8JSei/YjB01K660aljA/6/xO4S34XNLs5mreRivaYkqAyb+BFsl9i9mj+gUQ1MDBa16A==
+X-Received: by 2002:aa7:842d:0:b029:164:51c0:b81f with SMTP id
+ q13-20020aa7842d0000b029016451c0b81fmr4587650pfn.21.1604612142684; 
+ Thu, 05 Nov 2020 13:35:42 -0800 (PST)
+Received: from [172.16.1.221] (76-14-210-194.or.wavecable.com. [76.14.210.194])
+ by smtp.gmail.com with ESMTPSA id u7sm3479562pfn.37.2020.11.05.13.35.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Nov 2020 13:35:41 -0800 (PST)
+Subject: Re: [PATCH] target/alpha: fix icount handling for timer instructions
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>, qemu-devel@nongnu.org
+References: <160456704692.16573.15665952713514406897.stgit@pasha-ThinkPad-X280>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a2ff42a9-0bbc-1338-9ae2-bfc2c6136109@linaro.org>
+Date: Thu, 5 Nov 2020 13:35:39 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
+In-Reply-To: <160456704692.16573.15665952713514406897.stgit@pasha-ThinkPad-X280>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,46 +104,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Giuseppe Musacchio <thatlemon@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The function do_sigreturn() tries to store the PC, NPC and PSR in
-uint32_t local variables, which implicitly drops the high half of
-these fields for 64-bit guests.
+On 11/5/20 1:04 AM, Pavel Dovgalyuk wrote:
+> This patch handles icount mode for timer read/write instructions,
+> because it is required to call gen_io_start in such cases.
+> 
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+> ---
+>  target/alpha/translate.c |    9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 
-The usual effect was that a guest which used signals would crash on
-return from a signal unless it was lucky enough to take it while the
-PC was in the low 4GB of the address space.  In particular, Debian
-/bin/dash and /bin/bash would segfault after executing external
-commands.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Use abi_ulong, which is the type these fields all have in the
-__siginfo_t struct.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- linux-user/sparc/signal.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-index c315704b389..d12adc8e6ff 100644
---- a/linux-user/sparc/signal.c
-+++ b/linux-user/sparc/signal.c
-@@ -247,7 +247,7 @@ long do_sigreturn(CPUSPARCState *env)
- {
-     abi_ulong sf_addr;
-     struct target_signal_frame *sf;
--    uint32_t up_psr, pc, npc;
-+    abi_ulong up_psr, pc, npc;
-     target_sigset_t set;
-     sigset_t host_set;
-     int i;
--- 
-2.20.1
-
+r~
 
