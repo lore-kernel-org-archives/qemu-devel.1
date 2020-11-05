@@ -2,85 +2,85 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A61C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 00:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31276C4741F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 00:31:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B6CA2080D
+	by mail.kernel.org (Postfix) with ESMTPS id 7DCAF20825
 	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 00:31:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Odr4MA6P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B6CA2080D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="en8O+2QP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DCAF20825
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaTB5-0000xi-7Q
+	id 1kaTB5-0000yP-Hx
 	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 19:30:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59940)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kaT9q-00083E-Rx
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 19:29:42 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42190)
+ id 1kaT9p-00082v-N9
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 19:29:41 -0500
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:33278)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kaT9p-0002Pe-6r
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 19:29:42 -0500
-Received: by mail-pg1-x542.google.com with SMTP id u4so265344pgr.9
- for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 16:29:40 -0800 (PST)
+ id 1kaT9o-0002PY-6q
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 19:29:41 -0500
+Received: by mail-pg1-x533.google.com with SMTP id r186so163pgr.0
+ for <qemu-devel@nongnu.org>; Wed, 04 Nov 2020 16:29:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=hSL4KANQArQ4DL0uvXRZHnrnMeo7g67FEeAIzQ7HlBM=;
- b=Odr4MA6PhwEsnmew+J4MQTT0II8r1AZdGj3/UrTBzD74aQXW+HYn97AkTSfx9OE9aT
- ZgMeovpDPp+QHaAQng8L2h4Lv4yoGWBM1g/XeqQLKPuuUR9zg3lzp0iF8RYC4nrUrdFr
- KpZwZp3apXu5pxrS1P9hR3ZTEzF63VaZ5D8OCpml0i+/PIO4FqKrapDhWPUOzfTg0rRq
- fQNokoBjemBxfEt47i+Z/qXL0t6Pk76NNcCouluzbXo1SlywuidoBMWDY7mXc9EyiSOu
- zrR7gBGu15e2Ts6xHYWnP4Hp5irzFewprqO6A76GBDu9MHQ6iuAcpoF0ZtAacE7S7tMn
- E62A==
+ bh=aZDqheKeViwWkKxhyJVJqBQ0rBfSUmpaFBw1X/OyohA=;
+ b=en8O+2QP6gFyD/Dz38r8cv92xaA25UoTh7eVJGFBpCdqwM5scMrduiSGXrJPvWwmnu
+ sA5ZiBVkpG0NMJ6V0MDNtT82uEkDzxlJZgsyk9EdtiDMNEpzAZUd5EajdKPe/KndPZfL
+ ZCJ2R5vgSjjvvAttCxA+ZxryOcdmj7uig00YKxDxXQiGT73B6yWkKtqa30/s6Cd8IuYh
+ uT3T/Jl/Upu3SBUqnVy0a15yB3HTn9zWtZt3PlwkJc1zAhEpYRpOEAIrZt2JVtZbMc10
+ MharD+OJeV6LAjO+LG/J0ZKdVJ7CzF4ioXsFsv/Prmy2/sTIkUphuJrHF8kX48AA7Ye3
+ velA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=hSL4KANQArQ4DL0uvXRZHnrnMeo7g67FEeAIzQ7HlBM=;
- b=F/8I6VV8mrx2qTe30mp+TNLlokgKm1Qo8IT+UpOMgoAcqEEGRFja3WKfoIbqv12DFm
- OrB3Shd/4D4LeR5dybkH9LBJCc+jHdAVJDrwPstPQeQlZbIv99lhAFCGZewh11KPnF+Y
- 4hqU826OWzpxl2Gk1gDEez/+TtIHF/vZ2NzcnRZi8tm9epF0835aBVXKu8ntR0GDO505
- fCiir4W5Y6hSwxDIMvyJC6IsiuDktnuD6UTNhB1Wl78msXxsqlVDUCpOZ3GAB9MwBYox
- pfh6xSHPBrv0f/rMrtE9p3n1oH4cifY8kM4hQJwxHQ5W5qkjffgtLGgt9NWFf5rb/2dS
- KxmA==
-X-Gm-Message-State: AOAM530QDY3HL9IVHQanDrTMGW45jeZOfbTz32hbc6hDZdQTm5Lymznv
- 2W17ZXg/8KWSnAZ81l9i63+KuwhPyTPopA==
-X-Google-Smtp-Source: ABdhPJwBJWr9WNC2RDa+LaQaFi+mBu2gPj8VwaJ89qzBPAbNGI/rqWDgQ0vdjcH/XzpAZepaaCGj0w==
-X-Received: by 2002:a17:90b:118b:: with SMTP id
- gk11mr118658pjb.178.1604536179531; 
- Wed, 04 Nov 2020 16:29:39 -0800 (PST)
+ bh=aZDqheKeViwWkKxhyJVJqBQ0rBfSUmpaFBw1X/OyohA=;
+ b=ITskvZF0DQAUDanuDDfU0WjBQ+oI8Re5fd7mzobXFY2DTge2lovZlWVl3jeUKzjD7W
+ AoqLqHl5/0Tj1zCBaUWcwwVUGAJQvPkyGL7QN2lsmXTRzDGukU0+Bf1v2BS3ZIDt2iOr
+ BAF4snCgHR+6Wo6uxYEyvcQJRvJ72siZDGFTaOMM9GX+SEY5M+FiopWL92hiBnrEE/Zg
+ dlRpG3L9UGHs9Uofl3Xv8WpnkK12oRiOAC2cqK10Gb1i5fZyhnb/uaPRgGfWwWfk0e5F
+ OhdvtUk09Di4rkzKWWR5ISZVdjS05FFqTET3AmV8qn8RwU5yHKulCgcAriRrtJNUdNzk
+ bX3A==
+X-Gm-Message-State: AOAM531MvZNKXNUOutLqeOaoyWPyFbawUHlfvPH3IO8NLeLjUX0St/gN
+ Df72gfOx7QzngEhx8i17OvB+m2nMZ1uNOQ==
+X-Google-Smtp-Source: ABdhPJxffNFWnupvn3cAMcayRhYrJyT/bMoCqg0gngLB9V4cIJqmRgHpqQbpi4kMJD+nncc8q/Fv3Q==
+X-Received: by 2002:a17:90a:4a15:: with SMTP id
+ e21mr117456pjh.130.1604536178389; 
+ Wed, 04 Nov 2020 16:29:38 -0800 (PST)
 Received: from localhost.localdomain (76-14-210-194.or.wavecable.com.
  [76.14.210.194])
- by smtp.gmail.com with ESMTPSA id z17sm3438528pga.85.2020.11.04.16.29.38
+ by smtp.gmail.com with ESMTPSA id z17sm3438528pga.85.2020.11.04.16.29.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Nov 2020 16:29:38 -0800 (PST)
+ Wed, 04 Nov 2020 16:29:37 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL for-5.2 2/2] tcg: Revert "tcg/optimize: Flush data at labels
- not TCG_OPF_BB_END"
-Date: Wed,  4 Nov 2020 16:29:35 -0800
-Message-Id: <20201105002935.680486-3-richard.henderson@linaro.org>
+Subject: [PULL for-5.2 1/2] tcg: Remove assert from set_jmp_reset_offset
+Date: Wed,  4 Nov 2020 16:29:34 -0800
+Message-Id: <20201105002935.680486-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201105002935.680486-1-richard.henderson@linaro.org>
 References: <20201105002935.680486-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::533;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x533.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,108 +102,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu@igor2.repo.hu
+Cc: Sai Pavan Boddu <saipava@xilinx.com>, peter.maydell@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit cd0372c515c4732d8bd3777cdd995c139c7ed7ea.
+Since 6e6c4efed99, there has been a more appropriate range check
+done later at the end of tcg_gen_code.  There, a failing range
+check results in a returned error code, which causes the TB to
+be restarted at half the size.
 
-The patch is incorrect in that it retains copies between globals and
-non-local temps, and non-local temps still die at the end of the BB.
-
-Failing test case for hppa:
-
-	.globl	_start
-_start:
-	cmpiclr,=	0x24,%r19,%r0
-	cmpiclr,<>	0x2f,%r19,%r19
-
- ---- 00010057 0001005b
- movi_i32 tmp0,$0x24
- sub_i32 tmp1,tmp0,r19
- mov_i32 tmp2,tmp0
- mov_i32 tmp3,r19
- movi_i32 tmp1,$0x0
-
- ---- 0001005b 0001005f
- brcond_i32 tmp2,tmp3,eq,$L1
- movi_i32 tmp0,$0x2f
- sub_i32 tmp1,tmp0,r19
- mov_i32 tmp2,tmp0
- mov_i32 tmp3,r19
- movi_i32 tmp1,$0x0
- mov_i32 r19,tmp1
- setcond_i32 psw_n,tmp2,tmp3,ne
- set_label $L1
-
-In this case, both copies of "mov_i32 tmp3,r19" are removed.  The
-second because opt thought it was redundant.  The first is removed
-later by liveness because tmp3 is known to be dead.  This leaves
-the setcond_i32 with an uninitialized input.
-
-Revert the entire patch for 5.2, and a proper optimization across
-the branch may be considered for the next development cycle.
-
-Reported-by: qemu@igor2.repo.hu
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reported-by: Sai Pavan Boddu <saipava@xilinx.com>
+Tested-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/optimize.c | 35 +++++++++++++++++------------------
- 1 file changed, 17 insertions(+), 18 deletions(-)
+ tcg/tcg.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index 9952c28bdc..220f4601d5 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -1484,30 +1484,29 @@ void tcg_optimize(TCGContext *s)
-                     }
-                 }
-             }
--            /* fall through */
-+            goto do_reset_output;
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index f49f1a7f35..43c6cf8f52 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -335,10 +335,11 @@ static bool tcg_resolve_relocs(TCGContext *s)
  
-         default:
-         do_default:
--            /*
--             * Default case: we know nothing about operation (or were unable
--             * to compute the operation result) so no propagation is done.
--             */
--            for (i = 0; i < nb_oargs; i++) {
--                reset_temp(op->args[i]);
--                /*
--                 * Save the corresponding known-zero bits mask for the
--                 * first output argument (only one supported so far).
--                 */
--                if (i == 0) {
--                    arg_info(op->args[i])->mask = mask;
-+            /* Default case: we know nothing about operation (or were unable
-+               to compute the operation result) so no propagation is done.
-+               We trash everything if the operation is the end of a basic
-+               block, otherwise we only trash the output args.  "mask" is
-+               the non-zero bits mask for the first output arg.  */
-+            if (def->flags & TCG_OPF_BB_END) {
-+                bitmap_zero(temps_used.l, nb_temps);
-+            } else {
-+        do_reset_output:
-+                for (i = 0; i < nb_oargs; i++) {
-+                    reset_temp(op->args[i]);
-+                    /* Save the corresponding known-zero bits mask for the
-+                       first output argument (only one supported so far). */
-+                    if (i == 0) {
-+                        arg_info(op->args[i])->mask = mask;
-+                    }
-                 }
-             }
-             break;
--
--        case INDEX_op_set_label:
--            /* Trash everything at the start of a new extended bb. */
--            bitmap_zero(temps_used.l, nb_temps);
--            break;
-         }
+ static void set_jmp_reset_offset(TCGContext *s, int which)
+ {
+-    size_t off = tcg_current_code_size(s);
+-    s->tb_jmp_reset_offset[which] = off;
+-    /* Make sure that we didn't overflow the stored offset.  */
+-    assert(s->tb_jmp_reset_offset[which] == off);
++    /*
++     * We will check for overflow at the end of the opcode loop in
++     * tcg_gen_code, where we bound tcg_current_code_size to UINT16_MAX.
++     */
++    s->tb_jmp_reset_offset[which] = tcg_current_code_size(s);
+ }
  
-         /* Eliminate duplicate and redundant fence instructions.  */
+ #include "tcg-target.c.inc"
 -- 
 2.25.1
 
