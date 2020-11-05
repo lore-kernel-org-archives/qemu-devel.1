@@ -6,60 +6,63 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3335CC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 02:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A10C388F9
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 02:31:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65AA92074B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 02:31:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65AA92074B
+	by mail.kernel.org (Postfix) with ESMTPS id 601322074B
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 02:31:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 601322074B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaV41-0003PM-Bj
-	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 21:31:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51556)
+	id 1kaV42-0003Ru-7P
+	for qemu-devel@archiver.kernel.org; Wed, 04 Nov 2020 21:31:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaV31-0002Be-0A
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 21:30:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54026)
+ id 1kaV32-0002Co-2T
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 21:30:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54076)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kaV2y-0008WO-Vr
- for qemu-devel@nongnu.org; Wed, 04 Nov 2020 21:30:46 -0500
+ id 1kaV2z-00005D-94
+ for qemu-devel@nongnu.org; Wed, 04 Nov 2020 21:30:47 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kaV2w-0000Dr-KV
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 02:30:42 +0000
+ id 1kaV2x-0000DG-UM
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 02:30:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 979CB2E80AB
- for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 02:30:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E33622E812F
+ for <qemu-devel@nongnu.org>; Thu,  5 Nov 2020 02:30:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Nov 2020 02:20:24 -0000
-From: Jonathan Watt <1902975@bugs.launchpad.net>
+Date: Thu, 05 Nov 2020 02:23:04 -0000
+From: Gaoning Pan <1901981@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
+ assignee=pgn@zju.edu.cn; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jwatt
-X-Launchpad-Bug-Reporter: Jonathan Watt (jwatt)
-X-Launchpad-Bug-Modifier: Jonathan Watt (jwatt)
-Message-Id: <160454282468.18214.12996715197345700286.malonedeb@wampee.canonical.com>
-Subject: [Bug 1902975] [NEW] qemu.org/docs/ contains some old docs
+X-Launchpad-Bug-Commenters: hades0506 kraxel-redhat
+X-Launchpad-Bug-Reporter: Gaoning Pan (hades0506)
+X-Launchpad-Bug-Modifier: Gaoning Pan (hades0506)
+References: <160395133608.8291.17236692663498581160.malonedeb@soybean.canonical.com>
+Message-Id: <160454298500.13483.16151238729570081356.malone@gac.canonical.com>
+Subject: [Bug 1901981] Re: assert issue locates in hw/usb/dev-storage.c:248:
+ usb_msd_send_status
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 1aa72a9193b5204480bc842b46fa15bd21425fa1
+X-Launchpad-Hash: a07bbb694f5bf22b1697f8d2b600b06e0d2baee0
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/04 21:30:42
@@ -82,55 +85,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1902975 <1902975@bugs.launchpad.net>
+Reply-To: Bug 1901981 <1901981@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-When I searched for QEMU docs in a search engine I ended up on this
-page:
-
-https://www.qemu.org/docs/master/qemu-doc.html
-
-That is 4.2.50 documentation. It took me some time to realize that there
-is actually 5.1.50 documentation under https://www.qemu.org/docs/master/
-and that the 4.2 documentation is out of date.
-
-Presumably this file is cruft that was left over from a previous build
-of the website and something like a `make clean` is required?
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+OK, It seems to be fixed now.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1902975
+https://bugs.launchpad.net/bugs/1901981
 
 Title:
-  qemu.org/docs/ contains some old docs
+  assert issue locates in hw/usb/dev-storage.c:248: usb_msd_send_status
 
 Status in QEMU:
   New
 
 Bug description:
-  When I searched for QEMU docs in a search engine I ended up on this
-  page:
+  Hello,
 
-  https://www.qemu.org/docs/master/qemu-doc.html
+  I found an assertion failure through hw/usb/dev-storage.c.
 
-  That is 4.2.50 documentation. It took me some time to realize that
-  there is actually 5.1.50 documentation under
-  https://www.qemu.org/docs/master/ and that the 4.2 documentation is
-  out of date.
+  This was found in latest version 5.1.0.
 
-  Presumably this file is cruft that was left over from a previous build
-  of the website and something like a `make clean` is required?
+  --------
+
+  qemu-system-x86_64: hw/usb/dev-storage.c:248: usb_msd_send_status: Assert=
+ion `s->csw.sig =3D=3D cpu_to_le32(0x53425355)' failed.
+  [1]    29544 abort      sudo  -enable-kvm -boot c -m 2G -drive format=3Dq=
+cow2,file=3D./ubuntu.img -nic
+
+  To reproduce the assertion failure, please run the QEMU with following
+  command line.
+
+  =
+
+  $ qemu-system-x86_64 -enable-kvm -boot c -m 2G -drive format=3Dqcow2,file=
+=3D./ubuntu.img -nic user,model=3Drtl8139,hostfwd=3Dtcp:0.0.0.0:5555-:22 -d=
+evice piix4-usb-uhci,id=3Duhci -device usb-storage,drive=3Dmydrive -drive i=
+d=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone
+
+  The poc is attached.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1902975/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1901981/+subscriptions
 
