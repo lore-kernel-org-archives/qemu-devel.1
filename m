@@ -2,89 +2,90 @@ Return-Path: <SRS0=LLOU=EL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC28DC00A89
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A04C00A89
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:37:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A9302083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:37:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8A192078E
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Nov 2020 12:37:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="APwnxdAU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A9302083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="boXTXj6C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8A192078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kaeVe-0003Hc-RX
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 07:36:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45162)
+	id 1kaeWR-0004eH-TH
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 07:37:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kaePq-0003sQ-5o
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 07:30:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35483)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kaePl-0005F8-22
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 07:30:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604579452;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=08Ii7ADq210LKDryewmR2N85uoxpS0ATT5dLsrUwnXA=;
- b=APwnxdAUz1+WsqtpMb5Jjg+crlIEm7bGB3Ao05COWpzAw74wcrtVjp9ifun4fl0IRQzkES
- /j8snJdnRoeimCzm2+1y3BuFjOdFzMdhqdZmJI/EM0YpaN/sXj4CJXjaUJyv81kD4VXIIQ
- 2ptIVW1vvfe9YidAJZGt5AkgJNi65GI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-545-mP6hbsxePvuOJXySA0BFDw-1; Thu, 05 Nov 2020 07:30:50 -0500
-X-MC-Unique: mP6hbsxePvuOJXySA0BFDw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 765456D580;
- Thu,  5 Nov 2020 12:30:49 +0000 (UTC)
-Received: from localhost (unknown [10.36.110.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 48997513F0;
- Thu,  5 Nov 2020 12:30:37 +0000 (UTC)
-From: marcandre.lureau@redhat.com
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kaeQf-00056e-MB; Thu, 05 Nov 2020 07:31:49 -0500
+Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:33523)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kaeQZ-0005XA-4w; Thu, 05 Nov 2020 07:31:49 -0500
+Received: by mail-pf1-x433.google.com with SMTP id q10so785900pfn.0;
+ Thu, 05 Nov 2020 04:31:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=PJS7oGCcqz7pb4dQLFQlOPOs9s6TE2XwP4RwUlSKWNg=;
+ b=boXTXj6CbbMyCekKPLjd8r+95PdoEkk4Wijo3edr5w/gK5LpDPxp5MQgMB/IIdD2NY
+ rbIQU5eThiCve9vxEMSK1SLJaKMWXCuxrIg1UFXrfRP0DlZGZpxLrVnTK71ox6X3g9mj
+ uA+Wo4tmnHRW8rG4Rlq9IflfqSJEJ8XIGI0e0QQhQM59z6dJOifvxqgtWGc2GZceMvE8
+ pTKza5kZ1EohoRGPZdI/jB8mZZfFfFoDbNriDJljp8eWbY+UBbeDbTT9b+QH3YxkS6Kd
+ Y+ys5XUxjfMPzWivUfLlmEKzhEC4LoSB082ED4sThEO4fy2V9XLYuT4TP7PDCOS5GAnk
+ 4yWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=PJS7oGCcqz7pb4dQLFQlOPOs9s6TE2XwP4RwUlSKWNg=;
+ b=jCR9EQhgpL25u+CXP2Z4AkBB18jM1PFJ/JXMaFSmvPAIzz3W8VZDAzw+OYmQZbsE6u
+ 0CqpPM/32pQiawh/bG7NdWXJH03X1MbUa6y2GBtxjB6tWBcwDsfd3/zk+81Sq1p1S3rK
+ CurCS563TKImjmPRVQ+x/ZO7uA0p3Cd74ZUb9cv6N4JaiwilAWtMO5rhcp5XxHUlN1EU
+ 04UEEwa0OYdo3pYODVjkyU6ZhQQOBNG3XswPRf19QGUgKtBGjjkbI2BBjUtfEVJtINK6
+ AYfWDFUU4Hpsaez78tDp7OBq/50OHc1TwA8N/jFm9aJI3L0Vg1TTedQOQlXrXSy8kyj6
+ 9tYA==
+X-Gm-Message-State: AOAM533U2/0vzIxGRSrOtU9yWifDUtbjCI3yoI4ZlPZRD5myd4B/wzVw
+ tmPBOL+vJJcTFuGjtL7MiFRe3UfYu6B81Lju
+X-Google-Smtp-Source: ABdhPJz042gWPuIUbJXgYjWnGNmioYA+us0tEm+WcYC8r2dbVyD1duQ/D+ZN66G+O6I8XL8qTna0rg==
+X-Received: by 2002:a63:1748:: with SMTP id 8mr2309229pgx.168.1604579500537;
+ Thu, 05 Nov 2020 04:31:40 -0800 (PST)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id hi10sm2987008pjb.0.2020.11.05.04.31.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Nov 2020 04:31:39 -0800 (PST)
+From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 9/9] docs: update the documentation about schema
- configuration
-Date: Thu,  5 Nov 2020 16:28:08 +0400
-Message-Id: <20201105122808.1182973-10-marcandre.lureau@redhat.com>
-In-Reply-To: <20201105122808.1182973-1-marcandre.lureau@redhat.com>
-References: <20201105122808.1182973-1-marcandre.lureau@redhat.com>
+Subject: [PATCH v4 2/2] block: enable libnfs on msys2/mingw in cirrus.yml
+Date: Thu,  5 Nov 2020 20:31:16 +0800
+Message-Id: <20201105123116.674-3-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20201105123116.674-1-luoyonggang@gmail.com>
+References: <20201105123116.674-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=marcandre.lureau@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 01:14:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::433;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x433.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,72 +98,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, jsnow@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ QEMU Trivial <qemu-trivial@nongnu.org>, Peter Lieven <pl@kamp.de>,
+ Max Reitz <mreitz@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Initially, libnfs has not been enabled, and now it's fixed, so enable it
+on cirrus.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- docs/devel/qapi-code-gen.txt | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+ .cirrus.yml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 3d22a7ae21..c499352a74 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -772,26 +772,30 @@ downstream command __com.redhat_drive-mirror.
- === Configuring the schema ===
- 
- Syntax:
--    COND = STRING
--         | [ STRING, ... ]
-+    COND = CFG-ID
-+         | [ COND, ... ]
-+         | { 'all: [ COND, ... ] }
-+         | { 'any: [ COND, ... ] }
-+         | { 'not': COND }
- 
--All definitions take an optional 'if' member.  Its value must be a
--string or a list of strings.  A string is shorthand for a list
--containing just that string.  The code generated for the definition
--will then be guarded by #if STRING for each STRING in the COND list.
-+    CFG-ID = STRING
-+
-+All definitions take an optional 'if' member. Its value must be a string, a list
-+of strings or an object with a single member 'all', 'any' or 'not'. A string is
-+shorthand for a list containing just that string. A list is a shorthand for a
-+'all'-member object. The C code generated for the definition will then be guarded
-+by an #if precessor expression.
- 
- Example: a conditional struct
- 
-  { 'struct': 'IfStruct', 'data': { 'foo': 'int' },
--   'if': ['CONFIG_FOO', 'HAVE_BAR'] }
-+   'if': { 'all': [ 'CONFIG_FOO', 'HAVE_BAR' ] } }
- 
- gets its generated code guarded like this:
- 
-- #if defined(CONFIG_FOO)
-- #if defined(HAVE_BAR)
-+ #if defined(CONFIG_FOO) && defined(HAVE_BAR)
-  ... generated code ...
-- #endif /* defined(HAVE_BAR) */
-- #endif /* defined(CONFIG_FOO) */
-+ #endif /* defined(HAVE_BAR) && defined(CONFIG_FOO) */
- 
- Individual members of complex types, commands arguments, and
- event-specific data can also be made conditional.  This requires the
+diff --git a/.cirrus.yml b/.cirrus.yml
+index 900437dd2a..f0209b7a3e 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -109,6 +109,7 @@ windows_msys2_task:
+           mingw-w64-x86_64-cyrus-sasl \
+           mingw-w64-x86_64-curl \
+           mingw-w64-x86_64-gnutls \
++          mingw-w64-x86_64-libnfs \
+           "
+         bitsadmin /transfer msys_download /dynamic /download /priority FOREGROUND `
+           https://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python-sphinx-2.3.1-1-any.pkg.tar.xz `
 -- 
-2.29.0
+2.28.0.windows.1
 
 
