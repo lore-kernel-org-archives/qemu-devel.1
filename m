@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E0DC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4D1C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:32:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95B972087E
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:30:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 840872065E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:32:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K3HuHFnb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B972087E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTYxWRE6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 840872065E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kb6VQ-0000lK-A5
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 13:30:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55518)
+	id 1kb6XT-0003Wz-7V
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 13:32:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kb6UO-0008L8-2t
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:29:32 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37137)
+ id 1kb6W4-0002D1-Uk
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:31:16 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54395)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kb6UM-0005Qy-Hq
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:29:31 -0500
-Received: by mail-wm1-x342.google.com with SMTP id c16so2211377wmd.2
- for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 10:29:30 -0800 (PST)
+ id 1kb6W3-0005ps-FV
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:31:16 -0500
+Received: by mail-wm1-x342.google.com with SMTP id d142so2376776wmd.4
+ for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 10:31:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=1yJVRUpkJCkFCXxPJWdMlfqsn6ACQjjqqj85gHXl4n4=;
- b=K3HuHFnbdBNph8RO4GPDZeI9mbZnu/2tqe8D8Q3JSRLlLI3hMR4uliDfN6YWqo0d7f
- tkCPhWM2yM7zPo4plelTzsFbeiHC5kKiQT4TEnvGDR380dvYDe1s7nfozlvYPVlFRfmE
- yGGoN0OAuugVNXstIGRNT71QSGypxNp4uSwm+7RT4z60Zp0h2DDbIKPfSy8xuYZMMmLK
- P2nxCQYhaVfhuxyDE1Ch6H54LvljUw0cs/4QG7CPyjGXqCqJy+rwr1wXMAafAlfODEIQ
- e1u2d3ft6asSw0W9Is4lRZqS3hLVyCg2NGB7BRWtxCyYfQfWnH1sUGI3QFV4AjF6b4NA
- l2Ng==
+ bh=4S5EHSOhe3KRg5YDUFaFDV2yZBRJM7s955Tyd+1W/60=;
+ b=JTYxWRE6+1vA2VQ6FvVxfR3vpR96HtczEFKCmqZwGWfhKBwCQZa9XP+lvEemv0Ej1a
+ veYwaJrop3J2WdaFQznyOBzW6QBzlB7EX+djjE2P/TYe0avzSlssjVgvSXtfkXT0VeEF
+ 62Skim8pEi9IS1O3nXAdG3YmslzonBdBGrpiEbxbXDTH0H3Z5YtExnJM2yAt3y9EtQc7
+ /M9Rit8WjPgGoLddEkrOBBsAY0AR88VpyWdyI32KaYtJw/SSPs4uWxkYg1GbrmPNNtCJ
+ eol3a+Mh1/itg4R68IgKxaMan5+tGOh+/QDQ2WhAhhmgVs8GAbI9abfAFPT6UzQ7OqTG
+ Egnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=1yJVRUpkJCkFCXxPJWdMlfqsn6ACQjjqqj85gHXl4n4=;
- b=mxukIuTLl3YKed51POFRcCXHb/aHpFjabBl1dIVm0kRo0hKoNB4HPPp05l8BDuAiuU
- s5N96bnNlFwaRgUktXWq94IRW+C24UJD0s4HRROvZYLFAdolLbEHHFvyv34gOUlkqZJl
- m39qo3m07W05wqWQt12X42JODfXNcG0xKnrTb0+Cn7TkRrqw0ykfg3TYeDNOG3uv9abd
- VBlDlGuEcoYvRD2S7j1tYp/pLJ+XWHaHYe8p6GztgciMx03pALVPDOoqAx3E1p503qVe
- G32OlHeNA5bprzNIGtYxWyk4h5zgeIExbzbfU15eudCBtPxSMOfPkixdQgNxFVNlun4I
- eMcw==
-X-Gm-Message-State: AOAM533jWSvlkbnejiT0DlMOu7TnwEhnNpr7YPDsPxxxj4UVYLTF4F8y
- SiSS7rXr+AEx3TCOb/wwxlg=
-X-Google-Smtp-Source: ABdhPJxmp7wdqVg1cz6+Xvjqi9CKa6lk+cK/EejyC3hla/xCDnfkWANM0+EiGNX9PvAsi26aD165rA==
-X-Received: by 2002:a1c:3142:: with SMTP id x63mr928099wmx.168.1604687368921; 
- Fri, 06 Nov 2020 10:29:28 -0800 (PST)
+ bh=4S5EHSOhe3KRg5YDUFaFDV2yZBRJM7s955Tyd+1W/60=;
+ b=ejBdZgdVDsekSp8mZvzrnk6lhQFx1ONlBjEmGKdzyRMMdjl3eVuezvFZPCa8vjinL2
+ k+OwIvzbWO0oSd0LSVGGbkpFrlhrlEbteyNAol/fPCtbhIFshFoGTucBLTYAPkp/jFYk
+ QX6ERQLwUqjnGM75gw+OWnsKKS7/baLqTEXExmTZIaM4Xs9qporaNkAZshOK8RDDyo2O
+ 2+UQgGSKd9BRsmlRend+yeKBJsHf/LdZO0kELOpBg5gOXloCbJatFBM/0q52jUydPYmM
+ 77o2pBMB/Wecgg41e4Uq1IsM735KTv0caFy7BWrz8To6RVNqZmdRoXYUyyQgmnpkWTMc
+ L+kA==
+X-Gm-Message-State: AOAM533GzxvX6vtSUnOlp9TLozTWa6RAr0FrnvI7tySaC6o53wQ4sLRR
+ /Z7DHYY/IbBJHKBnZCm3MHo=
+X-Google-Smtp-Source: ABdhPJwt+at82tGhWpXp5wyLNflDkNdmXaoOkjkM2McbLGKuinWhU77fx+kw66svNdHA2wFtUpQxVQ==
+X-Received: by 2002:a1c:e286:: with SMTP id z128mr939878wmg.33.1604687474229; 
+ Fri, 06 Nov 2020 10:31:14 -0800 (PST)
 Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id g131sm3558927wma.35.2020.11.06.10.29.27
+ by smtp.gmail.com with ESMTPSA id c8sm3358734wrv.26.2020.11.06.10.31.12
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 06 Nov 2020 10:29:28 -0800 (PST)
-Subject: Re: [PATCH for-5.2 3/4] hw/net/can/ctucan_core: Handle big-endian
- hosts
+ Fri, 06 Nov 2020 10:31:13 -0800 (PST)
+Subject: Re: [PATCH for-5.2 4/4] hw/net/ctucan_core: Use stl_le_p to write to
+ tx_buffers
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20201106171153.32673-1-peter.maydell@linaro.org>
- <20201106171153.32673-4-peter.maydell@linaro.org>
+ <20201106171153.32673-5-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <51da5abd-bb51-2ee0-d1e8-dd3f0c93e2fa@amsat.org>
-Date: Fri, 6 Nov 2020 19:29:27 +0100
+Message-ID: <b545a78d-7b11-7c6d-cdf7-bf20272b8fd6@amsat.org>
+Date: Fri, 6 Nov 2020 19:31:12 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201106171153.32673-4-peter.maydell@linaro.org>
+In-Reply-To: <20201106171153.32673-5-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -114,44 +114,28 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 11/6/20 6:11 PM, Peter Maydell wrote:
-> The ctucan driver defines types for its registers which are a union
-> of a uint32_t with a struct with bitfields for the individual
-> fields within that register. This is a bad idea, because bitfields
-> aren't portable. The ctu_can_fd_regs.h header works around the
-> most glaring of the portability issues by defining the
-> fields in two different orders depending on the setting of the
-> __LITTLE_ENDIAN_BITFIELD define. However, in ctucan_core.h this
-> is unconditionally set to 1, which is wrong for big-endian hosts.
-> 
-> Set it only if HOST_WORDS_BIGENDIAN is not set. There is no need
-> for a "have we defined it already" guard, because the only place
-> that should set it is ctucan_core.h, which has the usual
-> double-inclusion guard.
+> Instead of casting an address within a uint8_t array to a
+> uint32_t*, use stl_le_p(). This handles possibly misaligned
+> addresses which would otherwise crash on some hosts.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-> Ideally all that bitfield-using code would be rewritten to use
-> extract32 and deposit32 instead, IMHO.
-> ---
->  hw/net/can/ctucan_core.h | 3 +--
+>  hw/net/can/ctucan_core.c | 3 +--
 >  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> diff --git a/hw/net/can/ctucan_core.h b/hw/net/can/ctucan_core.h
-> index f21cb1c5ec3..bbc09ae0678 100644
-> --- a/hw/net/can/ctucan_core.h
-> +++ b/hw/net/can/ctucan_core.h
-> @@ -31,8 +31,7 @@
->  #include "exec/hwaddr.h"
->  #include "net/can_emu.h"
->  
-> -
-> -#ifndef __LITTLE_ENDIAN_BITFIELD
-> +#ifndef HOST_WORDS_BIGENDIAN
->  #define __LITTLE_ENDIAN_BITFIELD 1
->  #endif
+> diff --git a/hw/net/can/ctucan_core.c b/hw/net/can/ctucan_core.c
+> index f2ce978e5ec..e66526efa83 100644
+> --- a/hw/net/can/ctucan_core.c
+> +++ b/hw/net/can/ctucan_core.c
+> @@ -305,8 +305,7 @@ void ctucan_mem_write(CtuCanCoreState *s, hwaddr addr, uint64_t val,
+>          addr %= CTUCAN_CORE_TXBUFF_SPAN;
+>          assert(buff_num < CTUCAN_CORE_TXBUF_NUM);
+>          if (addr < sizeof(s->tx_buffer[buff_num].data)) {
+> -            uint32_t *bufp = (uint32_t *)(s->tx_buffer[buff_num].data + addr);
+> -            *bufp = cpu_to_le32(val);
+> +            stl_le_p(s->tx_buffer[buff_num].data + addr, val);
 
-Alternatively s/#ifdef __LITTLE_ENDIAN_BITFIELD/#ifndef
-HOST_WORDS_BIGENDIAN/ the codebase and remove this here...
+Out of curiosity, how did you notice? Passing by while reviewing?
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
