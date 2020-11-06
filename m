@@ -2,99 +2,81 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4D1C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42044C388F2
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 840872065E
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:32:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTYxWRE6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 840872065E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5CCFF2065E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:34:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CCFF2065E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmp.felk.cvut.cz
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kb6XT-0003Wz-7V
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 13:32:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55988)
+	id 1kb6Z7-0005Ol-A7
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 13:34:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kb6W4-0002D1-Uk
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:31:16 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54395)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kb6W3-0005ps-FV
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:31:16 -0500
-Received: by mail-wm1-x342.google.com with SMTP id d142so2376776wmd.4
- for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 10:31:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=4S5EHSOhe3KRg5YDUFaFDV2yZBRJM7s955Tyd+1W/60=;
- b=JTYxWRE6+1vA2VQ6FvVxfR3vpR96HtczEFKCmqZwGWfhKBwCQZa9XP+lvEemv0Ej1a
- veYwaJrop3J2WdaFQznyOBzW6QBzlB7EX+djjE2P/TYe0avzSlssjVgvSXtfkXT0VeEF
- 62Skim8pEi9IS1O3nXAdG3YmslzonBdBGrpiEbxbXDTH0H3Z5YtExnJM2yAt3y9EtQc7
- /M9Rit8WjPgGoLddEkrOBBsAY0AR88VpyWdyI32KaYtJw/SSPs4uWxkYg1GbrmPNNtCJ
- eol3a+Mh1/itg4R68IgKxaMan5+tGOh+/QDQ2WhAhhmgVs8GAbI9abfAFPT6UzQ7OqTG
- Egnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=4S5EHSOhe3KRg5YDUFaFDV2yZBRJM7s955Tyd+1W/60=;
- b=ejBdZgdVDsekSp8mZvzrnk6lhQFx1ONlBjEmGKdzyRMMdjl3eVuezvFZPCa8vjinL2
- k+OwIvzbWO0oSd0LSVGGbkpFrlhrlEbteyNAol/fPCtbhIFshFoGTucBLTYAPkp/jFYk
- QX6ERQLwUqjnGM75gw+OWnsKKS7/baLqTEXExmTZIaM4Xs9qporaNkAZshOK8RDDyo2O
- 2+UQgGSKd9BRsmlRend+yeKBJsHf/LdZO0kELOpBg5gOXloCbJatFBM/0q52jUydPYmM
- 77o2pBMB/Wecgg41e4Uq1IsM735KTv0caFy7BWrz8To6RVNqZmdRoXYUyyQgmnpkWTMc
- L+kA==
-X-Gm-Message-State: AOAM533GzxvX6vtSUnOlp9TLozTWa6RAr0FrnvI7tySaC6o53wQ4sLRR
- /Z7DHYY/IbBJHKBnZCm3MHo=
-X-Google-Smtp-Source: ABdhPJwt+at82tGhWpXp5wyLNflDkNdmXaoOkjkM2McbLGKuinWhU77fx+kw66svNdHA2wFtUpQxVQ==
-X-Received: by 2002:a1c:e286:: with SMTP id z128mr939878wmg.33.1604687474229; 
- Fri, 06 Nov 2020 10:31:14 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id c8sm3358734wrv.26.2020.11.06.10.31.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 06 Nov 2020 10:31:13 -0800 (PST)
-Subject: Re: [PATCH for-5.2 4/4] hw/net/ctucan_core: Use stl_le_p to write to
- tx_buffers
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+ (Exim 4.90_1) (envelope-from <pisa@cmp.felk.cvut.cz>)
+ id 1kb6WI-0002Z4-3v
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:31:30 -0500
+Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:46377)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <pisa@cmp.felk.cvut.cz>) id 1kb6WE-0005qb-Gq
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:31:29 -0500
+Received: from cmp.felk.cvut.cz (haar.felk.cvut.cz [147.32.84.19])
+ by relay.felk.cvut.cz (8.15.2/8.15.2) with ESMTP id 0A6IUQse048593;
+ Fri, 6 Nov 2020 19:30:26 +0100 (CET)
+ (envelope-from pisa@cmp.felk.cvut.cz)
+Received: from haar.felk.cvut.cz (localhost [127.0.0.1])
+ by cmp.felk.cvut.cz (8.14.0/8.12.3/SuSE Linux 0.6) with ESMTP id
+ 0A6IUQQh024823; Fri, 6 Nov 2020 19:30:26 +0100
+Received: (from pisa@localhost)
+ by haar.felk.cvut.cz (8.14.0/8.13.7/Submit) id 0A6IUPx0024822;
+ Fri, 6 Nov 2020 19:30:25 +0100
+X-Authentication-Warning: haar.felk.cvut.cz: pisa set sender to
+ pisa@cmp.felk.cvut.cz using -f
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH for-5.2 1/4] hw/net/can/ctucan: Don't allow guest to write
+ off end of tx_buffer
+Date: Fri, 6 Nov 2020 19:30:25 +0100
+User-Agent: KMail/1.9.10
 References: <20201106171153.32673-1-peter.maydell@linaro.org>
- <20201106171153.32673-5-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b545a78d-7b11-7c6d-cdf7-bf20272b8fd6@amsat.org>
-Date: Fri, 6 Nov 2020 19:31:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ <202011061847.23354.pisa@cmp.felk.cvut.cz>
+ <CAFEAcA8rR0Tjx111Xzj5VpZGSVLi8R70PSQ7Wahzb1AQM2TgLA@mail.gmail.com>
+In-Reply-To: <CAFEAcA8rR0Tjx111Xzj5VpZGSVLi8R70PSQ7Wahzb1AQM2TgLA@mail.gmail.com>
+X-KMail-QuotePrefix: > 
 MIME-Version: 1.0
-In-Reply-To: <20201106171153.32673-5-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <202011061930.25439.pisa@cmp.felk.cvut.cz>
+X-FELK-MailScanner-Information: 
+X-MailScanner-ID: 0A6IUQse048593
+X-FELK-MailScanner: Found to be clean
+X-FELK-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
+ score=-0.223, required 6, BAYES_00 -0.50, KHOP_HELO_FCRDNS 0.28,
+ NICE_REPLY_A -0.00, SPF_HELO_NONE 0.00, SPF_NONE 0.00)
+X-FELK-MailScanner-From: pisa@cmp.felk.cvut.cz
+X-FELK-MailScanner-Watermark: 1605292229.15638@tObA1ekogkpwU1cpG130jA
+Received-SPF: none client-ip=2001:718:2:1611:0:1:0:70;
+ envelope-from=pisa@cmp.felk.cvut.cz; helo=relay.felk.cvut.cz
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 12:48:26
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,34 +90,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Jason Wang <jasowang@redhat.com>, Vikram Garhwal <fnu.vikram@xilinx.com>,
- Pavel Pisa <pisa@cmp.felk.cvut.cz>
+ Ondrej Ille <ondrej.ille@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Jan =?utf-8?q?Charv=C3=A1t?= <charvj10@fel.cvut.cz>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/6/20 6:11 PM, Peter Maydell wrote:
-> Instead of casting an address within a uint8_t array to a
-> uint32_t*, use stl_le_p(). This handles possibly misaligned
-> addresses which would otherwise crash on some hosts.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/net/can/ctucan_core.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/hw/net/can/ctucan_core.c b/hw/net/can/ctucan_core.c
-> index f2ce978e5ec..e66526efa83 100644
-> --- a/hw/net/can/ctucan_core.c
-> +++ b/hw/net/can/ctucan_core.c
-> @@ -305,8 +305,7 @@ void ctucan_mem_write(CtuCanCoreState *s, hwaddr addr, uint64_t val,
->          addr %= CTUCAN_CORE_TXBUFF_SPAN;
->          assert(buff_num < CTUCAN_CORE_TXBUF_NUM);
->          if (addr < sizeof(s->tx_buffer[buff_num].data)) {
-> -            uint32_t *bufp = (uint32_t *)(s->tx_buffer[buff_num].data + addr);
-> -            *bufp = cpu_to_le32(val);
-> +            stl_le_p(s->tx_buffer[buff_num].data + addr, val);
+Hello Peter,
 
-Out of curiosity, how did you notice? Passing by while reviewing?
+On Friday 06 of November 2020 19:04:38 Peter Maydell wrote:
+> On Fri, 6 Nov 2020 at 17:48, Pavel Pisa <pisa@cmp.felk.cvut.cz> wrote:
+> > Hello Peter,
+> >
+> > thanks much for the catching the problem and investing time into
+> > fixing. I hope to find time for more review of remarks and Xilinx
+> > patches next week. I do not find reasonable time slot till Sunday.
+> > Excuse me. To not block updates, I confirm your changes.
+> >
+> > On Friday 06 of November 2020 18:11:50 Peter Maydell wrote:
+> > > The ctucan device has 4 CAN bus cores, each of which has a set of 20
+> > > 32-bit registers for writing the transmitted data. The registers are
+> > > however not contiguous; each core's buffers is 0x100 bytes after
+> > > the last.
+> > >
+> > > We got the checks on the address wrong in the ctucan_mem_write()
+> > > function:
+> > >  * the first "is addr in range at all" check allowed
+> > >    addr == CTUCAN_CORE_MEM_SIZE, which is actually the first
+> > >    byte off the end of the range
+> > >  * the decode of addresses into core-number plus offset in the
+> > >    tx buffer for that core failed to check that the offset was
+> > >    in range, so the guest could write off the end of the
+> > >    tx_buffer[] array
+> > >  * the decode had an explicit check for whether the core-number
+> > >    was out of range, which is actually impossible given the
+> > >    CTUCAN_CORE_MEM_SIZE check and the number of cores.
+> > >
+> > > Fix the top level check, check the offset, and turn the check
+> > > on the core-number into an assertion.
+> > >
+> > > Fixes: Coverity CID 1432874
+> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > > ---
+> > >  hw/net/can/ctucan_core.c | 5 +++--
+> > >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/hw/net/can/ctucan_core.c b/hw/net/can/ctucan_core.c
+> > > index d20835cd7e9..ea09bf71a0c 100644
+> > > --- a/hw/net/can/ctucan_core.c
+> > > +++ b/hw/net/can/ctucan_core.c
+> > > @@ -303,7 +303,7 @@ void ctucan_mem_write(CtuCanCoreState *s, hwaddr
+> > > addr, uint64_t val, DPRINTF("write 0x%02llx addr 0x%02x\n",
+> > >              (unsigned long long)val, (unsigned int)addr);
+> > >
+> > > -    if (addr > CTUCAN_CORE_MEM_SIZE) {
+> > > +    if (addr >= CTUCAN_CORE_MEM_SIZE) {
+> > >          return;
+> > >      }
+> >
+> > Acked-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+> >
+> > > @@ -312,7 +312,8 @@ void ctucan_mem_write(CtuCanCoreState *s, hwaddr
+> > > addr, uint64_t val, addr -= CTU_CAN_FD_TXTB1_DATA_1;
+> > >          buff_num = addr / CTUCAN_CORE_TXBUFF_SPAN;
+> > >          addr %= CTUCAN_CORE_TXBUFF_SPAN;
+> > > -        if (buff_num < CTUCAN_CORE_TXBUF_NUM) {
+> > > +        assert(buff_num < CTUCAN_CORE_TXBUF_NUM);
+> >
+> > Assert is not necessary. If there is not buffer at that location,
+> > then write has no effect. Assert would check for driver errors,
+> > but it is not a problem of QEMU and for sure should not lead to its
+> > crash.
+>
+> We assert() here as a guide to readers of the code that we know
+> that buff_num can't possibly be out of range for the array
+> access we're about to do: the values of CTUCAN_CORE_MEM_SIZE,
+> CTUCAN_CORE_TXBUFF_SPAN, etc, make it mathematically impossible.
+> We prefer to assert() that kind of condition rather than having
+> an if() test for it.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+I understand but I see as fully valid to have CTUCAN_CORE_MEM_SIZE
+with some reserve and only two buffers populated which would lead
+to "spare" space after the end of the area where buffers are mapped
+into address-space. Same for CTUCAN_CORE_TXBUFF_SPAN
+and CTUCAN_CORE_MSG_MAX_LEN. There could be check
+
+  assert(CTUCAN_CORE_MSG_MAX_LEN <= CTUCAN_CORE_TXBUFF_SPAN)
+
+and 
+ 
+  assert(CTUCAN_CORE_TXBUFF_SPAN * CTUCAN_CORE_TXBUF_NUM +
+         CTU_CAN_FD_TXTB1_DATA_1 <= CTUCAN_CORE_MEM_SIZE)
+
+or even some cross checks of sizeof of the filed.
+
+But all other combination are in the fact real, depends on core
+synthesis parameters. Yes, for core release 2.x are the most
+fixed now. But option to provide variant compatible with actual
+driver which has CTUCAN_CORE_TXBUF_NUM > 4 up to hard limit of 8
+is left open still.
+
+Best wishes,
+
+Pavel
+
+
+ 
 
