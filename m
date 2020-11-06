@@ -2,80 +2,83 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 696A9C55178
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EEC1C2D0A3
 	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 15:29:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A598B22202
+	by mail.kernel.org (Postfix) with ESMTPS id 9EB89208C7
 	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 15:29:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dJLaOVpv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A598B22202
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O70VBhbR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EB89208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kb3fm-00050K-GU
+	id 1kb3fm-0004zZ-F9
 	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 10:29:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38090)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38064)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kb3eV-0003QE-CT
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 10:27:47 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:56165)
+ id 1kb3eU-0003Q7-Ml
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 10:27:46 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43799)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kb3eS-0001HB-Sp
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 10:27:47 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id c9so1803438wml.5
- for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 07:27:44 -0800 (PST)
+ id 1kb3eS-0001H6-51
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 10:27:46 -0500
+Received: by mail-wr1-x442.google.com with SMTP id g12so1723202wrp.10
+ for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 07:27:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=AdiicdP64VmJgYQJM0rUTlbseLHHNCO1CIl4JFbRXFA=;
- b=dJLaOVpvFVj5cqkmypEsd5EZP6rMR0/+TX+mgnP41qzxyUYyq9Y9QujpplmEyO4RGH
- yD5QYIw+FPwRky07w2ZoxmTrSaefKD2zYE/cIAN0NTyhE9A2GUM8f+9VyKcUIqNfKH7v
- +sDVk0jkyCnpEAZlw5K+ZB5ltsdV6ZhAOEpZsZT2xN3sQbHWae/6PqrfkEYIhscbRVXo
- uNlNV/Yx7tAHijUcaqIZrEHCY8FueQOz/Fl/sjfqJO0mRr5edIC+qW1mXXstzQ9Yxu04
- yh0Q24eWiHbuhlrsYlZvfjKPH1xe1ZaaDhBad95eGuZjJjhR25x1tY5hewIsJ7LTUTuD
- kCJQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=r8tx3kzrnnukFrD0hkvRYpxfc/p9hgOCDrl4XseNEZY=;
+ b=O70VBhbRoIoWRqHOsU6iDEeg3OePISMX7xc+h0nCtsIzNDolThMZWjVJAo+4bXAwGF
+ 0XzAXXpPxH1dmGjoidy2QKnhTqE0M2ogtx3MCxYALzBSO+V000g+a2P6WkBvmaGb/fFh
+ YGqrvGWxSdopGSb2eJKao0AZNhYqNZm0hhgDC+LqV+GWk653iPiZOnXAU317pryBHzDQ
+ y0U5hSY+0lf9z9KBd9CnbO/vMC4q82VDP5IEafq4MVfX4spolx1V6VGwgatLXAr7kVX6
+ 8yrgJ/236dMj1bacz2jGKdurkMdyDUfQQlEcysItga/Bs1WQPXgf4UKmGFHmyV63V1Eh
+ A7dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=AdiicdP64VmJgYQJM0rUTlbseLHHNCO1CIl4JFbRXFA=;
- b=h9IEtN1FxR/4fG8B379Jn0kZ8pL+c+lwjjZu59ZbkyKh+mbZo6OfDLVIIehRZsqRCO
- bky85VY4nP4P1+AyODqf9VaEKidZsoSqt0cVj/mNNz8IRmyh65uDufRaIdVBoEShas5U
- YdR7NryCy3znAvv7MzrbBmTOdhcxdyAHX2nm5udzcb7mH+KUK0dUvPdyIluz91/QmxYg
- NaXhHSG8nZ/hfa6Iw5jjQmmScKyV6sR85PYoMPBfb9tuKfv+7UOvmojq5yl4gxb8z5/D
- wAqX5gpDtixJB86KvGatXRXsfWTxbQCMhKHYeLjFKuCOSxEvovZNjEb4NYz3SS/4rbwE
- M8YA==
-X-Gm-Message-State: AOAM533IKW1r3XbYrXsNh71vFA6ZyqMDdQWJUWItnW5FMuNz4Pp4cTXe
- 439JivUKABTSh7IJnAePPNZk8/7Iu2B7PQ==
-X-Google-Smtp-Source: ABdhPJyhAEHZ9WSxroJ0PT8RrG0deY1TAu3RdgvdnzC1wf96JmK5Zoy0Rweg0VRg41vRVeu98xydow==
-X-Received: by 2002:a1c:ed0b:: with SMTP id l11mr145407wmh.46.1604676460875;
- Fri, 06 Nov 2020 07:27:40 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=r8tx3kzrnnukFrD0hkvRYpxfc/p9hgOCDrl4XseNEZY=;
+ b=ilMG9+Ie2O/7OMBBvEiC26SwPrKz8pROWNXc1TifvHTZdOqzCs9DyFFc9MKOqA+49M
+ DpYpHL4sTneODtS56ck2cvHJ+rONpsvrrsPQGg7slCo9zbeTCfliYO4dS053eHgFDDft
+ 7I0v31fIov/NtK+nXcRHyjefl/Aw0Uywepao4fkVRYIjGuehYdKxUkQZpOp20WrE47Aj
+ eOCGwyFWwVxdpou8fkyHibfmFxZXI8Rp7mR5xZcbTgWum3HZTkL2hdEy/tOCY9Xu0JTM
+ qTBfHd6wlWIAjvaj8GUqn+R3ZOn8s4fU6PAN99HOenlqLwhhe1QOn4BhqqiOvDKhWvIb
+ CDbA==
+X-Gm-Message-State: AOAM532NyFOWrQw857alZbstUkGsCWeig3GQ9fkChSZemFmij6Zqv7Hf
+ gMe6jdWcBZb4lXQWSO8/J4E0UtdH3p2eLA==
+X-Google-Smtp-Source: ABdhPJyOj+FS4e4eJhnhs3R7uTqcV4PpnMHqaefb+FJLj/msqQXgCW2MeqOI0gTLkITRrcUSshfwEQ==
+X-Received: by 2002:adf:e950:: with SMTP id m16mr2967236wrn.0.1604676462005;
+ Fri, 06 Nov 2020 07:27:42 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 109sm2723462wra.29.2020.11.06.07.27.39
+ by smtp.gmail.com with ESMTPSA id 109sm2723462wra.29.2020.11.06.07.27.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Nov 2020 07:27:40 -0800 (PST)
+ Fri, 06 Nov 2020 07:27:41 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/4] linux/sparc: more get/set_context fixes
-Date: Fri,  6 Nov 2020 15:27:34 +0000
-Message-Id: <20201106152738.26026-1-peter.maydell@linaro.org>
+Subject: [PATCH v2 1/4] linux-user/sparc: Correct sparc64_get/set_context()
+ FPU handling
+Date: Fri,  6 Nov 2020 15:27:35 +0000
+Message-Id: <20201106152738.26026-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201106152738.26026-1-peter.maydell@linaro.org>
+References: <20201106152738.26026-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32a.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,37 +108,175 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based-on: 20201105212314.9628-1-peter.maydell@linaro.org
-("[PATCH for-5.2 0/3] linux-user: fix various sparc64 guest bugs")
+The handling of the FPU state in sparc64_get_context() and
+sparc64_set_context() is not the same as what the kernel actually
+does: we unconditionally read and write the FP registers and the
+FSR, GSR and FPRS, but the kernel logic is more complicated:
+ * in get_context the kernel has code for saving FPU registers,
+   but it is hidden inside an "if (fenab) condition and the
+   fenab flag is always set to 0 (inside an "#if 1" which has
+   been in the kernel for over 15 years). So the effect is that
+   the FPU state part is always written as zeroes.
+ * in set_context the kernel looks at the fenab field in the
+   structure from the guest, and only restores the state if
+   it is set; it also looks at the structure's FPRS to see
+   whether either the upper or lower or both halves of the
+   register file have valid data.
 
-This series fixes a few more issues with our sparc linux-user
-sparc64_get_context() and sparc64_set_context() implementation:
- * we weren't handling FPU regs correctly, and also the way
-   we coded the handling triggered Coverity warnings
- * some stray pointless error checks
- * we shouldn't restore %g7 in set_context
- * we weren't saving and restoring tstate correctly
+Bring our implementations into line with the kernel:
+ * in get_context:
+    - clear the entire target_ucontext at the top of the
+      function (as the kernel does)
+    - then don't write the FPU state, so those fields remain zero
+    - this fixes Coverity issue CID 1432305 by deleting the code
+      it was complaining about
+ * in set_context:
+    - check the fenab and the fpsr to decide which parts of
+      the FPU data to restore, if any
+    - instead of setting the FPU registers by doing two
+      32-bit loads and filling in the .upper and .lower parts
+      of the CPU_Double union separately, just do a 64-bit
+      load of the whole register at once. This fixes Coverity
+      issue CID 1432303 because we now access the dregs[] part
+      of the mcfpu_fregs union rather than the sregs[] part
+      (which is not large enough to actually cover the whole of
+      the data, so we were accessing off the end of sregs[])
 
-My main aim here was to deal with the Coverity errors, but
-the rest are things I noticed while I was working on the
-code or which had fixme comments, and I figured I'd fix
-them while the code was fresh in my mind.
+We change both functions in a single commit to avoid potentially
+breaking bisection.
 
-thanks
--- PMM
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/sparc/cpu.h        |  4 ++-
+ linux-user/sparc/signal.c | 74 +++++++++++++++++++++++----------------
+ 2 files changed, 46 insertions(+), 32 deletions(-)
 
-Peter Maydell (4):
-  linux-user/sparc: Correct sparc64_get/set_context() FPU handling
-  linux-user/sparc: Remove unneeded checks of 'err' from
-    sparc64_get_context()
-  linux-user/sparc: Don't restore %g7 in sparc64_set_context()
-  linux-user/sparc: Handle tstate in sparc64_get/set_context()
-
- target/sparc/cpu.h          | 28 +++++++++---
- linux-user/sparc/signal.c   | 87 ++++++++++++++++++++-----------------
- target/sparc/int64_helper.c |  5 +--
- 3 files changed, 71 insertions(+), 49 deletions(-)
-
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index b9369398f24..277254732b9 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -156,7 +156,9 @@ enum {
+ #define PS_IE    (1<<1)
+ #define PS_AG    (1<<0) /* v9, zero on UA2007 */
+ 
+-#define FPRS_FEF (1<<2)
++#define FPRS_DL (1 << 0)
++#define FPRS_DU (1 << 1)
++#define FPRS_FEF (1 << 2)
+ 
+ #define HS_PRIV  (1<<2)
+ #endif
+diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
+index d12adc8e6ff..e661a769cb1 100644
+--- a/linux-user/sparc/signal.c
++++ b/linux-user/sparc/signal.c
+@@ -402,8 +402,10 @@ void sparc64_set_context(CPUSPARCState *env)
+     abi_ulong ucp_addr;
+     struct target_ucontext *ucp;
+     target_mc_gregset_t *grp;
++    target_mc_fpu_t *fpup;
+     abi_ulong pc, npc, tstate;
+     unsigned int i;
++    unsigned char fenab;
+ 
+     ucp_addr = env->regwptr[WREG_O0];
+     if (!lock_user_struct(VERIFY_READ, ucp, ucp_addr, 1)) {
+@@ -467,26 +469,42 @@ void sparc64_set_context(CPUSPARCState *env)
+     __get_user(env->regwptr[WREG_FP], &(ucp->tuc_mcontext.mc_fp));
+     __get_user(env->regwptr[WREG_I7], &(ucp->tuc_mcontext.mc_i7));
+ 
+-    /* FIXME this does not match how the kernel handles the FPU in
+-     * its sparc64_set_context implementation. In particular the FPU
+-     * is only restored if fenab is non-zero in:
+-     *   __get_user(fenab, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_enab));
+-     */
+-    __get_user(env->fprs, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fprs));
+-    {
+-        uint32_t *src = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
+-        for (i = 0; i < 64; i++, src++) {
+-            if (i & 1) {
+-                __get_user(env->fpr[i/2].l.lower, src);
+-            } else {
+-                __get_user(env->fpr[i/2].l.upper, src);
++    fpup = &ucp->tuc_mcontext.mc_fpregs;
++
++    __get_user(fenab, &(fpup->mcfpu_enab));
++    if (fenab) {
++        abi_ulong fprs;
++
++        /*
++         * We use the FPRS from the guest only in deciding whether
++         * to restore the upper, lower, or both banks of the FPU regs.
++         * The kernel here writes the FPU register data into the
++         * process's current_thread_info state and unconditionally
++         * clears FPRS and TSTATE_PEF: this disables the FPU so that the
++         * next FPU-disabled trap will copy the data out of
++         * current_thread_info and into the real FPU registers.
++         * QEMU doesn't need to handle lazy-FPU-state-restoring like that,
++         * so we always load the data directly into the FPU registers
++         * and leave FPRS and TSTATE_PEF alone (so the FPU stays enabled).
++         * Note that because we (and the kernel) always write zeroes for
++         * the fenab and fprs in sparc64_get_context() none of this code
++         * will execute unless the guest manually constructed or changed
++         * the context structure.
++         */
++        __get_user(fprs, &(fpup->mcfpu_fprs));
++        if (fprs & FPRS_DL) {
++            for (i = 0; i < 16; i++) {
++                __get_user(env->fpr[i].ll, &(fpup->mcfpu_fregs.dregs[i]));
+             }
+         }
++        if (fprs & FPRS_DU) {
++            for (i = 16; i < 31; i++) {
++                __get_user(env->fpr[i].ll, &(fpup->mcfpu_fregs.dregs[i]));
++            }
++        }
++        __get_user(env->fsr, &(fpup->mcfpu_fsr));
++        __get_user(env->gsr, &(fpup->mcfpu_gsr));
+     }
+-    __get_user(env->fsr,
+-               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fsr));
+-    __get_user(env->gsr,
+-               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_gsr));
+     unlock_user_struct(ucp, ucp_addr, 0);
+     return;
+ do_sigsegv:
+@@ -509,7 +527,9 @@ void sparc64_get_context(CPUSPARCState *env)
+     if (!lock_user_struct(VERIFY_WRITE, ucp, ucp_addr, 0)) {
+         goto do_sigsegv;
+     }
+-    
++
++    memset(ucp, 0, sizeof(*ucp));
++
+     mcp = &ucp->tuc_mcontext;
+     grp = &mcp->mc_gregs;
+ 
+@@ -572,19 +592,11 @@ void sparc64_get_context(CPUSPARCState *env)
+     __put_user(env->regwptr[WREG_FP], &(mcp->mc_fp));
+     __put_user(env->regwptr[WREG_I7], &(mcp->mc_i7));
+ 
+-    {
+-        uint32_t *dst = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
+-        for (i = 0; i < 64; i++, dst++) {
+-            if (i & 1) {
+-                __put_user(env->fpr[i/2].l.lower, dst);
+-            } else {
+-                __put_user(env->fpr[i/2].l.upper, dst);
+-            }
+-        }
+-    }
+-    __put_user(env->fsr, &(mcp->mc_fpregs.mcfpu_fsr));
+-    __put_user(env->gsr, &(mcp->mc_fpregs.mcfpu_gsr));
+-    __put_user(env->fprs, &(mcp->mc_fpregs.mcfpu_fprs));
++    /*
++     * We don't write out the FPU state. This matches the kernel's
++     * implementation (which has the code for doing this but
++     * hidden behind an "if (fenab)" where fenab is always 0).
++     */
+ 
+     if (err)
+         goto do_sigsegv;
 -- 
 2.20.1
 
