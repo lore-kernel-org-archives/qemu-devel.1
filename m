@@ -2,95 +2,91 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A36FC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 04:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CCCC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 04:43:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC24A20679
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 04:24:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E8F520704
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 04:43:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzuuTaaw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC24A20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="JMsLgPnx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E8F520704
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1katJ0-0005Xc-RP
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 23:24:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56754)
+	id 1katar-0000SN-0Z
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 23:43:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1katFa-0000iu-3u
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 23:21:22 -0500
-Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:35997)
+ (Exim 4.90_1) (envelope-from <palmer@dabbelt.com>)
+ id 1katZw-0008Ry-4R
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 23:42:24 -0500
+Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:47004)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1katFY-000785-DI
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 23:21:21 -0500
-Received: by mail-pf1-x435.google.com with SMTP id w65so151955pfd.3
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 20:21:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=aN9v8MBC8BPvxYlbgjVCYfcQYHAkJvABeggpTeTFNNs=;
- b=OzuuTaawF5J+yEReDSvz8z/qwLkrppL+4sXwm6NCz4txDUYXwuQW5Q+UVeiXmoZ4uh
- zZEMaSe3JIig4QuB13Ab5T3U2jBR0MXAFV2bvuCx2ji1AODwWWHie41DXgBz69zvoNyg
- nP8PvK5wB/RUTFwNvLuKu/2HbD0Cw6T84pEmnfU9DgsZZp4D5TgO+SChscpGUOVobhw9
- +ZKumOygXAK6o9W6apv0Wzuk2Vi7nSpfzCE8ni29Qn4uHkgvZlS/xljgRj9uqBAb31lf
- UuY5oSJgQGwNTUSoehp+cgvZ+McCltEHp5EnSuuH2D7We2779IZDb9I9Yk7Y7F2Yfubh
- /lMA==
+ (Exim 4.90_1) (envelope-from <palmer@dabbelt.com>)
+ id 1katZt-0006jn-NI
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 23:42:23 -0500
+Received: by mail-pg1-x52b.google.com with SMTP id w4so2977407pgg.13
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 20:42:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=r3YLGzm7snfxXqcurkqYtMnrfBi4+eIbtPBIHL19ksk=;
+ b=JMsLgPnxvu5BzI3WurFwRSXdC1FAZMqP2+UdpodA6Q5sksCkfTAVmxJ+QRssqFImrU
+ jABGGfujiylxHFzDMyLjKlFOzydV3Wg0YspKKNdiRD86JBnlWv8Rcbye3b6Jr6+DVHKk
+ y8W5DovayL/VeDRcReAGawPTxQ3Gckn5chxN3IgrmNz0lHXJB0xCnmAPoHhSY2Zm7nD6
+ qCR8D/omYKqNy2y0nm61FRAC39wi+svaeCVNA2VMdG49bkCRRtHGzQIzDSHV2mupSh/T
+ d3EeZhPx2GzNSCBhrpoWOQajYfEIH/8p1cjTTQ5Pi1StFT+BSUKBG7UtaNFZp9qWRwmi
+ Cf1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=aN9v8MBC8BPvxYlbgjVCYfcQYHAkJvABeggpTeTFNNs=;
- b=qf4KFT4KVd+f55udOiO6eHIXyyRIgX7eoDjJFXi69GTCX56HVjiLqci/SzFGFjUYQA
- E5MziPX6UxtdmwlPgvx/4Zv0STuSyqo36HXftfIpBX8QFekHFRQr8IcXltubYlhf+XIh
- +b6BIkZFHWFsBDnNB7RT7twxTkODEVPfxrjG7Mrg1DuAnqT5IO7W3r+zcau+Rhos9iwb
- /bhfWm4dd5Tjpe3jnukNSityou9+6uZJIIlcjXMmYNLfAr0WGrfeVcyX3a7iOl2ZTSqx
- nLSu4af78JnzP3qL/Ee9QF5idOK5SDvT4MtBghS19KTgJ21F6jn46n7wfgpBWBuaDu6v
- FDxw==
-X-Gm-Message-State: AOAM532P3CCu80k7uL3+8R8d8NJfLgvXbzDY/HBL6INRZO97HGWD6S86
- qr/UCE3J8Cr3iq+/I4ClyWo=
-X-Google-Smtp-Source: ABdhPJw7Yh3qexOmsO6UZ6iSCHGkI+qSkq+DqVwkKRrPZWYXObVRyiN3q8G3YEcwl5Nab4538RCqIA==
-X-Received: by 2002:a17:90a:4884:: with SMTP id
- b4mr353961pjh.198.1604636479209; 
- Thu, 05 Nov 2020 20:21:19 -0800 (PST)
-Received: from software.domain.org (111-252-196-15.dynamic-ip.hinet.net.
- [111.252.196.15])
- by smtp.gmail.com with ESMTPSA id y1sm262235pjl.12.2020.11.05.20.21.15
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 05 Nov 2020 20:21:18 -0800 (PST)
-From: Huacai Chen <zltjiangshi@gmail.com>
-X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH V17 3/6] hw/mips: Implement fw_cfg_arch_key_name()
-Date: Fri,  6 Nov 2020 12:21:47 +0800
-Message-Id: <1604636510-8347-4-git-send-email-chenhc@lemote.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1604636510-8347-1-git-send-email-chenhc@lemote.com>
-References: <1604636510-8347-1-git-send-email-chenhc@lemote.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=r3YLGzm7snfxXqcurkqYtMnrfBi4+eIbtPBIHL19ksk=;
+ b=Js44/Mi29tvZqChznR/euU8qtvKMunyRZ9ARpTfuFJ2yjVDBW8kEmE0S0EeDVzdamY
+ zwZx+9NgsgZowc4UYRgJeggfphCGHNwAKJoXANTZ4mNx8bvki6tGk1Bsu3CQFsjn2UGV
+ Qd9of4URySNRMn9SwH68gW+PCnxyINklo2pjiGcLc/MXHkmBnXRjmNha+CRvlsXNePB1
+ 2P8NUGJnqlLng6TbwXk700mrlAlEbBsGhu3YWJBFKgr6nto0Yq6SqBPBCugYMLCgfwjV
+ kuEGPc6TqijXpCj28RWVXuFm7unGggrhZtWi81Lmb+2gnE2Zfeg5d5lfBJO/Zky1w++V
+ BmkA==
+X-Gm-Message-State: AOAM533eEWSM+nzSQSg5RV6Vl5eOpYKMvr0/22ZY3SXxUXcdEDdUwfHo
+ h0+LTHWsEXXJYodchwpiAx1maQ==
+X-Google-Smtp-Source: ABdhPJyXg5zYtGxkmuIrcmMya/9/UiW9vKF04hBpE8fsrQAHdqH9w4wNH3fyl4woCRGgzGT/mz+dRA==
+X-Received: by 2002:a17:90a:3fcb:: with SMTP id
+ u11mr436398pjm.128.1604637739788; 
+ Thu, 05 Nov 2020 20:42:19 -0800 (PST)
+Received: from localhost (76-210-143-223.lightspeed.sntcca.sbcglobal.net.
+ [76.210.143.223])
+ by smtp.gmail.com with ESMTPSA id d22sm12562pgv.87.2020.11.05.20.42.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Nov 2020 20:42:19 -0800 (PST)
+Date: Thu, 05 Nov 2020 20:42:19 -0800 (PST)
+X-Google-Original-Date: Thu, 05 Nov 2020 19:54:42 PST (-0800)
+Subject: Re: Emulation for riscv
+In-Reply-To: <CAKmqyKNoUg9f-NdgAoGrq_DuBwWv_ZgusArvOobxEYM1mpzbRA@mail.gmail.com>
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: alistair23@gmail.com
+Message-ID: <mhng-5ca93c0e-3134-4384-915f-23c4aed71712@palmerdabbelt-glaptop1>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::435;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pf1-x435.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52b;
+ envelope-from=palmer@dabbelt.com; helo=mail-pg1-x52b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,107 +100,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, moyarrezam@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement fw_cfg_arch_key_name(), which returns the name of a
-mips-specific key.
+On Thu, 22 Oct 2020 17:56:38 PDT (-0700), alistair23@gmail.com wrote:
+> On Thu, Oct 22, 2020 at 4:58 PM Moises Arreola <moyarrezam@gmail.com> wrote:
+>>
+>> Hello everyone, my name is Moses and I'm trying to set up a VM for a risc-v processor, I'm using the Risc-V Getting Started Guide and on the final step I'm getting an error while trying to launch the virtual machine using the cmd:
+>
+> Hello,
+>
+> Please don't use the RISC-V Getting Started Guide. Pretty much all of
+> the information there is out of date and wrong. Unfortunately we are
+> unable to correct it.
+>
+> The QEMU wiki is a much better place for information:
+> https://wiki.qemu.org/Documentation/Platforms/RISCV
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
----
- hw/mips/fw_cfg.c    | 35 +++++++++++++++++++++++++++++++++++
- hw/mips/fw_cfg.h    | 19 +++++++++++++++++++
- hw/mips/meson.build |  2 +-
- 3 files changed, 55 insertions(+), 1 deletion(-)
- create mode 100644 hw/mips/fw_cfg.c
- create mode 100644 hw/mips/fw_cfg.h
+Ya, everything at riscv.org is useless.  It's best to stick to the open source
+documentation, as when that gets out of date we can at least fix it.  Using a
+distro helps a lot here, the wiki describes how to run a handful of popular
+ones that were ported to RISC-V early but if your favorite isn't on the list
+then it may have its own documentation somewhere else.
 
-diff --git a/hw/mips/fw_cfg.c b/hw/mips/fw_cfg.c
-new file mode 100644
-index 0000000..67c4a74
---- /dev/null
-+++ b/hw/mips/fw_cfg.c
-@@ -0,0 +1,35 @@
-+/*
-+ * QEMU fw_cfg helpers (MIPS specific)
-+ *
-+ * Copyright (c) 2020 Lemote, Inc.
-+ *
-+ * Author:
-+ *   Huacai Chen (chenhc@lemote.com)
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/mips/fw_cfg.h"
-+#include "hw/nvram/fw_cfg.h"
-+
-+const char *fw_cfg_arch_key_name(uint16_t key)
-+{
-+    static const struct {
-+        uint16_t key;
-+        const char *name;
-+    } fw_cfg_arch_wellknown_keys[] = {
-+        {FW_CFG_MACHINE_VERSION, "machine_version"},
-+        {FW_CFG_CPU_FREQ, "cpu_frequency"},
-+    };
-+
-+    for (size_t i = 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i++) {
-+        if (fw_cfg_arch_wellknown_keys[i].key == key) {
-+            return fw_cfg_arch_wellknown_keys[i].name;
-+        }
-+    }
-+    return NULL;
-+}
-diff --git a/hw/mips/fw_cfg.h b/hw/mips/fw_cfg.h
-new file mode 100644
-index 0000000..e317d5b
---- /dev/null
-+++ b/hw/mips/fw_cfg.h
-@@ -0,0 +1,19 @@
-+/*
-+ * QEMU fw_cfg helpers (MIPS specific)
-+ *
-+ * Copyright (c) 2020 Huacai Chen
-+ *
-+ * SPDX-License-Identifier: MIT
-+ */
-+
-+#ifndef HW_MIPS_FW_CFG_H
-+#define HW_MIPS_FW_CFG_H
-+
-+#include "hw/boards.h"
-+#include "hw/nvram/fw_cfg.h"
-+
-+/* Data for BIOS to identify machine */
-+#define FW_CFG_MACHINE_VERSION  (FW_CFG_ARCH_LOCAL + 0)
-+#define FW_CFG_CPU_FREQ         (FW_CFG_ARCH_LOCAL + 1)
-+
-+#endif
-diff --git a/hw/mips/meson.build b/hw/mips/meson.build
-index bcdf96b..0e9f930 100644
---- a/hw/mips/meson.build
-+++ b/hw/mips/meson.build
-@@ -1,5 +1,5 @@
- mips_ss = ss.source_set()
--mips_ss.add(files('addr.c', 'mips_int.c'))
-+mips_ss.add(files('addr.c', 'mips_int.c', 'fw_cfg.c'))
- mips_ss.add(when: 'CONFIG_FULOONG', if_true: files('fuloong2e.c'))
- mips_ss.add(when: 'CONFIG_JAZZ', if_true: files('jazz.c'))
- mips_ss.add(when: 'CONFIG_MALTA', if_true: files('gt64xxx_pci.c', 'malta.c'))
--- 
-2.7.0
-
+>> sudo qemu-system-riscv64 -nographic -machine virt \
+>> -kernel linux/arch/riscv/boot/Image -append "root=/dev/vda ro console=ttyS0" \
+>> -drive file=busybox,format=raw,id=hd0 \
+>> -device virtio-blk-device,drive=hd0
+>>
+>> But what I get in return is a message telling me that the file I gave wasn't the right one, the actual output is:
+>>
+>> qemu-system-riscv64: -drive file=busybox,format=raw,id=hd0: A regular file was expected by the 'file' driver, but something else was given
+>>
+>> And I checked the file busybox with de cmd "file" and got the following :
+>> busybox: ELF 64-bit LSB executable, UCB RISC-V, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-riscv64-lp64d.so.1, for GNU/Linux 4.15.0, stripped
+>
+> That looks like an ELF, which won't work when attached as a drive.
+>
+> How are you building this rootFS?
+>
+> Alistair
+>
+>>
+>> So I was wondering if the error message was related to qemu.
+>> Thanks in advance for answering any suggestions are welcome
 
