@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 083FDC388F7
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF599C55179
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:33:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 617422072E
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C0BD20729
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:33:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bd1BKXve"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 617422072E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DrixGB18"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C0BD20729
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kasVX-0001HF-Aa
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 22:33:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46824)
+	id 1kasVZ-0001L9-1P
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 22:33:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kasRP-0004N8-5S
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:31 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37586)
+ id 1kasRU-0004XF-09
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:36 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45380)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kasRM-0006tw-2m
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:30 -0500
-Received: by mail-pf1-x443.google.com with SMTP id 13so51933pfy.4
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 19:29:27 -0800 (PST)
+ id 1kasRQ-0006uh-S5
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:35 -0500
+Received: by mail-pg1-x542.google.com with SMTP id 62so2858697pgg.12
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 19:29:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=pAispzyuoe9bb7pX+t0JNwtc7CrjVyVvkGgTqmJ29zY=;
- b=bd1BKXveBuU//fHZTnIZDLyjtxcrIVGn5jr5DMLBZa95UkDPoPvw9ZG/0zqU8+ozKp
- Bmhu/keZnbhmWvKVtnNAum2iFCjIj99TpIVfCNubgZffGNABsaL7Pvp5pgaOUIXLnpU7
- KS1dEpaJ1aeFhB7PThe+jWnKH0hWR/9Ay7DV7fHF18wEQ5XLGv4vpiSEunmv8/6yzwqg
- k64QnE65/5g7SgKd6Uyv0tG1X4L/Dj6n1T8llcCeu5qNmZnXyfzVL+jyxBCd05tPutGp
- QmUaKXxm5oxSjSaPOinyU/ra/iK6kedtmFECB/JO0bxGddCIamVZFQ9B1PyhUH5C+hOf
- 4Ebg==
+ bh=umlTSoDWsL7GMFuN8NYGzjEz6Eu8noAzDLdtJRqQ4Ig=;
+ b=DrixGB18CuU/9aIYd3avoWoo18nA0RUNEU1IUUP82Gj+Uwzo9q7TP1jM/F6NddADji
+ +i7P+/LezZaRFEvmfjguKjn9mSCBgW84Z7kf8LkQdiHD4U08MYyrcqDk7TNsvEjRkyTi
+ EjtuWj1iytmoXfhjxgHGmisMhElSyTrFg9SUIR5U6UrNb9YIeXJiAdDwNiZNclbND747
+ AcR4pHv26Db2r32V+glAdjCBFhVsGhDkWS3/Tv+5344viwPZZ8p7g2PiYvAk3ojS+CzP
+ zLT2WMcJhRgyXd70Ert1y4p30F+8ZXF1CUE/M1nEr5hYHHZ/zb9Nslqsn07QO1ocKGY4
+ axHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=pAispzyuoe9bb7pX+t0JNwtc7CrjVyVvkGgTqmJ29zY=;
- b=cjJMl90gCXhQFa8zXce8Dgtb5ESf9lZVmkMtqAXartM6BkCAO/La71dJI60Onc7UZz
- hnK/ckshWeEamog1DHIpIgl73a3QuTL5qLLrjkzm2vIjYZSBYoiN1PWalBHd5W2g7IPQ
- 3vxuPjcLZzjTPmEnX782N+ucwelwR+u0P0aqyVJHi3QzZp2wqugeTI58tO9Crh1JiJ75
- CPMYJHJUrm1MT1gJfBGWz8cjdI0WkP2helXkIOTpyjC7FNQcrl8CllVhGnnAKnw9wnqb
- JlD75SWIo8RODjd+pRmP6X7o2aYjB6rsvRoV0iEvUxfaIummSDmtWOOLnIlM4V4rbsd0
- HWcQ==
-X-Gm-Message-State: AOAM532wdFeAtOtcyaf7LO9CExyeBwT7K/JpTxV65ISBSViL3bOPYFRA
- 5BDNtP9scQ+yMcJLslmAg3G0qrZRrkOebQ==
-X-Google-Smtp-Source: ABdhPJw69TmpVG9uvQtdmOAs1bhScRAW5tQ3GFGciX6X/W3paBl1u7o7Bkv9/M3d5X+VE18Nmt6M2Q==
-X-Received: by 2002:aa7:9e90:0:b029:18b:a94:3498 with SMTP id
- p16-20020aa79e900000b029018b0a943498mr5160617pfq.54.1604633365753; 
- Thu, 05 Nov 2020 19:29:25 -0800 (PST)
+ bh=umlTSoDWsL7GMFuN8NYGzjEz6Eu8noAzDLdtJRqQ4Ig=;
+ b=rQHnz4bRaaUVllYpQdb1hC5szbkL6Pk58kwPtjWnssbwExVPHCKDYn7ZH04PE4+2sv
+ h/z+nye6J8KCe0eEkJ3nVRkcJ3KX41SckuC0wsEIzbc3likbCcV2wLmZLr51cQCjGTio
+ mIcnNUKMDnrUxLOQX6uL87+5rk8qvRii1D0pakpYpt/r688M1NiOZ230NeuSaVvgGlfX
+ GPO1lijTK7ZyaW0urRKCGgDDFFeowpsBmEO/DpQ1vLaaB46zMR6ihhdIlEBrSy5+DqKd
+ y7310Uf7hc/e4Ja9IGPqycmMCQVg70edb/7BQETJ5wf+1zVTy+IzdEDVvz4M6PimnJaP
+ ZCBQ==
+X-Gm-Message-State: AOAM531H59CnfDmbwJeWYfNKqwBtDEZrSQ1vslQ9TekV3HlUtckVOnDE
+ nXlpKBo8laEM4BqFdZIyaZjZUBz52tw0vA==
+X-Google-Smtp-Source: ABdhPJzBaG8+Iwbdm/A1Z+EzeK2lBRnJ+TI6RjU1hjfD/T0SJvn9aKGOsoP9RQD1bnc/HRM0TwytqA==
+X-Received: by 2002:a17:90a:17ad:: with SMTP id
+ q42mr187342pja.36.1604633371216; 
+ Thu, 05 Nov 2020 19:29:31 -0800 (PST)
 Received: from localhost.localdomain (76-14-210-194.or.wavecable.com.
  [76.14.210.194])
- by smtp.gmail.com with ESMTPSA id i10sm40773pfd.60.2020.11.05.19.29.24
+ by smtp.gmail.com with ESMTPSA id i10sm40773pfd.60.2020.11.05.19.29.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Nov 2020 19:29:24 -0800 (PST)
+ Thu, 05 Nov 2020 19:29:30 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 02/41] tcg: Move tcg prologue pointer out of TCGContext
-Date: Thu,  5 Nov 2020 19:28:42 -0800
-Message-Id: <20201106032921.600200-3-richard.henderson@linaro.org>
+Subject: [PATCH v3 06/41] tcg: Adjust TCGLabel for const
+Date: Thu,  5 Nov 2020 19:28:46 -0800
+Message-Id: <20201106032921.600200-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201106032921.600200-1-richard.henderson@linaro.org>
 References: <20201106032921.600200-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,107 +106,131 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This value is constant across all thread-local copies of TCGContext,
-so we might as well move it out of thread-local storage.
-
-Use the correct function pointer type, and name the variable
-tcg_qemu_tb_exec, which means that we are able to remove the
-macro that does the casting.
-
-Replace HAVE_TCG_QEMU_TB_EXEC with CONFIG_TCG_INTERPRETER,
-as this is somewhat clearer in intent.
+Change TCGLabel.u.value_ptr to const, and initialize it with
+tcg_splitwx_to_rx.  Propagate const through tcg/host/ only
+as far as needed to avoid errors from the value_ptr change.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/tcg/tcg.h    | 9 ++++-----
- tcg/tci/tcg-target.h | 2 --
- tcg/tcg.c            | 9 ++++++++-
- tcg/tci.c            | 3 ++-
- 4 files changed, 14 insertions(+), 9 deletions(-)
+ include/tcg/tcg.h            | 2 +-
+ tcg/tcg.c                    | 2 +-
+ tcg/aarch64/tcg-target.c.inc | 2 +-
+ tcg/arm/tcg-target.c.inc     | 2 +-
+ tcg/mips/tcg-target.c.inc    | 5 +++--
+ tcg/ppc/tcg-target.c.inc     | 4 ++--
+ tcg/s390/tcg-target.c.inc    | 2 +-
+ 7 files changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
-index 8ff9dad4ef..9cc412f90c 100644
+index 249f83be72..b2ba16ea8c 100644
 --- a/include/tcg/tcg.h
 +++ b/include/tcg/tcg.h
-@@ -621,7 +621,6 @@ struct TCGContext {
-        here, because there's too much arithmetic throughout that relies
-        on addition and subtraction working on bytes.  Rely on the GCC
-        extension that allows arithmetic on void*.  */
--    void *code_gen_prologue;
-     void *code_gen_epilogue;
-     void *code_gen_buffer;
-     size_t code_gen_buffer_size;
-@@ -1222,11 +1221,11 @@ static inline unsigned get_mmuidx(TCGMemOpIdx oi)
- #define TB_EXIT_IDXMAX    1
- #define TB_EXIT_REQUESTED 3
- 
--#ifdef HAVE_TCG_QEMU_TB_EXEC
--uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr);
-+#ifdef CONFIG_TCG_INTERPRETER
-+uintptr_t tcg_qemu_tb_exec(CPUArchState *env, void *tb_ptr);
- #else
--# define tcg_qemu_tb_exec(env, tb_ptr) \
--    ((uintptr_t (*)(void *, void *))tcg_ctx->code_gen_prologue)(env, tb_ptr)
-+typedef uintptr_t tcg_prologue_fn(CPUArchState *env, void *tb_ptr);
-+extern tcg_prologue_fn *tcg_qemu_tb_exec;
- #endif
- 
- void tcg_register_jit(void *buf, size_t buf_size);
-diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-index 6460449719..49f3291f8a 100644
---- a/tcg/tci/tcg-target.h
-+++ b/tcg/tci/tcg-target.h
-@@ -189,8 +189,6 @@ typedef enum {
- 
- void tci_disas(uint8_t opc);
- 
--#define HAVE_TCG_QEMU_TB_EXEC
--
- /* Flush the dcache at RW, and the icache at RX, as necessary. */
- static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
- {
+@@ -261,7 +261,7 @@ struct TCGLabel {
+     unsigned refs : 16;
+     union {
+         uintptr_t value;
+-        tcg_insn_unit *value_ptr;
++        const tcg_insn_unit *value_ptr;
+     } u;
+     QSIMPLEQ_HEAD(, TCGRelocation) relocs;
+     QSIMPLEQ_ENTRY(TCGLabel) next;
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index d5a72c226f..a6f47b033c 100644
+index cea3a4e4f2..a88b314e97 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -161,6 +161,10 @@ static TCGContext **tcg_ctxs;
- static unsigned int n_tcg_ctxs;
- TCGv_env cpu_env = 0;
- 
-+#ifndef CONFIG_TCG_INTERPRETER
-+tcg_prologue_fn *tcg_qemu_tb_exec;
-+#endif
-+
- struct tcg_region_tree {
-     QemuMutex lock;
-     GTree *tree;
-@@ -1054,7 +1058,10 @@ void tcg_prologue_init(TCGContext *s)
-     s->code_ptr = buf0;
-     s->code_buf = buf0;
-     s->data_gen_ptr = NULL;
--    s->code_gen_prologue = buf0;
-+
-+#ifndef CONFIG_TCG_INTERPRETER
-+    tcg_qemu_tb_exec = (tcg_prologue_fn *)buf0;
-+#endif
- 
-     /* Compute a high-water mark, at which we voluntarily flush the buffer
-        and start over.  The size here is arbitrary, significantly larger
-diff --git a/tcg/tci.c b/tcg/tci.c
-index 82039fd163..d996eb7cf8 100644
---- a/tcg/tci.c
-+++ b/tcg/tci.c
-@@ -475,8 +475,9 @@ static bool tci_compare64(uint64_t u0, uint64_t u1, TCGCond condition)
- #endif
- 
- /* Interpret pseudo code in tb. */
--uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
-+uintptr_t tcg_qemu_tb_exec(CPUArchState *env, void *v_tb_ptr)
+@@ -305,7 +305,7 @@ static void tcg_out_label(TCGContext *s, TCGLabel *l, tcg_insn_unit *ptr)
  {
-+    uint8_t *tb_ptr = v_tb_ptr;
-     tcg_target_ulong regs[TCG_TARGET_NB_REGS];
-     long tcg_temps[CPU_TEMP_BUF_NLONGS];
-     uintptr_t sp_value = (uintptr_t)(tcg_temps + CPU_TEMP_BUF_NLONGS);
+     tcg_debug_assert(!l->has_value);
+     l->has_value = 1;
+-    l->u.value_ptr = ptr;
++    l->u.value_ptr = tcg_splitwx_to_rx(ptr);
+ }
+ 
+ TCGLabel *gen_new_label(void)
+diff --git a/tcg/aarch64/tcg-target.c.inc b/tcg/aarch64/tcg-target.c.inc
+index 76f8ae48ad..96dc9f4d0b 100644
+--- a/tcg/aarch64/tcg-target.c.inc
++++ b/tcg/aarch64/tcg-target.c.inc
+@@ -1306,7 +1306,7 @@ static void tcg_out_cmp(TCGContext *s, TCGType ext, TCGReg a,
+     }
+ }
+ 
+-static inline void tcg_out_goto(TCGContext *s, tcg_insn_unit *target)
++static void tcg_out_goto(TCGContext *s, const tcg_insn_unit *target)
+ {
+     ptrdiff_t offset = target - s->code_ptr;
+     tcg_debug_assert(offset == sextract64(offset, 0, 26));
+diff --git a/tcg/arm/tcg-target.c.inc b/tcg/arm/tcg-target.c.inc
+index 1e32bf42b8..f8f485d807 100644
+--- a/tcg/arm/tcg-target.c.inc
++++ b/tcg/arm/tcg-target.c.inc
+@@ -1019,7 +1019,7 @@ static inline void tcg_out_st8(TCGContext *s, int cond,
+  * with the code buffer limited to 16MB we wouldn't need the long case.
+  * But we also use it for the tail-call to the qemu_ld/st helpers, which does.
+  */
+-static void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
++static void tcg_out_goto(TCGContext *s, int cond, const tcg_insn_unit *addr)
+ {
+     intptr_t addri = (intptr_t)addr;
+     ptrdiff_t disp = tcg_pcrel_diff(s, addr);
+diff --git a/tcg/mips/tcg-target.c.inc b/tcg/mips/tcg-target.c.inc
+index f641105f9a..a3f838fa51 100644
+--- a/tcg/mips/tcg-target.c.inc
++++ b/tcg/mips/tcg-target.c.inc
+@@ -144,7 +144,8 @@ static tcg_insn_unit *bswap32_addr;
+ static tcg_insn_unit *bswap32u_addr;
+ static tcg_insn_unit *bswap64_addr;
+ 
+-static inline uint32_t reloc_pc16_val(tcg_insn_unit *pc, tcg_insn_unit *target)
++static inline uint32_t reloc_pc16_val(tcg_insn_unit *pc,
++                                      const tcg_insn_unit *target)
+ {
+     /* Let the compiler perform the right-shift as part of the arithmetic.  */
+     ptrdiff_t disp = target - (pc + 1);
+@@ -152,7 +153,7 @@ static inline uint32_t reloc_pc16_val(tcg_insn_unit *pc, tcg_insn_unit *target)
+     return disp & 0xffff;
+ }
+ 
+-static inline void reloc_pc16(tcg_insn_unit *pc, tcg_insn_unit *target)
++static inline void reloc_pc16(tcg_insn_unit *pc, const tcg_insn_unit *target)
+ {
+     *pc = deposit32(*pc, 0, 16, reloc_pc16_val(pc, target));
+ }
+diff --git a/tcg/ppc/tcg-target.c.inc b/tcg/ppc/tcg-target.c.inc
+index be116c6164..8a0b20a86b 100644
+--- a/tcg/ppc/tcg-target.c.inc
++++ b/tcg/ppc/tcg-target.c.inc
+@@ -184,7 +184,7 @@ static inline bool in_range_b(tcg_target_long target)
+     return target == sextract64(target, 0, 26);
+ }
+ 
+-static uint32_t reloc_pc24_val(tcg_insn_unit *pc, tcg_insn_unit *target)
++static uint32_t reloc_pc24_val(tcg_insn_unit *pc, const tcg_insn_unit *target)
+ {
+     ptrdiff_t disp = tcg_ptr_byte_diff(target, pc);
+     tcg_debug_assert(in_range_b(disp));
+@@ -201,7 +201,7 @@ static bool reloc_pc24(tcg_insn_unit *pc, tcg_insn_unit *target)
+     return false;
+ }
+ 
+-static uint16_t reloc_pc14_val(tcg_insn_unit *pc, tcg_insn_unit *target)
++static uint16_t reloc_pc14_val(tcg_insn_unit *pc, const tcg_insn_unit *target)
+ {
+     ptrdiff_t disp = tcg_ptr_byte_diff(target, pc);
+     tcg_debug_assert(disp == (int16_t) disp);
+diff --git a/tcg/s390/tcg-target.c.inc b/tcg/s390/tcg-target.c.inc
+index ac99ccea73..1b5c4f0ab0 100644
+--- a/tcg/s390/tcg-target.c.inc
++++ b/tcg/s390/tcg-target.c.inc
+@@ -1302,7 +1302,7 @@ static void tgen_extract(TCGContext *s, TCGReg dest, TCGReg src,
+     tcg_out_risbg(s, dest, src, 64 - len, 63, 64 - ofs, 1);
+ }
+ 
+-static void tgen_gotoi(TCGContext *s, int cc, tcg_insn_unit *dest)
++static void tgen_gotoi(TCGContext *s, int cc, const tcg_insn_unit *dest)
+ {
+     ptrdiff_t off = dest - s->code_ptr;
+     if (off == (int16_t)off) {
 -- 
 2.25.1
 
