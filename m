@@ -2,82 +2,74 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6316FC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 20:37:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBBC7C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 21:05:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACC5D20719
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 20:37:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 359D32087E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 21:05:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wcyn246g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACC5D20719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZDU1SHuP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359D32087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kb8UF-0001Ja-9s
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 15:37:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52152)
+	id 1kb8vA-0000kg-Lh
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 16:05:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kb8Su-0000p6-I3
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 15:36:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27393)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kb8uH-0000GC-7m
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 16:04:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34094)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kb8Ss-0003y3-CI
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 15:36:07 -0500
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kb8uE-0007TV-La
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 16:04:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604694964;
+ s=mimecast20190719; t=1604696660;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wTZGvFgMinVN6ECVKNldPNC1WHdpZNXG6Rq4h+n4HGc=;
- b=Wcyn246gGT5FPECPORpffsZHdOJ7KA69yCTFPwpYsA7h/gDyV/NdIUnY+9uLu6HrmAOSdw
- IZlud3uOZQKv72bDOv5R4PdEt0QVY5pAN2asG3C5xTXifdCruyUL8QxfLeiRShmGZDPNAt
- sqqw2Rwq+9EYtED1x0XbYOXMuqtxFCI=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=H/PXH+B7if04WRAIWkL+Jy54eXHRDtPsYGgcuKex6ec=;
+ b=ZDU1SHuPAlPWL5AS6+1GiRCgrqquuRA5cAmoYOtCVL9o/klnln6D4STWZbrp92QF2aqav9
+ ArNAK2+CY4sSUZzyQzRa2N4naOiSyVdP66AbqVuD1vTEtWAU4AfKVxqR5FoKMcAIN7ZBo3
+ KtSVPwadyoCRu3XYQF/7bAm4z2MBJcE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-568-m19i8tQ2M4Oc6lah8JSaAQ-1; Fri, 06 Nov 2020 15:36:00 -0500
-X-MC-Unique: m19i8tQ2M4Oc6lah8JSaAQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-562-It-9kqyZPx-HCm3U8SEjjw-1; Fri, 06 Nov 2020 16:04:17 -0500
+X-MC-Unique: It-9kqyZPx-HCm3U8SEjjw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3C2F805EFC;
- Fri,  6 Nov 2020 20:35:59 +0000 (UTC)
-Received: from [10.3.114.103] (ovpn-114-103.phx2.redhat.com [10.3.114.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 72D695D9CA;
- Fri,  6 Nov 2020 20:35:59 +0000 (UTC)
-Subject: Re: nbd: bitmap_to_extents() calls nbd_extent_array_add() without
- checking return value: coverity false positive?
-To: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <CAFEAcA8keTZEW3MLky3_HKh5cu2HR1O0iBax2c0hs0qSosNYSw@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <9ff386a7-c334-30ed-da79-341d75ed39b2@redhat.com>
-Date: Fri, 6 Nov 2020 14:35:58 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5767B803654
+ for <qemu-devel@nongnu.org>; Fri,  6 Nov 2020 21:04:16 +0000 (UTC)
+Received: from localhost (ovpn-112-11.ams2.redhat.com [10.36.112.11])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 12A311A4D8;
+ Fri,  6 Nov 2020 21:04:09 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] meson: always include contrib/libvhost-user
+Date: Fri,  6 Nov 2020 21:03:40 +0000
+Message-Id: <20201106210340.698771-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8keTZEW3MLky3_HKh5cu2HR1O0iBax2c0hs0qSosNYSw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 06:30:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -86,9 +78,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,45 +92,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/6/20 11:22 AM, Peter Maydell wrote:
-> Hi; Coverity's "you usually check the return value of this function
-> but you didn't do that here" heuristic has fired on the code in
-> nbd/server.c:bitmap_to_extents() -- the function nbd_extent_array_add()
-> is called five times in server.c, and the return value is checked
-> in four of those, but not in the final call at the end of
-> bitmap_to_extents(). (CID 1436125.)
-> 
-> Is this a false positive, or should the caller be handling an
-> error here ?
-
-False positive, but I don't mind tweaking the code to silence Coverity.
-This should do it; let me know if I should turn it into a formal patch.
-
-diff --git i/nbd/server.c w/nbd/server.c
-index d145e1a69083..377698a2ce85 100644
---- i/nbd/server.c
-+++ w/nbd/server.c
-@@ -2128,9 +2128,8 @@ static void bitmap_to_extents(BdrvDirtyBitmap *bitmap,
-         }
-     }
-
--    if (!full) {
--        /* last non dirty extent */
--        nbd_extent_array_add(es, end - start, 0);
-+    if (!full && nbd_extent_array_add(es, end - start, 0) < 0) {
-+        /* last non dirty extent, not a problem if array is now full */
-     }
-
-     bdrv_dirty_bitmap_unlock(bitmap);
-
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+bGlidmhvc3QtdXNlciBpcyBuZWVkZWQgd2hlbiBDT05GSUdfTElOVVggaXMgc2V0LiBUaGUgQ09O
+RklHX1ZIT1NUX1VTRVIKY2hlY2sgaW4gbWVzb24uYnVpbGQgaXMgaW5jb3JyZWN0LgoKSW4gZmFj
+dCwgbm8gZXhwbGljaXQgY2hlY2sgaXMgbmVlZGVkIHNpbmNlIHRoaXMgZGVwZW5kZW5jeSBpcyBu
+b3QgYnVpbHQKYnkgZGVmYXVsdC4gSWYgc29tZXRoaW5nIGRlY2xhcmVzIGEgZGVwZW5kZW5jeSBv
+biBsaWJ2aG9zdC11c2VyIHRoZW4gaXQKd2lsbCBiZSBidWlsdCwgb3RoZXJ3aXNlIGl0IHdvbid0
+IGJlIGJ1aWx0IChpLmUuIG9uIG5vbi1MaW51eCBob3N0cykuCgpUaGlzIGZpeGVzIC4vY29uZmln
+dXJlIC0tZGlzYWJsZS12aG9zdC11c2VyICYmIG1ha2UuCgpGaXhlczogYmMxNWU0NGNiMjE5MWJi
+YjIzMTg4NzhhY2RmNTAzODEzNGU1NjM5NCAoImNvbmZpZ3VyZTogaW50cm9kdWNlIC0tZW5hYmxl
+LXZob3N0LXVzZXItYmxrLXNlcnZlciIpClJlcG9ydGVkLWJ5OiBQaGlsaXBwZSBNYXRoaWV1LURh
+dWTDqSA8cGhpbG1kQHJlZGhhdC5jb20+ClJlcG9ydGVkLWJ5OiBNaWNoYWVsIFMuIFRzaXJraW4g
+PG1zdEByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhh
+QHJlZGhhdC5jb20+Ci0tLQogbWVzb24uYnVpbGQgfCA2ICstLS0tLQogMSBmaWxlIGNoYW5nZWQs
+IDEgaW5zZXJ0aW9uKCspLCA1IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL21lc29uLmJ1aWxk
+IGIvbWVzb24uYnVpbGQKaW5kZXggZjUxNzUwMTBkZi4uYjQ3MzYyMDMyMSAxMDA2NDQKLS0tIGEv
+bWVzb24uYnVpbGQKKysrIGIvbWVzb24uYnVpbGQKQEAgLTE0NTAsMTEgKzE0NTAsNyBAQCB0cmFj
+ZV9ldmVudHNfc3ViZGlycyArPSBbCiAgICd1dGlsJywKIF0KIAotdmhvc3RfdXNlciA9IG5vdF9m
+b3VuZAotaWYgJ0NPTkZJR19WSE9TVF9VU0VSJyBpbiBjb25maWdfaG9zdAotICBzdWJkaXIoJ2Nv
+bnRyaWIvbGlidmhvc3QtdXNlcicpCi1lbmRpZgotCitzdWJkaXIoJ2NvbnRyaWIvbGlidmhvc3Qt
+dXNlcicpCiBzdWJkaXIoJ3FhcGknKQogc3ViZGlyKCdxb2JqZWN0JykKIHN1YmRpcignc3R1YnMn
+KQotLSAKMi4yOC4wCgo=
 
 
