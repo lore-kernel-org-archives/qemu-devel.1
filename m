@@ -2,49 +2,48 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F39C388F7
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 02:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16402C55179
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 02:01:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86B5A206B2
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 02:01:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86B5A206B2
+	by mail.kernel.org (Postfix) with ESMTPS id 8B305206B2
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 02:01:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B305206B2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kar49-0001xo-DD
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 21:01:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58640)
+	id 1kar4A-0001yb-Dm
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 21:01:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kar2l-0000le-GW; Thu, 05 Nov 2020 20:59:59 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2395)
+ id 1kar2l-0000ld-An; Thu, 05 Nov 2020 20:59:59 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2394)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kar2i-0004Wn-1C; Thu, 05 Nov 2020 20:59:58 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CS3VW3G0Vz15QwY;
- Fri,  6 Nov 2020 09:59:47 +0800 (CST)
+ id 1kar2h-0004Wl-Ou; Thu, 05 Nov 2020 20:59:58 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CS3VS2bfCz15QZG;
+ Fri,  6 Nov 2020 09:59:44 +0800 (CST)
 Received: from [10.174.187.138] (10.174.187.138) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 6 Nov 2020 09:59:45 +0800
-Message-ID: <5FA4AE11.6060701@huawei.com>
-Date: Fri, 6 Nov 2020 09:59:45 +0800
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 6 Nov 2020 09:59:39 +0800
+Message-ID: <5FA4AE0B.1000007@huawei.com>
+Date: Fri, 6 Nov 2020 09:59:39 +0800
 From: AlexChen <alex.chen@huawei.com>
 User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
  rv:17.0) Gecko/20130509 Thunderbird/17.0.6
 MIME-Version: 1.0
 To: =?ISO-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Michael Tokarev
  <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
-Subject: [PATCH V2 1/2] plugins: Fix resource leak in connect_socket()
+Subject: [PATCH V2 0/2] plugins: Fix some resource leaks
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.174.187.138]
@@ -77,25 +76,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Close the fd when the connect() fails.
+There are 3 resource leaks in contrib/plugins/lockstep.c, fix it.
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Alex Chen <alex.chen@huawei.com>
----
- contrib/plugins/lockstep.c | 1 +
- 1 file changed, 1 insertion(+)
+v1->v2:
+- add the cover letter
+- modify the subject of the patch[2/2]
 
-diff --git a/contrib/plugins/lockstep.c b/contrib/plugins/lockstep.c
-index a696673dff..319bd44b83 100644
---- a/contrib/plugins/lockstep.c
-+++ b/contrib/plugins/lockstep.c
-@@ -292,6 +292,7 @@ static bool connect_socket(const char *path)
+alexchen (2):
+  plugins: Fix resource leak in connect_socket()
+  plugins: Fix two resource leaks in setup_socket()
 
-     if (connect(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
-         perror("failed to connect");
-+        close(fd);
-         return false;
-     }
+ contrib/plugins/lockstep.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 -- 
 2.19.1
