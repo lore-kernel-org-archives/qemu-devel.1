@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8437CC388F2
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:41:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D60BBC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:42:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0DE320735
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:41:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F3E12072E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:42:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nuK8DZ3V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DE320735
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L7gUHdwg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F3E12072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kasdO-0006gD-QH
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 22:41:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47492)
+	id 1kasdu-000700-6r
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 22:42:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kasSP-0005wp-In
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:30:33 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33489)
+ id 1kasRg-0004tb-27
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:48 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44939)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kasSG-0007It-TC
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:30:33 -0500
-Received: by mail-pf1-x444.google.com with SMTP id q10so67877pfn.0
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 19:30:23 -0800 (PST)
+ id 1kasRd-0006xO-Lu
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:47 -0500
+Received: by mail-pf1-x442.google.com with SMTP id y7so28322pfq.11
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 19:29:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+d27eU2L8HgDgwohO42SmmVaHgpu663rk7fnfFSZMqQ=;
- b=nuK8DZ3VsZkS0PXRlY00qP+A4+AW9DM19HWN59gGRHfOlSWQQeOB4GNaS6uSRvtLy7
- xFkRMCb+3XVco8hrgTysZug0EZ6xqzjxOKAPT41InJDzZGM4qS4n5NOkR3/3/UpCQ5+s
- WztJFohkpmK6lfiiHxDpfR2+C+lNUx5o6tazPmgs5YlbBhog05wxRtns8H43Uj2HbJ7K
- 7GENmD9HX/EJ20lBJSm+Tv5KI49ZcErodnFarjzuGck7nmI1CtFSUaUNvb2+XCc1W21l
- njueLOEoTQqL5tPc01VizryJnSHtD16rq7q44J4BoHjbpS5e0olGPXDNM+U0PuIpdQ+m
- BiCQ==
+ bh=lq4IkwTkjjjV6cEfjyzqrZr7JH5rLAW05aEI0Sl+9Jw=;
+ b=L7gUHdwguNP4jAPxpnFrHEN0Zm+hJa/7DI9lwXNVrV/UmOQEC6wB/jqvRCwuELzI8/
+ rRARviqfWrnGWfUwAbBwHQDmNpUYk/j0mWI8rNByReuPcoqFkA8ci4GLWA9e4Zwu1U5z
+ N1mEVstlRexLy3mhvFVjB3h88w83IB0YnCOlDD0qTtMPDk5xarHdVmbpOqGPke7sjeQg
+ L1hUfU104zpzpTcV1FYrtaJDaprf9EYglOVaKubllZL5MFyrV4XBuSMfhwNk4K/KWVVU
+ cVNtdvb+3UXXspiPO1gdMw/y1NCvbl1M5VTw85Vl2sxsQZYAL1vbHq2xbRLVeT+dnaIm
+ Tt4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+d27eU2L8HgDgwohO42SmmVaHgpu663rk7fnfFSZMqQ=;
- b=YCPudEhi1+me9J/YeQRUAKN9kS2bC/HBd9WstkIVk6IFcpBi8Ykm7oV+Q/M8PCNFMZ
- eFeORtikrjUHdu/jnnbWXJ180wvVvC5fQgJpN6skU2+P/yCBN0OzZbHfYQA34z9b3rgO
- Q1zQiClBYqH9XcrPoUTcmUKcq9q94kZdRwrozayIbbmjU/7ML8bdiNBB6XYAQOANp6Rt
- c+rmWH0kZjkGNunTL1+8lkex18/XxyGORRtezPpH/WSMyNIfj2TKqtSDGjn6vsAiDxrg
- my6FLRdqPf/odMXYtYT/nRX+vPkfbEITVOgiSvehvi//qlaP1Fkb3ISI/la4qlnMnQbf
- x6yw==
-X-Gm-Message-State: AOAM533A19piMlhCgDdS174Q8KhqrQPbeCFryR2yIS3WYV8UqXIGiPJ9
- ZfIqDFjOIYZb9G1z8L1mVf/ISiz+uoFPhg==
-X-Google-Smtp-Source: ABdhPJyCtHHsmrqsZLiOp2CADViNcAnqIeivcpYUGQdpGf2sJ++cDB3MUDFNEzdpvC1OM2GygBnMuQ==
-X-Received: by 2002:aa7:9f06:0:b029:18a:e1a6:cec9 with SMTP id
- g6-20020aa79f060000b029018ae1a6cec9mr5465343pfr.20.1604633421689; 
- Thu, 05 Nov 2020 19:30:21 -0800 (PST)
+ bh=lq4IkwTkjjjV6cEfjyzqrZr7JH5rLAW05aEI0Sl+9Jw=;
+ b=pt2IjQdEci1BrLPW4r4alENKxW5Kk4Ja5TEVLys0jWl8awLvskL7A9EVUugc7lR1ou
+ l6smo0It/5HaKXrMjv08bx/wA9BWlYAaD1luTW6KARyZ0V7dcxGSlzjPfWM9fag2FWil
+ sRCFH3cahelxnc7izENLtLbiDKt7LYEKzHI+mHwQYLGdqO65yT2W2sfpWXRtwngriG/9
+ QijGgD1HZzRkSpFWLe1IOjM4rmDHLfoQ9LhHhH9BAKiSwuq73VC6ETtD8sDmbLAMeb2t
+ v4Hwc7mLuFoJDtQ1ghfHc6fNQ9433Nm73k4PCuZJPCTjvaGxTW29MMHSslNkaLPZYner
+ RtHQ==
+X-Gm-Message-State: AOAM532lHft/XKnHX/8+S6NXoW7tR8Pu21hqrbVsman/o08BUTsE3MgY
+ REye0FSZ0p3MjMPR3/KEtXFhHVezLEuUvQ==
+X-Google-Smtp-Source: ABdhPJz00PzHzCtmUoiVhdR1vXp3DQwHjq94TIr0/r+y5W5hTDSziRxyOTECinXCM7jX0odc3q2Mkw==
+X-Received: by 2002:aa7:96ce:0:b029:155:8c02:e74a with SMTP id
+ h14-20020aa796ce0000b02901558c02e74amr722pfq.32.1604633384041; 
+ Thu, 05 Nov 2020 19:29:44 -0800 (PST)
 Received: from localhost.localdomain (76-14-210-194.or.wavecable.com.
  [76.14.210.194])
- by smtp.gmail.com with ESMTPSA id i10sm40773pfd.60.2020.11.05.19.30.20
+ by smtp.gmail.com with ESMTPSA id i10sm40773pfd.60.2020.11.05.19.29.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Nov 2020 19:30:20 -0800 (PST)
+ Thu, 05 Nov 2020 19:29:43 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 39/41] tcg: Remove TCG_TARGET_SUPPORT_MIRROR
-Date: Thu,  5 Nov 2020 19:29:19 -0800
-Message-Id: <20201106032921.600200-40-richard.henderson@linaro.org>
+Subject: [PATCH v3 16/41] accel/tcg: Support split-wx for darwin/iOS with
+ vm_remap
+Date: Thu,  5 Nov 2020 19:28:56 -0800
+Message-Id: <20201106032921.600200-17-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201106032921.600200-1-richard.henderson@linaro.org>
 References: <20201106032921.600200-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,151 +107,100 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that all native tcg hosts support splitwx,
-remove the define.  Replace the one use with a
-test for CONFIG_TCG_INTERPRETER.
+Cribbed from code posted by Joelle van Dyne <j@getutm.app>,
+and rearranged to a cleaner structure.  Completely untested.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/aarch64/tcg-target.h  |  1 -
- tcg/arm/tcg-target.h      |  1 -
- tcg/i386/tcg-target.h     |  1 -
- tcg/mips/tcg-target.h     |  1 -
- tcg/ppc/tcg-target.h      |  1 -
- tcg/riscv/tcg-target.h    |  1 -
- tcg/s390/tcg-target.h     |  1 -
- tcg/sparc/tcg-target.h    |  1 -
- tcg/tci/tcg-target.h      |  1 -
- accel/tcg/translate-all.c | 14 +++++++-------
- 10 files changed, 7 insertions(+), 16 deletions(-)
+ accel/tcg/translate-all.c | 65 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index abb94f9458..fedd88f6fb 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -155,6 +155,5 @@ void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- #define TCG_TARGET_NEED_LDST_LABELS
- #endif
- #define TCG_TARGET_NEED_POOL_LABELS
--#define TCG_TARGET_SUPPORT_MIRROR       1
- 
- #endif /* AARCH64_TCG_TARGET_H */
-diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
-index 17f6be9cfc..b21a2fb6a1 100644
---- a/tcg/arm/tcg-target.h
-+++ b/tcg/arm/tcg-target.h
-@@ -150,6 +150,5 @@ void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- #define TCG_TARGET_NEED_LDST_LABELS
- #endif
- #define TCG_TARGET_NEED_POOL_LABELS
--#define TCG_TARGET_SUPPORT_MIRROR       1
- 
- #endif
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index bbbd1c2d4a..f52ba0ffec 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -236,6 +236,5 @@ static inline void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
- #define TCG_TARGET_NEED_LDST_LABELS
- #endif
- #define TCG_TARGET_NEED_POOL_LABELS
--#define TCG_TARGET_SUPPORT_MIRROR       1
- 
- #endif
-diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
-index d7d8e6ea1c..cd548dacec 100644
---- a/tcg/mips/tcg-target.h
-+++ b/tcg/mips/tcg-target.h
-@@ -206,7 +206,6 @@ extern bool use_mips32r2_instructions;
- 
- #define TCG_TARGET_DEFAULT_MO (0)
- #define TCG_TARGET_HAS_MEMORY_BSWAP     1
--#define TCG_TARGET_SUPPORT_MIRROR       1
- 
- /* Flush the dcache at RW, and the icache at RX, as necessary. */
- static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index a8628b6cad..8f3e4c924a 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -185,6 +185,5 @@ void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- #define TCG_TARGET_NEED_LDST_LABELS
- #endif
- #define TCG_TARGET_NEED_POOL_LABELS
--#define TCG_TARGET_SUPPORT_MIRROR       1
- 
- #endif
-diff --git a/tcg/riscv/tcg-target.h b/tcg/riscv/tcg-target.h
-index 0eb19f2b11..e03fd17427 100644
---- a/tcg/riscv/tcg-target.h
-+++ b/tcg/riscv/tcg-target.h
-@@ -179,6 +179,5 @@ void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- #define TCG_TARGET_NEED_POOL_LABELS
- 
- #define TCG_TARGET_HAS_MEMORY_BSWAP 0
--#define TCG_TARGET_SUPPORT_MIRROR   1
- 
- #endif
-diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-index 1fd8b3858e..c5a749e425 100644
---- a/tcg/s390/tcg-target.h
-+++ b/tcg/s390/tcg-target.h
-@@ -163,6 +163,5 @@ static inline void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
- #define TCG_TARGET_NEED_LDST_LABELS
- #endif
- #define TCG_TARGET_NEED_POOL_LABELS
--#define TCG_TARGET_SUPPORT_MIRROR       1
- 
- #endif
-diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
-index bb2505bfc7..87e2be61e6 100644
---- a/tcg/sparc/tcg-target.h
-+++ b/tcg/sparc/tcg-target.h
-@@ -181,6 +181,5 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
- void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
- 
- #define TCG_TARGET_NEED_POOL_LABELS
--#define TCG_TARGET_SUPPORT_MIRROR       1
- 
- #endif
-diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-index 3653fef947..a19a6b06e5 100644
---- a/tcg/tci/tcg-target.h
-+++ b/tcg/tci/tcg-target.h
-@@ -200,7 +200,6 @@ static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, size_t len)
- #define TCG_TARGET_DEFAULT_MO  (0)
- 
- #define TCG_TARGET_HAS_MEMORY_BSWAP     1
--#define TCG_TARGET_SUPPORT_MIRROR       0
- 
- static inline void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_rx,
-                                             uintptr_t jmp_rw, uintptr_t addr)
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index b49aaf1026..06102871e7 100644
+index 1931e65365..17df6c94fa 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -1257,14 +1257,14 @@ static bool alloc_code_gen_buffer_splitwx_vmremap(size_t size, Error **errp)
+@@ -1166,9 +1166,71 @@ static bool alloc_code_gen_buffer_splitwx_memfd(size_t size, Error **errp)
+ }
+ #endif /* CONFIG_POSIX */
  
++#ifdef CONFIG_DARWIN
++#include <mach/mach.h>
++
++extern kern_return_t mach_vm_remap(vm_map_t target_task,
++                                   mach_vm_address_t *target_address,
++                                   mach_vm_size_t size,
++                                   mach_vm_offset_t mask,
++                                   int flags,
++                                   vm_map_t src_task,
++                                   mach_vm_address_t src_address,
++                                   boolean_t copy,
++                                   vm_prot_t *cur_protection,
++                                   vm_prot_t *max_protection,
++                                   vm_inherit_t inheritance);
++
++static bool alloc_code_gen_buffer_splitwx_vmremap(size_t size, Error **errp)
++{
++    kern_return_t ret;
++    mach_vm_address_t buf_rw, buf_rx;
++    vm_prot_t cur_prot, max_prot;
++
++    /* Map the read-write portion via normal anon memory. */
++    if (!alloc_code_gen_buffer_anon(size, PROT_READ | PROT_WRITE,
++                                    MAP_PRIVATE | MAP_ANONYMOUS, errp)) {
++        return false;
++    }
++
++    buf_rw = (mach_vm_address_t)tcg_ctx->code_gen_buffer;
++    buf_rx = 0;
++    ret = mach_vm_remap(mach_task_self(),
++                        &buf_rx,
++                        size,
++                        0,
++                        VM_FLAGS_ANYWHERE,
++                        mach_task_self(),
++                        buf_rw,
++                        false,
++                        &cur_prot,
++                        &max_prot,
++                        VM_INHERIT_NONE);
++    if (ret != KERN_SUCCESS) {
++        /* TODO: Convert "ret" to a human readable error message. */
++        error_setg(errp, "vm_remap for jit splitwx failed");
++        munmap((void *)buf_rw, size);
++        return false;
++    }
++
++    if (mprotect((void *)buf_rx, size, PROT_READ | PROT_EXEC) != 0) {
++        error_setg_errno(errp, errno, "mprotect for jit splitwx");
++        munmap((void *)buf_rx, size);
++        munmap((void *)buf_rw, size);
++        return false;
++    }
++
++    tcg_splitwx_diff = buf_rx - buf_rw;
++    return true;
++}
++#endif /* CONFIG_DARWIN */
++
  static bool alloc_code_gen_buffer_splitwx(size_t size, Error **errp)
  {
--    if (TCG_TARGET_SUPPORT_MIRROR) {
--#ifdef CONFIG_DARWIN
--        return alloc_code_gen_buffer_splitwx_vmremap(size, errp);
-+#ifndef CONFIG_TCG_INTERPRETER
-+# ifdef CONFIG_DARWIN
-+    return alloc_code_gen_buffer_splitwx_vmremap(size, errp);
-+# endif
-+# ifdef CONFIG_POSIX
-+    return alloc_code_gen_buffer_splitwx_memfd(size, errp);
-+# endif
+     if (TCG_TARGET_SUPPORT_MIRROR) {
++#ifdef CONFIG_DARWIN
++        return alloc_code_gen_buffer_splitwx_vmremap(size, errp);
++#endif
+ #ifdef CONFIG_POSIX
+         return alloc_code_gen_buffer_splitwx_memfd(size, errp);
  #endif
--#ifdef CONFIG_POSIX
--        return alloc_code_gen_buffer_splitwx_memfd(size, errp);
--#endif
--    }
-     error_setg(errp, "jit split-wx not supported");
-     return false;
- }
+@@ -1201,6 +1263,9 @@ static bool alloc_code_gen_buffer(size_t size, int splitwx, Error **errp)
+ #ifdef CONFIG_TCG_INTERPRETER
+     /* The tcg interpreter does not need execute permission. */
+     prot = PROT_READ | PROT_WRITE;
++#elif defined(CONFIG_DARWIN)
++    /* Applicable to both iOS and macOS (Apple Silicon). */
++    flags |= MAP_JIT;
+ #endif
+ 
+     return alloc_code_gen_buffer_anon(size, prot, flags, errp);
 -- 
 2.25.1
 
