@@ -2,90 +2,99 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B9EAC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA674C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:54:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AD4E206FC
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:53:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 361F1206FC
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:54:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RuT3Xgjf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AD4E206FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RiAy3J0c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 361F1206FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbBXS-0007YR-DO
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 18:53:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35872)
+	id 1kbBZE-0001M4-9H
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 18:54:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34282)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kbBVm-0006Bu-Lk
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 18:51:18 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34519)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kbBVj-0004Xh-Es
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 18:51:18 -0500
-Received: by mail-wm1-x344.google.com with SMTP id 23so1899033wmg.1
- for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 15:51:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=5LIhaFgUhyoIXXqpYlZHKoo2I0ctX3FWm0zLqbLaZR8=;
- b=RuT3XgjfLsS3vn1uK/kYT3Xks3sM8n44z6hdvbmiHZC9SrEpIsCP5gXvBV7kMLpxZX
- u3RP9TiPqNtgnlbwr04eN10sYvsXb98fr/+4pjFT0uNtEc895XptLKbJR0VYe5PFbbK+
- CzwpGgbsZpJEVQXL8bQiov1WpiZC+0srwmHh8eJUgSEVQussX0MgvqbnCtKyJ+dmCSxg
- RkKJ3yxWX1dCimmZRIoaV4yEqC24Lp8ocEIThgXiogYd1r0BXbjA+TQbCuJ8GelnD4C9
- izjDQG7jF5ixlpJR+s8+9A3SjMKy/s0xTNs69cg7CtJkY7bvfKj0p6D16UJ+GfIWHSTs
- Jwsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=5LIhaFgUhyoIXXqpYlZHKoo2I0ctX3FWm0zLqbLaZR8=;
- b=HystVigNwo3BSrVdH16riAwbiTVAAf/hQHIpFUVi5ZYSXlV6sqVqhKAwh3N1I4UTAT
- l8Jmgu5M4jHcSwgZ1HOzp4kxAFiLYu81FHhYU7zZlvF6dJTwVHSTOyQZBJRhY6xUDoQu
- EleILOm9aeT0WEyNLBIeSVeVHh7dfnDVk1meP3BpOWWqX29w/MKo30rxxAYNC91mFrL6
- HqF9Ujqta4m9LRiBtROQUODXhRZz8SPVkPlvCGZYDwdDIxkkrIZcT8vvdgHKf6n32B0B
- PJY0BO1g7dIcaavRUG29kL2kzxctO2DjbQ/WqhtbbciYo1dyKkNf+mnt+p0wRQH8r9/6
- kT4Q==
-X-Gm-Message-State: AOAM5323+JGnmUkleGmKsFtWpp9t8U0/V8SxKohjQKmcTRq0+F2ANua1
- T1b4xW02a5aJmVcIwkgkqCgLyOY39oQRaw==
-X-Google-Smtp-Source: ABdhPJzLw7VYBko0GhT3rIMgrfZ0Y3mgq1Mq8DHKrepJtbWlhE0PmvSj+QzqKYdkG9b2zqR2MWYB7Q==
-X-Received: by 2002:a1c:6a11:: with SMTP id f17mr1977752wmc.24.1604706673831; 
- Fri, 06 Nov 2020 15:51:13 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id n8sm4025374wmc.11.2020.11.06.15.51.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Nov 2020 15:51:13 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] hw/m68k/q800.c: Make the GLUE chip an actual QOM device
-Date: Fri,  6 Nov 2020 23:51:09 +0000
-Message-Id: <20201106235109.7066-3-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201106235109.7066-1-peter.maydell@linaro.org>
-References: <20201106235109.7066-1-peter.maydell@linaro.org>
+ (Exim 4.90_1)
+ (envelope-from <prvs=572b21b8d=dmitry.fomichev@wdc.com>)
+ id 1kbBOI-0005SA-CI; Fri, 06 Nov 2020 18:43:34 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:57360)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=572b21b8d=dmitry.fomichev@wdc.com>)
+ id 1kbBOG-0003Tq-BK; Fri, 06 Nov 2020 18:43:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1604706213; x=1636242213;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=g063222WlgUGzbpsQdE8ESMz45RVE42CPVFav5X88Us=;
+ b=RiAy3J0c0dC7az2FYMAGsZTX/OKGaV0IrvONIGAsMtfJTbNFtvOd0uPR
+ 8VRNl2DKzi0ND3cGxVZvStcwRANMGoPV2DmZeNPOb0LSkMtOdGMKsEWVj
+ HI3QJXBQtlJ7krddekixobnCHWv25A18KPIMN9y70nMw6XJZN9ZpWNcCN
+ 6lxNohEeP+xp+84b1W5LVt2zsSji+uEp+C2F09MJJ/VErBju5E/J+Ploy
+ ohIz5Z7E+qRBlyRyXmXB4p7RpgCcWAsEtfb1MaiRuT98sml9kqn1qvMWf
+ 1fsQeodnVsRblf2ziqgPde2VUfzLuPlsUd/hsF8FZzimMQhGxzP7MjzXg A==;
+IronPort-SDR: ewtCoAUuunRnAMMQ2l9Ozj8HLFi3ZuScEqUWOXZcQO3Mh/pddoae8w00SDad3UC6j/sTbwL+gJ
+ 4jtyUOsyaMXw1rk+9d79h3uO2bezqSi7FI2p3OUClZO338NiMJdmE9bOfahInF1Ij4A77Jmgpk
+ NjLD2M0ACe1T82F4B9c5qS1LqhN4lgLHUUfTNjHdMoRQsQW67YPIp8EwaqbAlHt7etmuFH1mNi
+ JvfxRVVdlE3E3dfUKYRDJymumnRzX5Pkdf/L616Gky9jMV4feSx6wZ+6Hsy+Y0Q+WFTZ7o1qqC
+ aQY=
+X-IronPort-AV: E=Sophos;i="5.77,457,1596470400"; d="scan'208";a="153267071"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 07 Nov 2020 07:43:31 +0800
+IronPort-SDR: 55o6HdOnW4Vv/pQrCMmRc0LSt0bLVUfySDVvDgOtT9UjCjNaBvIZDdA0Ij/1QbCRuvxsWJI+Et
+ Yj7Z4vPFRUXwq39iY4tNQVqvetlEM/y+v6fqvhu9oZFUCZMULQEm4DkvnFyi6OXPN7fkN1D+fp
+ K2O4sG/vcHrSPybIowgxR+ONfvulnDc8v/ZNMDpHbXXRRKd9dkZcO5843vbLw3U1TmdZI6qspg
+ f1Aiobw9+3Mupsw5mFKsj+ErDdebDiis3XvmnPfuddP47CBG+qsCYrN69/sZpO7m+sS8+aB+3R
+ Ymg4EqwTM9dN7rwZWR+jt1gK
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 06 Nov 2020 15:28:22 -0800
+IronPort-SDR: wxDKU7jQOtvn0suT9acN7pJP29WOvGxiLY7MrNbCLrmM1WzN72iJAlL/qs2IpuAIIbKxOiyULo
+ TB5PSdpM/4JkcQvt4sbLn3tUaYimpVZPkp8rmPSJEuv25yTS3V/NrC2goEpXr9XtjrkT6PuNWo
+ l0szem1Dl8kSNR9ECIIcRFq932ce6DtEdWarIuv1zIdOVBj4pPV1wmnsyrMdyN6n2srs3jWgTU
+ VUovQpzraIsvvRSYXFnkOpZ8iqwG648MYsAlUkIpmwoPq8eGO91uERpKWtI1hpbciBYFH1vFAz
+ cEQ=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
+ by uls-op-cesaip01.wdc.com with ESMTP; 06 Nov 2020 15:43:28 -0800
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Fam Zheng <fam@euphon.net>
+Subject: [PATCH v10 07/12] block/nvme: Make ZNS-related definitions
+Date: Sat,  7 Nov 2020 08:43:00 +0900
+Message-Id: <20201106234305.21339-8-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20201106234305.21339-1-dmitry.fomichev@wdc.com>
+References: <20201106234305.21339-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Received-SPF: pass client-ip=216.71.154.45;
+ envelope-from=prvs=572b21b8d=dmitry.fomichev@wdc.com; helo=esa6.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 18:43:12
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,178 +108,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The handling of the GLUE (General Logic Unit) device is
-currently open-coded. Make this into a proper QOM device.
+Define values and structures that are needed to support Zoned
+Namespace Command Set (NVMe TP 4053).
 
-This minor piece of modernisation gets rid of the free
-floating qemu_irq array 'pic', which Coverity points out
-is technically leaked when we exit the machine init function.
-(The replacement glue device is not leaked because it gets
-added to the sysbus, so it's accessible via that.)
-
-Fixes: Coverity CID 1421883
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- hw/m68k/q800.c | 82 ++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 70 insertions(+), 12 deletions(-)
+ include/block/nvme.h | 114 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 113 insertions(+), 1 deletion(-)
 
-diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-index dc13007aaf2..05bb372f958 100644
---- a/hw/m68k/q800.c
-+++ b/hw/m68k/q800.c
-@@ -47,6 +47,7 @@
- #include "sysemu/qtest.h"
- #include "sysemu/runstate.h"
- #include "sysemu/reset.h"
-+#include "migration/vmstate.h"
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 394db19022..752623b4f9 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -489,6 +489,9 @@ enum NvmeIoCommands {
+     NVME_CMD_COMPARE            = 0x05,
+     NVME_CMD_WRITE_ZEROES       = 0x08,
+     NVME_CMD_DSM                = 0x09,
++    NVME_CMD_ZONE_MGMT_SEND     = 0x79,
++    NVME_CMD_ZONE_MGMT_RECV     = 0x7a,
++    NVME_CMD_ZONE_APPEND        = 0x7d,
+ };
  
- #define MACROM_ADDR     0x40800000
- #define MACROM_SIZE     0x00100000
-@@ -94,10 +95,14 @@
-  * CPU.
-  */
+ typedef struct QEMU_PACKED NvmeDeleteQ {
+@@ -648,9 +651,13 @@ typedef struct QEMU_PACKED NvmeAerResult {
+     uint8_t resv;
+ } NvmeAerResult;
  
--typedef struct {
-+#define TYPE_GLUE "q800-glue"
-+OBJECT_DECLARE_SIMPLE_TYPE(GLUEState, GLUE)
++typedef struct QEMU_PACKED NvmeZonedResult {
++    uint64_t slba;
++} NvmeZonedResult;
 +
-+struct GLUEState {
-+    SysBusDevice parent_obj;
-     M68kCPU *cpu;
-     uint8_t ipr;
--} GLUEState;
-+};
+ typedef struct QEMU_PACKED NvmeCqe {
+     uint32_t    result;
+-    uint32_t    rsvd;
++    uint32_t    dw1;
+     uint16_t    sq_head;
+     uint16_t    sq_id;
+     uint16_t    cid;
+@@ -679,6 +686,7 @@ enum NvmeStatusCodes {
+     NVME_INVALID_USE_OF_CMB     = 0x0012,
+     NVME_INVALID_PRP_OFFSET     = 0x0013,
+     NVME_CMD_SET_CMB_REJECTED   = 0x002b,
++    NVME_INVALID_CMD_SET        = 0x002c,
+     NVME_LBA_RANGE              = 0x0080,
+     NVME_CAP_EXCEEDED           = 0x0081,
+     NVME_NS_NOT_READY           = 0x0082,
+@@ -703,6 +711,14 @@ enum NvmeStatusCodes {
+     NVME_CONFLICTING_ATTRS      = 0x0180,
+     NVME_INVALID_PROT_INFO      = 0x0181,
+     NVME_WRITE_TO_RO            = 0x0182,
++    NVME_ZONE_BOUNDARY_ERROR    = 0x01b8,
++    NVME_ZONE_FULL              = 0x01b9,
++    NVME_ZONE_READ_ONLY         = 0x01ba,
++    NVME_ZONE_OFFLINE           = 0x01bb,
++    NVME_ZONE_INVALID_WRITE     = 0x01bc,
++    NVME_ZONE_TOO_MANY_ACTIVE   = 0x01bd,
++    NVME_ZONE_TOO_MANY_OPEN     = 0x01be,
++    NVME_ZONE_INVAL_TRANSITION  = 0x01bf,
+     NVME_WRITE_FAULT            = 0x0280,
+     NVME_UNRECOVERED_READ       = 0x0281,
+     NVME_E2E_GUARD_ERROR        = 0x0282,
+@@ -887,6 +903,11 @@ typedef struct QEMU_PACKED NvmeIdCtrl {
+     uint8_t     vs[1024];
+ } NvmeIdCtrl;
  
- static void GLUE_set_irq(void *opaque, int irq, int level)
++typedef struct NvmeIdCtrlZoned {
++    uint8_t     zasl;
++    uint8_t     rsvd1[4095];
++} NvmeIdCtrlZoned;
++
+ enum NvmeIdCtrlOacs {
+     NVME_OACS_SECURITY  = 1 << 0,
+     NVME_OACS_FORMAT    = 1 << 1,
+@@ -1012,6 +1033,12 @@ typedef struct QEMU_PACKED NvmeLBAF {
+     uint8_t     rp;
+ } NvmeLBAF;
+ 
++typedef struct QEMU_PACKED NvmeLBAFE {
++    uint64_t    zsze;
++    uint8_t     zdes;
++    uint8_t     rsvd9[7];
++} NvmeLBAFE;
++
+ #define NVME_NSID_BROADCAST 0xffffffff
+ 
+ typedef struct QEMU_PACKED NvmeIdNs {
+@@ -1066,10 +1093,24 @@ enum NvmeNsIdentifierType {
+ 
+ enum NvmeCsi {
+     NVME_CSI_NVM                = 0x00,
++    NVME_CSI_ZONED              = 0x02,
+ };
+ 
+ #define NVME_SET_CSI(vec, csi) (vec |= (uint8_t)(1 << (csi)))
+ 
++typedef struct QEMU_PACKED NvmeIdNsZoned {
++    uint16_t    zoc;
++    uint16_t    ozcs;
++    uint32_t    mar;
++    uint32_t    mor;
++    uint32_t    rrl;
++    uint32_t    frl;
++    uint8_t     rsvd20[2796];
++    NvmeLBAFE   lbafe[16];
++    uint8_t     rsvd3072[768];
++    uint8_t     vs[256];
++} NvmeIdNsZoned;
++
+ /*Deallocate Logical Block Features*/
+ #define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) & 0x10)
+ #define NVME_ID_NS_DLFEAT_WRITE_ZEROES(dlfeat)    ((dlfeat) & 0x08)
+@@ -1101,10 +1142,76 @@ enum NvmeIdNsDps {
+     DPS_FIRST_EIGHT = 8,
+ };
+ 
++enum NvmeZoneAttr {
++    NVME_ZA_FINISHED_BY_CTLR         = 1 << 0,
++    NVME_ZA_FINISH_RECOMMENDED       = 1 << 1,
++    NVME_ZA_RESET_RECOMMENDED        = 1 << 2,
++    NVME_ZA_ZD_EXT_VALID             = 1 << 7,
++};
++
++typedef struct QEMU_PACKED NvmeZoneReportHeader {
++    uint64_t    nr_zones;
++    uint8_t     rsvd[56];
++} NvmeZoneReportHeader;
++
++enum NvmeZoneReceiveAction {
++    NVME_ZONE_REPORT                 = 0,
++    NVME_ZONE_REPORT_EXTENDED        = 1,
++};
++
++enum NvmeZoneReportType {
++    NVME_ZONE_REPORT_ALL             = 0,
++    NVME_ZONE_REPORT_EMPTY           = 1,
++    NVME_ZONE_REPORT_IMPLICITLY_OPEN = 2,
++    NVME_ZONE_REPORT_EXPLICITLY_OPEN = 3,
++    NVME_ZONE_REPORT_CLOSED          = 4,
++    NVME_ZONE_REPORT_FULL            = 5,
++    NVME_ZONE_REPORT_READ_ONLY       = 6,
++    NVME_ZONE_REPORT_OFFLINE         = 7,
++};
++
++enum NvmeZoneType {
++    NVME_ZONE_TYPE_RESERVED          = 0x00,
++    NVME_ZONE_TYPE_SEQ_WRITE         = 0x02,
++};
++
++enum NvmeZoneSendAction {
++    NVME_ZONE_ACTION_RSD             = 0x00,
++    NVME_ZONE_ACTION_CLOSE           = 0x01,
++    NVME_ZONE_ACTION_FINISH          = 0x02,
++    NVME_ZONE_ACTION_OPEN            = 0x03,
++    NVME_ZONE_ACTION_RESET           = 0x04,
++    NVME_ZONE_ACTION_OFFLINE         = 0x05,
++    NVME_ZONE_ACTION_SET_ZD_EXT      = 0x10,
++};
++
++typedef struct QEMU_PACKED NvmeZoneDescr {
++    uint8_t     zt;
++    uint8_t     zs;
++    uint8_t     za;
++    uint8_t     rsvd3[5];
++    uint64_t    zcap;
++    uint64_t    zslba;
++    uint64_t    wp;
++    uint8_t     rsvd32[32];
++} NvmeZoneDescr;
++
++enum NvmeZoneState {
++    NVME_ZONE_STATE_RESERVED         = 0x00,
++    NVME_ZONE_STATE_EMPTY            = 0x01,
++    NVME_ZONE_STATE_IMPLICITLY_OPEN  = 0x02,
++    NVME_ZONE_STATE_EXPLICITLY_OPEN  = 0x03,
++    NVME_ZONE_STATE_CLOSED           = 0x04,
++    NVME_ZONE_STATE_READ_ONLY        = 0x0D,
++    NVME_ZONE_STATE_FULL             = 0x0E,
++    NVME_ZONE_STATE_OFFLINE          = 0x0F,
++};
++
+ static inline void _nvme_check_size(void)
  {
-@@ -119,6 +124,58 @@ static void GLUE_set_irq(void *opaque, int irq, int level)
-     m68k_set_irq_level(s->cpu, 0, 0);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeBar) != 4096);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeAerResult) != 4);
++    QEMU_BUILD_BUG_ON(sizeof(NvmeZonedResult) != 8);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeCqe) != 16);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeDsmRange) != 16);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeCmd) != 64);
+@@ -1120,8 +1227,13 @@ static inline void _nvme_check_size(void)
+     QEMU_BUILD_BUG_ON(sizeof(NvmeSmartLog) != 512);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeEffectsLog) != 4096);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrl) != 4096);
++    QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrlZoned) != 4096);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeIdNsDescr) != 4);
++    QEMU_BUILD_BUG_ON(sizeof(NvmeLBAF) != 4);
++    QEMU_BUILD_BUG_ON(sizeof(NvmeLBAFE) != 16);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) != 4096);
++    QEMU_BUILD_BUG_ON(sizeof(NvmeIdNsZoned) != 4096);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeSglDescriptor) != 16);
++    QEMU_BUILD_BUG_ON(sizeof(NvmeZoneDescr) != 64);
  }
- 
-+static void glue_reset(DeviceState *dev)
-+{
-+    GLUEState *s = GLUE(dev);
-+
-+    s->ipr = 0;
-+}
-+
-+static const VMStateDescription vmstate_glue = {
-+    .name = "q800-glue",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(ipr, GLUEState),
-+        VMSTATE_END_OF_LIST(),
-+    },
-+};
-+
-+/*
-+ * If the m68k CPU implemented its inbound irq lines as GPIO lines
-+ * rather than via the m68k_set_irq_level() function we would not need
-+ * this cpu link property and could instead provide outbound IRQ lines
-+ * that the board could wire up to the CPU.
-+ */
-+static Property glue_properties[] = {
-+    DEFINE_PROP_LINK("cpu", GLUEState, cpu, TYPE_M68K_CPU, M68kCPU *),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void glue_init(Object *obj)
-+{
-+    DeviceState *dev = DEVICE(obj);
-+
-+    qdev_init_gpio_in(dev, GLUE_set_irq, 8);
-+}
-+
-+static void glue_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->vmsd = &vmstate_glue;
-+    dc->reset = glue_reset;
-+    device_class_set_props(dc, glue_properties);
-+}
-+
-+static const TypeInfo glue_info = {
-+    .name = TYPE_GLUE,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(GLUEState),
-+    .instance_init = glue_init,
-+    .class_init = glue_class_init,
-+};
-+
- static void main_cpu_reset(void *opaque)
- {
-     M68kCPU *cpu = opaque;
-@@ -178,8 +235,7 @@ static void q800_init(MachineState *machine)
-     SysBusDevice *sysbus;
-     BusState *adb_bus;
-     NubusBus *nubus;
--    GLUEState *irq;
--    qemu_irq *pic;
-+    DeviceState *glue;
-     DriveInfo *dinfo;
- 
-     linux_boot = (kernel_filename != NULL);
-@@ -213,10 +269,9 @@ static void q800_init(MachineState *machine)
-     }
- 
-     /* IRQ Glue */
--
--    irq = g_new0(GLUEState, 1);
--    irq->cpu = cpu;
--    pic = qemu_allocate_irqs(GLUE_set_irq, irq, 8);
-+    glue = qdev_new(TYPE_GLUE);
-+    object_property_set_link(OBJECT(glue), "cpu", OBJECT(cpu), &error_abort);
-+    sysbus_realize_and_unref(SYS_BUS_DEVICE(glue), &error_fatal);
- 
-     /* VIA */
- 
-@@ -228,8 +283,10 @@ static void q800_init(MachineState *machine)
-     sysbus = SYS_BUS_DEVICE(via_dev);
-     sysbus_realize_and_unref(sysbus, &error_fatal);
-     sysbus_mmio_map(sysbus, 0, VIA_BASE);
--    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0, pic[0]);
--    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1, pic[1]);
-+    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0,
-+                                qdev_get_gpio_in(glue, 0));
-+    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1,
-+                                qdev_get_gpio_in(glue, 1));
- 
- 
-     adb_bus = qdev_get_child_bus(via_dev, "adb.0");
-@@ -270,7 +327,7 @@ static void q800_init(MachineState *machine)
-     sysbus_realize_and_unref(sysbus, &error_fatal);
-     sysbus_mmio_map(sysbus, 0, SONIC_BASE);
-     sysbus_mmio_map(sysbus, 1, SONIC_PROM_BASE);
--    sysbus_connect_irq(sysbus, 0, pic[2]);
-+    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in(glue, 2));
- 
-     /* SCC */
- 
-@@ -292,7 +349,7 @@ static void q800_init(MachineState *machine)
-     qdev_realize_and_unref(escc_orgate, NULL, &error_fatal);
-     sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in(escc_orgate, 0));
-     sysbus_connect_irq(sysbus, 1, qdev_get_gpio_in(escc_orgate, 1));
--    qdev_connect_gpio_out(DEVICE(escc_orgate), 0, pic[3]);
-+    qdev_connect_gpio_out(DEVICE(escc_orgate), 0, qdev_get_gpio_in(glue, 3));
-     sysbus_mmio_map(sysbus, 0, SCC_BASE);
- 
-     /* SCSI */
-@@ -457,6 +514,7 @@ static const TypeInfo q800_machine_typeinfo = {
- static void q800_machine_register_types(void)
- {
-     type_register_static(&q800_machine_typeinfo);
-+    type_register_static(&glue_info);
- }
- 
- type_init(q800_machine_register_types)
+ #endif
 -- 
-2.20.1
+2.21.0
 
 
