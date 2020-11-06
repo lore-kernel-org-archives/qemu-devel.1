@@ -2,86 +2,111 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C004FC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 14:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97718C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 14:09:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F108E206A4
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 14:00:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA0C1207DE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 14:09:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RerSaBBn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F108E206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HojbH0hS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA0C1207DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kb2Hi-0004B1-8z
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 09:00:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46454)
+	id 1kb2QO-0008Ba-Il
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 09:09:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
- id 1kb2GG-0002qQ-Ut
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 08:58:40 -0500
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:43342)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
- id 1kb2GF-0002mz-7a
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 08:58:40 -0500
-Received: by mail-io1-xd43.google.com with SMTP id m9so1527010iox.10
- for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 05:58:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=wImSXZg528umXKWV8iWb3tOZ1CJF+0+nBRwHJ18ii/4=;
- b=RerSaBBnX0pVeN9H9+I09Q+OtolkUAEesW5EkNa+PW4T0vABkQn/Rgj7gbg2zsnjBF
- Z2y3Wn8Oi/JGU9Cw8eUcbr91GnTvN3iRr3fA6fMluEuiNgwveUDmqUSQxcjhkrR7bN7J
- E7uHjX2K95iNH7ax2Ymkzhz0JNkw7zcZLl+ZbmkE3z0CjXQyEGZ2hZBVVVXj/xPQiwCE
- fxh3Ps0CJFzeY5I504T0tS9Dkie82yBpBUiOoO0Lg14Hq+RzCo7e4ohzAFz0GgBUKOMr
- wwb2eaDxHbux9AvWqs6CaLELs7IblrGLeWeHROeArhlpbCUoTMLEDjbgheZf9KRfPGwq
- YMVA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb2Ph-0007eQ-6N
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 09:08:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59045)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb2Pe-0006Ii-9d
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 09:08:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604671701;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1bS11JZvYuw8fQhIRHUl4jInVsxqktGVvq+Wt24XfiM=;
+ b=HojbH0hSTiAZS4wE2bvVrpFXytWhof+RNjtvtdZ0sqyH/JNDRwcgkK1Qhkg6feCiX/8Bzc
+ ikBaAslt7gv65WwDTFm+83+NYZmKVo5YMPvt5NaLImaJjZGPclzx6TFltEu4uqMk2QBv7Z
+ mKYDvCu4D7csrxpjTLGNiuxCgTvvwtA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-537-RBrF3OozOKaad7mdgIasPw-1; Fri, 06 Nov 2020 09:08:17 -0500
+X-MC-Unique: RBrF3OozOKaad7mdgIasPw-1
+Received: by mail-wm1-f70.google.com with SMTP id z62so599219wmb.1
+ for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 06:08:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=wImSXZg528umXKWV8iWb3tOZ1CJF+0+nBRwHJ18ii/4=;
- b=fXR55BBWmXf+oNCBIbqWvdkbPxosEXNX9gALITu0beC5G7bQ2iPrcLd6TQ0tADlBna
- TtYqLc4fL37ChQS0LbCyE/ggdBur+VDNLJkOhfdLqLD6Gzf+UlDxwWpa2/nduXRsOsfd
- 82g91JXEcz1gJRnNQk5Aj3VjTAXNPy/68hXeloxlB82emfIHnJ2g9NuZCpjdhkUrGj2o
- Da4s7cOSyDDaAyX5EYTmNusSpPVZTV3hvBCRYFtdC013+ME0Tscfl6df85Dlm89jKqxF
- ilGAIvRPlU1/sMRjesl3YdldI3aPwq46W8z43t0QPcjXh7tc1mje3AAmym6jfiaXsIVv
- A6EA==
-X-Gm-Message-State: AOAM533V3Hxvy+UQuR4dlcKD1cf5iioVoTUZBVaV5+dQJjMygShqNtM+
- JfZJEDndVKQXS0rrtHJvKMP3r2nq2FhOpBs76P5x5GYG
-X-Google-Smtp-Source: ABdhPJyz0pgc/Q8sAzyTbJmzORx3pjNTR42WcY0GFxiPEI0IPq+RlPilA7d0SeCiOHoz9VygKXJVMg3ml/+1g5kk4W4=
-X-Received: by 2002:a6b:9089:: with SMTP id s131mr1549598iod.36.1604671116790; 
- Fri, 06 Nov 2020 05:58:36 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1bS11JZvYuw8fQhIRHUl4jInVsxqktGVvq+Wt24XfiM=;
+ b=C7DpMMDf/z8IGRnIMWSG+mHyxq5gIgG+asgVEFJtNZUsI+bUtu1HtSZXZKeavCH+JR
+ u4cjKlmVJ7la0qVvPb2qVAyaeivwit6C5WKP/Ab7E31/NCuMRttrEMX66iG2D57BChf7
+ Z4QMEGPFuNzJX8bAOrNkWA0PyQDRkeRKyRNVuu1cPQVdbqGnVofIhAZmdQdC95x+40n7
+ WiDgdG2J5pvm2jGIr3HRdCndOkQnALkJiWyux9FWzbbO7Fg6DTeFznSEKLfli3EDluA+
+ 5FeBNpxChRQjynOWyU+SLeCmz4cmn3gHtB6xIMBW+0synfLAmed1gBMyjuhas/Tpva71
+ 8bnw==
+X-Gm-Message-State: AOAM533dhDIEm2v3Zfe+zYzTbhPpQ27c8Lw0IqzCgzvEptly2kNSgKba
+ WvvXR2yOx42P0xNl1XwP12zUO96dHJ3czkcSeW8y/DR2vErjVAD6MJ7t8JjSN5r3OrfLbMnNVLs
+ dKuZ8gnrSzIFYjCs=
+X-Received: by 2002:adf:fd0e:: with SMTP id e14mr2805875wrr.119.1604671696760; 
+ Fri, 06 Nov 2020 06:08:16 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwissxLkze5VqyFHlFxuJVuw89BiHOEdrKz/Q4ezEp8nQiSA/7yuwGmpfFNsHUAOoH9EioDeQ==
+X-Received: by 2002:adf:fd0e:: with SMTP id e14mr2805848wrr.119.1604671696582; 
+ Fri, 06 Nov 2020 06:08:16 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id i33sm2274362wri.79.2020.11.06.06.08.14
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 06 Nov 2020 06:08:15 -0800 (PST)
+Subject: Re: [PATCH] scripts/checkpatch.pl: Modify the line length limit of
+ the code
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20201105154208.12442-1-ganqixin@huawei.com>
+ <CAFEAcA9QMBqF0Bm44q4m1d=QaPVBJodH9rwuYhGx5H6zy6ULcg@mail.gmail.com>
+ <87d00qk51l.fsf@dusky.pond.sub.org>
+ <CAFEAcA-_5vRbsi5fFpyLV2OyDX5TVrpAx7_Z43wqvb1zhQO_8w@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <37c519e4-d72b-944c-ed70-038f9c606be9@redhat.com>
+Date: Fri, 6 Nov 2020 15:08:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <20201022111302.8105-1-pankaj.gupta.linux@gmail.com>
-In-Reply-To: <20201022111302.8105-1-pankaj.gupta.linux@gmail.com>
-From: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date: Fri, 6 Nov 2020 14:58:25 +0100
-Message-ID: <CAM9Jb+izw67vqXQ-tOCuNugJeBUREopYuh0XHw5QZvKXP278fw@mail.gmail.com>
-Subject: Re: [PATCH] physmem: improve ram size error messages
-To: Qemu Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=pankaj.gupta.linux@gmail.com; helo=mail-io1-xd43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <CAFEAcA-_5vRbsi5fFpyLV2OyDX5TVrpAx7_Z43wqvb1zhQO_8w@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 07:11:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,53 +119,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Pankaj Gupta <pankaj.gupta@cloud.ionos.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Li Zhang <li.zhang@cloud.ionos.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gan Qixin <ganqixin@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Chenqun \(kuhn\)" <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping
+On 11/6/20 2:39 PM, Peter Maydell wrote:
+> On Fri, 6 Nov 2020 at 13:07, Markus Armbruster <armbru@redhat.com> wrote:
+>> The current "warn at 80, error at 90" is a compromise.  It's the result
+>> of a lengthy argument.  Why reopen it?
+> 
+> There was some previous discussion under this thread:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg05653.html
+> 
+> which I think is what prompted this patch.
 
->  Ram size mismatch condition logs below message.
->
->    "Length mismatch: pc.ram: 0x80000000 in != 0x180000000: Invalid argument"
->
->  This patch improves the readability of error messages.
->  Removed the superflous "in" and changed "Length" to "Size".
->
-> Signed-off-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-> Reported-by: Li Zhang <li.zhang@cloud.ionos.com>
-> ---
->  softmmu/physmem.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/softmmu/physmem.c b/softmmu/physmem.c
-> index e319fb2a1e..8da184f4a6 100644
-> --- a/softmmu/physmem.c
-> +++ b/softmmu/physmem.c
-> @@ -1756,15 +1756,15 @@ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
->
->      if (!(block->flags & RAM_RESIZEABLE)) {
->          error_setg_errno(errp, EINVAL,
-> -                         "Length mismatch: %s: 0x" RAM_ADDR_FMT
-> -                         " in != 0x" RAM_ADDR_FMT, block->idstr,
-> +                         "Size mismatch: %s: 0x" RAM_ADDR_FMT
-> +                         " != 0x" RAM_ADDR_FMT, block->idstr,
->                           newsize, block->used_length);
->          return -EINVAL;
->      }
->
->      if (block->max_length < newsize) {
->          error_setg_errno(errp, EINVAL,
-> -                         "Length too large: %s: 0x" RAM_ADDR_FMT
-> +                         "Size too large: %s: 0x" RAM_ADDR_FMT
->                           " > 0x" RAM_ADDR_FMT, block->idstr,
->                           newsize, block->max_length);
->          return -EINVAL;
-> --
-> 2.20.1
->
+Can we keep the error please? Maybe 132 is the next display logical
+limit once we increased the warning from 80 to 100.
+
+I understand hardware evolved, we have larger displays with better
+resolution and can fit more characters in a line.
+I am a bit wary however functions become heavier (more code into
+a single function). Maybe this checkpatch change should go with
+a another one warning when a function has more than 80 lines,
+excluding comments? (Even 80 is too much for my taste).
+
+Regards,
+
+Phil.
+
 
