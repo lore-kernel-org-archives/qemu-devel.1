@@ -2,78 +2,80 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01884C55178
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 11:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9B4C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 11:30:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3559820735
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 11:08:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88E29206B2
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 11:30:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NdygL/XG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3559820735
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d9e8ZSf/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88E29206B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kazb7-0005s5-TK
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 06:08:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57404)
+	id 1kazx4-0004yO-A2
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 06:30:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kaza5-0005Jl-N0
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 06:06:57 -0500
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:44506)
+ id 1kazwA-0004Jy-4d
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 06:29:46 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:32823)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kaza1-0006Mu-V7
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 06:06:57 -0500
-Received: by mail-ej1-x643.google.com with SMTP id o23so1322268ejn.11
- for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 03:06:50 -0800 (PST)
+ id 1kazw8-00005b-CE
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 06:29:45 -0500
+Received: by mail-wm1-x341.google.com with SMTP id p19so752807wmg.0
+ for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 03:29:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=wzNB+ZPocv9izgv7Ouydj5ESivB9v3PlCDHixLFnuFw=;
- b=NdygL/XGN3m10gVgEIHeQSmqjGw2XEJr3pMPqegqWtVhhTf2MkXRkDiC/oRJpwuwrs
- gMWYeR5BxgsTr/WWsntxQeiVVxARDRWgOiKvB4hcV5Z0oZ+gl2pCn+b5DRNQZOO+eq3I
- AXxarTODhQWdJPhHfcRnhQMHEAqwgDYd+ACAls1IgxwHQQBOnw3gWc0fGsx6Sjw+gm9D
- bZUgMqE+4gwdfDWb9Okmh1TKNpZQQJV3SblzD81/3jMz1XWjkcU6U4cD2NuuLKvRjTNT
- o9+fw1b0ke7PA/06Ln9zWLxQsuuGGf3g+AVKk8cLPStLS9C+12sPclRH+cujI9jnUwwG
- KlNA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=sBzZbxOaDzhkED96Ml51ZDDBBbPq+OYnSrAXiAMh9s8=;
+ b=d9e8ZSf/AGefJuuJ4O79zTi50Klm9dlLjQJeL89hxcdSYwBm1k+Ol5LGjADDKpYZAV
+ lAobDEMY9gnZZHcKEMNRMgjY/bxWDobMT//xt6eAeu5oKUBzcxHh/sWy11EFAu3sjtiw
+ CXY+3oQAKBLNSjL4KhN36rgAi2D18yqzFfzZlPE91OWOrtR2EHgItT4pmwgCBx+3wvlT
+ NUulEnipjTXP2M8edbW5MuNgtsrNEaTw5m4gwLpLdzbPYvDT2bu3f47wxdKTHSww2fr+
+ +0Z4CVMnEvwD5sZBEBwfwFzhCe7Td5UDX8ZdBiXJCRgeQ/R5O21Z8nr1c4X0q6SPxVpr
+ w0Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=wzNB+ZPocv9izgv7Ouydj5ESivB9v3PlCDHixLFnuFw=;
- b=MUoaeL2/GAngejK0kJXwqLoDgjWl3hb2wDtOGFekdhxmM5n1/bNAeZR998CzsREhf3
- DXtaFf1JRe1Wjxc0JsobS8bnDTDre1S2YEOiJOBTIFZp+AYhbNhHGX70PLbLq3Ytx82/
- 9WQa7QG2hMm4ekYKhr3WENEKjG3b169Nyb1ze6gwDeqkjP5AVxknuHAuAIxvaI9erAyq
- oVCAJMitPCm1HU04UdhqnUnpNIgJY/jM40G9iA9eEYyMmBw4I9UXxLn3eAv3fzkDsPxR
- Yj/sqhcNwi3VQdgOsS2t2Vf5zBJCHWDmftniQ9dkeINeyvc9iTJ+bnWe96glUz5cnfc2
- jxmA==
-X-Gm-Message-State: AOAM533ggGx30YuzsS/VHOpmoThfF3pxpm/LoHYEFYjiqOs4w8iJZafY
- NSnGWUUx3EQp2A3mGi4H4q4476zxzTy0bPeBMa3WvA==
-X-Google-Smtp-Source: ABdhPJxWPr7GuyFAJQ/616aUYX8SRB/mnXCCpp5+x+aNoevjdh+JYCas5GZ332uTeyCf0joqIWo35vQtvvTu3R+Pw0U=
-X-Received: by 2002:a17:906:7254:: with SMTP id
- n20mr1404024ejk.382.1604660809325; 
- Fri, 06 Nov 2020 03:06:49 -0800 (PST)
-MIME-Version: 1.0
-References: <20201105154208.12442-1-ganqixin@huawei.com>
-In-Reply-To: <20201105154208.12442-1-ganqixin@huawei.com>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=sBzZbxOaDzhkED96Ml51ZDDBBbPq+OYnSrAXiAMh9s8=;
+ b=dGl2ovz9AkBQEw8eWeO6F9uWHv5rOoVTJP0xuCwh57paeSb9Zpp7HNfNe1lgRHULWm
+ MFmJjpGp47TBaq+9ZkzfbC+q7cInL3YILkygyUJAh5VXQdhoJBxYGVAgU7ICfPftGmj+
+ zUwkv06ld8o8hNFeB5/gcUsnBNx9dptCdBVFt75Y4OAMGlYskPNTTEVNlfMaWy67TtGu
+ kBllLYH64QvMCz7mbRUhxvP/SnfhpJvcYz8ECcyXPK77l6shu1+CzMwO0CBprBfbJXrO
+ OHRaykkluUcjWumY3N8M/AGu2KnhGokQEIRgpVGreprWyE4TLVf80OkJZ85vDZ/GWipa
+ vVIw==
+X-Gm-Message-State: AOAM5300wwFrLK/TvSBl0OqsOvCjkd3ykFDv+CSsOx7hkcRTiqM/NReH
+ mzK/73PmDeQCGn75rCbVufWDKIjnuJBJaw==
+X-Google-Smtp-Source: ABdhPJxWrkxCRFfga7ylwsyuh8c94BLbuiBI8XVFpfKfrFo/f8JVwa4eYVmhEnBiRptbZMd2ILQ6pg==
+X-Received: by 2002:a1c:4302:: with SMTP id q2mr2047297wma.182.1604662182672; 
+ Fri, 06 Nov 2020 03:29:42 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id h128sm2019919wme.38.2020.11.06.03.29.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Nov 2020 03:29:42 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Nov 2020 11:06:37 +0000
-Message-ID: <CAFEAcA9QMBqF0Bm44q4m1d=QaPVBJodH9rwuYhGx5H6zy6ULcg@mail.gmail.com>
-Subject: Re: [PATCH] scripts/checkpatch.pl: Modify the line length limit of
- the code
-To: Gan Qixin <ganqixin@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH] CODING_STYLE.rst: Be less strict about 80 character limit
+Date: Fri,  6 Nov 2020 11:29:40 +0000
+Message-Id: <20201106112940.31300-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -82,7 +84,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,38 +99,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "Daniel P. Berrange" <berrange@redhat.com>,
  zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Chenqun \(kuhn\)" <kuhn.chenqun@huawei.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+ Gan Qixin <ganqixin@huawei.com>, "Chenqun \(kuhn\)" <kuhn.chenqun@huawei.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Nov 2020 at 06:15, Gan Qixin <ganqixin@huawei.com> wrote:
->
-> Modify the rule that limit the length of lines according to the following ideas:
->
-> --add a variable max_line_length to indicate the limit of line length and set it to 100 by default
-> --when the line length exceeds max_line_length, output warning information instead of error
-> --if/while/etc brace do not go on next line whether the line length exceeds max_line_length or not
->
-> Signed-off-by: Gan Qixin <ganqixin@huawei.com>
-> ---
->  scripts/checkpatch.pl | 18 +++++-------------
->  1 file changed, 5 insertions(+), 13 deletions(-)
+Relax the wording about line lengths a little bit; this goes with the
+checkpatch changes to warn at 100 characters rather than 80.
 
-For the code changes
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+(Compare the Linux kernel commit bdc48fa11e46f8; our coding style is
+not theirs, but the rationale is good and applies to us too.)
 
-but we also need to update our coding style documentation
-to match. I'll send out a patch with some proposed text.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ CODING_STYLE.rst | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Side note: the kernel version of this checkpatch change
-(kernel commit bdc48fa11e46f867) suppresses all line-length
-warnings for the "--file" use case. Do we care about that?
+diff --git a/CODING_STYLE.rst b/CODING_STYLE.rst
+index 8b13ef0669e..7bf4e39d487 100644
+--- a/CODING_STYLE.rst
++++ b/CODING_STYLE.rst
+@@ -85,8 +85,13 @@ Line width
+ Lines should be 80 characters; try not to make them longer.
+ 
+ Sometimes it is hard to do, especially when dealing with QEMU subsystems
+-that use long function or symbol names.  Even in that case, do not make
+-lines much longer than 80 characters.
++that use long function or symbol names. If wrapping the line at 80 columns
++is obviously less readable and more awkward, prefer not to wrap it; better
++to have an 85 character line than one which is awkwardly wrapped.
++
++Even in that case, try not to make lines much longer than 80 characters.
++(The checkpatch script will warn at 100 characters, but this is intended
++as a guard against obviously-overlength lines, not a target.)
+ 
+ Rationale:
+ 
+-- 
+2.20.1
 
-thanks
--- PMM
 
