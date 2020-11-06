@@ -2,109 +2,98 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5670C5517A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 16:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CC4C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 17:06:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30D2122228
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 16:58:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF89520720
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 17:06:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ScEyMppX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D2122228
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZUZGATL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF89520720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kb548-0006oS-VA
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 11:58:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58948)
+	id 1kb5Bo-0004Ma-KG
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 12:06:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb53F-0006MB-No
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 11:57:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23567)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb59u-00031V-Bz
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 12:04:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46932)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb53C-0008I9-J6
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 11:57:25 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb59s-0001zH-O7
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 12:04:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604681840;
+ s=mimecast20190719; t=1604682256;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1E0QBKESAHXJzxchxF7cJTnMe/DpdidM6SoHtjCqA8E=;
- b=ScEyMppX3CbGxGcYOWLQw9prD7RA+qC/83qBAAe2COUKG44Nmt/Gld6rzIqJo8zKblwIM0
- E6Z8hAwiZElvCKuHBrcHnbOpt5dctevS5nYD0xxbPkhOc5Tzj2zJfBK7WJWW9xhEXZUBO3
- 2bblIcxHy1eSEXF3E+6gRsO1vp/bxX4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-xIED1Kq1NI-fFcdwiPVBhw-1; Fri, 06 Nov 2020 11:57:19 -0500
-X-MC-Unique: xIED1Kq1NI-fFcdwiPVBhw-1
-Received: by mail-wm1-f71.google.com with SMTP id 8so653134wmg.6
- for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 08:57:18 -0800 (PST)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=7AwrTJUuq41/XCYK+7UGABhog2BUpWFpH3S0s5kN6W4=;
+ b=XZUZGATLmRUoarq+R4o/vPpQWbF2pJOYMOtx+JFDUMlwgua76rSujRT3MG++8wm1CcfzQ8
+ ih3qM8CkuycD77p8bUTlaqaD4U4w1xkL4geG5TW24SamddMChWKb5wXSYN5jqBoGp9mgKd
+ X6wpws9sKam26v3RRWnfenN4h+hv8xw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-hotfSxX0PIKOllj05ubaUQ-1; Fri, 06 Nov 2020 12:04:13 -0500
+X-MC-Unique: hotfSxX0PIKOllj05ubaUQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 3so674631wms.9
+ for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 09:04:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=1E0QBKESAHXJzxchxF7cJTnMe/DpdidM6SoHtjCqA8E=;
- b=PFIlwAncQxuDLZssrWlGCxfR3rQxo0d2WLtrXAfYxZrsXsukriCZtH4Fo0IdrQXD4O
- 3PR0DEdjCZJUNgAEhgwkpAKj9Bh2dVgB+JsHN7XtXWNYNccBR9rMbxQlX7lu9nbxGubT
- YF6z5181+jH5aD93ogIRntO4Wv7P8+bmj6nWQF5ws86NIuawGsOidzr+wTNaIGle8zm0
- Gzf94RMEIJEANfTVaNAC6jijVyGIbvrL+HEMi5hflQvVDqA+rdg3ONPn1Er6bpwqmc1l
- uDIUKPgjnmZNVkFyGCGTtMX+OioATAhyJdqbSntj6UT6VufmQJYy81imQGXaalDk5xaK
- O9Dg==
-X-Gm-Message-State: AOAM531s1otpqnBLpGJO8UWqBJEaWLf6THJgDjRpIbSrVVtWDctwlxvp
- fjaTSchCZ3Zu7gx7cyAe/axaeZdqjo2p9nTZazeZOcCcGajofi3K5T/sCkjjiTdDuTHTkMRuEez
- tdUONHjcNmVIEqcc=
-X-Received: by 2002:a7b:cc05:: with SMTP id f5mr492775wmh.123.1604681837937;
- Fri, 06 Nov 2020 08:57:17 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwsJxiQ6RxKIfOkBARItaBCNbS/Dbbh1ZPN/ehibKZNprY6iSnE3+JfM3kiXWl2s9irm5DU2Q==
-X-Received: by 2002:a7b:cc05:: with SMTP id f5mr492759wmh.123.1604681837756;
- Fri, 06 Nov 2020 08:57:17 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ bh=EbJkJ95FxPswVXG1ztV9sKjvQN1FMmoVTHeFp9snjqk=;
+ b=ohKRR1+Aj35douPADgg4JfIFKOLYhvMq0ik/B8nysWvO0wo5ObqqnkuU/2giTCZpWM
+ eHhOfCCW6jkDLYaQeVXTreZwLx6HvwrtjXhGciXTW9QULFbfkPdahVcCEWXzkwISWw5a
+ WVgVkXV//4coD9jBur7Xk1TGhSUfxitq0dI3RkZkcBqg8TTvfQ5/XGHBiJ9R/zpbiTNm
+ prRzSzxRu9cOO5P+4hFjLEKkF1YhsyMo0RQpqq9jBZ63rmjq3VXz7HInESFKCVbCUxBx
+ FjnngZXrMsEsq+ZgXnHTVgMbXSIfQ41Zu3Yx8KiPhmOu5EobX0V8ehUJwM57TaFUN0o3
+ ci2Q==
+X-Gm-Message-State: AOAM5301pZsZkpLLYmYXTd4r9JkjqiDTzyXyZEuWV0jFCMhoSpgWnoe6
+ YiG5b6mOfaiSCkioh4pen6o+ImgaGBtBoatuNEe1WcriE/+N0fpmNRvxXmz58X23P/641E3Q9oD
+ 38wJZFAuEQKNnn7I=
+X-Received: by 2002:adf:9e4c:: with SMTP id v12mr3601448wre.22.1604682251861; 
+ Fri, 06 Nov 2020 09:04:11 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxin7zoiwQLwLc3jCv5l0D02DkvnSTIhhmFvlfsktMjWYTB3ZNEmt6ZOI0/EiwBz+uwgafbFA==
+X-Received: by 2002:adf:9e4c:: with SMTP id v12mr3601421wre.22.1604682251640; 
+ Fri, 06 Nov 2020 09:04:11 -0800 (PST)
+Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id n22sm2955211wmk.40.2020.11.06.08.57.16
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 06 Nov 2020 08:57:16 -0800 (PST)
-Subject: Re: [PATCH 1/1] Change the order of g_free(info) and tracepoint
-To: David Edmondson <dme@dme.org>, Kirti Wankhede <kwankhede@nvidia.com>,
- alex.williamson@redhat.com, cjia@nvidia.com
-References: <1604669964-27222-1-git-send-email-kwankhede@nvidia.com>
- <cunr1p6tr1h.fsf@zarquon.hh.sledj.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5eccaf99-3fad-f24a-6cbb-439ac83c34b2@redhat.com>
-Date: Fri, 6 Nov 2020 17:57:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ by smtp.gmail.com with ESMTPSA id t15sm3099502wmn.19.2020.11.06.09.04.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Nov 2020 09:04:10 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-6.0 0/2] hw/scsi/scsi-disk: QOM style change
+Date: Fri,  6 Nov 2020 18:04:02 +0100
+Message-Id: <20201106170404.4130486-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <cunr1p6tr1h.fsf@zarquon.hh.sledj.net>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 07:11:31
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 06:30:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,53 +106,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mcrossley@nvidia.com, qemu-devel@nongnu.org, dnigam@nvidia.com
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/6/20 4:59 PM, David Edmondson wrote:
-> On Friday, 2020-11-06 at 19:09:24 +0530, Kirti Wankhede wrote:
-> 
->> Fixes Coverity issue:
->> CID 1436126:  Memory - illegal accesses  (USE_AFTER_FREE)
->>
->> Fixes: a9e271ec9b36 ("vfio: Add migration region initialization and finalize
->> function")
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> 
-> Maybe "fix use after free in vfio_migration_probe" as a summary?
-
-Yes please :)
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> 
-> Reviewed-by: David Edmondson <dme@dme.org>
-> 
->> ---
->>  hw/vfio/migration.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
->> index 3ce285ea395d..55261562d4f3 100644
->> --- a/hw/vfio/migration.c
->> +++ b/hw/vfio/migration.c
->> @@ -897,8 +897,8 @@ int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
->>          goto add_blocker;
->>      }
->>  
->> -    g_free(info);
->>      trace_vfio_migration_probe(vbasedev->name, info->index);
->> +    g_free(info);
->>      return 0;
->>  
->>  add_blocker:
->> -- 
->> 2.7.0
-> 
-> dme.
-> 
+Some QOM style changes in TYPE_SCSI_DISK to follow=0D
+the rest of the codebase style. No logical change.=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (2):=0D
+  hw/scsi/scsi-disk: Rename type as TYPE_SCSI_DISK=0D
+  hw/scsi/scsi-disk: Use SCSI_DISK_GET_CLASS() macro=0D
+=0D
+ hw/scsi/scsi-disk.c | 26 +++++++++++++-------------=0D
+ 1 file changed, 13 insertions(+), 13 deletions(-)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
