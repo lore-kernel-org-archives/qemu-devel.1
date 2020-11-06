@@ -2,73 +2,89 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1959C5517A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 04:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EDE6C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 04:02:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17EF3206F7
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 04:02:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17EF3206F7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 90B6F206F7
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 04:02:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jL2nIjO5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B6F206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kasx3-0003F3-SO
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 23:02:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52900)
+	id 1kasxD-0003Yd-Iu
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 23:02:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kasw3-0002Cu-Iy
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 23:01:11 -0500
-Resent-Date: Thu, 05 Nov 2020 23:01:11 -0500
-Resent-Message-Id: <E1kasw3-0002Cu-Iy@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21307)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kasvy-0007t1-Bh
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 23:01:11 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1604635259; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=JKKF2GJ/vGEgMca4UIE6ILNbi38LcmPfCvc94h+J3xRabgXvKBVSsda71EZRpUv4knkeon192YboVehElaJeR3CvWy2uEXNpL09V4cJT2cv/hmGuenutj4OOt2/O5MYhGFqgdcs2jEOzAq3h+nu4vd1dcJ2q2TyP6W0RvyfEX44=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1604635259;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=97mWR9tY/9Yus0gUVn2O1CVi+ahsxZb5Q/GVwxqQu4Y=; 
- b=KBYJF9jKHw9jOAwJPMW1eF1lxOck6bu+l90Jpsf05gWo2HDb8m9LLy7wXnjuvLDUeDp+uT7op8YYXvLIzlP0HsKRrY39tzRjuuOaSIJP69BpkUFOXoJ8qMy3lT7qHjGaa2kTN2Lnn/GaZDkI4sXh1eJpmvD81q7qRY73NHOcB3g=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1604635257959512.7318549936972;
- Thu, 5 Nov 2020 20:00:57 -0800 (PST)
-Subject: Re: [PATCH v3 00/41] Mirror map JIT memory for TCG
-Message-ID: <160463525675.7648.9261494423817229217@66eaa9a8a123>
-In-Reply-To: <20201106032921.600200-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Thu, 5 Nov 2020 20:00:57 -0800 (PST)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/05 23:01:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <msys.mizuma@gmail.com>)
+ id 1kaswA-0002Ga-8s
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 23:01:18 -0500
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:41993)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <msys.mizuma@gmail.com>)
+ id 1kasw8-0007wW-8c
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 23:01:17 -0500
+Received: by mail-qk1-x744.google.com with SMTP id b18so29546qkc.9
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 20:01:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=dN49RDrUvHwzDJ64CxwS9xQyMDw5g3qF6XQbqCTinsY=;
+ b=jL2nIjO5hVcWoFolqkzlXg4WBxrqkIQbTNqC0F9II+/jJ9Z+q6S9SZGo8hSJQmd9xg
+ oAh2LT09ecukCo9OCoLF2jhg6UqZSdUl6goaMmJhYACCOfy4Gp+PVoVQ+wtFO/Gz0eO0
+ QjBWrB6nY1//TrUP2ejfG2X/cx46xvYLVgIxG3YtJhFmACkwJN76MsEXDInQP4nbH3iP
+ Yyc6J2ufmkdaUmf/f78+b2M0C4mI6TvFakSRoSXhyLnZPQElS2GnAj/S8veD5ExvqsMb
+ 0DzhQ1P9sS97ehM4DRo4d+tnJ9Z077q1u8pGV71y4Ap1sX0UhT+p5b6xe8xof649IlnO
+ /pFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=dN49RDrUvHwzDJ64CxwS9xQyMDw5g3qF6XQbqCTinsY=;
+ b=OfpqamCT65U2ify1fIfqc49AdRZ7P10xkD+GBlnX8Y3KGd9tQbOGAqJLc8z/d9AnN7
+ pWqeQunDObW3w5zG2t2hv98+zs9ZAqWb7ekPnibcIlLayY+dykKgtJarm+Oknyd0N3Ch
+ PFc90PeP3GuQRO0ZTiSeLY6YbHsciabga84GleSTQVJMiUrzOEORgm24xVI/nuT6JjiY
+ DPlX8/vZB71DuFgRd801ZfT9WQ7IZt8uJx5BDV6iD51z0b/FRjJLcYRVSC6daaIHvSfu
+ /mShqPt8A94zOhSruV4HA5zkiM8G1wdvrJ3CTJP1J7jZWatMwR7Tc49ne7npsebuzfo5
+ sVRQ==
+X-Gm-Message-State: AOAM5325EEKY2Qx/kvi26bGtSIZyauABUiKr0nId++mxwcOKBz/iOjep
+ cx/T8Stb16zMUMc/+NwkqrC//dJCsQ==
+X-Google-Smtp-Source: ABdhPJwXw7gKcTstkoyRL6GZcmfslMuQmjk5sHkNuEJQGO8qaGtceJ9CvOcm+7hTdJYrdBHmf1IyWA==
+X-Received: by 2002:a05:620a:20d8:: with SMTP id
+ f24mr5162466qka.69.1604635274039; 
+ Thu, 05 Nov 2020 20:01:14 -0800 (PST)
+Received: from localhost
+ (209-6-122-159.s2973.c3-0.arl-cbr1.sbo-arl.ma.cable.rcncustomer.com.
+ [209.6.122.159])
+ by smtp.gmail.com with ESMTPSA id q28sm6640qkn.39.2020.11.05.20.01.13
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 05 Nov 2020 20:01:13 -0800 (PST)
+From: Masayoshi Mizuma <msys.mizuma@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/2] file-posix: Use OFD lock only if the filesystem supports
+ the lock
+Date: Thu,  5 Nov 2020 23:01:01 -0500
+Message-Id: <20201106040102.13892-1-msys.mizuma@gmail.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2607:f8b0:4864:20::744;
+ envelope-from=msys.mizuma@gmail.com; helo=mail-qk1-x744.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,139 +98,324 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, j@getutm.app
+Cc: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>,
+ Masayoshi Mizuma <msys.mizuma@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTEwNjAzMjkyMS42MDAy
-MDAtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
-ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
-Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDExMDYw
-MzI5MjEuNjAwMjAwLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTdWJqZWN0OiBbUEFU
-Q0ggdjMgMDAvNDFdIE1pcnJvciBtYXAgSklUIG1lbW9yeSBmb3IgVENHCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
-fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAxMTA2MDMyOTIxLjYwMDIwMC0x
-LXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDIwMTEwNjAzMjkyMS42
-MDAyMDAtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKMTcwZjMxMCB0Y2c6IENvbnN0aWZ5IFRDR0xhYmVsUWVtdUxkc3QucmFkZHIK
-YzMzNjQ5NCB0Y2c6IENvbnN0aWZ5IHRjZ19jb2RlX2dlbl9lcGlsb2d1ZQphMDA5ZTk5IHRjZzog
-UmVtb3ZlIFRDR19UQVJHRVRfU1VQUE9SVF9NSVJST1IKNTQ1ZmViNyB0Y2cvYXJtOiBTdXBwb3J0
-IHNwbGl0LXd4IGNvZGUgZ2VuZXJhdGlvbgphODczYzYxIHRjZy9taXBzOiBTdXBwb3J0IHNwbGl0
-LXd4IGNvZGUgZ2VuZXJhdGlvbgo3ZjEyZDQwIHRjZy9taXBzOiBEbyBub3QgYXNzZXJ0IG9uIHJl
-bG9jYXRpb24gb3ZlcmZsb3cKMjAwZWNiMyBhY2NlbC90Y2c6IEFkZCBtaXBzIHN1cHBvcnQgdG8g
-YWxsb2NfY29kZV9nZW5fYnVmZmVyX3NwbGl0d3hfbWVtZmQKZWRkNzJkYiB0Y2cvcmlzY3Y6IFN1
-cHBvcnQgc3BsaXQtd3ggY29kZSBnZW5lcmF0aW9uCjFjNjc2NGQgdGNnL3Jpc2N2OiBSZW1vdmUg
-YnJhbmNoLW92ZXItYnJhbmNoIGZhbGxiYWNrCjYzODgzZmMgdGNnL3Jpc2N2OiBGaXggYnJhbmNo
-IHJhbmdlIGNoZWNrcwpkZmYzNGUwIHRjZy9zMzkwOiBTdXBwb3J0IHNwbGl0LXd4IGNvZGUgZ2Vu
-ZXJhdGlvbgo4ZDg4ODc5IHRjZy9zMzkwOiBVc2UgdGNnX3RicmVsX2RpZmYKZjBmZWE2MyB0Y2cv
-c3BhcmM6IFN1cHBvcnQgc3BsaXQtd3ggY29kZSBnZW5lcmF0aW9uCjVhODM3YTMgdGNnL3NwYXJj
-OiBVc2UgdGNnX3RicmVsX2RpZmYKNjg0YzI4MSB0Y2cvcHBjOiBTdXBwb3J0IHNwbGl0LXd4IGNv
-ZGUgZ2VuZXJhdGlvbgphMjU0YmZkIHRjZy9wcGM6IFVzZSB0Y2dfb3V0X21lbV9sb25nIHRvIHJl
-c2V0IFRDR19SRUdfVEIKNGM0ZjY0NyB0Y2cvcHBjOiBVc2UgdGNnX3RicmVsX2RpZmYKNWY4MWYw
-ZSB0Y2c6IEludHJvZHVjZSB0Y2dfdGJyZWxfZGlmZgoxY2FiNDE4IHRjZy90Y2k6IFB1c2ggY29u
-c3QgZG93biB0aHJvdWdoIGJ5dGVjb2RlIHJlYWRpbmcKYzU1YThjMCBkaXNhczogUHVzaCBjb25z
-dCBkb3duIHRocm91Z2ggaG9zdCBkaXNhc2Fzc2VtYmx5CjU1YjkyNmMgdGNnL2FhcmNoNjQ6IFN1
-cHBvcnQgc3BsaXQtd3ggY29kZSBnZW5lcmF0aW9uCmFlZjcxYjQgdGNnL2FhcmNoNjQ6IEltcGxl
-bWVudCBmbHVzaF9pZGNhY2hlX3JhbmdlIG1hbnVhbGx5CjU0OGZjNzkgdGNnL2FhcmNoNjQ6IFVz
-ZSBCIG5vdCBCTCBmb3IgdGNnX291dF9nb3RvX2xvbmcKNmNiZDIyYSB0Y2cvaTM4NjogU3VwcG9y
-dCBzcGxpdC13eCBjb2RlIGdlbmVyYXRpb24KZmUzNmNhZCB0Y2c6IFJldHVybiB0aGUgVEIgcG9p
-bnRlciBmcm9tIHRoZSByeCByZWdpb24gZnJvbSBleGl0X3RiCmVmOTZhMTAgYWNjZWwvdGNnOiBT
-dXBwb3J0IHNwbGl0LXd4IGZvciBkYXJ3aW4vaU9TIHdpdGggdm1fcmVtYXAKZmVkNWUxOSBhY2Nl
-bC90Y2c6IFN1cHBvcnQgc3BsaXQtd3ggZm9yIGxpbnV4IHdpdGggbWVtZmQKY2FhZjY0NSB0Y2c6
-IEFkZCAtLWFjY2VsIHRjZyxzcGxpdC13eCBwcm9wZXJ0eQpmOTNhZTIyIHRjZzogVXNlIEVycm9y
-IHdpdGggYWxsb2NfY29kZV9nZW5fYnVmZmVyCmI2OTkyYjUgdGNnOiBNYWtlIHRiIGFyZyB0byBz
-eW5jaHJvbml6ZV9mcm9tX3RiIGNvbnN0CjA0Mzk3M2IgdGNnOiBNYWtlIERpc2FzQ29udGV4dEJh
-c2UudGIgY29uc3QKMWQ4MzQ4NiB0Y2c6IEFkanVzdCB0Yl90YXJnZXRfc2V0X2ptcF90YXJnZXQg
-Zm9yIHNwbGl0LXd4CmVlYzE4YTYgdGNnOiBBZGp1c3QgdGNnX3JlZ2lzdGVyX2ppdCBmb3IgY29u
-c3QKNjVlNzZiOSB0Y2c6IEFkanVzdCB0Y2dfb3V0X2xhYmVsIGZvciBjb25zdAo0NDk3NWE5IHRj
-ZzogQWRqdXN0IHRjZ19vdXRfY2FsbCBmb3IgY29uc3QKYzNlMWU1ZCB0Y2c6IEFkanVzdCBUQ0dM
-YWJlbCBmb3IgY29uc3QKNzJhYzIxZSB0Y2c6IEludHJvZHVjZSB0Y2dfc3BsaXR3eF90b197cngs
-cnd9CjNlMzIyZGEgdGNnOiBBZGQgaW5fY29kZV9nZW5fYnVmZmVyCmNjYjBjNDggdGNnOiBNb3Zl
-IHRjZyBlcGlsb2d1ZSBwb2ludGVyIG91dCBvZiBUQ0dDb250ZXh0CjA5ZWY4MDggdGNnOiBNb3Zl
-IHRjZyBwcm9sb2d1ZSBwb2ludGVyIG91dCBvZiBUQ0dDb250ZXh0CmU0ODhlNTggdGNnOiBFbmhh
-bmNlIGZsdXNoX2ljYWNoZV9yYW5nZSB3aXRoIHNlcGFyYXRlIGRhdGEgcG9pbnRlcgoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KMS80MSBDaGVja2luZyBjb21taXQgZTQ4OGU1ODA5NmY5ICh0Y2c6IEVu
-aGFuY2UgZmx1c2hfaWNhY2hlX3JhbmdlIHdpdGggc2VwYXJhdGUgZGF0YSBwb2ludGVyKQoyLzQx
-IENoZWNraW5nIGNvbW1pdCAwOWVmODA4MmNlN2YgKHRjZzogTW92ZSB0Y2cgcHJvbG9ndWUgcG9p
-bnRlciBvdXQgb2YgVENHQ29udGV4dCkKMy80MSBDaGVja2luZyBjb21taXQgY2NiMGM0ODJiZjNl
-ICh0Y2c6IE1vdmUgdGNnIGVwaWxvZ3VlIHBvaW50ZXIgb3V0IG9mIFRDR0NvbnRleHQpCjQvNDEg
-Q2hlY2tpbmcgY29tbWl0IDNlMzIyZGE1ZGU4OSAodGNnOiBBZGQgaW5fY29kZV9nZW5fYnVmZmVy
-KQo1LzQxIENoZWNraW5nIGNvbW1pdCA3MmFjMjFlMjcxMDMgKHRjZzogSW50cm9kdWNlIHRjZ19z
-cGxpdHd4X3RvX3tyeCxyd30pCjYvNDEgQ2hlY2tpbmcgY29tbWl0IGMzZTFlNWQzYTQ3MCAodGNn
-OiBBZGp1c3QgVENHTGFiZWwgZm9yIGNvbnN0KQo3LzQxIENoZWNraW5nIGNvbW1pdCA0NDk3NWE5
-Y2JiMDIgKHRjZzogQWRqdXN0IHRjZ19vdXRfY2FsbCBmb3IgY29uc3QpCjgvNDEgQ2hlY2tpbmcg
-Y29tbWl0IDY1ZTc2Yjk1YTAyOSAodGNnOiBBZGp1c3QgdGNnX291dF9sYWJlbCBmb3IgY29uc3Qp
-CjkvNDEgQ2hlY2tpbmcgY29tbWl0IGVlYzE4YTYwNzkwMyAodGNnOiBBZGp1c3QgdGNnX3JlZ2lz
-dGVyX2ppdCBmb3IgY29uc3QpCjEwLzQxIENoZWNraW5nIGNvbW1pdCAxZDgzNDg2ZWUxODAgKHRj
-ZzogQWRqdXN0IHRiX3RhcmdldF9zZXRfam1wX3RhcmdldCBmb3Igc3BsaXQtd3gpCjExLzQxIENo
-ZWNraW5nIGNvbW1pdCAwNDM5NzNiMjcyYjEgKHRjZzogTWFrZSBEaXNhc0NvbnRleHRCYXNlLnRi
-IGNvbnN0KQoxMi80MSBDaGVja2luZyBjb21taXQgYjY5OTJiNTc5NTcwICh0Y2c6IE1ha2UgdGIg
-YXJnIHRvIHN5bmNocm9uaXplX2Zyb21fdGIgY29uc3QpCjEzLzQxIENoZWNraW5nIGNvbW1pdCBm
-OTNhZTIyNjcwOTIgKHRjZzogVXNlIEVycm9yIHdpdGggYWxsb2NfY29kZV9nZW5fYnVmZmVyKQox
-NC80MSBDaGVja2luZyBjb21taXQgY2FhZjY0NWVjNTc0ICh0Y2c6IEFkZCAtLWFjY2VsIHRjZyxz
-cGxpdC13eCBwcm9wZXJ0eSkKMTUvNDEgQ2hlY2tpbmcgY29tbWl0IGZlZDVlMTliM2MwYyAoYWNj
-ZWwvdGNnOiBTdXBwb3J0IHNwbGl0LXd4IGZvciBsaW51eCB3aXRoIG1lbWZkKQoxNi80MSBDaGVj
-a2luZyBjb21taXQgZWY5NmExMDQ4MGM3IChhY2NlbC90Y2c6IFN1cHBvcnQgc3BsaXQtd3ggZm9y
-IGRhcndpbi9pT1Mgd2l0aCB2bV9yZW1hcCkKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lk
-ZWQgaW4gLmMgZmlsZXMKIzI0OiBGSUxFOiBhY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5jOjExNzI6
-CitleHRlcm4ga2Vybl9yZXR1cm5fdCBtYWNoX3ZtX3JlbWFwKHZtX21hcF90IHRhcmdldF90YXNr
-LAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAx
-Ni80MSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTcvNDEgQ2hlY2tpbmcgY29tbWl0IGZl
-MzZjYWQ4YmY3ZCAodGNnOiBSZXR1cm4gdGhlIFRCIHBvaW50ZXIgZnJvbSB0aGUgcnggcmVnaW9u
-IGZyb20gZXhpdF90YikKMTgvNDEgQ2hlY2tpbmcgY29tbWl0IDZjYmQyMmFmNDFhYSAodGNnL2kz
-ODY6IFN1cHBvcnQgc3BsaXQtd3ggY29kZSBnZW5lcmF0aW9uKQoxOS80MSBDaGVja2luZyBjb21t
-aXQgNTQ4ZmM3OTc1Y2M0ICh0Y2cvYWFyY2g2NDogVXNlIEIgbm90IEJMIGZvciB0Y2dfb3V0X2dv
-dG9fbG9uZykKMjAvNDEgQ2hlY2tpbmcgY29tbWl0IGFlZjcxYjQ0MmQ0MSAodGNnL2FhcmNoNjQ6
-IEltcGxlbWVudCBmbHVzaF9pZGNhY2hlX3JhbmdlIG1hbnVhbGx5KQoyMS80MSBDaGVja2luZyBj
-b21taXQgNTViOTI2YzU3YTFiICh0Y2cvYWFyY2g2NDogU3VwcG9ydCBzcGxpdC13eCBjb2RlIGdl
-bmVyYXRpb24pCjIyLzQxIENoZWNraW5nIGNvbW1pdCBjNTVhOGMwYzQ4OWQgKGRpc2FzOiBQdXNo
-IGNvbnN0IGRvd24gdGhyb3VnaCBob3N0IGRpc2FzYXNzZW1ibHkpCjIzLzQxIENoZWNraW5nIGNv
-bW1pdCAxY2FiNDE4MmZiMGUgKHRjZy90Y2k6IFB1c2ggY29uc3QgZG93biB0aHJvdWdoIGJ5dGVj
-b2RlIHJlYWRpbmcpCjI0LzQxIENoZWNraW5nIGNvbW1pdCA1ZjgxZjBlMDA3ZDkgKHRjZzogSW50
-cm9kdWNlIHRjZ190YnJlbF9kaWZmKQoyNS80MSBDaGVja2luZyBjb21taXQgNGM0ZjY0N2NjZTdi
-ICh0Y2cvcHBjOiBVc2UgdGNnX3RicmVsX2RpZmYpCjI2LzQxIENoZWNraW5nIGNvbW1pdCBhMjU0
-YmZkZGRhZjIgKHRjZy9wcGM6IFVzZSB0Y2dfb3V0X21lbV9sb25nIHRvIHJlc2V0IFRDR19SRUdf
-VEIpCjI3LzQxIENoZWNraW5nIGNvbW1pdCA2ODRjMjgxYWEyMjggKHRjZy9wcGM6IFN1cHBvcnQg
-c3BsaXQtd3ggY29kZSBnZW5lcmF0aW9uKQoyOC80MSBDaGVja2luZyBjb21taXQgNWE4MzdhMzg3
-OWZlICh0Y2cvc3BhcmM6IFVzZSB0Y2dfdGJyZWxfZGlmZikKMjkvNDEgQ2hlY2tpbmcgY29tbWl0
-IGYwZmVhNjM3N2IwMCAodGNnL3NwYXJjOiBTdXBwb3J0IHNwbGl0LXd4IGNvZGUgZ2VuZXJhdGlv
-bikKMzAvNDEgQ2hlY2tpbmcgY29tbWl0IDhkODg4Nzk0OTViNiAodGNnL3MzOTA6IFVzZSB0Y2df
-dGJyZWxfZGlmZikKMzEvNDEgQ2hlY2tpbmcgY29tbWl0IGRmZjM0ZTA2ZGQ5MSAodGNnL3MzOTA6
-IFN1cHBvcnQgc3BsaXQtd3ggY29kZSBnZW5lcmF0aW9uKQozMi80MSBDaGVja2luZyBjb21taXQg
-NjM4ODNmY2M0MDE1ICh0Y2cvcmlzY3Y6IEZpeCBicmFuY2ggcmFuZ2UgY2hlY2tzKQozMy80MSBD
-aGVja2luZyBjb21taXQgMWM2NzY0ZGU2Y2RhICh0Y2cvcmlzY3Y6IFJlbW92ZSBicmFuY2gtb3Zl
-ci1icmFuY2ggZmFsbGJhY2spCjM0LzQxIENoZWNraW5nIGNvbW1pdCBlZGQ3MmRiNzA3Y2EgKHRj
-Zy9yaXNjdjogU3VwcG9ydCBzcGxpdC13eCBjb2RlIGdlbmVyYXRpb24pCjM1LzQxIENoZWNraW5n
-IGNvbW1pdCAyMDBlY2IzZDc1MGYgKGFjY2VsL3RjZzogQWRkIG1pcHMgc3VwcG9ydCB0byBhbGxv
-Y19jb2RlX2dlbl9idWZmZXJfc3BsaXR3eF9tZW1mZCkKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNw
-ZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzI1OiBGSUxFOiBhY2NlbC90Y2cvdHJh
-bnNsYXRlLWFsbC5jOjExNDM6CisjaWZkZWYgX19taXBzX18KCldBUk5JTkc6IGFyY2hpdGVjdHVy
-ZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM0MzogRklMRTogYWNjZWwvdGNn
-L3RyYW5zbGF0ZS1hbGwuYzoxMTYwOgorI2lmZGVmIF9fbWlwc19fCgp0b3RhbDogMCBlcnJvcnMs
-IDIgd2FybmluZ3MsIDY4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDM1LzQxIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCjM2LzQxIENoZWNraW5nIGNvbW1pdCA3ZjEyZDQwYjM0NzAgKHRjZy9taXBz
-OiBEbyBub3QgYXNzZXJ0IG9uIHJlbG9jYXRpb24gb3ZlcmZsb3cpCjM3LzQxIENoZWNraW5nIGNv
-bW1pdCBhODczYzYxMzI2MTIgKHRjZy9taXBzOiBTdXBwb3J0IHNwbGl0LXd4IGNvZGUgZ2VuZXJh
-dGlvbikKMzgvNDEgQ2hlY2tpbmcgY29tbWl0IDU0NWZlYjcwYzlhOCAodGNnL2FybTogU3VwcG9y
-dCBzcGxpdC13eCBjb2RlIGdlbmVyYXRpb24pCjM5LzQxIENoZWNraW5nIGNvbW1pdCBhMDA5ZTk5
-M2Q5NDUgKHRjZzogUmVtb3ZlIFRDR19UQVJHRVRfU1VQUE9SVF9NSVJST1IpCjQwLzQxIENoZWNr
-aW5nIGNvbW1pdCBjMzM2NDk0NDhhNjkgKHRjZzogQ29uc3RpZnkgdGNnX2NvZGVfZ2VuX2VwaWxv
-Z3VlKQo0MS80MSBDaGVja2luZyBjb21taXQgMTcwZjMxMDBmYWE0ICh0Y2c6IENvbnN0aWZ5IFRD
-R0xhYmVsUWVtdUxkc3QucmFkZHIpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
-aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
-YXRjaGV3Lm9yZy9sb2dzLzIwMjAxMTA2MDMyOTIxLjYwMDIwMC0xLXJpY2hhcmQuaGVuZGVyc29u
-QGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+
+locking=auto doesn't work if the filesystem doesn't support OFD lock.
+In that situation, following error happens:
+
+  qemu-system-x86_64: -blockdev driver=qcow2,node-name=disk,file.driver=file,file.filename=/mnt/guest.qcow2,file.locking=auto: Failed to lock byte 100
+
+qemu_probe_lock_ops() judges whether qemu can use OFD lock
+or not with doing fcntl(F_OFD_GETLK) to /dev/null. So the
+error happens if /dev/null supports OFD lock, but the filesystem
+doesn't support the lock.
+
+Lock the actual file, not /dev/null, using F_OFD_SETLK and if that
+fails, then fallback to F_SETLK.
+
+Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+---
+ block/file-posix.c   |  56 ++++++++--------
+ include/qemu/osdep.h |   2 +-
+ util/osdep.c         | 149 ++++++++++++++++++++++++++++---------------
+ 3 files changed, 125 insertions(+), 82 deletions(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index c63926d592..a568dbf125 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -584,34 +584,6 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+     s->use_linux_io_uring = (aio == BLOCKDEV_AIO_OPTIONS_IO_URING);
+ #endif
+ 
+-    locking = qapi_enum_parse(&OnOffAuto_lookup,
+-                              qemu_opt_get(opts, "locking"),
+-                              ON_OFF_AUTO_AUTO, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        ret = -EINVAL;
+-        goto fail;
+-    }
+-    switch (locking) {
+-    case ON_OFF_AUTO_ON:
+-        s->use_lock = true;
+-        if (!qemu_has_ofd_lock()) {
+-            warn_report("File lock requested but OFD locking syscall is "
+-                        "unavailable, falling back to POSIX file locks");
+-            error_printf("Due to the implementation, locks can be lost "
+-                         "unexpectedly.\n");
+-        }
+-        break;
+-    case ON_OFF_AUTO_OFF:
+-        s->use_lock = false;
+-        break;
+-    case ON_OFF_AUTO_AUTO:
+-        s->use_lock = qemu_has_ofd_lock();
+-        break;
+-    default:
+-        abort();
+-    }
+-
+     str = qemu_opt_get(opts, "pr-manager");
+     if (str) {
+         s->pr_mgr = pr_manager_lookup(str, &local_err);
+@@ -641,6 +613,34 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+     }
+     s->fd = fd;
+ 
++    locking = qapi_enum_parse(&OnOffAuto_lookup,
++                              qemu_opt_get(opts, "locking"),
++                              ON_OFF_AUTO_AUTO, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto fail;
++    }
++    switch (locking) {
++    case ON_OFF_AUTO_ON:
++        s->use_lock = true;
++        if (!qemu_has_ofd_lock(s->fd)) {
++            warn_report("File lock requested but OFD locking syscall is "
++                        "unavailable, falling back to POSIX file locks");
++            error_printf("Due to the implementation, locks can be lost "
++                         "unexpectedly.\n");
++        }
++        break;
++    case ON_OFF_AUTO_OFF:
++        s->use_lock = false;
++        break;
++    case ON_OFF_AUTO_AUTO:
++        s->use_lock = qemu_has_ofd_lock(s->fd);
++        break;
++    default:
++        abort();
++    }
++
+     /* Check s->open_flags rather than bdrv_flags due to auto-read-only */
+     if (s->open_flags & O_RDWR) {
+         ret = check_hdev_writable(s->fd);
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index f9ec8c84e9..222138a81a 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -512,7 +512,7 @@ int qemu_dup(int fd);
+ int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
+ int qemu_unlock_fd(int fd, int64_t start, int64_t len);
+ int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
+-bool qemu_has_ofd_lock(void);
++bool qemu_has_ofd_lock(int orig_fd);
+ #endif
+ 
+ #if defined(__HAIKU__) && defined(__i386__)
+diff --git a/util/osdep.c b/util/osdep.c
+index 66d01b9160..454e8ef9f4 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -117,9 +117,6 @@ int qemu_mprotect_none(void *addr, size_t size)
+ 
+ #ifndef _WIN32
+ 
+-static int fcntl_op_setlk = -1;
+-static int fcntl_op_getlk = -1;
+-
+ /*
+  * Dups an fd and sets the flags
+  */
+@@ -187,68 +184,87 @@ static int qemu_parse_fdset(const char *param)
+     return qemu_parse_fd(param);
+ }
+ 
+-static void qemu_probe_lock_ops(void)
++bool qemu_has_ofd_lock(int orig_fd)
+ {
+-    if (fcntl_op_setlk == -1) {
+ #ifdef F_OFD_SETLK
+-        int fd;
+-        int ret;
+-        struct flock fl = {
+-            .l_whence = SEEK_SET,
+-            .l_start  = 0,
+-            .l_len    = 0,
+-            .l_type   = F_WRLCK,
+-        };
+-
+-        fd = open("/dev/null", O_RDWR);
+-        if (fd < 0) {
++    int fd;
++    int ret;
++    struct flock fl = {
++        .l_whence = SEEK_SET,
++        .l_start  = 0,
++        .l_len    = 0,
++        .l_type   = F_RDLCK,
++    };
++
++    fd = qemu_dup(orig_fd);
++    if (fd >= 0) {
++        ret = fcntl_setfl(fd, O_RDONLY);
++        if (ret) {
+             fprintf(stderr,
+-                    "Failed to open /dev/null for OFD lock probing: %s\n",
+-                    strerror(errno));
+-            fcntl_op_setlk = F_SETLK;
+-            fcntl_op_getlk = F_GETLK;
+-            return;
+-        }
+-        ret = fcntl(fd, F_OFD_GETLK, &fl);
+-        close(fd);
+-        if (!ret) {
+-            fcntl_op_setlk = F_OFD_SETLK;
+-            fcntl_op_getlk = F_OFD_GETLK;
+-        } else {
+-            fcntl_op_setlk = F_SETLK;
+-            fcntl_op_getlk = F_GETLK;
++                    "Failed to fcntl for OFD lock probing.\n");
++            qemu_close(fd);
++            return false;
+         }
++    }
++
++    ret = fcntl(fd, F_OFD_GETLK, &fl);
++    qemu_close(fd);
++
++    if (ret == 0) {
++        return true;
++    } else {
++        return false;
++    }
+ #else
+-        fcntl_op_setlk = F_SETLK;
+-        fcntl_op_getlk = F_GETLK;
++    return false;
+ #endif
+-    }
+ }
+ 
+-bool qemu_has_ofd_lock(void)
+-{
+-    qemu_probe_lock_ops();
+ #ifdef F_OFD_SETLK
+-    return fcntl_op_setlk == F_OFD_SETLK;
++static int _qemu_lock_fcntl(int fd, struct flock *fl)
++{
++    int ret;
++    bool ofd_lock = true;
++
++    do {
++        if (ofd_lock) {
++            ret = fcntl(fd, F_OFD_SETLK, fl);
++            if ((ret == -1) && (errno == EINVAL)) {
++                ofd_lock = false;
++            }
++        }
++
++        if (!ofd_lock) {
++            /* Fallback to POSIX lock */
++            ret = fcntl(fd, F_SETLK, fl);
++        }
++    } while (ret == -1 && errno == EINTR);
++
++    return ret == -1 ? -errno : 0;
++}
+ #else
+-    return false;
+-#endif
++static int _qemu_lock_fcntl(int fd, struct flock *fl)
++{
++    int ret;
++
++    do {
++        ret = fcntl(fd, F_SETLK, fl);
++    } while (ret == -1 && errno == EINTR);
++
++    return ret == -1 ? -errno : 0;
+ }
++#endif
+ 
+ static int qemu_lock_fcntl(int fd, int64_t start, int64_t len, int fl_type)
+ {
+-    int ret;
+     struct flock fl = {
+         .l_whence = SEEK_SET,
+         .l_start  = start,
+         .l_len    = len,
+         .l_type   = fl_type,
+     };
+-    qemu_probe_lock_ops();
+-    do {
+-        ret = fcntl(fd, fcntl_op_setlk, &fl);
+-    } while (ret == -1 && errno == EINTR);
+-    return ret == -1 ? -errno : 0;
++
++    return _qemu_lock_fcntl(fd, &fl);
+ }
+ 
+ int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive)
+@@ -261,22 +277,49 @@ int qemu_unlock_fd(int fd, int64_t start, int64_t len)
+     return qemu_lock_fcntl(fd, start, len, F_UNLCK);
+ }
+ 
+-int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive)
++#ifdef F_OFD_SETLK
++static int _qemu_lock_fd_test(int fd, struct flock *fl)
+ {
+     int ret;
++
++    ret = fcntl(fd, F_OFD_GETLK, fl);
++    if ((ret == -1) && (errno != EINVAL)) {
++        return -errno;
++
++    } else if ((ret == -1) && (errno == EINVAL)) {
++        /* Fallback to POSIX lock */
++        ret = fcntl(fd, F_GETLK, fl);
++        if (ret == -1) {
++            return -errno;
++        }
++    }
++
++    return fl->l_type == F_UNLCK ? 0 : -EAGAIN;
++}
++#else
++static int _qemu_lock_fd_test(int fd, struct flock *fl)
++{
++    int ret;
++
++    ret = fcntl(fd, F_GETLK, fl);
++    if (ret == -1) {
++        return -errno;
++    } else {
++        return fl->l_type == F_UNLCK ? 0 : -EAGAIN;
++    }
++}
++#endif
++
++int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive)
++{
+     struct flock fl = {
+         .l_whence = SEEK_SET,
+         .l_start  = start,
+         .l_len    = len,
+         .l_type   = exclusive ? F_WRLCK : F_RDLCK,
+     };
+-    qemu_probe_lock_ops();
+-    ret = fcntl(fd, fcntl_op_getlk, &fl);
+-    if (ret == -1) {
+-        return -errno;
+-    } else {
+-        return fl.l_type == F_UNLCK ? 0 : -EAGAIN;
+-    }
++
++    return _qemu_lock_fd_test(fd, &fl);
+ }
+ #endif
+ 
+-- 
+2.27.0
+
 
