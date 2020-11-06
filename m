@@ -2,117 +2,88 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,RCVD_DOTEDU_SUSP,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 287B4C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 372FEC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:12:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C71A206FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:08:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F731205CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 18:12:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="l9eRZjUW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C71A206FA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R6ufOMYV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F731205CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kb6A4-0006Cm-De
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 13:08:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50256)
+	id 1kb6EF-0008MR-0G
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 13:12:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kb67v-0004Hi-3X
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:06:19 -0500
-Received: from mail-dm6nam08on2113.outbound.protection.outlook.com
- ([40.107.102.113]:7896 helo=NAM04-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kb67t-0002XB-2J
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:06:18 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mK1hnd2YAuGMrMFsNq5JwIjpF3UdOQ8g335E6pGIuGqTJ07jn+78gOKgLbbnjD33yb+efO+OYUwl2MB/K48evI2pFeteDr6mghv5oCUwltN1zUjoYJr3dqWQJUvLz6KpQcmGCBpFENiitwtPj82ycYsdQ08JwA/TzDtYNc8zuGq1a4ZomEJRlEh+VL5bXuNlF/7DJY/QLMcBgN3Re//xAv4gBAd1jw5fFC25LOe4EFKyptZbBw6iL+UWdWOO48o3WbqJCwfJT92WVctRkZ6KFRDA7ZWYDo0I3+SqrPMHRxrkKBWsC5952mD6z9+3S5G4TZjAdqWK7Nhs9FM0WnSafA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3r3BgWn85+zSzMGQk2SogxF4oS9rOr9ZOBv1xfN00qY=;
- b=ZYhIPWmkBwT9UlMwLmFaoTHLrXEnryzEcJI1MpEmktPDIk5wjzTcsE3DUouWopJ63rrMZkTZPHQSpAklxdyBWnP3PNWeDQc/bJcgHK10smb7BPvXUBAQcxaxDYasi3NyfhEIulxbXpkMYDSWTXaQD8lOcnh+wyOHpvScJSho8nUwQ4UlXzqQZ1QlMb7SNEbNktiNqg2Z3D+n9puvpUZJTthWI97CvV6w/xY+hWHJLYDNz4EQJlfGiyMpX7FZ9EayI4Mt1xXpj3K0ZYUZsnZNyCQGVQWS5k2p8jG4C5xskfLQXWN2iWh0Lbg27Hbbdegg3uxrwttnmSYl0z9wYLuzLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
- header.d=bu.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3r3BgWn85+zSzMGQk2SogxF4oS9rOr9ZOBv1xfN00qY=;
- b=l9eRZjUW3KYgj6rhEd8ysF6hNhvPKqokkoWnZ9rHtxkjkBX/VWIAzW70D/gNXVixnyrK7/+4GGaMa9pTPqMlpW6Ecdbv/fQkOopTiwqT2iECZtHt6OB/esLBHvVkLH/faek8xU4LYaSuxURwqoaawLwpFVUOnw6Svzska+Y24Ps=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SN2PR03MB2207.namprd03.prod.outlook.com (2603:10b6:804:e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21; Fri, 6 Nov
- 2020 18:06:13 +0000
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::d520:4c19:8ce6:7db2]) by SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::d520:4c19:8ce6:7db2%2]) with mapi id 15.20.3499.032; Fri, 6 Nov 2020
- 18:06:13 +0000
-From: Alexander Bulekov <alxndr@bu.edu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 0/2] Fuzzing Documentation Updates
-Date: Fri,  6 Nov 2020 13:05:58 -0500
-Message-Id: <20201106180600.360110-1-alxndr@bu.edu>
-X-Mailer: git-send-email 2.28.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [72.93.72.163]
-X-ClientProxiedBy: MN2PR06CA0004.namprd06.prod.outlook.com
- (2603:10b6:208:23d::9) To SN6PR03MB3871.namprd03.prod.outlook.com
- (2603:10b6:805:6d::32)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kb6DZ-0007us-GS
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:12:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22437)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kb6DX-000362-4W
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 13:12:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604686324;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=br2En5SgEYBPfiEmfeuWV+6096Upc+HED/wX69lPF/w=;
+ b=R6ufOMYVE2lG76Gr1eHX12wGF0OWvRh8pwL0MKjOq6S+pt7xnz1m/m1TYyztDCOHa6dmWu
+ IrB+uyW8KcIoVM0bfeFiWr0eo6P7VbMh/A3+JIVUoU8IuRHAtuFpzL22yL+qfssCpZ8Dqf
+ +5t5XZC6ciOCu1jN85bUJojjVTv1EOE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-0TIZMCoLO-uSahfMbq6T4A-1; Fri, 06 Nov 2020 13:12:03 -0500
+X-MC-Unique: 0TIZMCoLO-uSahfMbq6T4A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C6158030C8;
+ Fri,  6 Nov 2020 18:12:02 +0000 (UTC)
+Received: from work-vm (ovpn-114-220.ams2.redhat.com [10.36.114.220])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7377375121;
+ Fri,  6 Nov 2020 18:11:58 +0000 (UTC)
+Date: Fri, 6 Nov 2020 18:11:55 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Fotis Xenakis <foxen@windowslive.com>
+Subject: Re: [Virtio-fs] [qemu-web PATCH v2] Add virtio-fs in OSv overview
+ blog post
+Message-ID: <20201106181155.GR3576@work-vm>
+References: <AM0PR03MB629226965B72D3808EFB8795A6EF0@AM0PR03MB6292.eurprd03.prod.outlook.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from stormtrooper.vrmnet (72.93.72.163) by
- MN2PR06CA0004.namprd06.prod.outlook.com (2603:10b6:208:23d::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3541.21 via Frontend Transport; Fri, 6 Nov 2020 18:06:12 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 642417e1-4049-4a32-37d5-08d8827ea59a
-X-MS-TrafficTypeDiagnostic: SN2PR03MB2207:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN2PR03MB22079B8C743107C8220EEA13BAED0@SN2PR03MB2207.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WQy67aYuEfVTMMy3yRsV8kg7V0yEuBJdCAW8iw3BsR7orY7PLcxys5xWoiXnIy2K3IQJBwnrvzgOKTCCUOy9D/Vnw37TF1YF2Lj+rFG8/GUOpxie696PgLrgcC+zYP8L+r6hhuIRxjOkTyTsck7+znzg7Jt5VysdEXbrLlRUqQQWYimNGTHKSdCvWNIiFNrKip8xW/ixRJufMycqP1ren+mqqN1FTHNYGF8u+RnMhCBjThgFc5LZTVKrEKclS5oAyS3MOOVlX+0RvqE3ffnFsEIAAE0nQgAoyWYA4TcU+ETW8sI/4WygUJDyJJl/K8Rot9lr6VDlh5Vi0Hbfz2GuGA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(136003)(396003)(39860400002)(346002)(376002)(366004)(478600001)(83380400001)(956004)(786003)(316002)(8676002)(4326008)(66476007)(2906002)(6486002)(186003)(66946007)(36756003)(66556008)(1076003)(52116002)(6916009)(86362001)(16526019)(26005)(5660300002)(6506007)(15650500001)(8936002)(75432002)(6512007)(6666004)(4744005)(2616005);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 3D9w4tNZ0DJnhqK9gxdxEHT9C52t2luGe9KayL84CytduJE6KTkLzPYrDaByUobz0RDgkkTm/s09eDTcmVHY1vPepyCT5U59/BUh9pHuBYvaK700adwhqbQgeSpsN/h+TxMOdbGmYcrj9pKWTv73xBi8v4uDX3dG4QCPod4Eg2za7wlhkwN6Uz3xRQxH9OoGA2RwJ2afuF07DxqrdCKTMIQksOcVgiGmZeVKva31eRwh7T6pd5JeBvhs0UldAvvUEaili6PSgitbeiApbMXLHwWXrTsXXtj55gqQ2nkLvgvyqZbqg42yyqjsQPQizVsbwaZUbrlXQtE2PFZrwsI/TmJJ/Anc9jK8bFT+bXWCEuqUXWbpF3r35TxZ6HJCfp4fiQcbd/e6nO2zgfN5nt7lejTzmq+dKVSiCYlbrQ05h6d1i+g58kuAKQDxsPQO/HVkDK4BR6imXUBSw1TJmPUT7KMzlk9n8lePQtEdhopdpyZqUHxNfYIihE4jkHKmzwTXcte0pdqmqtER1XYUGjf/w+gErtrjGUbTlgmtJpxLL9YGz5MiqBxbHBXxvrxFXjEVyczKapnzpP+sEZEiwzGT24/MQpFkUSFrb4VqlyHKbsGrwR0S1MYcywJHnJ3HD7yGQK0g73TZ18P0/cPhPM1vaw==
-X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 642417e1-4049-4a32-37d5-08d8827ea59a
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2020 18:06:13.1811 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m9aq5SQS24BlqQ+sHzggK/as8+Ko02ZkHAheZ6jQkZGeYRQd50/X6fOfG7fc/zee
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR03MB2207
-Received-SPF: pass client-ip=40.107.102.113; envelope-from=alxndr@bu.edu;
- helo=NAM04-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 13:06:14
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -8
-X-Spam_score: -0.9
-X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.999,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <AM0PR03MB629226965B72D3808EFB8795A6EF0@AM0PR03MB6292.eurprd03.prod.outlook.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 06:30:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,27 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>
+Cc: virtio-fs@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I converted the docuemntation to markdown and updated build instructions
-that changed after meson.
+* Fotis Xenakis (foxen@windowslive.com) wrote:
+> This post briefly goes over the main points of virtio-fs and OSv, a
+> unikernel running under QEMU/KVM and taking advantage of its virtio-fs
+> implementation.
+> 
+> Changes since v1:
+> - Fixed wording and links, as suggested by Thomas Huth.
+> - Added a short example of virtio-fs usage in OSv.
+> 
+> Signed-off-by: Fotis Xenakis <foxen@windowslive.com>
 
-Alexander Bulekov (2):
-  docs/fuzz: rST-ify the fuzzing documentation
-  docs/fuzz: update fuzzing documentation post-meson
+> +One central point is OSv's support for booting from virtio-fs: this enables
+> +deploying a modified version or a whole new application **without rebuilding**
+> +the image, just by adjusting its root file system contents on the host. Last,
+> +owing to the DAX window practically providing low-overhead access to the host's
+> +page cache, scalability is also expected to excel, with it being a common
+> +concern due to the potentially high density of unikernels per host.
 
- MAINTAINERS            |   2 +-
- docs/devel/fuzzing.rst | 236 +++++++++++++++++++++++++++++++++++++++++
- docs/devel/fuzzing.txt | 214 -------------------------------------
- docs/devel/index.rst   |   1 +
- 4 files changed, 238 insertions(+), 215 deletions(-)
- create mode 100644 docs/devel/fuzzing.rst
- delete mode 100644 docs/devel/fuzzing.txt
+Hi Fotis,
+  Since I'm not used to unikernels, I'm a little confused by this; I'd
+appreciate some explanation.
 
+  In your unikernel, does the root filesystem just contain data?  I mean
+being a 'unikernel' aren't all the binaries and support all linked into
+the kernel itself?
+
+Dave
 -- 
-2.28.0
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
