@@ -2,82 +2,84 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 470A3C388F7
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B870EC4742C
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:31:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9841A20729
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:31:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2588C20729
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 03:31:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n5VlqOcC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9841A20729
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZTH1vMnk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2588C20729
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kasT4-0006Br-Ih
-	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 22:31:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46784)
+	id 1kasTA-0006Gx-AP
+	for qemu-devel@archiver.kernel.org; Thu, 05 Nov 2020 22:31:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kasRN-0004Mw-Qt
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:29 -0500
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:43107)
+ id 1kasRP-0004Nr-Ro
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:31 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:39701)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kasRJ-0006to-8Y
- for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:29 -0500
-Received: by mail-pf1-x429.google.com with SMTP id z3so30906pfb.10
- for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 19:29:24 -0800 (PST)
+ id 1kasRO-0006uE-7N
+ for qemu-devel@nongnu.org; Thu, 05 Nov 2020 22:29:31 -0500
+Received: by mail-pg1-x544.google.com with SMTP id i7so2880472pgh.6
+ for <qemu-devel@nongnu.org>; Thu, 05 Nov 2020 19:29:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=dkPQWma2Mypff5ie8s38chap8PGgRqouLTX75a1GMRU=;
- b=n5VlqOcCsPnYcXHcwoiRa79PKxClnYgW522NHFl5Pr096XCBMP2EdRCz/i/TczJZdg
- EQYLLmb7xnOd8P9JkOPuWWanqTPFKP8oNf9Ef1tZ/mhf/gHqY4NU3/qlnorFBEza1+Pc
- sgep/5zwypJyiT6Wg3sO3EIST9HGMj76z/JYVmZTUyCURtClqm7MPLbK7WWFmPV7oD9L
- Ig9QQk9r+O33yzsXdUn3ggWcFk0nKt36KzDAR1t81YiQhdanYBnnzQIpNO9nXxPVtcmE
- gfTLfI2N+/FYL9oNXTtZ5fYzWVgwbgDD+8ETbt1GG9Y4F3NqelHOXCJrGS/vxMuEXyLj
- Ks4A==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=kjsZwqo16wWQgyXnGfAD2sB/J/+jiHAWTHwjAIw7NfU=;
+ b=ZTH1vMnki1p5vmUOBjZzTzJM7NUOdveFifsjKnIo5PB2GuTdYJTA1vCSgtNv3SUw4R
+ M3LjWPLD52N/0mPrvglxPepdDyOZ0s1ykWw3MSLdM6wwdbtfCdsJE8wX8qJkTVXU4iaG
+ 5yVOHwkO+XED8+9YkLh4bYM/4zcnmAs9a9NWGm2lbvEb6xGyT4AHIRe5Fro4B0l8h5z5
+ SZM9QdM04FOTivgIU/zqRyfWyDSAupDgKurqRjRN1vjYdVxRuMMoMZRpsba+G97e0i3L
+ zIolhk118ZNbB48awBa1LyFW30S2RVdlOeJDgBYNWk7I7OfC/RlmRvQKRiWDhCIR6xfI
+ ob9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=dkPQWma2Mypff5ie8s38chap8PGgRqouLTX75a1GMRU=;
- b=rUBpnnTUZ2KqG2KRiMBBVnlYx5CKGqob52vA9U6la/srULEAFNx44aoI5x+lDKBGd3
- TI36dYE0wxfpxUXEzpsJWL/0eaqVxU1HpnAYmX4X8bg7JZz+gM6eB2Ho3PfrfZXQXyb7
- sPd8Hb+1BddD8AXYtBQ1Xy5ZmZ2BBmozSppCqo3FIb3aCT78g4oDtOvKXmKu62QVbgnE
- blWINWhsOzmGf+9GBOfRE7H69P3SvTcpQ4u5af18QPHUhwAcmwf0SdyU3zBtVU1HTVTN
- 14huBRwUe2xBLQaeXhy886rKb+qZXE2LtVIbmqWq+dPd2wQsA0VXJqM7vbIKC9JQxamz
- iPWg==
-X-Gm-Message-State: AOAM532o9QnHM2wQdN0hy8uXY6ui2sIW45zyKXpd09U8mYefnvZpHw+/
- +jjhD//aAW3+Q2+xD81ft/UoSrU+FNnKuA==
-X-Google-Smtp-Source: ABdhPJzQ7SW2IRxr7a9lWBEX5oBxbk5j3fYOMCuLMXv/yWfziQIs/4smbHAEElVvQd3xt0bEMfWm6Q==
-X-Received: by 2002:a17:90a:6c96:: with SMTP id
- y22mr136198pjj.63.1604633363110; 
- Thu, 05 Nov 2020 19:29:23 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=kjsZwqo16wWQgyXnGfAD2sB/J/+jiHAWTHwjAIw7NfU=;
+ b=KGk8Z30ieUKbNAhoNuxCFUy8mHic76q0rKlGuKEDfXoomR3t4dbeYaHcIUvglCdxEv
+ aiHsBGHNFt+y7f9y6NhmLPfzQw4tLO6iM/+PL1G/n61MtA7kOnx8eaf/QfQfvW2HL3Sr
+ KJEYja0XKUtQitWLrBfOBBLdTG8fONtIBNFoBLOfzy+BUEFVVyTA9V79fZb7Q0zPdeZ+
+ W7R3VDGYwpStzHZY0+JqfMOEE8SgazCDCWS5ZESxAKJgyk+vBx7kRmAz5AUGjfs6gI7+
+ edJqfOGlm5l0wGs58I4k3mWz0iWs+V5oUCKjc7Vn8GOYbaknub7uY6IYTuanHtcaRIZ6
+ IC0w==
+X-Gm-Message-State: AOAM533sy5cd50zTwGkljn1/MXdf7wybtU0YCIwCzXwr53Jz8zK0evEp
+ Nx7y22I9BTqoKM/MC86Vdf6q83sevqa7ZQ==
+X-Google-Smtp-Source: ABdhPJxFHQGOc3dY4qjXzdw/JdPbL2A0630inlRe2f6Pmob4YKhhhNempPn21/LWdw4actCCUZNA/A==
+X-Received: by 2002:a17:90a:d082:: with SMTP id
+ k2mr128978pju.195.1604633368541; 
+ Thu, 05 Nov 2020 19:29:28 -0800 (PST)
 Received: from localhost.localdomain (76-14-210-194.or.wavecable.com.
  [76.14.210.194])
- by smtp.gmail.com with ESMTPSA id i10sm40773pfd.60.2020.11.05.19.29.21
+ by smtp.gmail.com with ESMTPSA id i10sm40773pfd.60.2020.11.05.19.29.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Nov 2020 19:29:22 -0800 (PST)
+ Thu, 05 Nov 2020 19:29:27 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 00/41] Mirror map JIT memory for TCG
-Date: Thu,  5 Nov 2020 19:28:40 -0800
-Message-Id: <20201106032921.600200-1-richard.henderson@linaro.org>
+Subject: [PATCH v3 04/41] tcg: Add in_code_gen_buffer
+Date: Thu,  5 Nov 2020 19:28:44 -0800
+Message-Id: <20201106032921.600200-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201106032921.600200-1-richard.henderson@linaro.org>
+References: <20201106032921.600200-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::429;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x429.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,120 +106,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is my take on Joelle's patch set:
-https://lists.nongnu.org/archive/html/qemu-devel/2020-10/msg07837.html
+Create a function to determine if a pointer is within the buffer.
 
-Changes for v3:
-  * Even more patches -- all tcg backends converted.
-  * Fixups for darwin/ios merged (Joelle).
-  * Feature renamed to splitwx (Paolo).
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/tcg/tcg.h         |  6 ++++++
+ accel/tcg/translate-all.c | 26 ++++++++------------------
+ 2 files changed, 14 insertions(+), 18 deletions(-)
 
-
-r~
-
-
-Richard Henderson (41):
-  tcg: Enhance flush_icache_range with separate data pointer
-  tcg: Move tcg prologue pointer out of TCGContext
-  tcg: Move tcg epilogue pointer out of TCGContext
-  tcg: Add in_code_gen_buffer
-  tcg: Introduce tcg_splitwx_to_{rx,rw}
-  tcg: Adjust TCGLabel for const
-  tcg: Adjust tcg_out_call for const
-  tcg: Adjust tcg_out_label for const
-  tcg: Adjust tcg_register_jit for const
-  tcg: Adjust tb_target_set_jmp_target for split-wx
-  tcg: Make DisasContextBase.tb const
-  tcg: Make tb arg to synchronize_from_tb const
-  tcg: Use Error with alloc_code_gen_buffer
-  tcg: Add --accel tcg,split-wx property
-  accel/tcg: Support split-wx for linux with memfd
-  accel/tcg: Support split-wx for darwin/iOS with vm_remap
-  tcg: Return the TB pointer from the rx region from exit_tb
-  tcg/i386: Support split-wx code generation
-  tcg/aarch64: Use B not BL for tcg_out_goto_long
-  tcg/aarch64: Implement flush_idcache_range manually
-  tcg/aarch64: Support split-wx code generation
-  disas: Push const down through host disasassembly
-  tcg/tci: Push const down through bytecode reading
-  tcg: Introduce tcg_tbrel_diff
-  tcg/ppc: Use tcg_tbrel_diff
-  tcg/ppc: Use tcg_out_mem_long to reset TCG_REG_TB
-  tcg/ppc: Support split-wx code generation
-  tcg/sparc: Use tcg_tbrel_diff
-  tcg/sparc: Support split-wx code generation
-  tcg/s390: Use tcg_tbrel_diff
-  tcg/s390: Support split-wx code generation
-  tcg/riscv: Fix branch range checks
-  tcg/riscv: Remove branch-over-branch fallback
-  tcg/riscv: Support split-wx code generation
-  accel/tcg: Add mips support to alloc_code_gen_buffer_splitwx_memfd
-  tcg/mips: Do not assert on relocation overflow
-  tcg/mips: Support split-wx code generation
-  tcg/arm: Support split-wx code generation
-  tcg: Remove TCG_TARGET_SUPPORT_MIRROR
-  tcg: Constify tcg_code_gen_epilogue
-  tcg: Constify TCGLabelQemuLdst.raddr
-
- accel/tcg/tcg-runtime.h      |   2 +-
- include/disas/dis-asm.h      |   4 +-
- include/disas/disas.h        |   2 +-
- include/exec/exec-all.h      |   2 +-
- include/exec/gen-icount.h    |   4 +-
- include/exec/log.h           |   2 +-
- include/exec/translator.h    |   2 +-
- include/hw/core/cpu.h        |   3 +-
- include/sysemu/tcg.h         |   3 +-
- include/tcg/tcg-op.h         |   2 +-
- include/tcg/tcg.h            |  56 +++++--
- tcg/aarch64/tcg-target.h     |   8 +-
- tcg/arm/tcg-target.h         |  10 +-
- tcg/i386/tcg-target.h        |   9 +-
- tcg/mips/tcg-target.h        |  10 +-
- tcg/ppc/tcg-target.h         |   4 +-
- tcg/riscv/tcg-target.h       |  10 +-
- tcg/s390/tcg-target.h        |  11 +-
- tcg/sparc/tcg-target.h       |  10 +-
- tcg/tci/tcg-target.h         |  11 +-
- accel/tcg/cpu-exec.c         |  41 +++--
- accel/tcg/tcg-all.c          |  26 ++-
- accel/tcg/tcg-runtime.c      |   4 +-
- accel/tcg/translate-all.c    | 307 +++++++++++++++++++++++++++--------
- accel/tcg/translator.c       |   4 +-
- bsd-user/main.c              |   2 +-
- disas.c                      |   2 +-
- disas/capstone.c             |   2 +-
- linux-user/main.c            |   2 +-
- softmmu/physmem.c            |   9 +-
- target/arm/cpu.c             |   3 +-
- target/arm/translate-a64.c   |   2 +-
- target/avr/cpu.c             |   3 +-
- target/hppa/cpu.c            |   3 +-
- target/i386/cpu.c            |   3 +-
- target/microblaze/cpu.c      |   3 +-
- target/mips/cpu.c            |   3 +-
- target/riscv/cpu.c           |   3 +-
- target/rx/cpu.c              |   3 +-
- target/sh4/cpu.c             |   3 +-
- target/sparc/cpu.c           |   3 +-
- target/tricore/cpu.c         |   2 +-
- tcg/tcg-op.c                 |  15 +-
- tcg/tcg.c                    |  86 ++++++++--
- tcg/tci.c                    |  60 ++++---
- accel/tcg/trace-events       |   2 +-
- tcg/aarch64/tcg-target.c.inc | 139 ++++++++++++----
- tcg/arm/tcg-target.c.inc     |  41 ++---
- tcg/i386/tcg-target.c.inc    |  36 ++--
- tcg/mips/tcg-target.c.inc    |  97 +++++------
- tcg/ppc/tcg-target.c.inc     | 105 ++++++------
- tcg/riscv/tcg-target.c.inc   | 125 +++++---------
- tcg/s390/tcg-target.c.inc    |  91 +++++------
- tcg/sparc/tcg-target.c.inc   |  58 +++----
- tcg/tcg-ldst.c.inc           |   2 +-
- tcg/tcg-pool.c.inc           |   6 +-
- tcg/tci/tcg-target.c.inc     |   2 +-
- 57 files changed, 917 insertions(+), 546 deletions(-)
-
+diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
+index bb1e97b13b..e4d0ace44b 100644
+--- a/include/tcg/tcg.h
++++ b/include/tcg/tcg.h
+@@ -680,6 +680,12 @@ extern __thread TCGContext *tcg_ctx;
+ extern void *tcg_code_gen_epilogue;
+ extern TCGv_env cpu_env;
+ 
++static inline bool in_code_gen_buffer(const void *p)
++{
++    const TCGContext *s = &tcg_init_ctx;
++    return (size_t)(p - s->code_gen_buffer) <= s->code_gen_buffer_size;
++}
++
+ static inline size_t temp_idx(TCGTemp *ts)
+ {
+     ptrdiff_t n = ts - tcg_ctx->temps;
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 4572b4901f..744f97a717 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -392,27 +392,18 @@ void tb_destroy(TranslationBlock *tb)
+ 
+ bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc, bool will_exit)
+ {
+-    TranslationBlock *tb;
+-    bool r = false;
+-    uintptr_t check_offset;
+-
+-    /* The host_pc has to be in the region of current code buffer. If
+-     * it is not we will not be able to resolve it here. The two cases
+-     * where host_pc will not be correct are:
++    /*
++     * The host_pc has to be in the region of the code buffer.
++     * If it is not we will not be able to resolve it here.
++     * The two cases where host_pc will not be correct are:
+      *
+      *  - fault during translation (instruction fetch)
+      *  - fault from helper (not using GETPC() macro)
+      *
+      * Either way we need return early as we can't resolve it here.
+-     *
+-     * We are using unsigned arithmetic so if host_pc <
+-     * tcg_init_ctx.code_gen_buffer check_offset will wrap to way
+-     * above the code_gen_buffer_size
+      */
+-    check_offset = host_pc - (uintptr_t) tcg_init_ctx.code_gen_buffer;
+-
+-    if (check_offset < tcg_init_ctx.code_gen_buffer_size) {
+-        tb = tcg_tb_lookup(host_pc);
++    if (in_code_gen_buffer((const void *)host_pc)) {
++        TranslationBlock *tb = tcg_tb_lookup(host_pc);
+         if (tb) {
+             cpu_restore_state_from_tb(cpu, tb, host_pc, will_exit);
+             if (tb_cflags(tb) & CF_NOCACHE) {
+@@ -421,11 +412,10 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc, bool will_exit)
+                 tcg_tb_remove(tb);
+                 tb_destroy(tb);
+             }
+-            r = true;
++            return true;
+         }
+     }
+-
+-    return r;
++    return false;
+ }
+ 
+ static void page_init(void)
 -- 
 2.25.1
 
