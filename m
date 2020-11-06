@@ -2,90 +2,93 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 444D5C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 14:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20417C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 14:50:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B0042078B
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 14:44:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F358208B3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 14:50:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FDiabtwk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0042078B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+RWN71g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F358208B3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kb2yn-0007rb-Ba
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 09:44:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54684)
+	id 1kb347-0001Gw-Fm
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 09:50:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb2xT-000781-OR
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 09:43:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25633)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb33W-0000k0-H2
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 09:49:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22432)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb2xQ-0001dO-G7
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 09:43:19 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kb33U-0003cV-TM
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 09:49:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604673794;
+ s=mimecast20190719; t=1604674172;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tfq3RwRfTCNbRHXbldz4BqrN+f88floznS4PhC0uO7M=;
- b=FDiabtwkYdrZi5RUvNbcoE/+JRP7RAU76BlnzSOsex1Cwm6mapbqLggDEaI1b3VzVQf/17
- hsgFx+1YEnFvoXR3cHeBfzE40E+aliiz4ArP3MlcuC8jhdYFh8ydcITwrHAZ3vKvuXKf2n
- C5SfazE2M3/l47WpV1KBdxchr2ygRt0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-kaC0IXftN4-_2HZhSiobZw-1; Fri, 06 Nov 2020 09:43:13 -0500
-X-MC-Unique: kaC0IXftN4-_2HZhSiobZw-1
-Received: by mail-wr1-f71.google.com with SMTP id p12so556549wrx.3
- for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 06:43:13 -0800 (PST)
+ bh=p3RAt5gU4b6xZjcbF/eXTV1ap+70W4fuDZRQSNFImrY=;
+ b=D+RWN71gN+YCKScQVY75EPiLhI1XMurpgiVXYVXdQC08830yHy7YdbKOaWHYu+Ml66dAOu
+ q09/gdV32LoL6dufyJE3jFjHakz5oYphI477+bDS51D1wrtr/ySTT6bv3KPp4/mReO0xCr
+ TyDp52RQw4iUJLodHnHseP+WepCyrN0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-585-Mr0TLYQhNg-pfCHMZSbFbQ-1; Fri, 06 Nov 2020 09:49:30 -0500
+X-MC-Unique: Mr0TLYQhNg-pfCHMZSbFbQ-1
+Received: by mail-wr1-f69.google.com with SMTP id i1so546449wrb.18
+ for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 06:49:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=tfq3RwRfTCNbRHXbldz4BqrN+f88floznS4PhC0uO7M=;
- b=XCEYwPuZZtgbkvHJ8Kq8cbCWpbVNN6DLKLkG54hAKiODaHknqwZo6P9DcOoNuTfkl8
- Tkj/ixeo8GBqDEWeRSLFuVPMwDrA0Ichnt1xUy80PoaCe0tL3QEEZni/CRTv1f389zld
- O4jKJQOiXuiLAagMnFEJKBhCH8hz0pmTbvtQw2qmwmNowGkGkbwfVxBZ5tA6jDT0rmXj
- yGeEbd8e8X35Qvayq5hF7lGenYg/eRDht90V15bueFo3y2D1dI5lrZ4SyGwi5ND+Mh1W
- O9LlpSxTfyqcVjR6LylTO9zFIYElqx1t1rcf3BqF5eBmNJZVAfpa37E0QQ4OaL+mUIbN
- VV8w==
-X-Gm-Message-State: AOAM532u3D6jYaPzuva+Wd+VyLvWf6Sr1fQp8zX33cmAJ7qPqI1KB5vm
- WmS5CQkXAAhmmMNbnKjE8TNAW/5j9mND/bRVst6PZE8/PcgemRds1s0DDIozbHQN9zsFWSfwSYA
- 3Rda33RiEd8ll2I8=
-X-Received: by 2002:a1c:bbc4:: with SMTP id l187mr3026858wmf.133.1604673792085; 
- Fri, 06 Nov 2020 06:43:12 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyCpRHi3fBrTnjUy/pYz18YCIt5/72cKSvXAZs49enEth6R1ZJFqCsH3C2JrrwjIdFlpmFFfQ==
-X-Received: by 2002:a1c:bbc4:: with SMTP id l187mr3026835wmf.133.1604673791827; 
- Fri, 06 Nov 2020 06:43:11 -0800 (PST)
+ bh=p3RAt5gU4b6xZjcbF/eXTV1ap+70W4fuDZRQSNFImrY=;
+ b=E8BgAHZLAkOYTeHDARu7Ev/3puVeZk3yYXG95mSAs/fM8pOTm9SEL7u1HSDETB5X/m
+ 6XiwiZNDdUtFxE9JP8OQ5BzqYkknOEDvT8cgC+bGdv5GRuYhh4R2OFE0dIUqnxRdNCSg
+ VeoJYOt2etUrvlHBnTqI1XAJFqOWSf/51Ji0twMhDu1BSMsSD8MQ1AH60Z0c6m1o1l2L
+ o81u8977ZEpXcdOAccRJ8QWnu/pDunWCDNTnLVh97mDKcXP5SwmJbymaxDQhxu2QU618
+ Qv0JrNAaJLZMQK45/Mn2XQ+rZTwojmI/azKbm72kkB1VH771+aWLBkwb25rguxWTDpGp
+ HEyQ==
+X-Gm-Message-State: AOAM5330LnaAOnXS3Q77MmUK0J/9LwwAdbzosNQLtd3Y9KyAb8PP7b60
+ hl3cTGNcmkCdyu6bn+ctzj4uczWyvafXcCNyGs+iwkyLb3wz2zLCOSAtT160MzdkqT3y4K5el8F
+ vXhQoghN1U6y8RM8=
+X-Received: by 2002:adf:9e48:: with SMTP id v8mr3316866wre.55.1604674169203;
+ Fri, 06 Nov 2020 06:49:29 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxNfigChjYNIUrTqxd+fy+WfbQTdIDSXPIZDwDpHhVixTnfa37iHhJT2gOCgcgD1CLFm82j1A==
+X-Received: by 2002:adf:9e48:: with SMTP id v8mr3316838wre.55.1604674168965;
+ Fri, 06 Nov 2020 06:49:28 -0800 (PST)
 Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id v67sm2789997wma.17.2020.11.06.06.43.10
+ by smtp.gmail.com with ESMTPSA id 89sm2739596wrp.58.2020.11.06.06.49.27
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 06 Nov 2020 06:43:11 -0800 (PST)
-Subject: Re: [PATCH-for-5.2? v3 5/9] scsi: fix overflow in
- scsi_disk_new_request_dump
+ Fri, 06 Nov 2020 06:49:28 -0800 (PST)
+Subject: Re: [PATCH] scripts/checkpatch.pl: Modify the line length limit of
+ the code
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20201105154208.12442-1-ganqixin@huawei.com>
+ <CAFEAcA9QMBqF0Bm44q4m1d=QaPVBJodH9rwuYhGx5H6zy6ULcg@mail.gmail.com>
+ <87d00qk51l.fsf@dusky.pond.sub.org>
+ <CAFEAcA-_5vRbsi5fFpyLV2OyDX5TVrpAx7_Z43wqvb1zhQO_8w@mail.gmail.com>
+ <37c519e4-d72b-944c-ed70-038f9c606be9@redhat.com>
+ <CAFEAcA_a=vBjLM8_-KDkYfFuTLDW6cMsQ48or70uwwVusW2q7w@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Daniele Buono <dbuono@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-References: <20201105221905.1350-1-dbuono@linux.vnet.ibm.com>
- <20201105221905.1350-6-dbuono@linux.vnet.ibm.com>
- <ad3594d4-3541-32fd-ad61-9b57f2d08e5b@redhat.com>
-Message-ID: <b6dcbbe3-294f-dcf4-72a6-c29314ec0d8d@redhat.com>
-Date: Fri, 6 Nov 2020 15:43:10 +0100
+Message-ID: <66edd934-0ff0-bc91-7539-a6792c1906e9@redhat.com>
+Date: Fri, 6 Nov 2020 15:49:26 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <ad3594d4-3541-32fd-ad61-9b57f2d08e5b@redhat.com>
+In-Reply-To: <CAFEAcA_a=vBjLM8_-KDkYfFuTLDW6cMsQ48or70uwwVusW2q7w@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -117,81 +120,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Gan Qixin <ganqixin@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Chenqun \(kuhn\)" <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/6/20 3:32 PM, Philippe Mathieu-Daudé wrote:
-> On 11/5/20 11:19 PM, Daniele Buono wrote:
->> scsi_disk_new_request_dump is used to dump the content of a scsi request
->> for tracing. It does that by decoding the command to get the size of the
->> command buffer, and then printing the content of such buffer on a string.
+On 11/6/20 3:16 PM, Peter Maydell wrote:
+> On Fri, 6 Nov 2020 at 14:08, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>> Can we keep the error please? Maybe 132 is the next display logical
+>> limit once we increased the warning from 80 to 100.
 >>
->> When using gcc with link-time optimizations, it warns that the argument of
->> malloc may be too large.
->>
->> In function 'scsi_disk_new_request_dump',
->>     inlined from 'scsi_new_request' at ../qemu-cfi-v3/hw/scsi/scsi-disk.c:2588:9:
->> ../qemu-cfi-v3/hw/scsi/scsi-disk.c:2562:17: warning: argument 1 value '18446744073709551612' exceeds maximum object size 9223372036854775807 [-Walloc-size-larger-than=]
->>      line_buffer = g_malloc(len * 5 + 1);
->>                  ^
->> ../qemu-cfi-v3/hw/scsi/scsi-disk.c: In function 'scsi_new_request':
->> /usr/include/glib-2.0/glib/gmem.h:78:10: note: in a call to allocation function 'g_malloc' declared here
->>  gpointer g_malloc         (gsize  n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
->>
->> len is a signed integer filled up by scsi_cdb_length which can return -1
->> if it can't decode the command. In this case, g_malloc would probably fail.
->> However, an unknown command here is a possibility, and since this is used for
->> tracing, we should try to print the command anyway, for debugging purposes.
->>
->> Since knowing the size of the command in the buffer is impossible (could not
->> decode the command), only print the header by setting len=1 if scsi_cdb_length
->> returned -1
->>
->> Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
->> ---
->> If we had a way to know the (maximum) size of the buffer, we could
->> alternatively dump the whole buffer, instead of dumping only the
->> first byte. Not sure if this can be done, nor if it is considered
->> a better option.
->>
->> We could also produce an error instead/in addition to just dumping
->> the buffer, if the command cannot be decoded.
->>
->>  hw/scsi/scsi-disk.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
->> index e859534eaf..d70dfdd9dc 100644
->> --- a/hw/scsi/scsi-disk.c
->> +++ b/hw/scsi/scsi-disk.c
->> @@ -2559,6 +2559,10 @@ static void scsi_disk_new_request_dump(uint32_t lun, uint32_t tag, uint8_t *buf)
->>      int len = scsi_cdb_length(buf);
->>      char *line_buffer, *p;
->>  
->> +    if (len < 0) {
->> +        len = 1;
->> +    }
->> +
->>      line_buffer = g_malloc(len * 5 + 1);
->>  
->>      for (i = 0, p = line_buffer; i < len; i++) {
->>
+>> I understand hardware evolved, we have larger displays with better
+>> resolution and can fit more characters in a line.
+>> I am a bit wary however functions become heavier (more code into
+>> a single function). Maybe this checkpatch change should go with
+>> a another one warning when a function has more than 80 lines,
+>> excluding comments? (Even 80 is too much for my taste).
 > 
-> I think scsi_cdb_length() should always return >=1,
-> and scsi_req_parse_cdb() return if len <= 1.
+> Personally I just don't think checkpatch should be nudging people
+> into folding 85-character lines, especially when there are
+> multiple very similar lines in a row and only one would get
+> folded, eg the prototypes in target/arm/helper.h -- some of
+> these just edge beyond 80 characters and I think wrapping them
+> is clearly worse for readability. If we don't want people
+> sending us "style fix" patches which wrap >80 char lines
+> (which I think we do not) then we shouldn't have checkpatch
+> complain about them, because if it does then that's what we get.
 
-Looking at how this works, scsi_req_new() shouldn't take
-only a pointer to buffer without knowing its size...
-We should add a buflen argument and propagate it.
+I think I was not clear. I am not arguing against changing the *length*
+limit of a line (although I'd still keep one, as I don't think we want
+lines with 500 characters). I'm suggesting an orthogonal change,
+restricting the number of lines in a function :)
 
-Then we can check if scsi_cdb_length() <= buflen,
-and dump buflen if unknown opcode.
-
-Regards,
-
-Phil.
-
+> 
+> thanks
+> -- PMM
+> 
 
 
