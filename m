@@ -2,136 +2,92 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2E5C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C4AC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:44:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 197332078B
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:09:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23C4A20702
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:44:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FvuFNdRp";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ZQFagura"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 197332078B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="cG42IeA1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23C4A20702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbArm-0007FQ-4P
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 18:09:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53924)
+	id 1kbBPa-0007BN-0G
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 18:44:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <prvs=572b21b8d=Dmitry.Fomichev@wdc.com>)
- id 1kbAps-0004JM-4R; Fri, 06 Nov 2020 18:08:00 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:59197)
+ (envelope-from <prvs=572b21b8d=dmitry.fomichev@wdc.com>)
+ id 1kbBOD-0005K7-MM; Fri, 06 Nov 2020 18:43:31 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:57347)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <prvs=572b21b8d=Dmitry.Fomichev@wdc.com>)
- id 1kbApo-0006qa-I3; Fri, 06 Nov 2020 18:07:59 -0500
+ (envelope-from <prvs=572b21b8d=dmitry.fomichev@wdc.com>)
+ id 1kbBO6-0003Sk-Fr; Fri, 06 Nov 2020 18:43:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1604704076; x=1636240076;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=y5nwMFxr+6TpbPzU1ELHCWzRoanCpWpH6lzv+te2YHQ=;
- b=FvuFNdRppXGjaOlCra/dR14E+jOg81QqGOGM+rDsOMDD0/U2SOPBzjLV
- /JSkShKQkVKqPnFWZcKsByTV+fdxsW1l1yxwkVRgDiXtW3YqX/YZBIF8x
- LPl8kB7+xT1Y1DunhoZi/FuzJmnorMFihyGjenhi/PuGmQZs8M0eUtcx0
- KxtzSMmhYWPcz8QvoOsZzSaEGuXZhS5BD2Eli0Qc++b//KewP3Ev/6CGP
- tWQcOULyk2DaFwvt9KAsHBcwvAfE4tTMn9GCWPI+yYX1qTtOHZSlGjRHJ
- 5wAUn5/lr1T4es1F4LmIFJRyOzL8vWXBxLfxwjPgKWeNp3iqE3CALOv0G w==;
-IronPort-SDR: oSRCGRwzsT7Y9O3+HXtuzclwDkGMdhzJzedqRJWnyx8rU6gqQdJtagEWPSj5BoqVnkQjgRtrkp
- 3B0iLzXrNKq09ZR/SDR8nIg2IK58A9mj/rp2SKdJUkLZzrIOY59ldQR73zJE+sVUSQXLb+U8uN
- cRmISb2HYgRALr2QGEKAXESlOvzOmK77X8KHS/4HKJ0hVnxBXJ/3lT9XbwSYpegvKuYrI6Cp2J
- a5waIEvWI14p3aimqBVXjAloGYkMAhmkVNKIJ4+3Iw9dIRyFXMyILNw6/ZpqmO2aws5bzX+FVb
- 8QI=
-X-IronPort-AV: E=Sophos;i="5.77,457,1596470400"; d="scan'208";a="156545901"
-Received: from mail-co1nam11lp2174.outbound.protection.outlook.com (HELO
- NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.174])
- by ob1.hgst.iphmx.com with ESMTP; 07 Nov 2020 07:07:51 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SHqx7esU1YspDqhYRDtMDXe2imL+KmaukcUd65G7kE6OvEN1wpG6tHWhO4HN8iklJnrf7v1xn3avE9o13sqhECcThNmCPw4y0pajCQvVvtM+T/sn9ls7qeBLSdwxAzHAzSKQsZesEHeei/kuJiZty9aTufxa4lCsYrCIqvexxc7iYddsZybVZZqYHNlXsfZPr9HO38qn1Bu3fv149xSNL0Ftn30JQ9kyuuNzTClNbc/GUOaL19DEg8jBzSwRCpY6MotsFK8s/OIvYI0/dFoKw77CRVmCBQaU0+zdstnQYItHgSNbexOkasGBnAgT5mIazmvXj+SZtwvhg+uwoYwnqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AQLvKJ//S1Q2eW3mytyMpWvP+EYqFTksdrzahU9/WzA=;
- b=CxCLqDxghkvb0L53CjttE0BnV6cgKVZeH1IQ8CbGLGiEIY8o/zWFv1RD9Z/0i7CPrQMDX6qRb5ujd1Yj+0o1cNI6hZb7lT7YEwshX+h5Ne3mlBHrc3I1op7snT/puwo1p0fW89+0xyzgYkwyWDeeCIdfpiUrZQnau0iJ9NKfPWFIDHfwSfNG79UyaFLlI0Y7XeLM6X2YVGi5lu5kUhEwVKppk0oSFSzsU5LMDybypONdOrspkO4l/Cx2/fXrJh45JnFPZYCyC1VRH8Hg4AgeGx4HtWL9PRkpGT60CySv9fTTxq4mTMRBO9Xi4pWvVsdkOhU00Ai0P2tdDn12KLuBgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AQLvKJ//S1Q2eW3mytyMpWvP+EYqFTksdrzahU9/WzA=;
- b=ZQFagurattW7ZHc2vCf5W5YJKV1QIpbXIgh2jYKi6niTeD148c66Gj2C89ktS4caDQkUkIQK19sjWv1ihnc3B3vw9Bmk/hD8oJb3zsjgMgIYSlo+FaRGAjnSUHJB7c1afa/U1U1Ay5EKLQMSRnNqQmEMEcULXIOlDMvJIc/iz/U=
-Received: from MN2PR04MB5951.namprd04.prod.outlook.com (2603:10b6:208:3f::13)
- by MN2PR04MB5821.namprd04.prod.outlook.com (2603:10b6:208:a1::12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.27; Fri, 6 Nov
- 2020 23:07:50 +0000
-Received: from MN2PR04MB5951.namprd04.prod.outlook.com
- ([fe80::44c9:85df:4910:44d8]) by MN2PR04MB5951.namprd04.prod.outlook.com
- ([fe80::44c9:85df:4910:44d8%4]) with mapi id 15.20.3541.022; Fri, 6 Nov 2020
- 23:07:50 +0000
-From: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-To: Niklas Cassel <Niklas.Cassel@wdc.com>
-Subject: RE: [PATCH v9 08/12] hw/block/nvme: Support Zoned Namespace Command
- Set
-Thread-Topic: [PATCH v9 08/12] hw/block/nvme: Support Zoned Namespace Command
- Set
-Thread-Index: AQHWsx7wYCt5lx+QlEqSmzx8mJXt96m7AjKAgACkXBA=
-Date: Fri, 6 Nov 2020 23:07:49 +0000
-Message-ID: <MN2PR04MB5951A587754969FA3FFF7DEFE1ED0@MN2PR04MB5951.namprd04.prod.outlook.com>
-References: <20201105025342.9037-1-dmitry.fomichev@wdc.com>
- <20201105025342.9037-9-dmitry.fomichev@wdc.com>
- <20201106115903.GA345539@localhost.localdomain>
-In-Reply-To: <20201106115903.GA345539@localhost.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: d93184f2-a0f0-4a92-b2ed-08d882a8c866
-x-ms-traffictypediagnostic: MN2PR04MB5821:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB58218FAE884FDC9693207745E1ED0@MN2PR04MB5821.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: U4fqNzLc0GPgIdsudZHM6EPJ0kXwRHq8Z16d/Cx7WR9u5jK30Wh8rtKilXVqo6NBEK6X+y3vYmv2FL/oeacwxbVYg8t+24KWPhA6hU7D1O3wXGibEpB8H86JiJ3zn4+rbUZNDTJxL2TlBfdhrJTr3LX1ormaDjyj654GedjvwYZPZKftoTZ2rNtQTRA2TPH31jCBVSwC5giFSLnpqUQP94n0iteIUeWVOf2gNPvG7wSOm7N/ASfqctsLlORA51OHnA+/op/ZYkDt5vR7d99zhsGTg9TcLTLpPrmJP+U+Y4FRi92lE0rZjKwCiHeD2D7aJha/0O6lgELL9qw447/eJQ==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MN2PR04MB5951.namprd04.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39860400002)(136003)(376002)(366004)(396003)(346002)(86362001)(66476007)(7696005)(9686003)(33656002)(66946007)(55016002)(54906003)(53546011)(83380400001)(26005)(6506007)(186003)(64756008)(66556008)(66446008)(5660300002)(8676002)(76116006)(8936002)(71200400001)(52536014)(2906002)(316002)(6636002)(4326008)(6862004)(478600001);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: cOXnF26AZ5o9l5yXKUEEZBYwzpeMwvYyFl44TZqkMBiR283Vu8h+rMnNFBOEDhnYQ/lZNIjoaPhdZBcZldYWC6jOAXtmQlqaXRfcWgqk+u/8iTaAO6xSPPtPMZ/dWwYcVoEkDARtukHXkGFfBwcO6m/rHHOZiWCQgtPXxexcAIk51olFCXpZHtmwxQeTjtqfK6DgovhQn112pNQ/U+5M3PYliEjDgjvynaR+RubN3+DJ09F0OXmwbCCzmUjSQHJa6TGx8dlPReXCrcUm5hRE6I4YOdc1CJ733z98RHdB61k5Ee4ofLUMkyE9LlDHbOR6oUxnQolBFL7/hFXMn4XRlmE/JPuWyONNg/Kv60KNzUEEUTOfZYfDE21YW6T9u26yC7pln140+gjwAjUv9EywCjsHGM99xEoLGhGoGHBc62MWL2/EPPk2P3pLubMv2o4I0gq/CcjFdb9lBDh5RbGAZIsSx8NIw+rha9+hP5FocwW3fc1bVr0yjzTMnocbDNb3PVHRkdYlqsUugAuFAKGo3bUTFKNXrOoFTFUxQcMRdiVGl8i24YAcUFiebgsMc6KPUYmWBlfUxqBU6QkwvPb7CM3/IiJgrQu5/2S1p9G3ZG8v3yVfiHEK4QZFBZY1glcZZr7FBYh1TCMeq/CVVlC4Dg==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ t=1604706203; x=1636242203;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=6G60QSjZ5krlPLtstuo7O4+ni+lcVZttvDGIQYGvErY=;
+ b=cG42IeA1rmUDUD3gBVRdLEUIroEPdNGAR15ddGgjpwLhjH1cTEEUaIim
+ 6HhcyDSm7u8S+Oa2cmbNIfTsybd+6YE3wcV1OpfCGxL5b9fTRwDH4DMbL
+ 3r5JGIQInGbFiIXVGUiyN+yk056jjpjadg/aVDGd6naumX+rubE7EFqVN
+ 1TAlnbfIlLeAac0g6JBwybr63hLlxpoUrNY93LT9VxCJfy9gsL9x07KTD
+ ZP2JNdno0jRglnO8Qq1DgHRqqLuQQLchJtNujSyIe33BWHjWOclyYSWFb
+ kSz0yW81rY4EYF0cJjtvFIfnWcRCESHot8ImVeKlKQz+90gjNDfm87hJc Q==;
+IronPort-SDR: eVRk/l04tD7WHMybTbrYI5IrnyBFtqPqGh3biCRtDeuTreDZXsna9tk5MM8bHTcbnhpFeFXVNU
+ sClJoGDgf8Dg2jULTJKzL3H3HKxr9vfrxRg6YyIaBxkSXgpe+/huvxAIf44JVZPXZC+7HR6VPt
+ Tf0+S7yUPAJopj8c+wbdqI19UesYoQEfFTswgWTvo4fNl1MI+URZQiBusO2EhsFm8ET69dSSXK
+ 00A6D8dgglg7GfA45AmQR/OnYQhShaMHW2dbDYhK3n/jihXaW0nFSaAKghzynI7jrq0S9JtEoo
+ enE=
+X-IronPort-AV: E=Sophos;i="5.77,457,1596470400"; d="scan'208";a="153267058"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 07 Nov 2020 07:43:20 +0800
+IronPort-SDR: lPsAgmjEEX/sBbM6gJ4ThCQKCGwphh5CBKGobB7LSWSwSJswjOaVlkqIuTQZWeanpgc99VawWD
+ kMiZmIcK2r4LeXJq3Z69PA3grh8KcE3uvDhsgmmS7bLUOgtntTK12PFNPNhXsRha/eEV6TA+Gi
+ TbuZUWbsQyyRphiKXcyHbfsD571VdARODI7JpGJQhMHRH43akHvHT2jJEy/Mcn/B4T2A6KdokI
+ YWqdu6XpGDNENIodF/0LWXXdX9i8x7IN+y2Q0S7IfTIarRZwzsPuW+2K+9KU6veDtUNBxT+Y9x
+ Vs7H/9k+kNmKV8648wKmg8gt
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 06 Nov 2020 15:28:11 -0800
+IronPort-SDR: jvqQwdkAZ804dQyqbFI+ZB9JkyifRd4C+4Ajm3NfSanxXjjw4LGo13/fDelabpFNG3cAnHz5Cx
+ XPOIHzeZwee28OtYY0MNaeBopwOe6/3C7Pu/i59uw6G9uKwxutXprug2quaPwRaH61ONGlkLit
+ TLCNUFT6yKVE8S7qf6vsb6smEaseBUhwM8cnq8b6PB/azIwyway5XEVcUmdpABR8z1RJpgOHvr
+ HQYO00JtUXmLbCQDMoexEns8vUw/iZNK2FLFwqmgoiJWWKQzCqBcGxgxKYdZuoEu+mP9hovLHh
+ Vvg=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
+ by uls-op-cesaip01.wdc.com with ESMTP; 06 Nov 2020 15:43:17 -0800
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Fam Zheng <fam@euphon.net>
+Subject: [PATCH v10 03/12] hw/block/nvme: Separate read and write handlers
+Date: Sat,  7 Nov 2020 08:42:56 +0900
+Message-Id: <20201106234305.21339-4-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20201106234305.21339-1-dmitry.fomichev@wdc.com>
+References: <20201106234305.21339-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR04MB5951.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d93184f2-a0f0-4a92-b2ed-08d882a8c866
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Nov 2020 23:07:50.0306 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GUAFoiVsdGT0VTEIQk2ognLdFiqOqffN6WMNPpVyEbv5wqzC+xPyEY/cjEyYQyY5vm85Mh3SffwYIWJHhh0duA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB5821
-Received-SPF: pass client-ip=216.71.153.141;
- envelope-from=prvs=572b21b8d=Dmitry.Fomichev@wdc.com; helo=esa3.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 18:07:53
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.154.45;
+ envelope-from=prvs=572b21b8d=dmitry.fomichev@wdc.com; helo=esa6.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 18:43:12
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -152,225 +108,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Damien Le Moal <Damien.LeMoal@wdc.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Klaus Jensen <k.jensen@samsung.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
- Max Reitz <mreitz@redhat.com>,
- =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Matias Bjorling <Matias.Bjorling@wdc.com>
+Cc: Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Niklas Cassel <Niklas.Cassel@wdc.com>
-> Sent: Friday, November 6, 2020 6:59 AM
-> To: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
-> Cc: Keith Busch <kbusch@kernel.org>; Klaus Jensen
-> <k.jensen@samsung.com>; Kevin Wolf <kwolf@redhat.com>; Philippe
-> Mathieu-Daud=E9 <philmd@redhat.com>; Max Reitz <mreitz@redhat.com>;
-> Maxim Levitsky <mlevitsk@redhat.com>; Fam Zheng <fam@euphon.net>;
-> Alistair Francis <Alistair.Francis@wdc.com>; Matias Bjorling
-> <Matias.Bjorling@wdc.com>; Damien Le Moal <Damien.LeMoal@wdc.com>;
-> qemu-block@nongnu.org; qemu-devel@nongnu.org
-> Subject: Re: [PATCH v9 08/12] hw/block/nvme: Support Zoned Namespace
-> Command Set
->=20
-> On Thu, Nov 05, 2020 at 11:53:38AM +0900, Dmitry Fomichev wrote:
-> > The emulation code has been changed to advertise NVM Command Set
-> when
-> > "zoned" device property is not set (default) and Zoned Namespace
-> > Command Set otherwise.
-> >
-> > Define values and structures that are needed to support Zoned
-> > Namespace Command Set (NVMe TP 4053) in PCI NVMe controller
-> emulator.
-> > Define trace events where needed in newly introduced code.
-> >
-> > In order to improve scalability, all open, closed and full zones
-> > are organized in separate linked lists. Consequently, almost all
-> > zone operations don't require scanning of the entire zone array
-> > (which potentially can be quite large) - it is only necessary to
-> > enumerate one or more zone lists.
-> >
-> > Handlers for three new NVMe commands introduced in Zoned Namespace
-> > Command Set specification are added, namely for Zone Management
-> > Receive, Zone Management Send and Zone Append.
-> >
-> > Device initialization code has been extended to create a proper
-> > configuration for zoned operation using device properties.
-> >
-> > Read/Write command handler is modified to only allow writes at the
-> > write pointer if the namespace is zoned. For Zone Append command,
-> > writes implicitly happen at the write pointer and the starting write
-> > pointer value is returned as the result of the command. Write Zeroes
-> > handler is modified to add zoned checks that are identical to those
-> > done as a part of Write flow.
-> >
-> > Subsequent commits in this series add ZDE support and checks for
-> > active and open zone limits.
-> >
-> > Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-> > Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
-> > Signed-off-by: Ajay Joshi <ajay.joshi@wdc.com>
-> > Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> > Signed-off-by: Matias Bjorling <matias.bjorling@wdc.com>
-> > Signed-off-by: Aravind Ramesh <aravind.ramesh@wdc.com>
-> > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> > Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
-> > Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> > Reviewed-by: Niklas Cassel <Niklas.Cassel@wdc.com>
-> > ---
-> >  hw/block/nvme-ns.h    |  54 +++
-> >  hw/block/nvme.h       |   8 +
-> >  hw/block/nvme-ns.c    | 173 ++++++++
-> >  hw/block/nvme.c       | 971
-> +++++++++++++++++++++++++++++++++++++++++-
-> >  hw/block/trace-events |  18 +-
-> >  5 files changed, 1209 insertions(+), 15 deletions(-)
-> >
->=20
-> (snip)
->=20
-> > +static uint16_t nvme_zone_mgmt_recv(NvmeCtrl *n, NvmeRequest
-> *req)
-> > +{
-> > +    NvmeCmd *cmd =3D (NvmeCmd *)&req->cmd;
-> > +    NvmeNamespace *ns =3D req->ns;
-> > +    /* cdw12 is zero-based number of dwords to return. Convert to byte=
-s
-> */
-> > +    uint32_t data_size =3D (le32_to_cpu(cmd->cdw12) + 1) << 2;
-> > +    uint32_t dw13 =3D le32_to_cpu(cmd->cdw13);
-> > +    uint32_t zone_idx, zra, zrasf, partial;
-> > +    uint64_t max_zones, nr_zones =3D 0;
-> > +    uint16_t ret;
-> > +    uint64_t slba;
-> > +    NvmeZoneDescr *z;
-> > +    NvmeZone *zs;
-> > +    NvmeZoneReportHeader *header;
-> > +    void *buf, *buf_p;
-> > +    size_t zone_entry_sz;
-> > +
-> > +    req->status =3D NVME_SUCCESS;
-> > +
-> > +    ret =3D nvme_get_mgmt_zone_slba_idx(ns, cmd, &slba, &zone_idx);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    zra =3D dw13 & 0xff;
-> > +    if (zra !=3D NVME_ZONE_REPORT) {
-> > +        return NVME_INVALID_FIELD | NVME_DNR;
-> > +    }
-> > +
-> > +    zrasf =3D (dw13 >> 8) & 0xff;
-> > +    if (zrasf > NVME_ZONE_REPORT_OFFLINE) {
-> > +        return NVME_INVALID_FIELD | NVME_DNR;
-> > +    }
-> > +
-> > +    if (data_size < sizeof(NvmeZoneReportHeader)) {
-> > +        return NVME_INVALID_FIELD | NVME_DNR;
-> > +    }
-> > +
-> > +    ret =3D nvme_map_dptr(n, data_size, req);
->=20
-> nvme_map_dptr() call was not here in v8 patch set.
->=20
-> On v7 I commented that you were missing a call to nvme_check_mdts().
-> I think you still need to call nvme_check_mdts in order to verify
-> that data_size < mdts, no?
+With ZNS support in place, the majority of code in nvme_rw() has
+become read- or write-specific. Move these parts to two separate
+handlers, nvme_read() and nvme_write() to make the code more
+readable and to remove multiple is_write checks that so far existed
+in the i/o path.
 
-Ugh, I've added nvme_map_dptr() instead of nvme_check_mdts() :o
-Will send the corrected version shortly...
+This is a refactoring patch, no change in functionality.
 
-Cheers,
-DF
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Reviewed-by: Niklas Cassel <Niklas.Cassel@wdc.com>
+Acked-by: Klaus Jensen <its@irrelevant.dk>
+---
+ hw/block/nvme.c       | 91 ++++++++++++++++++++++++++++++-------------
+ hw/block/trace-events |  3 +-
+ 2 files changed, 67 insertions(+), 27 deletions(-)
 
->=20
-> This function already has a call do nvme_dma(). nvme_dma() already
-> calls nvme_map_dptr().
-> If you use nvme_dma(), you cannot use nvme_map_dptr().
->=20
-> It will call nvme_map_addr() (which calls qemu_sglist_add()) on the
-> same buffer twice, causing the qsg->size to be twice what the user
-> sent in. Which will cause the:
->=20
->         if (unlikely(residual)) {
->=20
-> check in nvme_dma() to fail.
->=20
->=20
-> Looking at nvme_read()/nvme_write(), they use nvme_map_dptr()
-> (without any call to nvme_dma()), and then use dma_blk_read() or
-> dma_blk_write(). (and they both call nvme_check_mdts())
->=20
->=20
-> Kind regards,
-> Niklas
->=20
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    partial =3D (dw13 >> 16) & 0x01;
-> > +
-> > +    zone_entry_sz =3D sizeof(NvmeZoneDescr);
-> > +
-> > +    max_zones =3D (data_size - sizeof(NvmeZoneReportHeader)) /
-> zone_entry_sz;
-> > +    buf =3D g_malloc0(data_size);
-> > +
-> > +    header =3D (NvmeZoneReportHeader *)buf;
-> > +    buf_p =3D buf + sizeof(NvmeZoneReportHeader);
-> > +
-> > +    while (zone_idx < ns->num_zones && nr_zones < max_zones) {
-> > +        zs =3D &ns->zone_array[zone_idx];
-> > +
-> > +        if (!nvme_zone_matches_filter(zrasf, zs)) {
-> > +            zone_idx++;
-> > +            continue;
-> > +        }
-> > +
-> > +        z =3D (NvmeZoneDescr *)buf_p;
-> > +        buf_p +=3D sizeof(NvmeZoneDescr);
-> > +        nr_zones++;
-> > +
-> > +        z->zt =3D zs->d.zt;
-> > +        z->zs =3D zs->d.zs;
-> > +        z->zcap =3D cpu_to_le64(zs->d.zcap);
-> > +        z->zslba =3D cpu_to_le64(zs->d.zslba);
-> > +        z->za =3D zs->d.za;
-> > +
-> > +        if (nvme_wp_is_valid(zs)) {
-> > +            z->wp =3D cpu_to_le64(zs->d.wp);
-> > +        } else {
-> > +            z->wp =3D cpu_to_le64(~0ULL);
-> > +        }
-> > +
-> > +        zone_idx++;
-> > +    }
-> > +
-> > +    if (!partial) {
-> > +        for (; zone_idx < ns->num_zones; zone_idx++) {
-> > +            zs =3D &ns->zone_array[zone_idx];
-> > +            if (nvme_zone_matches_filter(zrasf, zs)) {
-> > +                nr_zones++;
-> > +            }
-> > +        }
-> > +    }
-> > +    header->nr_zones =3D cpu_to_le64(nr_zones);
-> > +
-> > +    ret =3D nvme_dma(n, (uint8_t *)buf, data_size,
-> > +                   DMA_DIRECTION_FROM_DEVICE, req);
-> > +
-> > +    g_free(buf);
-> > +
-> > +    return ret;
-> > +}
-> > +
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index ed3f38f01d..770e42a066 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -953,6 +953,54 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeRequest *req)
+     return NVME_NO_COMPLETE;
+ }
+ 
++static uint16_t nvme_read(NvmeCtrl *n, NvmeRequest *req)
++{
++    NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
++    NvmeNamespace *ns = req->ns;
++    uint64_t slba = le64_to_cpu(rw->slba);
++    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
++    uint64_t data_size = nvme_l2b(ns, nlb);
++    uint64_t data_offset;
++    BlockBackend *blk = ns->blkconf.blk;
++    uint16_t status;
++
++    trace_pci_nvme_read(nvme_cid(req), nvme_nsid(ns), nlb, data_size, slba);
++
++    status = nvme_check_mdts(n, data_size);
++    if (status) {
++        trace_pci_nvme_err_mdts(nvme_cid(req), data_size);
++        goto invalid;
++    }
++
++    status = nvme_check_bounds(n, ns, slba, nlb);
++    if (status) {
++        trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
++        goto invalid;
++    }
++
++    status = nvme_map_dptr(n, data_size, req);
++    if (status) {
++        goto invalid;
++    }
++
++    data_offset = nvme_l2b(ns, slba);
++
++    block_acct_start(blk_get_stats(blk), &req->acct, data_size,
++                     BLOCK_ACCT_READ);
++    if (req->qsg.sg) {
++        req->aiocb = dma_blk_read(blk, &req->qsg, data_offset,
++                                  BDRV_SECTOR_SIZE, nvme_rw_cb, req);
++    } else {
++        req->aiocb = blk_aio_preadv(blk, data_offset, &req->iov, 0,
++                                    nvme_rw_cb, req);
++    }
++    return NVME_NO_COMPLETE;
++
++invalid:
++    block_acct_invalid(blk_get_stats(blk), BLOCK_ACCT_READ);
++    return status | NVME_DNR;
++}
++
+ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
+@@ -978,22 +1026,19 @@ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+     return NVME_NO_COMPLETE;
+ }
+ 
+-static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
++static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
+     NvmeNamespace *ns = req->ns;
+-    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
+     uint64_t slba = le64_to_cpu(rw->slba);
+-
++    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
+     uint64_t data_size = nvme_l2b(ns, nlb);
+-    uint64_t data_offset = nvme_l2b(ns, slba);
+-    enum BlockAcctType acct = req->cmd.opcode == NVME_CMD_WRITE ?
+-        BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
++    uint64_t data_offset;
+     BlockBackend *blk = ns->blkconf.blk;
+     uint16_t status;
+ 
+-    trace_pci_nvme_rw(nvme_cid(req), nvme_io_opc_str(rw->opcode),
+-                      nvme_nsid(ns), nlb, data_size, slba);
++    trace_pci_nvme_write(nvme_cid(req), nvme_io_opc_str(rw->opcode),
++                         nvme_nsid(ns), nlb, data_size, slba);
+ 
+     status = nvme_check_mdts(n, data_size);
+     if (status) {
+@@ -1012,29 +1057,22 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
+         goto invalid;
+     }
+ 
+-    block_acct_start(blk_get_stats(blk), &req->acct, data_size, acct);
++    data_offset = nvme_l2b(ns, slba);
++
++    block_acct_start(blk_get_stats(blk), &req->acct, data_size,
++                     BLOCK_ACCT_WRITE);
+     if (req->qsg.sg) {
+-        if (acct == BLOCK_ACCT_WRITE) {
+-            req->aiocb = dma_blk_write(blk, &req->qsg, data_offset,
+-                                       BDRV_SECTOR_SIZE, nvme_rw_cb, req);
+-        } else {
+-            req->aiocb = dma_blk_read(blk, &req->qsg, data_offset,
+-                                      BDRV_SECTOR_SIZE, nvme_rw_cb, req);
+-        }
++        req->aiocb = dma_blk_write(blk, &req->qsg, data_offset,
++                                   BDRV_SECTOR_SIZE, nvme_rw_cb, req);
+     } else {
+-        if (acct == BLOCK_ACCT_WRITE) {
+-            req->aiocb = blk_aio_pwritev(blk, data_offset, &req->iov, 0,
+-                                         nvme_rw_cb, req);
+-        } else {
+-            req->aiocb = blk_aio_preadv(blk, data_offset, &req->iov, 0,
+-                                        nvme_rw_cb, req);
+-        }
++        req->aiocb = blk_aio_pwritev(blk, data_offset, &req->iov, 0,
++                                     nvme_rw_cb, req);
+     }
+     return NVME_NO_COMPLETE;
+ 
+ invalid:
+-    block_acct_invalid(blk_get_stats(ns->blkconf.blk), acct);
+-    return status;
++    block_acct_invalid(blk_get_stats(blk), BLOCK_ACCT_WRITE);
++    return status | NVME_DNR;
+ }
+ 
+ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
+@@ -1064,8 +1102,9 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
+     case NVME_CMD_WRITE_ZEROES:
+         return nvme_write_zeroes(n, req);
+     case NVME_CMD_WRITE:
++        return nvme_write(n, req);
+     case NVME_CMD_READ:
+-        return nvme_rw(n, req);
++        return nvme_read(n, req);
+     default:
+         assert(false);
+     }
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 33832a2021..540c600931 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -40,7 +40,8 @@ pci_nvme_map_prp(uint64_t trans_len, uint32_t len, uint64_t prp1, uint64_t prp2,
+ pci_nvme_map_sgl(uint16_t cid, uint8_t typ, uint64_t len) "cid %"PRIu16" type 0x%"PRIx8" len %"PRIu64""
+ pci_nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode, const char *opname) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8" opname '%s'"
+ pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode, const char *opname) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8" opname '%s'"
+-pci_nvme_rw(uint16_t cid, const char *verb, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" opname '%s' nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
++pci_nvme_read(uint16_t cid, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
++pci_nvme_write(uint16_t cid, const char *verb, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" opname '%s' nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
+ pci_nvme_rw_cb(uint16_t cid, const char *blkname) "cid %"PRIu16" blk '%s'"
+ pci_nvme_write_zeroes(uint16_t cid, uint32_t nsid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" nsid %"PRIu32" slba %"PRIu64" nlb %"PRIu32""
+ pci_nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
+-- 
+2.21.0
+
 
