@@ -2,99 +2,91 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA674C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA518C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:55:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 361F1206FC
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:54:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A99A206FC
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 23:55:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RiAy3J0c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 361F1206FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W4668tyx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A99A206FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbBZE-0001M4-9H
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 18:54:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34282)
+	id 1kbBZN-0001Vv-2B
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 18:55:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=572b21b8d=dmitry.fomichev@wdc.com>)
- id 1kbBOI-0005SA-CI; Fri, 06 Nov 2020 18:43:34 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:57360)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=572b21b8d=dmitry.fomichev@wdc.com>)
- id 1kbBOG-0003Tq-BK; Fri, 06 Nov 2020 18:43:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1604706213; x=1636242213;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=g063222WlgUGzbpsQdE8ESMz45RVE42CPVFav5X88Us=;
- b=RiAy3J0c0dC7az2FYMAGsZTX/OKGaV0IrvONIGAsMtfJTbNFtvOd0uPR
- 8VRNl2DKzi0ND3cGxVZvStcwRANMGoPV2DmZeNPOb0LSkMtOdGMKsEWVj
- HI3QJXBQtlJ7krddekixobnCHWv25A18KPIMN9y70nMw6XJZN9ZpWNcCN
- 6lxNohEeP+xp+84b1W5LVt2zsSji+uEp+C2F09MJJ/VErBju5E/J+Ploy
- ohIz5Z7E+qRBlyRyXmXB4p7RpgCcWAsEtfb1MaiRuT98sml9kqn1qvMWf
- 1fsQeodnVsRblf2ziqgPde2VUfzLuPlsUd/hsF8FZzimMQhGxzP7MjzXg A==;
-IronPort-SDR: ewtCoAUuunRnAMMQ2l9Ozj8HLFi3ZuScEqUWOXZcQO3Mh/pddoae8w00SDad3UC6j/sTbwL+gJ
- 4jtyUOsyaMXw1rk+9d79h3uO2bezqSi7FI2p3OUClZO338NiMJdmE9bOfahInF1Ij4A77Jmgpk
- NjLD2M0ACe1T82F4B9c5qS1LqhN4lgLHUUfTNjHdMoRQsQW67YPIp8EwaqbAlHt7etmuFH1mNi
- JvfxRVVdlE3E3dfUKYRDJymumnRzX5Pkdf/L616Gky9jMV4feSx6wZ+6Hsy+Y0Q+WFTZ7o1qqC
- aQY=
-X-IronPort-AV: E=Sophos;i="5.77,457,1596470400"; d="scan'208";a="153267071"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 07 Nov 2020 07:43:31 +0800
-IronPort-SDR: 55o6HdOnW4Vv/pQrCMmRc0LSt0bLVUfySDVvDgOtT9UjCjNaBvIZDdA0Ij/1QbCRuvxsWJI+Et
- Yj7Z4vPFRUXwq39iY4tNQVqvetlEM/y+v6fqvhu9oZFUCZMULQEm4DkvnFyi6OXPN7fkN1D+fp
- K2O4sG/vcHrSPybIowgxR+ONfvulnDc8v/ZNMDpHbXXRRKd9dkZcO5843vbLw3U1TmdZI6qspg
- f1Aiobw9+3Mupsw5mFKsj+ErDdebDiis3XvmnPfuddP47CBG+qsCYrN69/sZpO7m+sS8+aB+3R
- Ymg4EqwTM9dN7rwZWR+jt1gK
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 06 Nov 2020 15:28:22 -0800
-IronPort-SDR: wxDKU7jQOtvn0suT9acN7pJP29WOvGxiLY7MrNbCLrmM1WzN72iJAlL/qs2IpuAIIbKxOiyULo
- TB5PSdpM/4JkcQvt4sbLn3tUaYimpVZPkp8rmPSJEuv25yTS3V/NrC2goEpXr9XtjrkT6PuNWo
- l0szem1Dl8kSNR9ECIIcRFq932ce6DtEdWarIuv1zIdOVBj4pPV1wmnsyrMdyN6n2srs3jWgTU
- VUovQpzraIsvvRSYXFnkOpZ8iqwG648MYsAlUkIpmwoPq8eGO91uERpKWtI1hpbciBYFH1vFAz
- cEQ=
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip01.wdc.com with ESMTP; 06 Nov 2020 15:43:28 -0800
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
- Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Fam Zheng <fam@euphon.net>
-Subject: [PATCH v10 07/12] block/nvme: Make ZNS-related definitions
-Date: Sat,  7 Nov 2020 08:43:00 +0900
-Message-Id: <20201106234305.21339-8-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20201106234305.21339-1-dmitry.fomichev@wdc.com>
-References: <20201106234305.21339-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kbBVl-0006BA-U3
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 18:51:17 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53903)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kbBVi-0004XZ-JK
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 18:51:17 -0500
+Received: by mail-wm1-x341.google.com with SMTP id p22so3011623wmg.3
+ for <qemu-devel@nongnu.org>; Fri, 06 Nov 2020 15:51:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ciIxu8fgfHqLwzeZe9kzt7oqxoPUcHRTdGjgpHaZohw=;
+ b=W4668tyxn/0cj88UQ1FP5bqj7dji5vObycPBabRnBtNNBiE7nRTaBVhaQWxQE8GROf
+ zYI3VmTX5BVs83tVHTxhM9J5PXiZENYXLaL5/bMVTLst8k16Vsf0oHMoOadKAEaIE4mL
+ VV4Va2EeNZtdqacMv8hK/PIz0tC6rzZaDE2AmxqzWbJpZtPHWFgJ4aLyWYigtk+zKrH0
+ fXvPFyhqoXNaMYmncGJQ5ESr58lLruZ1Lac2EnGlqiRgylIu5gnocCrxH2QOXuYPpkzs
+ FuCoGSH49PnNXtdwyxoTu1ysFxcu1vV7B9EGQeDN84bJXiTIgIBqFbeYVFwGvuSTI4Ag
+ 9OKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ciIxu8fgfHqLwzeZe9kzt7oqxoPUcHRTdGjgpHaZohw=;
+ b=Lzx/Rd8KZzI+c+fKgRn5anr4wkJVKSheeapWO7DegQldkKpMRGA3W28VlgAauNnzoR
+ +vGORKuVRqhHhACOAazPz1CA/0pJdj8pvIi4h1+p5w5o+oWgYD7SHbx7+FuYaiQ/2v7d
+ BcV2nL8WNwrUzTs+Pwjw7KL/jXfdnlybj7y3GeLrAzAgn8xDc1dVSM4lEY7yUmdOJEst
+ NkJKeV/6dYncqbs3q1W1v04k+TkeR4tq+LDL9+yvpFhIgA/W1a+VAAc9BpNLRaCNcxox
+ ZSY5w8IHGQWyx/EVFVxzYE1OsGDjY0UbHq4KxTUIyU1IWm922/fy6vogDLaPCe7Pp7Lp
+ eevA==
+X-Gm-Message-State: AOAM532zkHA+SubB0rxe1jjstzF0XetqqP9PYcqOCM+NYsSyutwfBMqi
+ Eeaf0GVC5WPMKdfRyvDcMFiK89HOBusRug==
+X-Google-Smtp-Source: ABdhPJwlcVvabq9ZbZ2JTWQYniTKPz3dUCLsxCtxUyHBEFA+z3E5GG4RwdAHorKuBGFcU5d5ir59DQ==
+X-Received: by 2002:a7b:cf31:: with SMTP id m17mr1980037wmg.62.1604706672408; 
+ Fri, 06 Nov 2020 15:51:12 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id n8sm4025374wmc.11.2020.11.06.15.51.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Nov 2020 15:51:11 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/2] hw/m68k/q800: Don't connect two qemu_irqs directly to the
+ same input
+Date: Fri,  6 Nov 2020 23:51:08 +0000
+Message-Id: <20201106235109.7066-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201106235109.7066-1-peter.maydell@linaro.org>
+References: <20201106235109.7066-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.45;
- envelope-from=prvs=572b21b8d=dmitry.fomichev@wdc.com; helo=esa6.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 18:43:12
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,217 +100,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Define values and structures that are needed to support Zoned
-Namespace Command Set (NVMe TP 4053).
+The q800 board code connects both of the IRQ outputs of the ESCC
+to the same pic[3] qemu_irq. Connecting two qemu_irqs outputs directly
+to the same input is not valid as it produces subtly wrong behaviour
+(for instance if both the IRQ lines are high, and then one goes
+low, the PIC input will see this as a high-to-low transition
+even though the second IRQ line should still be holding it high).
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+This kind of wiring needs an explicitly created OR gate; add one.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/block/nvme.h | 114 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 113 insertions(+), 1 deletion(-)
+ hw/m68k/q800.c  | 12 ++++++++++--
+ hw/m68k/Kconfig |  1 +
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 394db19022..752623b4f9 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -489,6 +489,9 @@ enum NvmeIoCommands {
-     NVME_CMD_COMPARE            = 0x05,
-     NVME_CMD_WRITE_ZEROES       = 0x08,
-     NVME_CMD_DSM                = 0x09,
-+    NVME_CMD_ZONE_MGMT_SEND     = 0x79,
-+    NVME_CMD_ZONE_MGMT_RECV     = 0x7a,
-+    NVME_CMD_ZONE_APPEND        = 0x7d,
- };
+diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+index ce4b47c3e34..dc13007aaf2 100644
+--- a/hw/m68k/q800.c
++++ b/hw/m68k/q800.c
+@@ -28,6 +28,7 @@
+ #include "hw/hw.h"
+ #include "hw/boards.h"
+ #include "hw/irq.h"
++#include "hw/or-irq.h"
+ #include "elf.h"
+ #include "hw/loader.h"
+ #include "ui/console.h"
+@@ -171,6 +172,7 @@ static void q800_init(MachineState *machine)
+     CPUState *cs;
+     DeviceState *dev;
+     DeviceState *via_dev;
++    DeviceState *escc_orgate;
+     SysBusESPState *sysbus_esp;
+     ESPState *esp;
+     SysBusDevice *sysbus;
+@@ -283,8 +285,14 @@ static void q800_init(MachineState *machine)
+     qdev_prop_set_uint32(dev, "chnAtype", 0);
+     sysbus = SYS_BUS_DEVICE(dev);
+     sysbus_realize_and_unref(sysbus, &error_fatal);
+-    sysbus_connect_irq(sysbus, 0, pic[3]);
+-    sysbus_connect_irq(sysbus, 1, pic[3]);
++
++    /* Logically OR both its IRQs together */
++    escc_orgate = DEVICE(object_new(TYPE_OR_IRQ));
++    object_property_set_int(OBJECT(escc_orgate), "num-lines", 2, &error_fatal);
++    qdev_realize_and_unref(escc_orgate, NULL, &error_fatal);
++    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in(escc_orgate, 0));
++    sysbus_connect_irq(sysbus, 1, qdev_get_gpio_in(escc_orgate, 1));
++    qdev_connect_gpio_out(DEVICE(escc_orgate), 0, pic[3]);
+     sysbus_mmio_map(sysbus, 0, SCC_BASE);
  
- typedef struct QEMU_PACKED NvmeDeleteQ {
-@@ -648,9 +651,13 @@ typedef struct QEMU_PACKED NvmeAerResult {
-     uint8_t resv;
- } NvmeAerResult;
- 
-+typedef struct QEMU_PACKED NvmeZonedResult {
-+    uint64_t slba;
-+} NvmeZonedResult;
-+
- typedef struct QEMU_PACKED NvmeCqe {
-     uint32_t    result;
--    uint32_t    rsvd;
-+    uint32_t    dw1;
-     uint16_t    sq_head;
-     uint16_t    sq_id;
-     uint16_t    cid;
-@@ -679,6 +686,7 @@ enum NvmeStatusCodes {
-     NVME_INVALID_USE_OF_CMB     = 0x0012,
-     NVME_INVALID_PRP_OFFSET     = 0x0013,
-     NVME_CMD_SET_CMB_REJECTED   = 0x002b,
-+    NVME_INVALID_CMD_SET        = 0x002c,
-     NVME_LBA_RANGE              = 0x0080,
-     NVME_CAP_EXCEEDED           = 0x0081,
-     NVME_NS_NOT_READY           = 0x0082,
-@@ -703,6 +711,14 @@ enum NvmeStatusCodes {
-     NVME_CONFLICTING_ATTRS      = 0x0180,
-     NVME_INVALID_PROT_INFO      = 0x0181,
-     NVME_WRITE_TO_RO            = 0x0182,
-+    NVME_ZONE_BOUNDARY_ERROR    = 0x01b8,
-+    NVME_ZONE_FULL              = 0x01b9,
-+    NVME_ZONE_READ_ONLY         = 0x01ba,
-+    NVME_ZONE_OFFLINE           = 0x01bb,
-+    NVME_ZONE_INVALID_WRITE     = 0x01bc,
-+    NVME_ZONE_TOO_MANY_ACTIVE   = 0x01bd,
-+    NVME_ZONE_TOO_MANY_OPEN     = 0x01be,
-+    NVME_ZONE_INVAL_TRANSITION  = 0x01bf,
-     NVME_WRITE_FAULT            = 0x0280,
-     NVME_UNRECOVERED_READ       = 0x0281,
-     NVME_E2E_GUARD_ERROR        = 0x0282,
-@@ -887,6 +903,11 @@ typedef struct QEMU_PACKED NvmeIdCtrl {
-     uint8_t     vs[1024];
- } NvmeIdCtrl;
- 
-+typedef struct NvmeIdCtrlZoned {
-+    uint8_t     zasl;
-+    uint8_t     rsvd1[4095];
-+} NvmeIdCtrlZoned;
-+
- enum NvmeIdCtrlOacs {
-     NVME_OACS_SECURITY  = 1 << 0,
-     NVME_OACS_FORMAT    = 1 << 1,
-@@ -1012,6 +1033,12 @@ typedef struct QEMU_PACKED NvmeLBAF {
-     uint8_t     rp;
- } NvmeLBAF;
- 
-+typedef struct QEMU_PACKED NvmeLBAFE {
-+    uint64_t    zsze;
-+    uint8_t     zdes;
-+    uint8_t     rsvd9[7];
-+} NvmeLBAFE;
-+
- #define NVME_NSID_BROADCAST 0xffffffff
- 
- typedef struct QEMU_PACKED NvmeIdNs {
-@@ -1066,10 +1093,24 @@ enum NvmeNsIdentifierType {
- 
- enum NvmeCsi {
-     NVME_CSI_NVM                = 0x00,
-+    NVME_CSI_ZONED              = 0x02,
- };
- 
- #define NVME_SET_CSI(vec, csi) (vec |= (uint8_t)(1 << (csi)))
- 
-+typedef struct QEMU_PACKED NvmeIdNsZoned {
-+    uint16_t    zoc;
-+    uint16_t    ozcs;
-+    uint32_t    mar;
-+    uint32_t    mor;
-+    uint32_t    rrl;
-+    uint32_t    frl;
-+    uint8_t     rsvd20[2796];
-+    NvmeLBAFE   lbafe[16];
-+    uint8_t     rsvd3072[768];
-+    uint8_t     vs[256];
-+} NvmeIdNsZoned;
-+
- /*Deallocate Logical Block Features*/
- #define NVME_ID_NS_DLFEAT_GUARD_CRC(dlfeat)       ((dlfeat) & 0x10)
- #define NVME_ID_NS_DLFEAT_WRITE_ZEROES(dlfeat)    ((dlfeat) & 0x08)
-@@ -1101,10 +1142,76 @@ enum NvmeIdNsDps {
-     DPS_FIRST_EIGHT = 8,
- };
- 
-+enum NvmeZoneAttr {
-+    NVME_ZA_FINISHED_BY_CTLR         = 1 << 0,
-+    NVME_ZA_FINISH_RECOMMENDED       = 1 << 1,
-+    NVME_ZA_RESET_RECOMMENDED        = 1 << 2,
-+    NVME_ZA_ZD_EXT_VALID             = 1 << 7,
-+};
-+
-+typedef struct QEMU_PACKED NvmeZoneReportHeader {
-+    uint64_t    nr_zones;
-+    uint8_t     rsvd[56];
-+} NvmeZoneReportHeader;
-+
-+enum NvmeZoneReceiveAction {
-+    NVME_ZONE_REPORT                 = 0,
-+    NVME_ZONE_REPORT_EXTENDED        = 1,
-+};
-+
-+enum NvmeZoneReportType {
-+    NVME_ZONE_REPORT_ALL             = 0,
-+    NVME_ZONE_REPORT_EMPTY           = 1,
-+    NVME_ZONE_REPORT_IMPLICITLY_OPEN = 2,
-+    NVME_ZONE_REPORT_EXPLICITLY_OPEN = 3,
-+    NVME_ZONE_REPORT_CLOSED          = 4,
-+    NVME_ZONE_REPORT_FULL            = 5,
-+    NVME_ZONE_REPORT_READ_ONLY       = 6,
-+    NVME_ZONE_REPORT_OFFLINE         = 7,
-+};
-+
-+enum NvmeZoneType {
-+    NVME_ZONE_TYPE_RESERVED          = 0x00,
-+    NVME_ZONE_TYPE_SEQ_WRITE         = 0x02,
-+};
-+
-+enum NvmeZoneSendAction {
-+    NVME_ZONE_ACTION_RSD             = 0x00,
-+    NVME_ZONE_ACTION_CLOSE           = 0x01,
-+    NVME_ZONE_ACTION_FINISH          = 0x02,
-+    NVME_ZONE_ACTION_OPEN            = 0x03,
-+    NVME_ZONE_ACTION_RESET           = 0x04,
-+    NVME_ZONE_ACTION_OFFLINE         = 0x05,
-+    NVME_ZONE_ACTION_SET_ZD_EXT      = 0x10,
-+};
-+
-+typedef struct QEMU_PACKED NvmeZoneDescr {
-+    uint8_t     zt;
-+    uint8_t     zs;
-+    uint8_t     za;
-+    uint8_t     rsvd3[5];
-+    uint64_t    zcap;
-+    uint64_t    zslba;
-+    uint64_t    wp;
-+    uint8_t     rsvd32[32];
-+} NvmeZoneDescr;
-+
-+enum NvmeZoneState {
-+    NVME_ZONE_STATE_RESERVED         = 0x00,
-+    NVME_ZONE_STATE_EMPTY            = 0x01,
-+    NVME_ZONE_STATE_IMPLICITLY_OPEN  = 0x02,
-+    NVME_ZONE_STATE_EXPLICITLY_OPEN  = 0x03,
-+    NVME_ZONE_STATE_CLOSED           = 0x04,
-+    NVME_ZONE_STATE_READ_ONLY        = 0x0D,
-+    NVME_ZONE_STATE_FULL             = 0x0E,
-+    NVME_ZONE_STATE_OFFLINE          = 0x0F,
-+};
-+
- static inline void _nvme_check_size(void)
- {
-     QEMU_BUILD_BUG_ON(sizeof(NvmeBar) != 4096);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeAerResult) != 4);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeZonedResult) != 8);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeCqe) != 16);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeDsmRange) != 16);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeCmd) != 64);
-@@ -1120,8 +1227,13 @@ static inline void _nvme_check_size(void)
-     QEMU_BUILD_BUG_ON(sizeof(NvmeSmartLog) != 512);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeEffectsLog) != 4096);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrl) != 4096);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrlZoned) != 4096);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeIdNsDescr) != 4);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeLBAF) != 4);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeLBAFE) != 16);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) != 4096);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeIdNsZoned) != 4096);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeSglDescriptor) != 16);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeZoneDescr) != 64);
- }
- #endif
+     /* SCSI */
+diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
+index c757e7dfa48..60d7bcfb8f2 100644
+--- a/hw/m68k/Kconfig
++++ b/hw/m68k/Kconfig
+@@ -22,3 +22,4 @@ config Q800
+     select ESCC
+     select ESP
+     select DP8393X
++    select OR_IRQ
 -- 
-2.21.0
+2.20.1
 
 
