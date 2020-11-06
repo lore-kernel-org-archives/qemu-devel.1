@@ -2,92 +2,92 @@ Return-Path: <SRS0=tv2o=EM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC2EC55178
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 20:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6316FC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 20:37:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F86E20882
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 20:34:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F86E20882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id ACC5D20719
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Nov 2020 20:37:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wcyn246g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACC5D20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kb8RZ-0008UP-L9
-	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 15:34:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51878)
+	id 1kb8UF-0001Ja-9s
+	for qemu-devel@archiver.kernel.org; Fri, 06 Nov 2020 15:37:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jose.carlos.venegas.munoz@intel.com>)
- id 1kb8Qp-00083N-9t
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 15:33:59 -0500
-Received: from mga02.intel.com ([134.134.136.20]:28890)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jose.carlos.venegas.munoz@intel.com>)
- id 1kb8Qm-0003ce-3z
- for qemu-devel@nongnu.org; Fri, 06 Nov 2020 15:33:58 -0500
-IronPort-SDR: aSGqr9szay4QZZz29h9jRwYGDVvwQ7M/5xOOTxh6cuo0RifqjubU0KRZFckvU620KrNl0G8iEY
- H9C9RKo9niTA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9797"; a="156599099"
-X-IronPort-AV: E=Sophos;i="5.77,457,1596524400"; d="scan'208";a="156599099"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 06 Nov 2020 12:33:51 -0800
-IronPort-SDR: yQ5HkaB31DV4YSDoyyo+RmATPPnYrMkZbmr2DmrqG/TMVKqqz9wKpaIoMC8alwnzC8qhN3qVN4
- lQVYdQWa7x5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,457,1596524400"; d="scan'208";a="321716397"
-Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
- by orsmga003.jf.intel.com with ESMTP; 06 Nov 2020 12:33:50 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 6 Nov 2020 12:33:50 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 6 Nov 2020 12:33:50 -0800
-Received: from orsmsx612.amr.corp.intel.com ([10.22.229.25]) by
- ORSMSX612.amr.corp.intel.com ([10.22.229.25]) with mapi id 15.01.1713.004;
- Fri, 6 Nov 2020 12:33:50 -0800
-From: "Venegas Munoz, Jose Carlos" <jose.carlos.venegas.munoz@intel.com>
-To: Vivek Goyal <vgoyal@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, virtio-fs-list <virtio-fs@redhat.com>
-Subject: Re: [Virtio-fs] [PATCH] virtiofsd: Use --thread-pool-size=0 to mean
- no thread pool
-Thread-Topic: [Virtio-fs] [PATCH] virtiofsd: Use --thread-pool-size=0 to mean
- no thread pool
-Thread-Index: AQHWs6wS+hq1rToqXk+gGyKm0jKNO6m6eUOAgAE5L4A=
-Date: Fri, 6 Nov 2020 20:33:50 +0000
-Message-ID: <D9233684-9B76-468E-A5F1-B35DA3F3C091@intel.com>
-References: <20201105194416.GA1384085@redhat.com>
- <20201105195253.GB1384085@redhat.com>
-In-Reply-To: <20201105195253.GB1384085@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.1.200.100]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EAAF2BC282F5464EB90CB54D6A06759B@intel.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kb8Su-0000p6-I3
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 15:36:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27393)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kb8Ss-0003y3-CI
+ for qemu-devel@nongnu.org; Fri, 06 Nov 2020 15:36:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604694964;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wTZGvFgMinVN6ECVKNldPNC1WHdpZNXG6Rq4h+n4HGc=;
+ b=Wcyn246gGT5FPECPORpffsZHdOJ7KA69yCTFPwpYsA7h/gDyV/NdIUnY+9uLu6HrmAOSdw
+ IZlud3uOZQKv72bDOv5R4PdEt0QVY5pAN2asG3C5xTXifdCruyUL8QxfLeiRShmGZDPNAt
+ sqqw2Rwq+9EYtED1x0XbYOXMuqtxFCI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-568-m19i8tQ2M4Oc6lah8JSaAQ-1; Fri, 06 Nov 2020 15:36:00 -0500
+X-MC-Unique: m19i8tQ2M4Oc6lah8JSaAQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3C2F805EFC;
+ Fri,  6 Nov 2020 20:35:59 +0000 (UTC)
+Received: from [10.3.114.103] (ovpn-114-103.phx2.redhat.com [10.3.114.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 72D695D9CA;
+ Fri,  6 Nov 2020 20:35:59 +0000 (UTC)
+Subject: Re: nbd: bitmap_to_extents() calls nbd_extent_array_add() without
+ checking return value: coverity false positive?
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <CAFEAcA8keTZEW3MLky3_HKh5cu2HR1O0iBax2c0hs0qSosNYSw@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <9ff386a7-c334-30ed-da79-341d75ed39b2@redhat.com>
+Date: Fri, 6 Nov 2020 14:35:58 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Received-SPF: pass client-ip=134.134.136.20;
- envelope-from=jose.carlos.venegas.munoz@intel.com; helo=mga02.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 15:33:51
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+In-Reply-To: <CAFEAcA8keTZEW3MLky3_HKh5cu2HR1O0iBax2c0hs0qSosNYSw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 06:30:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,167 +101,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Shinde, Archana M" <archana.m.shinde@intel.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgVml2ZWssDQoNCkkgaGF2ZSB0ZXN0ZWQgd2l0aCBLYXRhIDEuMTItYXBoYTAsIHRoZSByZXN1
-bHRzIHNlZW1zIHRoYXQgYXJlIGJldHRlciBmb3IgdGhlIHVzZSBmaW8gY29uZmlnIEkgYW0gdHJh
-Y2tpbmcuIA0KDQpUaGUgZmlvIGNvbmZpZyBkb2VzICByYW5kcnc6DQoNCmZpbyAtLWRpcmVjdD0x
-IC0tZ3RvZF9yZWR1Y2U9MSAtLW5hbWU9dGVzdCAtLWZpbGVuYW1lPXJhbmRvbV9yZWFkX3dyaXRl
-LmZpbyAtLWJzPTRrIC0taW9kZXB0aD02NCAtLXNpemU9MjAwTSAtLXJlYWR3cml0ZT1yYW5kcncg
-LS1yd21peHJlYWQ9NzUNCg0KLSBJIGNhbiBzZWUgYmV0dGVyIHJlc3VsdHMgd2l0aCB0aGlzIHBh
-dGNoDQotIDlwZnMgaXMgc3RpbGwgYmV0dGVyIGluIHRoZSBjYXNlIG9mIEthdGEgYmVjYXVzZSBv
-ZiB0aGUgdXNlIG9mOg0KaHR0cHM6Ly9naXRodWIuY29tL2thdGEtY29udGFpbmVycy9wYWNrYWdp
-bmcvYmxvYi9zdGFibGUtMS4xMi9xZW11L3BhdGNoZXMvNS4wLngvMDAwMS05cC1yZW1vdmluZy1j
-b3JvdXRpbmVzLW9mLTlwLXRvLWluY3JlYXNlLXRoZS1JLU8tcGVyLnBhdGNoDQoNClJlc3VsdHM6
-DQouL2Zpby1yZXN1bHRzLXJ1bl92aXJ0aW9mc190cmVhZF9wb29sXzANCiAgIFJFQUQ6IGJ3PTQy
-LjhNaUIvcyAoNDQuOE1CL3MpLCA0Mi44TWlCL3MtNDIuOE1pQi9zICg0NC44TUIvcy00NC44TUIv
-cyksIGlvPTE1ME1pQiAoMTU3TUIpLCBydW49MzUwNy0zNTA3bXNlYw0KICBXUklURTogYnc9MTQu
-M01pQi9zICgxNC45TUIvcyksIDE0LjNNaUIvcy0xNC4zTWlCL3MgKDE0LjlNQi9zLTE0LjlNQi9z
-KSwgaW89NDkuME1pQiAoNTIuNE1CKSwgcnVuPTM1MDctMzUwN21zZWMNCi4vZmlvLXJlc3VsdHMt
-cnVuXzlwZnMNCiAgIFJFQUQ6IGJ3PTU1LjFNaUIvcyAoNTcuOE1CL3MpLCA1NS4xTWlCL3MtNTUu
-MU1pQi9zICg1Ny44TUIvcy01Ny44TUIvcyksIGlvPTE1ME1pQiAoMTU3TUIpLCBydW49MjcyMi0y
-NzIybXNlYw0KICBXUklURTogYnc9MTguNE1pQi9zICgxOS4zTUIvcyksIDE4LjRNaUIvcy0xOC40
-TWlCL3MgKDE5LjNNQi9zLTE5LjNNQi9zKSwgaW89NDkuME1pQiAoNTIuNE1CKSwgcnVuPTI3MjIt
-MjcyMm1zZWMNCi4vZmlvLXJlc3VsdHMtcnVuX3ZpcnRpb2ZzX3RyZWFkX3Bvb2xfMQ0KICAgUkVB
-RDogYnc9MzQuNU1pQi9zICgzNi4xTUIvcyksIDM0LjVNaUIvcy0zNC41TWlCL3MgKDM2LjFNQi9z
-LTM2LjFNQi9zKSwgaW89MTUwTWlCICgxNTdNQiksIHJ1bj00MzU0LTQzNTRtc2VjDQogIFdSSVRF
-OiBidz0xMS41TWlCL3MgKDEyLjBNQi9zKSwgMTEuNU1pQi9zLTExLjVNaUIvcyAoMTIuME1CL3Mt
-MTIuME1CL3MpLCBpbz00OS4wTWlCICg1Mi40TUIpLCBydW49NDM1NC00MzU0bXNlYw0KLi9maW8t
-cmVzdWx0cy1ydW5fdmlydGlvZnNfdHJlYWRfcG9vbF82NA0KICAgUkVBRDogYnc9MzIuM01pQi9z
-ICgzMy44TUIvcyksIDMyLjNNaUIvcy0zMi4zTWlCL3MgKDMzLjhNQi9zLTMzLjhNQi9zKSwgaW89
-MTUwTWlCICgxNTdNQiksIHJ1bj00NjQ4LTQ2NDhtc2VjDQogIFdSSVRFOiBidz0xMC44TWlCL3Mg
-KDExLjNNQi9zKSwgMTAuOE1pQi9zLTEwLjhNaUIvcyAoMTEuM01CL3MtMTEuM01CL3MpLCBpbz00
-OS4wTWlCICg1Mi40TUIpLCBydW49NDY0OC00NjQ4bXNlYw0KDQpOZXh0OiANCi0gcnVuIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9yaHZnb3lhbC92aXJ0aW9mcy10ZXN0cyBmb3IgIHRyZWFkX3Bvb2xfMCwg
-dHJlYWRfcG9vbF82NCwgYW5kIDlwZnMNCi0gVGVzdCBodHRwczovL2xvcmUua2VybmVsLm9yZy9s
-aW51eC1mc2RldmVsLzIwMjAxMDA5MTgxNTEyLjY1NDk2LTEtdmdveWFsQHJlZGhhdC5jb20vDQoN
-CkFsbCB0aGUgdGVzdGluZyAgZm9yIGthdGEgaXMgYmFzZWQgaW46DQpodHRwczovL2dpdGh1Yi5j
-b20vamN2ZW5lZ2FzL21ydW5uZXIvYmxvYi9tYXN0ZXIvc2NyaXB0cy9iYXNoX3dvcmtsb2Fkcy9i
-dWlsZC1xZW11LWFuZC1ydW4tZmlvLXRlc3Quc2gNCg0KSSByYW4gdGhpcyB1c2luZyBhbiBhenVy
-ZSBWTS4NCg0KQ2hlZXJzLA0KQ2FybG9zDQoNCg0K77u/T24gMDUvMTEvMjAgMTM6NTMsICJWaXZl
-ayBHb3lhbCIgPHZnb3lhbEByZWRoYXQuY29tPiB3cm90ZToNCg0KICAgIE9uIFRodSwgTm92IDA1
-LCAyMDIwIGF0IDAyOjQ0OjE2UE0gLTA1MDAsIFZpdmVrIEdveWFsIHdyb3RlOg0KICAgID4gUmln
-aHQgbm93IHdlIGNyZWF0ZSBhIHRocmVhZCBwb29sIGFuZCBtYWluIHRocmVhZCBoYW5kcyBvdmVy
-IHRoZSByZXF1ZXN0DQogICAgPiB0byB0aHJlYWQgaW4gdGhyZWFkIHBvb2wgdG8gcHJvY2Vzcy4g
-TnVtYmVyIG9mIHRocmVhZHMgaW4gdGhyZWFkIHBvb2wNCiAgICA+IGNhbiBiZSBtYW5hZ2VkIGJ5
-IG9wdGlvbiAtLXRocmVhZC1wb29sLXNpemUuDQogICAgPiANCiAgICA+IFRoZXJlIGlzIGEgY2hh
-bmNlIHRoYXQgaW4gY2FzZSBvZiBzb21lIHdvcmtsb2Fkcywgd2UgbWlnaHQgZ2V0IGJldHRlcg0K
-ICAgID4gcGVyZm9ybWFuY2UgaWYgd2UgZG9uJ3QgaGFuZG92ZXIgdGhlIHJlcXVlc3QgdG8gYSBk
-aWZmZXJlbnQgdGhyZWFkDQogICAgPiBhbmQgcHJvY2VzcyBpbiB0aGUgY29udGV4dCBvZiB0aHJl
-YWQgcmVjZWl2aW5nIHRoZSByZXF1ZXN0Lg0KICAgID4gDQogICAgPiBUbyBpbXBsZW1lbnQgdGhh
-dCwgcmVkZWZpbmUgdGhlIG1lYW5pbmcgb2YgLS10aHJlYWQtcG9vbC1zaXplPTAgdG8NCiAgICA+
-IG1lYW4gdGhhdCBkb24ndCB1c2UgYSB0aHJlYWQgcG9vbC4gSW5zdGVhZCBwcm9jZXNzIHRoZSBy
-ZXF1ZXN0IGluDQogICAgPiB0aGUgY29udGV4dCBvZiB0aHJlYWQgcmVjZWl2aW5nIHJlcXVlc3Qg
-ZnJvbSB0aGUgcXVldWUuDQogICAgPiANCiAgICA+IEkgY2FuJ3QgdGhpbmsgaG93IC0tdGhyZWFk
-LXBvb2wtc2l6ZT0wIGlzIHVzZWZ1bCBhbmQgaGVuY2UgdXNpbmcNCiAgICA+IHRoYXQuIElmIGl0
-IGlzIGFscmVhZHkgdXNlZnVsIHNvbWVob3csIEkgY291bGQgbG9vayBhdCBkZWZpbmluZw0KICAg
-ID4gYSBuZXcgb3B0aW9uIHNheSAiLS1uby10aHJlYWQtcG9vbCIuDQogICAgPiANCiAgICA+IEkg
-dGhpbmsgdGhpcyBwYXRjaCB3aWxsIGJlIHVzZWQgbW9yZSBhcyBhIGRlYnVnIGhlbHAgdG8gZG8g
-Y29tcGFyaXNvbg0KICAgID4gd2hlbiBpdCBpcyBtb3JlIGVmZmVjaWVudCB0byBkbyBub3QgaGFu
-ZCBvdmVyIHRoZSByZXF1ZXN0cyB0byBhDQogICAgPiB0aHJlYWQgcG9vbC4NCg0KICAgIEkgcmFu
-IHZpcnRpb2ZzLXRlc3RzIHRvIGNvbWFwcmUgLS10aHJlYWQtcG9vbC1zaXplPTAgYW5kDQogICAg
-LS10aHJlYWQtcG9vbC1zaXplPTY0LiBBbmQgcmVzdWx0cyBzZWVtIHRvIGJlIGFsbCBvdmVyIHRo
-ZSBwbGFjZS4gSW4NCiAgICBzb21lIGNhc2VzIHRocmVhZCBwb29sIHNlZW1zIHRvIHBlcmZvcm0g
-YmF0dGVyIGFuZCBpbiBvdGhlciBjYXNlcw0KICAgIG5vLXRocmVhZC1wb29sIHNlZW1zIHRvIHBl
-cmZvcm0gYmV0dGVyLg0KDQogICAgQnV0IGluIGdlbmVyYWwgaXQgbG9va3MgbGlrZSB0aGF0IGV4
-Y2VwdCBmb3IgdGhlIGNhc2Ugb2YgbGliYWlvIHdvcmtsb2FkLA0KICAgIG5vLXRocmVhZC1wb29s
-IGlzIGhlbHBpbmcuDQoNCiAgICBUaGFua3MNCiAgICBWaXZlaw0KDQogICAgTkFNRSAgICAgICAg
-ICAgICAgICAgICAgV09SS0xPQUQgICAgICAgICAgICAgICAgQmFuZHdpZHRoICAgICAgIElPUFMg
-ICAgICAgICAgICANCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXFyZWFkLXBzeW5jICAg
-ICAgICAgICA2ODIuNG1iICAgICAgICAgMTcwLjZrICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1w
-b29sICAgICAgICAgIHNlcXJlYWQtcHN5bmMgICAgICAgICAgIDY3OS4zbWIgICAgICAgICAxNjku
-OGsgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXFyZWFkLXBzeW5j
-LW11bHRpICAgICAyNDE1LjltYiAgICAgICAgNjAzLjlrICAgICAgICAgIA0KICAgIG5vLXRocmVh
-ZC1wb29sICAgICAgICAgIHNlcXJlYWQtcHN5bmMtbXVsdGkgICAgIDI1MjguNW1iICAgICAgICA2
-MzIuMWsgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXFyZWFkLW1t
-YXAgICAgICAgICAgICA1OTEuN21iICAgICAgICAgMTQ3LjlrICAgICAgICAgIA0KICAgIG5vLXRo
-cmVhZC1wb29sICAgICAgICAgIHNlcXJlYWQtbW1hcCAgICAgICAgICAgIDU5NS42bWIgICAgICAg
-ICAxNDguOWsgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXFyZWFk
-LW1tYXAtbXVsdGkgICAgICAyMTk1LjNtYiAgICAgICAgNTQ4LjhrICAgICAgICAgIA0KICAgIG5v
-LXRocmVhZC1wb29sICAgICAgICAgIHNlcXJlYWQtbW1hcC1tdWx0aSAgICAgIDIyODYuMW1iICAg
-ICAgICA1NzEuNWsgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXFy
-ZWFkLWxpYmFpbyAgICAgICAgICAzMjkuMW1iICAgICAgICAgODIuMmsgICAgICAgICAgIA0KICAg
-IG5vLXRocmVhZC1wb29sICAgICAgICAgIHNlcXJlYWQtbGliYWlvICAgICAgICAgIDI3MS41bWIg
-ICAgICAgICA2Ny44ayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBz
-ZXFyZWFkLWxpYmFpby1tdWx0aSAgICAxMzg3LjFtYiAgICAgICAgMzQ2LjdrICAgICAgICAgIA0K
-ICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHNlcXJlYWQtbGliYWlvLW11bHRpICAgIDE1MDgu
-Mm1iICAgICAgICAzNzcuMGsgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAg
-ICByYW5kcmVhZC1wc3luYyAgICAgICAgICA1OS4wbWIgICAgICAgICAgMTQuN2sgICAgICAgICAg
-IA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRyZWFkLXBzeW5jICAgICAgICAgIDc4
-LjVtYiAgICAgICAgICAxOS42ayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAg
-ICAgICByYW5kcmVhZC1wc3luYy1tdWx0aSAgICAyMjYuNG1iICAgICAgICAgNTYuNmsgICAgICAg
-ICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRyZWFkLXBzeW5jLW11bHRpICAg
-IDI4OS4ybWIgICAgICAgICA3Mi4zayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAg
-ICAgICAgICByYW5kcmVhZC1tbWFwICAgICAgICAgICA0OC40bWIgICAgICAgICAgMTIuMWsgICAg
-ICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRyZWFkLW1tYXAgICAgICAg
-ICAgIDU3LjRtYiAgICAgICAgICAxNC4zayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAg
-ICAgICAgICAgICByYW5kcmVhZC1tbWFwLW11bHRpICAgICAxODMuNW1iICAgICAgICAgNDUuOGsg
-ICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRyZWFkLW1tYXAtbXVs
-dGkgICAgIDI0MC41bWIgICAgICAgICA2MC4xayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9v
-bCAgICAgICAgICAgICByYW5kcmVhZC1saWJhaW8gICAgICAgICAzMjkuNG1iICAgICAgICAgODIu
-M2sgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRyZWFkLWxpYmFp
-byAgICAgICAgIDI2MS44bWIgICAgICAgICA2NS40ayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQt
-cG9vbCAgICAgICAgICAgICByYW5kcmVhZC1saWJhaW8tbXVsdGkgICAyNTIuMW1iICAgICAgICAg
-NjMuMGsgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRyZWFkLWxp
-YmFpby1tdWx0aSAgIDI3OC4zbWIgICAgICAgICA2OS41ayAgICAgICAgICAgDQoNCiAgICB0aHJl
-YWQtcG9vbCAgICAgICAgICAgICBzZXF3cml0ZS1wc3luYyAgICAgICAgICA1NC45bWIgICAgICAg
-ICAgMTMuN2sgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHNlcXdyaXRl
-LXBzeW5jICAgICAgICAgIDc3LjhtYiAgICAgICAgICAxOS40ayAgICAgICAgICAgDQoNCiAgICB0
-aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXF3cml0ZS1wc3luYy1tdWx0aSAgICAyMTkuOW1iICAg
-ICAgICAgNTQuOWsgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHNlcXdy
-aXRlLXBzeW5jLW11bHRpICAgIDMxNC44bWIgICAgICAgICA3OC43ayAgICAgICAgICAgDQoNCiAg
-ICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXF3cml0ZS1tbWFwICAgICAgICAgICAxOTEuN21i
-ICAgICAgICAgNDcuOWsgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHNl
-cXdyaXRlLW1tYXAgICAgICAgICAgIDIwMS40bWIgICAgICAgICA1MC4zayAgICAgICAgICAgDQoN
-CiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXF3cml0ZS1tbWFwLW11bHRpICAgICAzNDYu
-Nm1iICAgICAgICAgODYuNmsgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAg
-IHNlcXdyaXRlLW1tYXAtbXVsdGkgICAgIDM4Ny42bWIgICAgICAgICA5Ni45ayAgICAgICAgICAg
-DQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXF3cml0ZS1saWJhaW8gICAgICAgICAz
-MDYuNG1iICAgICAgICAgNzYuNmsgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAg
-ICAgIHNlcXdyaXRlLWxpYmFpbyAgICAgICAgIDI0OC4ybWIgICAgICAgICA2Mi4wayAgICAgICAg
-ICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBzZXF3cml0ZS1saWJhaW8tbXVsdGkg
-ICAzMjguNW1iICAgICAgICAgODIuMWsgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAg
-ICAgICAgIHNlcXdyaXRlLWxpYmFpby1tdWx0aSAgIDMwNS42bWIgICAgICAgICA3Ni40ayAgICAg
-ICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICByYW5kd3JpdGUtcHN5bmMgICAg
-ICAgICA1NS42bWIgICAgICAgICAgMTMuOWsgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1wb29s
-ICAgICAgICAgIHJhbmR3cml0ZS1wc3luYyAgICAgICAgIDgxLjJtYiAgICAgICAgICAyMC4zayAg
-ICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICByYW5kd3JpdGUtcHN5bmMt
-bXVsdGkgICAyMjcuMG1iICAgICAgICAgNTYuN2sgICAgICAgICAgIA0KICAgIG5vLXRocmVhZC1w
-b29sICAgICAgICAgIHJhbmR3cml0ZS1wc3luYy1tdWx0aSAgIDMxMS42bWIgICAgICAgICA3Ny44
-ayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICByYW5kd3JpdGUtbW1h
-cCAgICAgICAgICAzNS4zbWIgICAgICAgICAgOTAzOCAgICAgICAgICAgIA0KICAgIG5vLXRocmVh
-ZC1wb29sICAgICAgICAgIHJhbmR3cml0ZS1tbWFwICAgICAgICAgIDU4LjFtYiAgICAgICAgICAx
-NC41ayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICByYW5kd3JpdGUt
-bW1hcC1tdWx0aSAgICAxNDAuOG1iICAgICAgICAgMzUuMmsgICAgICAgICAgIA0KICAgIG5vLXRo
-cmVhZC1wb29sICAgICAgICAgIHJhbmR3cml0ZS1tbWFwLW11bHRpICAgIDIxMC41bWIgICAgICAg
-ICA1Mi42ayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICByYW5kd3Jp
-dGUtbGliYWlvICAgICAgICAzMDcuMW1iICAgICAgICAgNzYuN2sgICAgICAgICAgIA0KICAgIG5v
-LXRocmVhZC1wb29sICAgICAgICAgIHJhbmR3cml0ZS1saWJhaW8gICAgICAgIDI3OS40bWIgICAg
-ICAgICA2OS44ayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICByYW5k
-d3JpdGUtbGliYWlvLW11bHRpICAzNjEuM21iICAgICAgICAgOTAuM2sgICAgICAgICAgIA0KICAg
-IG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmR3cml0ZS1saWJhaW8tbXVsdGkgIDMwMi42bWIg
-ICAgICAgICA3NS42ayAgICAgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAgICBy
-YW5kcnctcHN5bmMgICAgICAgICAgICAzNC4xbWIvMTEuNG1iICAgODc1NC8yOTI5ICAgICAgIA0K
-ICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRydy1wc3luYyAgICAgICAgICAgIDM4Ljdt
-Yi8xMi45bWIgICA5OTE5LzMzMjEgICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAgICAg
-ICByYW5kcnctcHN5bmMtbXVsdGkgICAgICAxMjYuMm1iLzQyLjNtYiAgMzEuNWsvMTAuNWsgICAg
-IA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRydy1wc3luYy1tdWx0aSAgICAgIDE3
-Mi4ybWIvNTcuN21iICA0My4way8xNC40ayAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAgICAg
-ICAgICByYW5kcnctbW1hcCAgICAgICAgICAgICAyNC4xbWIvODI3MGtiICAgNjE5NC8yMDY3ICAg
-ICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRydy1tbWFwICAgICAgICAgICAg
-IDQyLjBtYi8xNC4wbWIgICAxMC41ay8zNjA2ICAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAgICAg
-ICAgICAgICByYW5kcnctbW1hcC1tdWx0aSAgICAgICAxMjcuOW1iLzQyLjhtYiAgMzEuOWsvMTAu
-N2sgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRydy1tbWFwLW11bHRpICAg
-ICAgIDE3OS40bWIvNjAuMG1iICA0NC44ay8xNS4wayAgICAgDQoNCiAgICB0aHJlYWQtcG9vbCAg
-ICAgICAgICAgICByYW5kcnctbGliYWlvICAgICAgICAgICA2NC4wbWIvMjEuNG1iICAgMTYuMGsv
-NTQ4NSAgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRydy1saWJhaW8gICAg
-ICAgICAgIDc5LjZtYi8yNi42bWIgICAxOS45ay82ODMxICAgICAgDQoNCiAgICB0aHJlYWQtcG9v
-bCAgICAgICAgICAgICByYW5kcnctbGliYWlvLW11bHRpICAgICAxNzQuMm1iLzU4LjNtYiAgNDMu
-NWsvMTQuNWsgICAgIA0KICAgIG5vLXRocmVhZC1wb29sICAgICAgICAgIHJhbmRydy1saWJhaW8t
-bXVsdGkgICAgIDIwMS42bWIvNjcuNW1iICA1MC40ay8xNi44ayAgICAgDQoNCg0K
+On 11/6/20 11:22 AM, Peter Maydell wrote:
+> Hi; Coverity's "you usually check the return value of this function
+> but you didn't do that here" heuristic has fired on the code in
+> nbd/server.c:bitmap_to_extents() -- the function nbd_extent_array_add()
+> is called five times in server.c, and the return value is checked
+> in four of those, but not in the final call at the end of
+> bitmap_to_extents(). (CID 1436125.)
+> 
+> Is this a false positive, or should the caller be handling an
+> error here ?
+
+False positive, but I don't mind tweaking the code to silence Coverity.
+This should do it; let me know if I should turn it into a formal patch.
+
+diff --git i/nbd/server.c w/nbd/server.c
+index d145e1a69083..377698a2ce85 100644
+--- i/nbd/server.c
++++ w/nbd/server.c
+@@ -2128,9 +2128,8 @@ static void bitmap_to_extents(BdrvDirtyBitmap *bitmap,
+         }
+     }
+
+-    if (!full) {
+-        /* last non dirty extent */
+-        nbd_extent_array_add(es, end - start, 0);
++    if (!full && nbd_extent_array_add(es, end - start, 0) < 0) {
++        /* last non dirty extent, not a problem if array is now full */
+     }
+
+     bdrv_dirty_bitmap_unlock(bitmap);
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
