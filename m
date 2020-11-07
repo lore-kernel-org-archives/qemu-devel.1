@@ -2,100 +2,99 @@ Return-Path: <SRS0=ex3l=EN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 569DBC388F7
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73628C388F7
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 21:10:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2C2A2087E
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:41:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B410020723
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 21:10:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ATouQogl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2C2A2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n52EO/0G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B410020723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbU5w-0006ZU-Sh
-	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 14:41:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58608)
+	id 1kbVTD-0002WL-Lz
+	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 16:09:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbU52-00065s-TL
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 14:40:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23529)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbU4y-0000i0-Jd
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 14:40:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604778051;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=AQZWhvSbI5p4N1e0B4bgocntEDGXJm7E/SmoI1MVHIY=;
- b=ATouQoglAer5+3b/sCJgDPDswjEA6lB7TWE8Rb/3q9uYIT29nLGBmKr0PL8ka4QEbkCTpG
- 17P6o40SwnyscuYO9l1iPxP2UdJvLHIpESxLsZAk84hNNhrUZccNsVGqja2EBozV+CTv0k
- 8aV67rffyXu79CBBwmRQqTJIVLCqZGU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-523-InncbzfgNZum28zY_Bk9pA-1; Sat, 07 Nov 2020 14:40:50 -0500
-X-MC-Unique: InncbzfgNZum28zY_Bk9pA-1
-Received: by mail-wm1-f69.google.com with SMTP id z62so1952054wmb.1
- for <qemu-devel@nongnu.org>; Sat, 07 Nov 2020 11:40:49 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kbVSH-000236-4x
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 16:09:01 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39956)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kbVSF-00023P-De
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 16:09:00 -0500
+Received: by mail-wm1-x342.google.com with SMTP id t67so151765wmt.5
+ for <qemu-devel@nongnu.org>; Sat, 07 Nov 2020 13:08:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=AZOz1KbVGO1PF6nPUfaRLdflyDNl/dm4E8SY6QR5h7U=;
+ b=n52EO/0GKsnoo0bmVWC47oZloBFDSXBme6fbEzCndyLoFRHlrijLp7pcNWetQ9s5mN
+ ToBLFpRIfterlVFrp3INtv5krRg7MrU3jQ1hD+6IHqAeTgJfLfNX49Lp4U95aOjRVe63
+ xZ7CNXdg52FDG10HzYac1Z1IqWmdAxmByIyPiGecPD1ByteYy3IWuXg5lciQHPYnvt3q
+ t4MdiG5wjWxY2uWstgzcv2RLMPzJumdqkduQ8i565g/5w+mgv87Q7lMaXs4WsZc8BXIa
+ n8PQwjWLwllf04ZufhxRMXk2Io+KXEa6kqyYXSTfWpw0JmIjsAR2IVglbjQPcbss+mFp
+ BG1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=AQZWhvSbI5p4N1e0B4bgocntEDGXJm7E/SmoI1MVHIY=;
- b=YJDTJ2Zu7VpVDmm5g5dBbv/PUmtFTqAJjagnNFH2DSlHTdxfn2ombB12yOf30Qujtt
- dh+BDYfCiIomuZ7YFdZBCIH/gckySsias6Xj5ecpz3DxKbCOsggo6qH8KzyDvuh5VRBg
- xrF5gA/zAzG7tzucK8EzMPZb6uk5H0TNZMR/fcxL5eJxPubls7HEYsqiqzX/46IX4ZeB
- JX0X5Lbc0Cl1iTH9jGF/wbTA7QJqpKN0xxALjhRH0n36aWyBoxwhVd2OXTbLagiKj8Wd
- 7iPIv3AWkRMT6NrfRcD2HSjE71CiuPRGnsYvKaaIAyxMt4qESVj9M4V5/lDi63EnW5MT
- FbMg==
-X-Gm-Message-State: AOAM533Rzj4GvC66kBqC3nuaCU5DFaJbzCE9frZvD77qQnq+4havcuMA
- ZHSQbBTEtixks/fqzmVP5LO/XQb0WXrsX8qK/kOTb0KhRMnTPmjmAPld6yf4Ex+46/5KdKN8EWx
- qE3mB/JrNpN7GQrk=
-X-Received: by 2002:adf:f3d2:: with SMTP id g18mr65217wrp.77.1604778048612;
- Sat, 07 Nov 2020 11:40:48 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwDSVt8lASy3Eq82HgII3vyyx1qJw3kYKfbLzY7KY7t3FE3ihO3HV4byqp1ONSTKCXfIYdqJg==
-X-Received: by 2002:adf:f3d2:: with SMTP id g18mr65196wrp.77.1604778048420;
- Sat, 07 Nov 2020 11:40:48 -0800 (PST)
-Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id t7sm7194233wrx.42.2020.11.07.11.40.47
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=AZOz1KbVGO1PF6nPUfaRLdflyDNl/dm4E8SY6QR5h7U=;
+ b=JTO9I2djB7VnO+vkHkptkZ9sdV96bfHk9fXw3KcTL/nbItKo9vwZmYrwRnmlPfGIRh
+ S7/mFfLpknvhWXbuqbKheHvHijROd+816nSKVz68aeFez4B12bbee/RxInJyRMoRXgBj
+ Wu+dhZs79n1lrmHAlw1UFqyVMO1u0YrAwEYug3NP6+EXcmToXbF5dlbagG6WuQ98pOdU
+ bIv9l/etb8shXa/Eolf2lyreKRPcsqkES+r8gxLrA7pevJcbadsi4RTb37idkMG5YCN1
+ a2m/efBM2TgxwAZTLdJSKaoav/rMyFVDyaolpF5cs9tbIR6gcUaGHVqo0S4rg2bQVQPp
+ fWmQ==
+X-Gm-Message-State: AOAM531Q8LIaMnF2KTtIDiKkZD8ORNFWpzkkOzArIRyokv9gY2I32QzV
+ wWoEp/LksrnP8OkelshyuWAFDg==
+X-Google-Smtp-Source: ABdhPJyHM/bHEMujdKT7rp899i0tfLeG/36yDWotvDCK/iNIyUFMQbtBAJi+6gcuqwtdnncLx5EX6Q==
+X-Received: by 2002:a7b:c848:: with SMTP id c8mr4171681wml.86.1604783337252;
+ Sat, 07 Nov 2020 13:08:57 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c2sm7413052wmf.47.2020.11.07.13.08.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 07 Nov 2020 11:40:47 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 v2] hw/i386/acpi-build: Fix maybe-uninitialized error
- when ACPI hotplug off
-Date: Sat,  7 Nov 2020 20:40:45 +0100
-Message-Id: <20201107194045.438027-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
+ Sat, 07 Nov 2020 13:08:56 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 6B0CA1FF7E;
+ Sat,  7 Nov 2020 21:08:55 +0000 (GMT)
+References: <20201106032921.600200-1-richard.henderson@linaro.org>
+ <20201106032921.600200-2-richard.henderson@linaro.org>
+ <87tuu28bwy.fsf@linaro.org>
+ <bfd043eb-cf7d-b5a4-bb26-e8ef07bfb2b5@linaro.org>
+User-agent: mu4e 1.5.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v3 01/41] tcg: Enhance flush_icache_range with separate
+ data pointer
+In-reply-to: <bfd043eb-cf7d-b5a4-bb26-e8ef07bfb2b5@linaro.org>
+Date: Sat, 07 Nov 2020 21:08:55 +0000
+Message-ID: <87r1p498ns.fsf@linaro.org>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/07 14:38:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,96 +107,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Ani Sinha <ani@anisinha.ca>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: j@getutm.app, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-GCC 9.3.0 thinks that 'method' can be left uninitialized. This code
-is already in the "if (bsel || pcihp_bridge_en)" block statement,
-but it isn't smart enough to figure it out.
 
-Restrict the code to be used only in the "if (bsel || pcihp_bridge_en)"
-block statement to fix (on Ubuntu):
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-  ../hw/i386/acpi-build.c: In function 'build_append_pci_bus_devices':
-  ../hw/i386/acpi-build.c:496:9: error: 'method' may be used uninitialized
-  in this function [-Werror=maybe-uninitialized]
-    496 |         aml_append(parent_scope, method);
-        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  cc1: all warnings being treated as errors
+> On 11/6/20 12:31 PM, Alex Benn=C3=A9e wrote:
+>>> +/* Flush the dcache at RW, and the icache at RX, as necessary. */
+>>> +static inline void flush_idcache_range(uintptr_t rx, uintptr_t rw, siz=
+e_t len)
+>>>  {
+>>> -    __builtin___clear_cache((char *)start, (char *)stop);
+>>> +    /* TODO: Copy this from gcc to avoid 4 loops instead of 2. */
+>>=20
+>> Why not do it now?
+>
+> Do you really want to be including that into a patch that touches all host
+> backends?  I do it later, in a change by itself.
 
-Fixes: df4008c9c59 ("piix4: don't reserve hw resources when hotplug is off globally")
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/i386/acpi-build.c | 45 +++++++++++++++++++++-----------------------
- 1 file changed, 21 insertions(+), 24 deletions(-)
+Ahh I hadn't noticed. I was just thrown by the TODO and wondering what
+it was.
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 4f66642d887..1f5c2112452 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -465,34 +465,31 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-      */
-     if (bsel || pcihp_bridge_en) {
-         method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
--    }
--    /* If bus supports hotplug select it and notify about local events */
--    if (bsel) {
--        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
- 
--        aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
--        aml_append(method,
--            aml_call2("DVNT", aml_name("PCIU"), aml_int(1) /* Device Check */)
--        );
--        aml_append(method,
--            aml_call2("DVNT", aml_name("PCID"), aml_int(3)/* Eject Request */)
--        );
--    }
-+        /* If bus supports hotplug select it and notify about local events */
-+        if (bsel) {
-+            uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
- 
--    /* Notify about child bus events in any case */
--    if (pcihp_bridge_en) {
--        QLIST_FOREACH(sec, &bus->child, sibling) {
--            int32_t devfn = sec->parent_dev->devfn;
--
--            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
--                continue;
--            }
--
--            aml_append(method, aml_name("^S%.02X.PCNT", devfn));
-+            aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
-+            aml_append(method, aml_call2("DVNT", aml_name("PCIU"),
-+                                         aml_int(1))); /* Device Check */
-+            aml_append(method, aml_call2("DVNT", aml_name("PCID"),
-+                                         aml_int(3))); /* Eject Request */
-+        }
-+
-+        /* Notify about child bus events in any case */
-+        if (pcihp_bridge_en) {
-+            QLIST_FOREACH(sec, &bus->child, sibling) {
-+                int32_t devfn = sec->parent_dev->devfn;
-+
-+                if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
-+                    continue;
-+                }
-+
-+                aml_append(method, aml_name("^S%.02X.PCNT", devfn));
-+            }
-         }
--    }
- 
--    if (bsel || pcihp_bridge_en) {
-         aml_append(parent_scope, method);
-     }
-     qobject_unref(bsel);
--- 
-2.26.2
+>
+>> I take it i386 is just too primitive to care about flushing things?
+>
+> Or the reverse.  ;-)
+>
+>
+> r~
 
+
+--=20
+Alex Benn=C3=A9e
 
