@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57BFEC388F9
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 05:46:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5409EC388F9
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 05:56:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC0F420885
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 05:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AA5A20885
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 05:56:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GRjTaeAo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0F420885
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gTgi3YE2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AA5A20885
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbH3N-00006E-Ki
-	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 00:46:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51354)
+	id 1kbHCh-0001r7-8C
+	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 00:55:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kbH2b-0007kb-Rf
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 00:45:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36148)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kbHBl-0001PE-Ug
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 00:55:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27395)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kbH2Y-0006FI-KP
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 00:45:33 -0500
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kbHBk-0000xZ-8w
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 00:55:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604727928;
+ s=mimecast20190719; t=1604728498;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=nRpLKAXVVGQNYDxOX+V8MPgzhta2NuCg1AZBiUdKaXU=;
- b=GRjTaeAoMhAb25evJ+ux9OitNFjCPsBnDiYg8xWZzgCvRbUjqpDaS2t+bMCgUQDhviETBE
- 984OAw8I9cN9nPXSk7RFAKQL7FBmTPjhUasYfBMJh4jrzfg/V0BF1713iciQxqfU/A2vDF
- fV9oYoCnCiPZf+bcC3HcQx+guyB+5Pc=
+ bh=4oRfLr2Osk93MJ1NcyLSXNYHd7E0mmzMT2Y5WAaOv9A=;
+ b=gTgi3YE22uQmQUUAQCegPH6JKuhNoBfr9pPeQoyDKUxq534sbTja9Q9YEFzGoP/Kr1HROW
+ NywP/PZYKTQ2iisrjPqjc8afFcXR/L0UOKGBhcoEpBJvH9jNMAHpFsdtAmeJim/daImxgC
+ oBjXOFWuOuiqvl5wPQPBC/qzeLrGQKM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-eTk8X9yiO1-RXmO8S3F-sw-1; Sat, 07 Nov 2020 00:45:26 -0500
-X-MC-Unique: eTk8X9yiO1-RXmO8S3F-sw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-540-n3_Cx0GzOGa0FU_6GLMSpg-1; Sat, 07 Nov 2020 00:54:55 -0500
+X-MC-Unique: n3_Cx0GzOGa0FU_6GLMSpg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBBDF1007464
- for <qemu-devel@nongnu.org>; Sat,  7 Nov 2020 05:45:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF6DF185A0CA
+ for <qemu-devel@nongnu.org>; Sat,  7 Nov 2020 05:54:54 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-112-47.rdu2.redhat.com
  [10.10.112.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BCDE1A4D8;
- Sat,  7 Nov 2020 05:45:24 +0000 (UTC)
-Date: Sat, 7 Nov 2020 00:45:22 -0500
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 251EA6EF6C;
+ Sat,  7 Nov 2020 05:54:54 +0000 (UTC)
+Date: Sat, 7 Nov 2020 00:54:52 -0500
 From: Cleber Rosa <crosa@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 09/11] qapi/introspect.py: create a typed 'Annotated'
- data strutcure
-Message-ID: <20201107054522.GE2208@localhost.localdomain>
+Subject: Re: [PATCH v2 10/11] qapi/introspect.py: improve readability of
+ _tree_to_qlit
+Message-ID: <20201107055452.GF2208@localhost.localdomain>
 References: <20201026194251.11075-1-jsnow@redhat.com>
- <20201026194251.11075-10-jsnow@redhat.com>
+ <20201026194251.11075-11-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201026194251.11075-10-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20201026194251.11075-11-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="AH+kv8CCoFf6qPuz"
+ protocol="application/pgp-signature"; boundary="gvF4niNJ+uBMJnEh"
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 07:11:31
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/06 22:10:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,90 +102,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---AH+kv8CCoFf6qPuz
+--gvF4niNJ+uBMJnEh
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 26, 2020 at 03:42:49PM -0400, John Snow wrote:
-> This replaces _make_tree with Annotated(). By creating it as a generic
-> container, we can more accurately describe the exact nature of this
-> particular value. i.e., each Annotated object is actually an
-> Annotated<T>, describing its contained value.
->=20
-> This adds stricter typing to Annotated nodes and extra annotated
-> information. It also replaces a check of "isinstance tuple" with the
-> much more explicit "isinstance Annotated" which is guaranteed not to
-> break if a tuple is accidentally introduced into the type tree. (Perhaps
-> as a result of a bad conversion from a list.)
->=20
+On Mon, Oct 26, 2020 at 03:42:50PM -0400, John Snow wrote:
+> Subjective, but I find getting rid of the comprehensions helps. Also,
+> divide the sections into scalar and non-scalar sections, and remove
+> old-style string formatting.
+>
+
+It's certainly a matter of picking your favorite poison... but for the
+most part I think this is an improvement...
+
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  scripts/qapi/introspect.py | 97 +++++++++++++++++++-------------------
->  1 file changed, 48 insertions(+), 49 deletions(-)
+>  scripts/qapi/introspect.py | 37 +++++++++++++++++++++----------------
+>  1 file changed, 21 insertions(+), 16 deletions(-)
 >=20
 > diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-> index a0978cb3adb..a261e402d69 100644
+> index a261e402d69..d4f28485ba5 100644
 > --- a/scripts/qapi/introspect.py
 > +++ b/scripts/qapi/introspect.py
-> @@ -13,12 +13,13 @@
->  from typing import (
->      Any,
->      Dict,
-> +    Generic,
-> +    Iterable,
->      List,
->      Optional,
->      Sequence,
-> -    Tuple,
-> +    TypeVar,
->      Union,
-> -    cast,
->  )
+> @@ -100,7 +100,7 @@ def indent(level: int) -> str:
 > =20
->  from .common import (
-> @@ -63,50 +64,48 @@
->  _scalar =3D Union[str, bool, None]
->  _nonscalar =3D Union[Dict[str, _stub], List[_stub]]
->  _value =3D Union[_scalar, _nonscalar]
-> -TreeValue =3D Union[_value, 'Annotated']
-> +TreeValue =3D Union[_value, 'Annotated[_value]']
-> =20
->  # This is just an alias for an object in the structure described above:
->  _DObject =3D Dict[str, object]
-> =20
-> -# Represents the annotations themselves:
-> -Annotations =3D Dict[str, object]
-> =20
-> -# Represents an annotated node (of some kind).
-> -Annotated =3D Tuple[_value, Annotations]
-> +_AnnoType =3D TypeVar('_AnnoType', bound=3DTreeValue)
+>          ret =3D ''
+>          if obj.comment:
+> -            ret +=3D indent(level) + '/* %s */\n' % obj.comment
+> +            ret +=3D indent(level) + f"/* {obj.comment} */\n"
+>          if obj.ifcond:
+>              ret +=3D gen_if(obj.ifcond)
+>          ret +=3D _tree_to_qlit(obj.value, level, suppress_first_indent)
+> @@ -111,31 +111,36 @@ def indent(level: int) -> str:
+>      ret =3D ''
+>      if not suppress_first_indent:
+>          ret +=3D indent(level)
+> +
+> +    # Scalars:
+>      if obj is None:
+>          ret +=3D 'QLIT_QNULL'
+>      elif isinstance(obj, str):
+> -        ret +=3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
+> +        ret +=3D f"QLIT_QSTR({to_c_string(obj)})"
+> +    elif isinstance(obj, bool):
+> +        ret +=3D "QLIT_QBOOL({:s})".format(str(obj).lower())
+> +
+> +    # Non-scalars:
+>      elif isinstance(obj, list):
+> -        elts =3D [_tree_to_qlit(elt, level + 1).strip('\n')
+> -                for elt in obj]
+> -        elts.append(indent(level + 1) + "{}")
+>          ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+> -        ret +=3D '\n'.join(elts) + '\n'
+> +        for value in obj:
+> +            ret +=3D _tree_to_qlit(value, level + 1).strip('\n') + '\n'
+> +        ret +=3D indent(level + 1) + '{}\n'
+>          ret +=3D indent(level) + '}))'
+>      elif isinstance(obj, dict):
+> -        elts =3D []
+> -        for key, value in sorted(obj.items()):
+> -            elts.append(indent(level + 1) + '{ %s, %s }' %
+> -                        (to_c_string(key),
+> -                         _tree_to_qlit(value, level + 1, True)))
+> -        elts.append(indent(level + 1) + '{}')
+>          ret +=3D 'QLIT_QDICT(((QLitDictEntry[]) {\n'
+> -        ret +=3D ',\n'.join(elts) + '\n'
+> +        for key, value in sorted(obj.items()):
+> +            ret +=3D indent(level + 1) + "{{ {:s}, {:s} }},\n".format(
+> +                to_c_string(key),
+> +                _tree_to_qlit(value, level + 1, suppress_first_indent=3D=
+True)
+> +            )
+> +        ret +=3D indent(level + 1) + '{}\n'
+>          ret +=3D indent(level) + '}))'
+> -    elif isinstance(obj, bool):
+> -        ret +=3D 'QLIT_QBOOL(%s)' % ('true' if obj else 'false')
+>      else:
+> -        assert False                # not implemented
+> +        raise NotImplementedError(
 
-Here it becomes much harder to keep the suggestions I made on patch
-5 because of forward and backward references.
+This is an improvement, but doesn't fall into the *readability* bucket.
+IMO it's worth splitting it out.
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+- Cleber.
 
---AH+kv8CCoFf6qPuz
+--gvF4niNJ+uBMJnEh
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+mNG0ACgkQZX6NM6Xy
-CfOcOhAAkilNmqlMDV9SJ1jkeQ4F7C5ckUY6qYPJI5qYyWMj/QwXwDrprc/bVpmz
-SL0VOiepg1rYRJy7ChH1xx9N1+RS9exMshgYx0QYxt4qfUYyt5hUc4gudgUTFs1t
-Njs5gTouP36VajcuO2RBKjn8hJAfulcLH814dYtSwEAdvoQzTB/VUPFFsarBdrCo
-tlLl6O3Oq2EKI7zbqjq6gwcx7hH373ucjIGI1OCz39SrIbcWW0xgdbMGjjBWYfx7
-Xbugby/cOxttrTBju/znWP+ClmeFodxfvcwGpkUwr1XLp8ciKnnmFZazb/qtQ8VH
-tAKEqbDeFRuJb80jdmkgdNSw/MvNJbcIK5AJ3MVsKa88YLzmha0IdP2MRLas4DfF
-znDTamKF03yf8PFwF5fAjR2p5+N8M9ak/iwj+cE76guKY5panf/m546b813N0yBQ
-5hJKQIVFpPapdapSKTiUWl9AZqcaFJjXs5DeL8mMICR0qnfmzfn8xVuB1fiPKsaR
-Bb5ZrFyFs565CaFQLBV//IsrkqjZg0gg5l83HTpkBktAALP3bERT/u1kHAuhtkcW
-Vz94ZkwJJYdPfjbs6zzmpWUQWrME6X4W+LdHRH9Wt+xazS4ds2IOzxX89iwqNn+T
-svVCUAAkwTs+iRu0UP4DFstO74J0S+FyEPoo2tPjuGDrzyV5GIw=
-=hX+0
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+mNqkACgkQZX6NM6Xy
+CfPL3g/+PMHzqIB2IJ3zjVv2reOpiC4aa3pzmRFO9ZoK7jdbhCu9blKljxeFMT/F
+AvEgczzlPb0/5mYANXYPnnYTCcSInZkD5vM1A6tLj0gsVup6Y9bf6AFU4wApT5xI
+Jdd0Tb8ep1kVIs71d3eIPCfwUE7XJfIXbBKciAMO374HOcCB1XIyqtETaGlUJwqo
+/1AxQfxLJjPg5mGTPdz+XQIBZ6FDAmrbkjmbUV6ESGIqRRmdMbiXgktqDiSlDFDv
+P/iWon964XBkYA+BpmWQ7tib2UO6OiVZLp/a/353ja4Zcv4XncayH0LCemmMKePn
+Z7ZrEfZZY1knWgzYMrVdtHV4KTujuQKZzSQ5iPqYZLPLjaVFCn5kx5AoWzcb+gpK
+85SvZvdb+N9YcmDDIoyBjG7857IMa26Pn6TvznPclLRa2x2+ylNDn86CpCTXR2mW
+Z2ebL93GFiJuhxa//stS8hPCsoMEiXPv8GZ5/LH4fu5OswPaD51KPf26sxf0vudo
+eLkDbofW/8KsAo07WUphuKvCcjqhJGTAwMnDylv+OPdj9+AKDeD03ydkcjSoN7/D
+MnpUGwV5ozaV4MVKS3qJphoP7cRynphN/0LdFRZn/nT2dHVFxzaCOzSWGP01HDg9
+Fwe1qcF9cSz+jLUl6VRBTQ/KCklbhDpzRsjH7HsSok1YA3D3Px4=
+=Wq+l
 -----END PGP SIGNATURE-----
 
---AH+kv8CCoFf6qPuz--
+--gvF4niNJ+uBMJnEh--
 
 
