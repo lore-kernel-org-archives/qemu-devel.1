@@ -2,99 +2,90 @@ Return-Path: <SRS0=ex3l=EN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E31C388F9
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 14:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD859C388F7
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 15:10:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73BBF20702
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 14:53:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48CF420719
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 15:10:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JrX/AziJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73BBF20702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="CD2WAUCc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48CF420719
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbPav-0003s0-Jh
-	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 09:53:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42112)
+	id 1kbPqv-0008Cy-98
+	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 10:10:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbPZf-000357-JM
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 09:52:15 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46035)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kbPpz-0007bT-Np
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 10:09:07 -0500
+Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:33148)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbPZd-0003do-V9
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 09:52:15 -0500
-Received: by mail-wr1-x444.google.com with SMTP id p1so4229790wrf.12
- for <qemu-devel@nongnu.org>; Sat, 07 Nov 2020 06:52:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=WTk8CLmn3H4rCxGMS/xI4SrNYM3HqqXpVO5Z7ICvWpg=;
- b=JrX/AziJ08ivmSkiakj0xSbmcY5q+rkzcLTjv/yo9iqsmCAx5MEHOTwBJkOWKYhTiv
- LTljsUTnbMtrt57Oj6n+yjFzx245tZ+vp24YgntVH/tHy/N/E1VNr98FrPAHml6XyCGT
- uGom173FKbdajfsVmd6Z1RuvpS2UPcybP3KE7XybqB6fTNI17oZg9CU6sPp0RVlZBLEo
- VtmrgdBjeP0/Atjy6DWLJ3ML8xbkidYygx3A9c9mxV62BstRoJ/tec8vxWM2skcuBIYj
- YdzAiXZB+nqX+l8bIanhdfNzjIsOFL7tB2dZD5GCbzHsO96z/f5yLemsVNq/qXPtbRFM
- HfYA==
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kbPpx-00015u-Qs
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 10:09:07 -0500
+Received: by mail-pg1-x52b.google.com with SMTP id r186so3401704pgr.0
+ for <qemu-devel@nongnu.org>; Sat, 07 Nov 2020 07:09:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=FgUBNn/WeXuzZ0IJo7k8Qi0MsF8WLkO7uhitXmPP18o=;
+ b=CD2WAUCcUIwwlBXIxnHesEYbpTSfW9en+HQXO+B1VNo3WbOF3izkdXDWFwQN96hr/9
+ p1izN9/8fneQvm3MW+ZnZ8PMr/kzam7y5iyLSevFocvJZYnjPmfI6iolGNAmdfOnlaoh
+ 34yG9EqjD4JOcu/vxGu+II8HyU80NOKI1s58yFYCObtcSaodIoGdTwzidpQKt9MGPM/O
+ metLrbu+hoGZWxGl6Trf8Sir4108BepprPoZgO2p/vbX8MGItkKvq9VyfuaPy+6s0t5y
+ +OablTFRHWlM0/9+VuUBydFM2XMUKzDL+IM44pCZJwk7FqIyamS0yCPzehy77vdI0QkY
+ tHuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=WTk8CLmn3H4rCxGMS/xI4SrNYM3HqqXpVO5Z7ICvWpg=;
- b=HRBGSgM0eDTNP4Ve88p6anoN7CVLL2QaCogS32x+l0e7X8m8q6NPM4Yh1gmu5m+e3b
- +CrToOHDUzlo8O59SonThbrX/HMfngngkhD03EKkjXF1QG6otV7winbk5aZ/D6wXe2SL
- o6gpLPkjrSu7kpgAqCXrBPW3k0gAf2m3efwhkwcFe/kxl38mlsZgY5ksU6qhExRG2vnq
- wHaL6gDGTt9L/+hmh+CCUKSAqnJns8WVXgYoXCdiqs4c5j6iuVcNocF1XB0zAw2cEIMu
- CVa9O6KwA/43IoZsIIkL/a4Yxf0DsEEBqRUW7Ca7M6hUUj6aJV2fSOpZl5ostoV3u7y1
- uqcQ==
-X-Gm-Message-State: AOAM530rFOcoYUddpPK+kEh9mc9DSS5Aw5CZphQzYwG73wRAA+0Nleon
- fKmJiV5pxTaEqJWP1JwApbs=
-X-Google-Smtp-Source: ABdhPJwGE/UyL9VP+lM2VygBPOUsj4rvPpvT0fqF2Tc2L7CfJapLi4JuBl3LQlSbC0zBCzVgl+PJkA==
-X-Received: by 2002:a5d:4104:: with SMTP id l4mr7031070wrp.276.1604760732006; 
- Sat, 07 Nov 2020 06:52:12 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id d16sm6816179wrw.17.2020.11.07.06.52.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 07 Nov 2020 06:52:11 -0800 (PST)
-Subject: Re: [PATCH 1/2] hw/m68k/q800: Don't connect two qemu_irqs directly to
- the same input
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20201106235109.7066-1-peter.maydell@linaro.org>
- <20201106235109.7066-2-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <11e6fcf5-fbd3-d2d8-ab20-c017080599d4@amsat.org>
-Date: Sat, 7 Nov 2020 15:52:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ bh=FgUBNn/WeXuzZ0IJo7k8Qi0MsF8WLkO7uhitXmPP18o=;
+ b=l6kN49xg7s9g5GH30Tup3tWc3Qmf6r+QUWDxmdcoV4EOiN4xmiR1Ajkp3jMikXcPrB
+ kq0MZkZUiVNTVqnbXogtchBTnz2TKljkzXfCWNe4jPjN870c0xzBVx5MYnxTennjxheG
+ upMgM00NwVCzvsdoQ/j6lRV0CZHVkYunrqOadrpXTD78/lWZyneSLzxEt7ZGIpfXfEb9
+ 64VBpNp4IiFrM1eHXsJ1GqBdIvh/leoPSs7tqd/f64h9Z/cysV5Hi6qFb4QN2FhD8i4+
+ bTciPb891frv6TrOj5WJEAzGrX3xbHY+a8Dz9SS0c5+tc43GDLGUeh4eVRrhGhlIw9JJ
+ FGUg==
+X-Gm-Message-State: AOAM532P5u1l0s3thVk9fjEq23WG+KABEDADpjJVdecWHQKwpch22TO+
+ ouqoL3moevNgGkRL//cWmz+tkwCucJuNZg==
+X-Google-Smtp-Source: ABdhPJxu1F6BILcFtzOG5nl/Qfnhsw8O5vHsPrHgjRw8pQenw00oTftwWratL5qKDxqcv6lYu6WGbA==
+X-Received: by 2002:a63:fb11:: with SMTP id o17mr6117622pgh.109.1604761741661; 
+ Sat, 07 Nov 2020 07:09:01 -0800 (PST)
+Received: from localhost.localdomain ([115.96.136.129])
+ by smtp.googlemail.com with ESMTPSA id
+ d145sm6478308pfd.136.2020.11.07.07.08.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 07 Nov 2020 07:09:00 -0800 (PST)
+From: Ani Sinha <ani@anisinha.ca>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.2] acpi-build: Fix maybe-uninitialized warning when ACPI
+ hotplug is off
+Date: Sat,  7 Nov 2020 20:38:51 +0530
+Message-Id: <20201107150851.87008-1-ani@anisinha.ca>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20201106235109.7066-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=2607:f8b0:4864:20::52b;
+ envelope-from=ani@anisinha.ca; helo=mail-pg1-x52b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,87 +98,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, mst@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>, philmd@redhat.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing SPARC maintainers ...
+ This fixes the following warning (gcc 9.3.0 on Ubuntu):
 
-On 11/7/20 12:51 AM, Peter Maydell wrote:
-> The q800 board code connects both of the IRQ outputs of the ESCC
-> to the same pic[3] qemu_irq. Connecting two qemu_irqs outputs directly
-> to the same input is not valid as it produces subtly wrong behaviour
-> (for instance if both the IRQ lines are high, and then one goes
-> low, the PIC input will see this as a high-to-low transition
-> even though the second IRQ line should still be holding it high).
-> 
-> This kind of wiring needs an explicitly created OR gate; add one.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/m68k/q800.c  | 12 ++++++++++--
->  hw/m68k/Kconfig |  1 +
->  2 files changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-> index ce4b47c3e34..dc13007aaf2 100644
-> --- a/hw/m68k/q800.c
-> +++ b/hw/m68k/q800.c
-> @@ -28,6 +28,7 @@
->  #include "hw/hw.h"
->  #include "hw/boards.h"
->  #include "hw/irq.h"
-> +#include "hw/or-irq.h"
->  #include "elf.h"
->  #include "hw/loader.h"
->  #include "ui/console.h"
-> @@ -171,6 +172,7 @@ static void q800_init(MachineState *machine)
->      CPUState *cs;
->      DeviceState *dev;
->      DeviceState *via_dev;
-> +    DeviceState *escc_orgate;
->      SysBusESPState *sysbus_esp;
->      ESPState *esp;
->      SysBusDevice *sysbus;
-> @@ -283,8 +285,14 @@ static void q800_init(MachineState *machine)
->      qdev_prop_set_uint32(dev, "chnAtype", 0);
->      sysbus = SYS_BUS_DEVICE(dev);
->      sysbus_realize_and_unref(sysbus, &error_fatal);
-> -    sysbus_connect_irq(sysbus, 0, pic[3]);
-> -    sysbus_connect_irq(sysbus, 1, pic[3]);
+  ../hw/i386/acpi-build.c: In function 'build_append_pci_bus_devices':
+  ../hw/i386/acpi-build.c:496:9: error: 'method' may be used uninitialized
+  in this function [-Werror=maybe-uninitialized]
+    496 |         aml_append(parent_scope, method);
+        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  cc1: all warnings being treated as errors
 
-... because sun4m_hw_init() has the same issue:
+Fixes: df4008c9c59 ("piix4: don't reserve hw resources when hotplug is off globally")
+Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
+---
+ hw/i386/acpi-build.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- 986     dev = qdev_new(TYPE_ESCC);
-...
- 996     sysbus_connect_irq(s, 0, slavio_irq[14]);
- 997     sysbus_connect_irq(s, 1, slavio_irq[14]);
-...
-1011     sysbus_connect_irq(s, 0, slavio_irq[15]);
-1012     sysbus_connect_irq(s, 1,  slavio_irq[15]);
-
-> +
-> +    /* Logically OR both its IRQs together */
-> +    escc_orgate = DEVICE(object_new(TYPE_OR_IRQ));
-> +    object_property_set_int(OBJECT(escc_orgate), "num-lines", 2, &error_fatal);
-> +    qdev_realize_and_unref(escc_orgate, NULL, &error_fatal);
-> +    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in(escc_orgate, 0));
-> +    sysbus_connect_irq(sysbus, 1, qdev_get_gpio_in(escc_orgate, 1));
-> +    qdev_connect_gpio_out(DEVICE(escc_orgate), 0, pic[3]);
->      sysbus_mmio_map(sysbus, 0, SCC_BASE);
->  
->      /* SCSI */
-> diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
-> index c757e7dfa48..60d7bcfb8f2 100644
-> --- a/hw/m68k/Kconfig
-> +++ b/hw/m68k/Kconfig
-> @@ -22,3 +22,4 @@ config Q800
->      select ESCC
->      select ESP
->      select DP8393X
-> +    select OR_IRQ
-> 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 4f66642d88..79b86d4a36 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -349,7 +349,7 @@ static void build_append_pcihp_notify_entry(Aml *method, int slot)
+ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+                                          bool pcihp_bridge_en)
+ {
+-    Aml *dev, *notify_method = NULL, *method;
++    Aml *dev, *notify_method = NULL, *method = NULL;
+     QObject *bsel;
+     PCIBus *sec;
+     int i;
+@@ -492,7 +492,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+         }
+     }
+ 
+-    if (bsel || pcihp_bridge_en) {
++    if (method) {
+         aml_append(parent_scope, method);
+     }
+     qobject_unref(bsel);
+-- 
+2.25.1
 
 
