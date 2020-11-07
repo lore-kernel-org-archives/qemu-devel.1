@@ -2,75 +2,75 @@ Return-Path: <SRS0=ex3l=EN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CCF1C388F7
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 05:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4CC3C388F7
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 05:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFB8620878
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 05:09:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16EAA20872
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 05:11:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YxLxeeYj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFB8620878
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPy3QYfz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16EAA20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbGTE-0001qI-Ph
-	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 00:09:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47832)
+	id 1kbGVo-0002uS-0j
+	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 00:11:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kbGSf-0001Q8-RM
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 00:08:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27280)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kbGVF-0002UJ-52
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 00:11:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57310)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kbGSd-0001Q9-Fp
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 00:08:24 -0500
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kbGVD-0002bB-LW
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 00:11:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604725702;
+ s=mimecast20190719; t=1604725862;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=xPVcjxGNSCti1IF4TqarPkWoANl0PPv3OiQ2x0o9kV8=;
- b=YxLxeeYj0reLZznXetmur2We3UJntphteXeynN0zYR1YZnOcZg+nIoQmyOVvlE2iWG+JMj
- gQ/d+4t40y5w9XqmW8L/Ogs8njLrmT7T6wwGCVTfQJoT/ewtsMVXISa99U1fokZmGs9QMG
- lab0vLwwyTWRiv4SEUFPcP2lgckgIgA=
+ bh=sZR3fIdnHj0k4LIUzAOAhB1WRK3FkVi59znhSdBaBnI=;
+ b=GPy3QYfz7m3/lrVn5AQX8+125QYWphw8rdN0JSaabmkuIhW7EqXbzMVi1ApodRyThRXQ1e
+ S3niS3Cx1DXgRuBshHSjMLYShWvY6mEEdiHKbmuyqlQKR2dFRl+U17KNFFhXzwTSd3VwWB
+ v7nzy6oNNkfeu6QwQfCcRYiBAj9LC6Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-J7EMbZS1P9WBSp110Hnj1w-1; Sat, 07 Nov 2020 00:08:19 -0500
-X-MC-Unique: J7EMbZS1P9WBSp110Hnj1w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-409-QvHDrJGCM0SGmDPYrG6rMA-1; Sat, 07 Nov 2020 00:10:59 -0500
+X-MC-Unique: QvHDrJGCM0SGmDPYrG6rMA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED27A801FCC
- for <qemu-devel@nongnu.org>; Sat,  7 Nov 2020 05:08:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 221D41006C82
+ for <qemu-devel@nongnu.org>; Sat,  7 Nov 2020 05:10:58 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-112-47.rdu2.redhat.com
  [10.10.112.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 337E25D9CA;
- Sat,  7 Nov 2020 05:08:18 +0000 (UTC)
-Date: Sat, 7 Nov 2020 00:08:16 -0500
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 726996EF7B;
+ Sat,  7 Nov 2020 05:10:57 +0000 (UTC)
+Date: Sat, 7 Nov 2020 00:10:55 -0500
 From: Cleber Rosa <crosa@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v2 07/11] qapi/introspect.py: Unify return type of
- _make_tree()
-Message-ID: <20201107050816.GC2208@localhost.localdomain>
+Subject: Re: [PATCH v2 08/11] qapi/introspect.py: replace 'extra' dict with
+ 'comment' argument
+Message-ID: <20201107051055.GD2208@localhost.localdomain>
 References: <20201026194251.11075-1-jsnow@redhat.com>
- <20201026194251.11075-8-jsnow@redhat.com>
+ <20201026194251.11075-9-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201026194251.11075-8-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20201026194251.11075-9-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="NklN7DEeGtkPCoo3"
+ protocol="application/pgp-signature"; boundary="cPi+lWm09sJ+d57q"
 Content-Disposition: inline
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -101,44 +101,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---NklN7DEeGtkPCoo3
+--cPi+lWm09sJ+d57q
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 26, 2020 at 03:42:47PM -0400, John Snow wrote:
-> Returning two different types conditionally can be complicated to
-> type. Let's always return a tuple for consistency.
+On Mon, Oct 26, 2020 at 03:42:48PM -0400, John Snow wrote:
+> This is only used to pass in a dictionary with a comment already set, so
+> skip the runaround and just accept the comment.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
 
-This seems like a standalone change.
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
 
-> Prohibit the use of
-> annotations with dict-values in this circumstance. It can be implemented
-> later if and when the need for it arises.
-
-And this seems like another change.
-
-- Cleber.
-
---NklN7DEeGtkPCoo3
+--cPi+lWm09sJ+d57q
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+mK70ACgkQZX6NM6Xy
-CfPQHg/+MhkGC2udCRDL44HGP535dGuDoGE+e+bR65Rl+R1ikH/EmDQWfl2M0DLL
-TaR2DHeBf/4pZvfVX4uK4epRziwXLBJF5Mp9vBJEVib99SHqih+tRoAPFFlsdop/
-szP5B4AMO7Xr+PDoz6lvsSrP539+soXI4jwKQbr9XHwKhNK6x0zOkeVZyEIvZBxv
-JBXxxOsUhSPJ3E1BvmzvBOS3AfisGhuWQX3rG/zV8mxAXlsb0pTfhVK7XIkT2Omz
-scK1qPd1muJwZZOWTDQVL5Qd2W2GqHm9dIed3q973IckQf+d4INLUdYHgSuLs4fy
-nnHeuYxsGqG20TfiaY+gtWifTpitIa0+WCsCVKZ5qcfZIM6jYhjez+gsyl4KdSNs
-nyeEk1p1pJF6hWcJZhWn42wd0Bq1UjNz1NqDPVcKeVS8Xz7CE8AxLsy0QH4b98Q7
-QxKZtOzTcACsIfU1Ar/VFYnvg3owVAapzKW9eolOkyafREge3K5FDVF7ug9j3jWh
-F2nKlUECLVLH+noSL2OcERdL1gmePSBS1KzOiXzjXjvmilBbc4u3V7ZZXKcnHNVJ
-0XlMBYDelHJvmUT9+z0f2eog0l4FIjF2XPfmbc+2DxV6ArEj9BQQYaOe8TOT8sDQ
-5Eu/swJYDJPv8wJ+3dDt2Fguz+6r57WTrTFbLAv4aKgn3WeZ5yo=
-=R4Pa
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+mLF8ACgkQZX6NM6Xy
+CfOhzA//ZkgTgJT/t0TyrDtb2yZHNIaPcuZJaKZPrn0eTkmNMvDTsqN0/R2l2iSw
+Rg7nCGns4NZnRJ7EXxCrXe+O+mIqzQF4csLQBI0j5CUkirKll4YIJBfeuUDqTOv4
+F9VxgLBojGRdWGcdrefWbU8OWDu9l23bnZY8dVrbrxrx/oe/WqCtxofdGC2i3g6O
+Rr4vj1irpKOE+5kMzWsBvMS2Pa+tWAPcSd5A64u/QdKG1eBVSyCqWkoj/7ERGMCS
+ALiQOz1R0v3qiQKaCm5U3LvYRK6qY/JE9BfA9lhvEKjmltyVThQ+oy/hlBTHSfwU
+4/2PUsIVifvKkLWp9TQZkql6gvRoekOri14wmNgmzEtZ+YA26hFAV9F4PSc2xMaF
+x+Q8FBVT8TSVM6UaTpia+1qRMkHSvOXKsDelRVYfN9gAQ9NUUGy3AnCjq1Gmp062
+aRBtuw24u2u23oH1eX1Y+1mO8n8RLhRPLTVHPdcWyTbcpNI6d7cRw6xRxWYRsnhI
+yvjzZZkXG7PHRQWUQXqxihos53U5nxnpr0O9cocfb+rJVZD6hSdknK+W+bvO+LNz
+0o2yQNU/0xTKnZGbTjJR+yOF91A456+wvf21bQJwzvMTYFrpk3UqOw/8N+Thmiso
+On+/wpYoOS2CXJuPrhal5v0kBD+z4emirQhGetgMeCbijxvvs7Q=
+=6Rcw
 -----END PGP SIGNATURE-----
 
---NklN7DEeGtkPCoo3--
+--cPi+lWm09sJ+d57q--
 
 
