@@ -2,106 +2,71 @@ Return-Path: <SRS0=ex3l=EN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD473C388F7
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 09:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB651C388F7
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 09:58:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D9CA20704
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 09:00:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C8E820872
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 09:58:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LD+2p9gE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D9CA20704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="b4xW2WaQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C8E820872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbK5N-0007TE-24
-	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 04:00:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46602)
+	id 1kbKzm-0007P4-8B
+	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 04:58:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbK4R-000704-Tz
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 03:59:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56067)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbK4Q-0006NH-60
- for qemu-devel@nongnu.org; Sat, 07 Nov 2020 03:59:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604739577;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3fejYZCGdqtP2PcGYj2CLQRph7/f+1FTFxzQ7+HwqdY=;
- b=LD+2p9gEfhtqjImOMdpWR06x8dI/q4zCrdm1aajwF90pc9oX8EVZecMOG5QCNf5EVy+FuU
- dtzHFVQcOGSCNriMFjn6Am272sDsTwZyumQLYSrZgUbPGvE1QVi6D1HuS1p/LRjpgCALK1
- tmXaQVNSWLWY9bV5G/yGqVWO5EXfdfc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-593-Yb8XU3cWN8iu3rJIFY83hg-1; Sat, 07 Nov 2020 03:59:35 -0500
-X-MC-Unique: Yb8XU3cWN8iu3rJIFY83hg-1
-Received: by mail-wr1-f72.google.com with SMTP id w6so1505834wrk.1
- for <qemu-devel@nongnu.org>; Sat, 07 Nov 2020 00:59:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=3fejYZCGdqtP2PcGYj2CLQRph7/f+1FTFxzQ7+HwqdY=;
- b=e/5q5PRa4mxvPQeK7++8ZIUxGfSZNMUQcBg2AkjApmmfE7FpuDAOHR1bGdoqDCtpON
- KJLBGaBFyaX2DAwNPSQzgeVZoY63n0HGEjeGZpXju+nsyccPq+mQA+nEMD0Scn/zwZgw
- 7r5aHmQFOWrk1AeHiMNQwU/g5iZ+X7GwaJ0Thqtq3m88pzKFD40o998UmNM0v3DgvGOe
- cdt0T4cCzjnawxEWQCULlqHVyjjYpcAhxtUWtx0ED8UsqnmzMtB4nSMTvosBm4+tVG0b
- RIZjH0sJu5Pd+lPF+rYXkXL1VxL6huswkiOn2oQgxFRIPhMaujGCDR/LxDH5FbUqeTvR
- LBig==
-X-Gm-Message-State: AOAM530ZKbo+nFqrdzd+1AIGJdd6mNZ1TXhu3KFBAXOJv+ISj5oru631
- SPQAECWbOGuQBglTKy0rUNIDk+V6+6IX2dII+LBYeJLyEqIBpBG8V2UjSW9kAGY27bPgUv9QPyE
- IUrh5dRmGhUvs2Pw=
-X-Received: by 2002:a5d:4a50:: with SMTP id v16mr1253253wrs.106.1604739574647; 
- Sat, 07 Nov 2020 00:59:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzuR5VshvhFhngXsyBP9eXh2ASexJxv6Nr09Lo5B67i/F0+gJW8AVyexzmy3RN+vbmETl7iuw==
-X-Received: by 2002:a5d:4a50:: with SMTP id v16mr1253236wrs.106.1604739574434; 
- Sat, 07 Nov 2020 00:59:34 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id k18sm5799347wrx.96.2020.11.07.00.59.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 07 Nov 2020 00:59:33 -0800 (PST)
-Subject: Re: [PATCH-for-5.2 v2] hw/core/qdev-properties-system: Rewrite
- set_pci_host_devaddr using GLib
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kbKzC-0006xd-GM
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 04:58:18 -0500
+Received: from lizzy.crudebyte.com ([91.194.90.13]:40049)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kbKzA-0001NT-IP
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 04:58:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=HQhlzxGZmZEPN3cVjsuMRIkse22+wlWlgU2NgU5MLsM=; b=b4xW2WaQTdUDY8m7JYqX9p2wrw
+ 8r/5ko+Nr2pnsrUZpfpaDtcuwmlCO8qw0s8C9HjVnrRkyy1cNFVqeQ9QAUKiA9Wle46Uqe5hfctid
+ s3aKq6z33xB7GzwFUpFO8pqW+pxJ4OKLwCNwmWQlm9qhzE/iQHEiRICNDI13bgtk0gXYXXACltFO7
+ zVr5Zw46zixUgakWHLjEePWYkw9tmxMHWp1Q0DDnYwzsNXHBvIm1gEBoQMkFJC9GXWOgBgYgBmD+R
+ mZsWIKrZ2dG8dX+x4AUqptO1TLp/xB8tPrjQKkYr0Zr9DYPRxp8QftMlkEF+bU+J2vZ7mwoamuUJ8
+ hncmCv6g==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
 To: qemu-devel@nongnu.org
-References: <20201013102252.3562860-1-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <60f5af9c-4153-7702-cd99-b317a6de89c0@redhat.com>
-Date: Sat, 7 Nov 2020 09:59:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+Cc: Geoffrey McRae <geoff@hostfission.com>, kraxel@redhat.com,
+ pbonzini@redhat.com
+Subject: Re: [PATCH v9 1/1] audio/jack: fix use after free segfault
+Date: Sat, 07 Nov 2020 10:58:10 +0100
+Message-ID: <15581795.ItcsEykuCY@silver>
+In-Reply-To: <20201107000458.8754-2-geoff@hostfission.com>
+References: <20200821134554.101397-2-geoff@hostfission.com>
+ <20201107000458.8754-1-geoff@hostfission.com>
+ <20201107000458.8754-2-geoff@hostfission.com>
 MIME-Version: 1.0
-In-Reply-To: <20201013102252.3562860-1-philmd@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/07 03:59:37
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/07 04:58:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -115,133 +80,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Klaus Herman <kherman@inbox.lv>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping for 5.2 as this is a bugfix.
+On Samstag, 7. November 2020 01:04:58 CET Geoffrey McRae wrote:
+> This change registers a bottom handler to close the JACK client
+> connection when a server shutdown signal is recieved. Without this
+> libjack2 attempts to "clean up" old clients and causes a use after free
+> segfault.
+> 
+> Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
+> ---
+>  audio/jackaudio.c | 50 +++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 37 insertions(+), 13 deletions(-)
+> 
+> diff --git a/audio/jackaudio.c b/audio/jackaudio.c
+> index 1e714b30bc..e00e19061a 100644
+> --- a/audio/jackaudio.c
+> +++ b/audio/jackaudio.c
+> @@ -25,6 +25,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/module.h"
+>  #include "qemu/atomic.h"
+> +#include "qemu/main-loop.h"
+>  #include "qemu-common.h"
+>  #include "audio.h"
+> 
+> @@ -63,6 +64,7 @@ typedef struct QJackClient {
+>      QJackState      state;
+>      jack_client_t  *client;
+>      jack_nframes_t  freq;
+> +    QEMUBH         *shutdown_bh;
+> 
+>      struct QJack   *j;
+>      int             nchannels;
+> @@ -87,6 +89,7 @@ QJackIn;
+>  static int qjack_client_init(QJackClient *c);
+>  static void qjack_client_connect_ports(QJackClient *c);
+>  static void qjack_client_fini(QJackClient *c);
+> +QemuMutex qjack_shutdown_lock;
+> 
 
-On 10/13/20 12:22 PM, Philippe Mathieu-Daudé wrote:
-> set_pci_host_devaddr() is hard to follow, thus bug-prone.
-> We indeed introduced a bug in commit bccb20c49df, as the
-> same line might be used to parse a bus (up to 0xff) or a
-> slot (up to 0x1f). Instead of making things worst, rewrite
-> using g_strsplit().
-> 
-> Fixes: bccb20c49df ("Use qemu_strtoul() in set_pci_host_devaddr()")
-> Reported-by: Klaus Herman <kherman@inbox.lv>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> v2: Free g_strsplit() with g_auto(GStrv) (Daniel)
-> ---
->  hw/core/qdev-properties-system.c | 61 ++++++++++++++------------------
->  1 file changed, 27 insertions(+), 34 deletions(-)
-> 
-> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-> index 49bdd125814..36d4fd8b22a 100644
-> --- a/hw/core/qdev-properties-system.c
-> +++ b/hw/core/qdev-properties-system.c
-> @@ -878,11 +878,11 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
->      DeviceState *dev = DEVICE(obj);
->      Property *prop = opaque;
->      PCIHostDeviceAddress *addr = qdev_get_prop_ptr(dev, prop);
-> -    char *str, *p;
-> -    const char *e;
-> +    g_autofree char *str = NULL;
-> +    g_auto(GStrv) col_s0 = NULL;
-> +    g_auto(GStrv) dot_s = NULL;
-> +    char **col_s;
->      unsigned long val;
-> -    unsigned long dom = 0, bus = 0;
-> -    unsigned int slot = 0, func = 0;
->  
->      if (dev->realized) {
->          qdev_prop_set_after_realize(dev, name, errp);
-> @@ -893,57 +893,50 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
->          return;
->      }
->  
-> -    p = str;
-> -    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0xffff || e == p) {
-> +    col_s = col_s0 = g_strsplit(str, ":", 3);
-> +    if (!col_s || !col_s[0] || !col_s[1]) {
->          goto inval;
->      }
-> -    if (*e != ':') {
-> -        goto inval;
-> -    }
-> -    bus = val;
->  
-> -    p = (char *)e + 1;
-> -    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
-> -        goto inval;
-> -    }
-> -    if (*e == ':') {
-> -        dom = bus;
-> -        bus = val;
-> -        p = (char *)e + 1;
-> -        if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
-> +    /* domain */
-> +    if (col_s[2]) {
-> +        if (qemu_strtoul(col_s[0], NULL, 16, &val) < 0 || val > 0xffff) {
->              goto inval;
->          }
-> +        addr->domain = val;
-> +        col_s++;
-> +    } else {
-> +        addr->domain = 0;
->      }
-> -    slot = val;
->  
-> -    if (*e != '.') {
-> +    /* bus */
-> +    if (qemu_strtoul(col_s[0], NULL, 16, &val) < 0 || val > 0xff) {
->          goto inval;
->      }
-> -    p = (char *)e + 1;
-> -    if (qemu_strtoul(p, &e, 10, &val) < 0 || val > 7 || e == p) {
-> -        goto inval;
-> -    }
-> -    func = val;
-> +    addr->bus = val;
->  
-> -    if (bus > 0xff) {
-> +    /* <slot>.<func> */
-> +    dot_s = g_strsplit(col_s[1], ".", 2);
-> +    if (!dot_s || !dot_s[0] || !dot_s[1]) {
->          goto inval;
->      }
->  
-> -    if (*e) {
-> +    /* slot */
-> +    if (qemu_strtoul(dot_s[0], NULL, 16, &val) < 0 || val > 0x1f) {
->          goto inval;
->      }
-> +    addr->slot = val;
->  
-> -    addr->domain = dom;
-> -    addr->bus = bus;
-> -    addr->slot = slot;
-> -    addr->function = func;
-> +    /* func */
-> +    if (qemu_strtoul(dot_s[1], NULL, 10, &val) < 0 || val > 7) {
-> +        goto inval;
-> +    }
-> +    addr->function = val;
->  
-> -    g_free(str);
->      return;
->  
->  inval:
->      error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
-> -    g_free(str);
+I think this should be:
+
+static QemuMutex qjack_shutdown_lock;
+
+as this mutex is only accessed from within this unit. Except of that:
+
+Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+
+BTW it is common practice to add local functions for initializing, destroying, 
+locking and unlocking a specific mutex use case to avoid issues when code 
+evolves. But so far the use of this mutex is trivial, so it is Ok for now from 
+my PoV.
+
+>  static void qjack_buffer_create(QJackBuffer *buffer, int channels, int
+> frames) {
+> @@ -306,21 +309,27 @@ static int qjack_xrun(void *arg)
+>      return 0;
 >  }
->  
->  const PropertyInfo qdev_prop_pci_host_devaddr = {
 > 
+> +static void qjack_shutdown_bh(void *opaque)
+> +{
+> +    QJackClient *c = (QJackClient *)opaque;
+> +    qjack_client_fini(c);
+> +}
+> +
+>  static void qjack_shutdown(void *arg)
+>  {
+>      QJackClient *c = (QJackClient *)arg;
+>      c->state = QJACK_STATE_SHUTDOWN;
+> +    qemu_bh_schedule(c->shutdown_bh);
+>  }
+> 
+>  static void qjack_client_recover(QJackClient *c)
+>  {
+> -    if (c->state == QJACK_STATE_SHUTDOWN) {
+> -        qjack_client_fini(c);
+> +    if (c->state != QJACK_STATE_DISCONNECTED) {
+> +        return;
+>      }
+> 
+>      /* packets is used simply to throttle this */
+> -    if (c->state == QJACK_STATE_DISCONNECTED &&
+> -        c->packets % 100 == 0) {
+> +    if (c->packets % 100 == 0) {
+> 
+>          /* if enabled then attempt to recover */
+>          if (c->enabled) {
+> @@ -489,15 +498,16 @@ static int qjack_init_out(HWVoiceOut *hw, struct
+> audsettings *as, QJackOut *jo  = (QJackOut *)hw;
+>      Audiodev *dev = (Audiodev *)drv_opaque;
+> 
+> -    qjack_client_fini(&jo->c);
+> -
+>      jo->c.out       = true;
+>      jo->c.enabled   = false;
+>      jo->c.nchannels = as->nchannels;
+>      jo->c.opt       = dev->u.jack.out;
+> 
+> +    jo->c.shutdown_bh = qemu_bh_new(qjack_shutdown_bh, &jo->c);
+> +
+>      int ret = qjack_client_init(&jo->c);
+>      if (ret != 0) {
+> +        qemu_bh_delete(jo->c.shutdown_bh);
+>          return ret;
+>      }
+> 
+> @@ -525,15 +535,16 @@ static int qjack_init_in(HWVoiceIn *hw, struct
+> audsettings *as, QJackIn  *ji  = (QJackIn *)hw;
+>      Audiodev *dev = (Audiodev *)drv_opaque;
+> 
+> -    qjack_client_fini(&ji->c);
+> -
+>      ji->c.out       = false;
+>      ji->c.enabled   = false;
+>      ji->c.nchannels = as->nchannels;
+>      ji->c.opt       = dev->u.jack.in;
+> 
+> +    ji->c.shutdown_bh = qemu_bh_new(qjack_shutdown_bh, &ji->c);
+> +
+>      int ret = qjack_client_init(&ji->c);
+>      if (ret != 0) {
+> +        qemu_bh_delete(ji->c.shutdown_bh);
+>          return ret;
+>      }
+> 
+> @@ -555,7 +566,7 @@ static int qjack_init_in(HWVoiceIn *hw, struct
+> audsettings *as, return 0;
+>  }
+> 
+> -static void qjack_client_fini(QJackClient *c)
+> +static void qjack_client_fini_locked(QJackClient *c)
+>  {
+>      switch (c->state) {
+>      case QJACK_STATE_RUNNING:
+> @@ -564,28 +575,40 @@ static void qjack_client_fini(QJackClient *c)
+> 
+>      case QJACK_STATE_SHUTDOWN:
+>          jack_client_close(c->client);
+> +        c->client = NULL;
+> +
+> +        qjack_buffer_free(&c->fifo);
+> +        g_free(c->port);
+> +
+> +        c->state = QJACK_STATE_DISCONNECTED;
+>          /* fallthrough */
+> 
+>      case QJACK_STATE_DISCONNECTED:
+>          break;
+>      }
+> +}
+> 
+> -    qjack_buffer_free(&c->fifo);
+> -    g_free(c->port);
+> -
+> -    c->state = QJACK_STATE_DISCONNECTED;
+> +static void qjack_client_fini(QJackClient *c)
+> +{
+> +    qemu_mutex_lock(&qjack_shutdown_lock);
+> +    qjack_client_fini_locked(c);
+> +    qemu_mutex_unlock(&qjack_shutdown_lock);
+>  }
+> 
+>  static void qjack_fini_out(HWVoiceOut *hw)
+>  {
+>      QJackOut *jo = (QJackOut *)hw;
+>      qjack_client_fini(&jo->c);
+> +
+> +    qemu_bh_delete(jo->c.shutdown_bh);
+>  }
+> 
+>  static void qjack_fini_in(HWVoiceIn *hw)
+>  {
+>      QJackIn *ji = (QJackIn *)hw;
+>      qjack_client_fini(&ji->c);
+> +
+> +    qemu_bh_delete(ji->c.shutdown_bh);
+>  }
+> 
+>  static void qjack_enable_out(HWVoiceOut *hw, bool enable)
+> @@ -662,6 +685,7 @@ static void qjack_info(const char *msg)
+> 
+>  static void register_audio_jack(void)
+>  {
+> +    qemu_mutex_init(&qjack_shutdown_lock);
+>      audio_driver_register(&jack_driver);
+>      jack_set_thread_creator(qjack_thread_creator);
+>      jack_set_error_function(qjack_error);
+
+Best regards,
+Christian Schoenebeck
+
 
 
