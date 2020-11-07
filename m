@@ -2,93 +2,100 @@ Return-Path: <SRS0=ex3l=EN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AAEFC388F9
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 569DBC388F7
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C25292087E
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:39:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2C2A2087E
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:41:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jrqPGW9t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C25292087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ATouQogl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2C2A2087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbU3m-0004J9-VQ
-	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 14:39:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57766)
+	id 1kbU5w-0006ZU-Sh
+	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 14:41:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58608)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbTz1-00081L-1m; Sat, 07 Nov 2020 14:34:43 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52145)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbTyy-0008NA-Jw; Sat, 07 Nov 2020 14:34:42 -0500
-Received: by mail-wm1-x343.google.com with SMTP id v5so4559640wmh.1;
- Sat, 07 Nov 2020 11:34:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=fgdYdhDY03zoPgadIiKhWW6DCP4typfikMNrmEkn0p8=;
- b=jrqPGW9tsCt+SXiyZQcQkihiqvMadba2ZzCBGwKS+j/drhGHyHFTrNp1nc5+s/sHsR
- mGrSsGjkGTYnaQ5N9SzxpO7Eqql1sCxTEri14zP9f5IFYHeP+oIscRmLhcIyH4fKJWJz
- 2PWgZbrHz9+FC8ePucHjrKHmBaCTNGsxulqNO7qpEhKqK4U9jbFyFoXxiRTuNIQMPr5a
- 29d2eaaOWW0kE38BhNAnBlU5I7t/x4T5X3cibScm0CSpPSG7edLZ+hRlO18H1z+3fx4Q
- rdiW+R8WuAG35tcM7qGjsXN5QXUWrI0ApTPR7r/TrKo87n3CfVlRsBxjKG3CO/p5PFeN
- U9lA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbU52-00065s-TL
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 14:40:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23529)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbU4y-0000i0-Jd
+ for qemu-devel@nongnu.org; Sat, 07 Nov 2020 14:40:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604778051;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=AQZWhvSbI5p4N1e0B4bgocntEDGXJm7E/SmoI1MVHIY=;
+ b=ATouQoglAer5+3b/sCJgDPDswjEA6lB7TWE8Rb/3q9uYIT29nLGBmKr0PL8ka4QEbkCTpG
+ 17P6o40SwnyscuYO9l1iPxP2UdJvLHIpESxLsZAk84hNNhrUZccNsVGqja2EBozV+CTv0k
+ 8aV67rffyXu79CBBwmRQqTJIVLCqZGU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-523-InncbzfgNZum28zY_Bk9pA-1; Sat, 07 Nov 2020 14:40:50 -0500
+X-MC-Unique: InncbzfgNZum28zY_Bk9pA-1
+Received: by mail-wm1-f69.google.com with SMTP id z62so1952054wmb.1
+ for <qemu-devel@nongnu.org>; Sat, 07 Nov 2020 11:40:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=fgdYdhDY03zoPgadIiKhWW6DCP4typfikMNrmEkn0p8=;
- b=R6QAWObpmaHgBQnr/VEJ95Oj3uNpTrRHdiZX3Gr6q0rHKmEHi1d4uDKUAVstLZrRzp
- 8VKWcwtYOpJ9neB1uuCzyl2Q6hBpfFMVwMjzBtd7lpqjBJ8+shtl/F5fDgqW/khZ8KdO
- d3/y95FAzVrFA/b6gifgk4uGuHiigpq/Dned4N3Ca7Wa41nPJJ2dZBg5CsH3UQlCjyer
- u8nFwK108ZO3ltiCosfQRGxSpLosIMoPeHxBly0+kz+gPUSAhB7dUJOlJFSeOGv945+J
- qsx7++CLA4LekJp6ZDIxBszjNjerUWOgcFxQ4nh2Sfu2Esf82akZhXX/cmFMZLguIj8o
- jmdw==
-X-Gm-Message-State: AOAM53322x5+pb/w/SU+0kB3rc3tDFpQvg6/7poqs6YUlD/lk9HvgTP5
- as4ixlysm6rR+8GSJ3o3fVNj5824Vuc=
-X-Google-Smtp-Source: ABdhPJzch91pop+RyceriIHWKgC4IQBp5vZmhnL2xbV1Xqtwzcflj42NHJ5xYpDbBGsez41J0pTSxA==
-X-Received: by 2002:a7b:c157:: with SMTP id z23mr6095102wmi.70.1604777671085; 
- Sat, 07 Nov 2020 11:34:31 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=AQZWhvSbI5p4N1e0B4bgocntEDGXJm7E/SmoI1MVHIY=;
+ b=YJDTJ2Zu7VpVDmm5g5dBbv/PUmtFTqAJjagnNFH2DSlHTdxfn2ombB12yOf30Qujtt
+ dh+BDYfCiIomuZ7YFdZBCIH/gckySsias6Xj5ecpz3DxKbCOsggo6qH8KzyDvuh5VRBg
+ xrF5gA/zAzG7tzucK8EzMPZb6uk5H0TNZMR/fcxL5eJxPubls7HEYsqiqzX/46IX4ZeB
+ JX0X5Lbc0Cl1iTH9jGF/wbTA7QJqpKN0xxALjhRH0n36aWyBoxwhVd2OXTbLagiKj8Wd
+ 7iPIv3AWkRMT6NrfRcD2HSjE71CiuPRGnsYvKaaIAyxMt4qESVj9M4V5/lDi63EnW5MT
+ FbMg==
+X-Gm-Message-State: AOAM533Rzj4GvC66kBqC3nuaCU5DFaJbzCE9frZvD77qQnq+4havcuMA
+ ZHSQbBTEtixks/fqzmVP5LO/XQb0WXrsX8qK/kOTb0KhRMnTPmjmAPld6yf4Ex+46/5KdKN8EWx
+ qE3mB/JrNpN7GQrk=
+X-Received: by 2002:adf:f3d2:: with SMTP id g18mr65217wrp.77.1604778048612;
+ Sat, 07 Nov 2020 11:40:48 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwDSVt8lASy3Eq82HgII3vyyx1qJw3kYKfbLzY7KY7t3FE3ihO3HV4byqp1ONSTKCXfIYdqJg==
+X-Received: by 2002:adf:f3d2:: with SMTP id g18mr65196wrp.77.1604778048420;
+ Sat, 07 Nov 2020 11:40:48 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id q2sm7363998wrw.40.2020.11.07.11.34.29
+ by smtp.gmail.com with ESMTPSA id t7sm7194233wrx.42.2020.11.07.11.40.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 07 Nov 2020 11:34:30 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Sat, 07 Nov 2020 11:40:47 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-6.0 5/5] hw/arm/musicpal: Only use qdev_get_gpio_in() when
- necessary
-Date: Sat,  7 Nov 2020 20:34:03 +0100
-Message-Id: <20201107193403.436146-6-f4bug@amsat.org>
+Subject: [PATCH-for-5.2 v2] hw/i386/acpi-build: Fix maybe-uninitialized error
+ when ACPI hotplug off
+Date: Sat,  7 Nov 2020 20:40:45 +0100
+Message-Id: <20201107194045.438027-1-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201107193403.436146-1-f4bug@amsat.org>
-References: <20201107193403.436146-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/07 14:38:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,93 +108,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Ani Sinha <ani@anisinha.ca>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We don't need to fill the full pic[] array if we only use
-few of the interrupt lines. Directly call qdev_get_gpio_in()
-when necessary.
+GCC 9.3.0 thinks that 'method' can be left uninitialized. This code
+is already in the "if (bsel || pcihp_bridge_en)" block statement,
+but it isn't smart enough to figure it out.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Restrict the code to be used only in the "if (bsel || pcihp_bridge_en)"
+block statement to fix (on Ubuntu):
+
+  ../hw/i386/acpi-build.c: In function 'build_append_pci_bus_devices':
+  ../hw/i386/acpi-build.c:496:9: error: 'method' may be used uninitialized
+  in this function [-Werror=maybe-uninitialized]
+    496 |         aml_append(parent_scope, method);
+        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  cc1: all warnings being treated as errors
+
+Fixes: df4008c9c59 ("piix4: don't reserve hw resources when hotplug is off globally")
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/arm/musicpal.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+ hw/i386/acpi-build.c | 45 +++++++++++++++++++++-----------------------
+ 1 file changed, 21 insertions(+), 24 deletions(-)
 
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index ebc3ec24ef7..458b1cbeb76 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -1587,8 +1587,8 @@ static struct arm_boot_info musicpal_binfo = {
- static void musicpal_init(MachineState *machine)
- {
-     ARMCPU *cpu;
--    qemu_irq pic[32];
-     DeviceState *dev;
-+    DeviceState *pic;
-     DeviceState *uart_orgate;
-     DeviceState *i2c_dev;
-     DeviceState *lcd_dev;
-@@ -1619,20 +1619,20 @@ static void musicpal_init(MachineState *machine)
-                            &error_fatal);
-     memory_region_add_subregion(address_space_mem, MP_SRAM_BASE, sram);
- 
--    dev = sysbus_create_simple(TYPE_MV88W8618_PIC, MP_PIC_BASE,
-+    pic = sysbus_create_simple(TYPE_MV88W8618_PIC, MP_PIC_BASE,
-                                qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_IRQ));
--    for (i = 0; i < 32; i++) {
--        pic[i] = qdev_get_gpio_in(dev, i);
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 4f66642d887..1f5c2112452 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -465,34 +465,31 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+      */
+     if (bsel || pcihp_bridge_en) {
+         method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
 -    }
--    sysbus_create_varargs(TYPE_MV88W8618_PIT, MP_PIT_BASE, pic[MP_TIMER1_IRQ],
--                          pic[MP_TIMER2_IRQ], pic[MP_TIMER3_IRQ],
--                          pic[MP_TIMER4_IRQ], NULL);
-+    sysbus_create_varargs(TYPE_MV88W8618_PIT, MP_PIT_BASE,
-+                          qdev_get_gpio_in(pic, MP_TIMER1_IRQ),
-+                          qdev_get_gpio_in(pic, MP_TIMER2_IRQ),
-+                          qdev_get_gpio_in(pic, MP_TIMER3_IRQ),
-+                          qdev_get_gpio_in(pic, MP_TIMER4_IRQ), NULL);
+-    /* If bus supports hotplug select it and notify about local events */
+-    if (bsel) {
+-        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
  
-     /* Logically OR both UART IRQs together */
-     uart_orgate = DEVICE(object_new(TYPE_OR_IRQ));
-     object_property_set_int(OBJECT(uart_orgate), "num-lines", 2, &error_fatal);
-     qdev_realize_and_unref(uart_orgate, NULL, &error_fatal);
--    qdev_connect_gpio_out(DEVICE(uart_orgate), 0, pic[MP_UART_SHARED_IRQ]);
-+    qdev_connect_gpio_out(DEVICE(uart_orgate), 0,
-+                          qdev_get_gpio_in(pic, MP_UART_SHARED_IRQ));
+-        aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
+-        aml_append(method,
+-            aml_call2("DVNT", aml_name("PCIU"), aml_int(1) /* Device Check */)
+-        );
+-        aml_append(method,
+-            aml_call2("DVNT", aml_name("PCID"), aml_int(3)/* Eject Request */)
+-        );
+-    }
++        /* If bus supports hotplug select it and notify about local events */
++        if (bsel) {
++            uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
  
-     serial_mm_init(address_space_mem, MP_UART1_BASE, 2,
-                    qdev_get_gpio_in(uart_orgate, 0),
-@@ -1674,14 +1674,15 @@ static void musicpal_init(MachineState *machine)
-                              OBJECT(get_system_memory()), &error_fatal);
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, MP_ETH_BASE);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[MP_ETH_IRQ]);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0,
-+                       qdev_get_gpio_in(pic, MP_ETH_IRQ));
+-    /* Notify about child bus events in any case */
+-    if (pcihp_bridge_en) {
+-        QLIST_FOREACH(sec, &bus->child, sibling) {
+-            int32_t devfn = sec->parent_dev->devfn;
+-
+-            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
+-                continue;
+-            }
+-
+-            aml_append(method, aml_name("^S%.02X.PCNT", devfn));
++            aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
++            aml_append(method, aml_call2("DVNT", aml_name("PCIU"),
++                                         aml_int(1))); /* Device Check */
++            aml_append(method, aml_call2("DVNT", aml_name("PCID"),
++                                         aml_int(3))); /* Eject Request */
++        }
++
++        /* Notify about child bus events in any case */
++        if (pcihp_bridge_en) {
++            QLIST_FOREACH(sec, &bus->child, sibling) {
++                int32_t devfn = sec->parent_dev->devfn;
++
++                if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
++                    continue;
++                }
++
++                aml_append(method, aml_name("^S%.02X.PCNT", devfn));
++            }
+         }
+-    }
  
-     sysbus_create_simple("mv88w8618_wlan", MP_WLAN_BASE, NULL);
- 
-     sysbus_create_simple(TYPE_MUSICPAL_MISC, MP_MISC_BASE, NULL);
- 
-     dev = sysbus_create_simple(TYPE_MUSICPAL_GPIO, MP_GPIO_BASE,
--                               pic[MP_GPIO_IRQ]);
-+                               qdev_get_gpio_in(pic, MP_GPIO_IRQ));
-     i2c_dev = sysbus_create_simple("gpio_i2c", -1, NULL);
-     i2c = (I2CBus *)qdev_get_child_bus(i2c_dev, "i2c");
- 
-@@ -1713,7 +1714,7 @@ static void musicpal_init(MachineState *machine)
-                              NULL);
-     sysbus_realize_and_unref(s, &error_fatal);
-     sysbus_mmio_map(s, 0, MP_AUDIO_BASE);
--    sysbus_connect_irq(s, 0, pic[MP_AUDIO_IRQ]);
-+    sysbus_connect_irq(s, 0, qdev_get_gpio_in(pic, MP_AUDIO_IRQ));
- 
-     musicpal_binfo.ram_size = MP_RAM_DEFAULT_SIZE;
-     arm_load_kernel(cpu, machine, &musicpal_binfo);
+-    if (bsel || pcihp_bridge_en) {
+         aml_append(parent_scope, method);
+     }
+     qobject_unref(bsel);
 -- 
 2.26.2
 
