@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E97CC388F7
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6970DC388F9
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:39:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EB402087E
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:37:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA2592087E
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Nov 2020 19:39:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="usdV4vQZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EB402087E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pVsUNLkf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA2592087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbU1M-0001KP-DB
-	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 14:37:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57738)
+	id 1kbU3f-0004Bf-U9
+	for qemu-devel@archiver.kernel.org; Sat, 07 Nov 2020 14:39:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbTyn-0007tZ-RW; Sat, 07 Nov 2020 14:34:29 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:55124)
+ id 1kbTyd-0007k1-HZ; Sat, 07 Nov 2020 14:34:19 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:36982)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbTym-0008MC-AR; Sat, 07 Nov 2020 14:34:29 -0500
-Received: by mail-wm1-x334.google.com with SMTP id d142so4549190wmd.4;
- Sat, 07 Nov 2020 11:34:27 -0800 (PST)
+ id 1kbTyc-0008Li-46; Sat, 07 Nov 2020 14:34:19 -0500
+Received: by mail-wr1-x434.google.com with SMTP id w1so4712593wrm.4;
+ Sat, 07 Nov 2020 11:34:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=IWHQ4zGNPskYzL/akHXO5stc1InHlH57u2pVf49lbSo=;
- b=usdV4vQZ1IclT8J7iUAbyQ7oGZe+DBjrkIvsyG/6y/WGIr7QrLNtVs8fdC1YNOzIm/
- T5E9HwWtrYvYkRFYi/d8HnVP2RhxGYIOucLVl3AW1G9YYxxegty+xtofGNFbFlnlxRQp
- Cq7q43ewAyqZ5mUr20//056ytxru/MP3OvY7OcJqaxxU133ium/lMbfnbGYPjJopV+3A
- BaqV8/7amoP+D879Fun9tMuDsNM4aPTBI+DZ1jEAKdEcnuxvTQ5Fz5I5+NuAmDPakTRv
- VymbX7SuL7QLYC4DGysGoOy0MTKDhiLndlao0RYyneg9ENUQ07RoVmj8F/ag8tUaOIgd
- blXw==
+ bh=XNu7ZLoR4xU4f3L7jkcDncHCuG1GeetmfTtko2ZN1QU=;
+ b=pVsUNLkfg3ETSv26S7xdy5P1KiYSFW9gqn7RnSa44oSwLOwj2xN2Z1ed77ziicCr7a
+ iAFn2FkYCWHi8PmvupwrEuq+sGxBNCN1o8jRGgh8FnrvzXXs7LlRqCIHtJZTP3xKrzf3
+ LBpqwrcIQKOspxdT3HCbsZhYxT2p+2U5k29tg9AQAs/wRL8Oluz9QxgzBedABLXfLVg/
+ 6k1NUurusdVxSVNA10LycOtBpf1jDr7xsItho8YpoyYzfXtbdMksU/b6CG73q/1RHCVH
+ kCdruiXlF6UeLne9wO7HKZsqXxs7w1fsPlzsrM0zs7gPuvJFtOa8NYMnsulS/HePJF1h
+ BwIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=IWHQ4zGNPskYzL/akHXO5stc1InHlH57u2pVf49lbSo=;
- b=rjIh9KoMECMW3EaJGXDy6c29dR7a7LePHMP13GJp4kei9xzMahe+anVJMW/leSKO+F
- j3R0pJ+BgiwEf83j3AV5d3I4kOhQKtuKhEmVk2r0yUwrfjp09NkrqC+8vFovu3o2GNd9
- YZ8Y2SPK6IQqkIsIpUGEmu9P+GQV0CJyDx9XSCUnVgPNQ/Dwizxo3X4ou1qXcTCwPoUc
- 5ciDCjgi050aXl86zOb/gX6IpIJMKSjTu0OihwHMdOh/Hep2Hvwd9juzLApBq/OWG/mU
- d7/XkszkJlQUwu5M/yu3f2XUgd09aMB7XZV9EaJKzLBIvQEEr5NNLxgY5OjOrxSe5XjQ
- IrXw==
-X-Gm-Message-State: AOAM531G0HlAFdLN61RRIbRYqZpMbgPiVfiMiD1bkygnJ/HAJrPF49Y5
- bMcM7lw8Om8ErazyBPYD43spkLjSgDk=
-X-Google-Smtp-Source: ABdhPJwxI6y3vKynt/gYrD08m/TxE/J+PPvvYqOF5LVBMzUGPmvonJwRmvAIVwiN+gzoWXCT07Xekw==
-X-Received: by 2002:a1c:80cb:: with SMTP id b194mr6113072wmd.73.1604777666245; 
- Sat, 07 Nov 2020 11:34:26 -0800 (PST)
+ bh=XNu7ZLoR4xU4f3L7jkcDncHCuG1GeetmfTtko2ZN1QU=;
+ b=fX6YXV97nl6gCR7s3JjAqJ5lw+5c9l7Uk9avW2vHpAJBNwgrYZhPh+gY3WhKFK/2QE
+ eJTmPxh/fbCEwINOSyOvkKAenbZ//1xmPuMSwxBI9+nJQU4wWNCYSpsS0S/HLsS971xD
+ wo9qXskBRSwd9GJCHlm3GyhmU2rHbaZS/b5V+gdtccgJz+XhXX6Pfruz892KcTBqWmKA
+ w2dD3KLu/p9kwn8vVauPznJWdR1StC3M6JmtET5c+PoyGgzd2SP4SNaXNt8phMeiu69J
+ p0zOMbcEmGEI2nFkYiDZcrFFpriNS51kkt8odxTnp5FvT/vyOOY/gbbcMa9w15XF5qar
+ E6/A==
+X-Gm-Message-State: AOAM5327LRD1R7EIq+KzQ/hBGxejaKTgfiaYk5xpK6EVPjwoTtPI4I6H
+ RhzXyGEKZHeRxb6KezqRLI1SWb/kRH4=
+X-Google-Smtp-Source: ABdhPJzvkDp+mjeqT4GT5wqb/KVZZJTOQ0gSumlUXAk/bg73muGuPzITWu4o7Q9AM36Y+gwUsYdbGA==
+X-Received: by 2002:adf:906b:: with SMTP id h98mr9223066wrh.310.1604777656184; 
+ Sat, 07 Nov 2020 11:34:16 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id s4sm194076wro.10.2020.11.07.11.34.25
+ by smtp.gmail.com with ESMTPSA id n67sm7153864wmf.25.2020.11.07.11.34.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 07 Nov 2020 11:34:25 -0800 (PST)
+ Sat, 07 Nov 2020 11:34:15 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2? 4/5] hw/arm/musicpal: Don't connect two qemu_irqs
- directly to the same input
-Date: Sat,  7 Nov 2020 20:34:02 +0100
-Message-Id: <20201107193403.436146-5-f4bug@amsat.org>
+Subject: [PATCH-for-5.2 2/5] hw/misc/stm32f2xx_syscfg: Remove extraneous IRQ
+Date: Sat,  7 Nov 2020 20:34:00 +0100
+Message-Id: <20201107193403.436146-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201107193403.436146-1-f4bug@amsat.org>
 References: <20201107193403.436146-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x334.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::434;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x434.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -109,84 +108,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The MusicPal board code connects both of the IRQ outputs of the UART
-to the same INTC qemu_irq. Connecting two qemu_irqs outputs directly
-to the same input is not valid as it produces subtly wrong behaviour
-(for instance if both the IRQ lines are high, and then one goes
-low, the INTC input will see this as a high-to-low transition
-even though the second IRQ line should still be holding it high).
+The system configuration controller (SYSCFG) doesn't have
+any output IRQ (and the INTC input #71 belongs to the UART6).
+Remove the invalid code.
 
-This kind of wiring needs an explicitly created OR gate; add one.
-
-Inspired-by: Peter Maydell <peter.maydell@linaro.org>
+Fixes: db635521a02 ("stm32f205: Add the stm32f205 SoC")
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/musicpal.c | 17 +++++++++++++----
- hw/arm/Kconfig    |  1 +
- 2 files changed, 14 insertions(+), 4 deletions(-)
+ include/hw/misc/stm32f2xx_syscfg.h | 2 --
+ hw/arm/stm32f205_soc.c             | 1 -
+ hw/misc/stm32f2xx_syscfg.c         | 2 --
+ 3 files changed, 5 deletions(-)
 
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index 5eb3f969fb4..ebc3ec24ef7 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -27,6 +27,7 @@
- #include "ui/console.h"
- #include "hw/i2c/i2c.h"
- #include "hw/irq.h"
-+#include "hw/or-irq.h"
- #include "hw/audio/wm8750.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/runstate.h"
-@@ -77,8 +78,7 @@
- #define MP_TIMER4_IRQ           7
- #define MP_EHCI_IRQ             8
- #define MP_ETH_IRQ              9
--#define MP_UART1_IRQ            11
--#define MP_UART2_IRQ            11
-+#define MP_UART_SHARED_IRQ      11
- #define MP_GPIO_IRQ             12
- #define MP_RTC_IRQ              28
- #define MP_AUDIO_IRQ            30
-@@ -1589,6 +1589,7 @@ static void musicpal_init(MachineState *machine)
-     ARMCPU *cpu;
-     qemu_irq pic[32];
-     DeviceState *dev;
-+    DeviceState *uart_orgate;
-     DeviceState *i2c_dev;
-     DeviceState *lcd_dev;
-     DeviceState *key_dev;
-@@ -1627,9 +1628,17 @@ static void musicpal_init(MachineState *machine)
-                           pic[MP_TIMER2_IRQ], pic[MP_TIMER3_IRQ],
-                           pic[MP_TIMER4_IRQ], NULL);
+diff --git a/include/hw/misc/stm32f2xx_syscfg.h b/include/hw/misc/stm32f2xx_syscfg.h
+index 57a98c533db..8595a3b31b0 100644
+--- a/include/hw/misc/stm32f2xx_syscfg.h
++++ b/include/hw/misc/stm32f2xx_syscfg.h
+@@ -53,8 +53,6 @@ struct STM32F2XXSyscfgState {
+     uint32_t syscfg_exticr3;
+     uint32_t syscfg_exticr4;
+     uint32_t syscfg_cmpcr;
+-
+-    qemu_irq irq;
+ };
  
--    serial_mm_init(address_space_mem, MP_UART1_BASE, 2, pic[MP_UART1_IRQ],
-+    /* Logically OR both UART IRQs together */
-+    uart_orgate = DEVICE(object_new(TYPE_OR_IRQ));
-+    object_property_set_int(OBJECT(uart_orgate), "num-lines", 2, &error_fatal);
-+    qdev_realize_and_unref(uart_orgate, NULL, &error_fatal);
-+    qdev_connect_gpio_out(DEVICE(uart_orgate), 0, pic[MP_UART_SHARED_IRQ]);
-+
-+    serial_mm_init(address_space_mem, MP_UART1_BASE, 2,
-+                   qdev_get_gpio_in(uart_orgate, 0),
-                    1825000, serial_hd(0), DEVICE_NATIVE_ENDIAN);
--    serial_mm_init(address_space_mem, MP_UART2_BASE, 2, pic[MP_UART2_IRQ],
-+    serial_mm_init(address_space_mem, MP_UART2_BASE, 2,
-+                   qdev_get_gpio_in(uart_orgate, 1),
-                    1825000, serial_hd(1), DEVICE_NATIVE_ENDIAN);
+ #endif /* HW_STM32F2XX_SYSCFG_H */
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index a4f3344db25..9cd41bf56da 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -117,7 +117,6 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+     }
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, 0x40013800);
+-    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, 71));
  
-     /* Register flash */
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index fdf4464b948..319916c310e 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -94,6 +94,7 @@ config MUSCA
+     /* Attach UART (uses USART registers) and USART controllers */
+     for (i = 0; i < STM_NUM_USARTS; i++) {
+diff --git a/hw/misc/stm32f2xx_syscfg.c b/hw/misc/stm32f2xx_syscfg.c
+index aa59b435498..04c22c28502 100644
+--- a/hw/misc/stm32f2xx_syscfg.c
++++ b/hw/misc/stm32f2xx_syscfg.c
+@@ -133,8 +133,6 @@ static void stm32f2xx_syscfg_init(Object *obj)
+ {
+     STM32F2XXSyscfgState *s = STM32F2XX_SYSCFG(obj);
  
- config MUSICPAL
-     bool
-+    select OR_IRQ
-     select BITBANG_I2C
-     select MARVELL_88W8618
-     select PTIMER
+-    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
+-
+     memory_region_init_io(&s->mmio, obj, &stm32f2xx_syscfg_ops, s,
+                           TYPE_STM32F2XX_SYSCFG, 0x400);
+     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
 -- 
 2.26.2
 
