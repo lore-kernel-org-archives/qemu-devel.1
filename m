@@ -2,92 +2,89 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F14C388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC52C55ABD
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:48:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEF77206D4
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:46:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F393A206D4
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:48:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c5tZPxQH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEF77206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CL7fERA1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F393A206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbraN-0003fl-Bi
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 15:46:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52704)
+	id 1kbrc4-0005TN-1d
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 15:48:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrZR-00034n-BN
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:45:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24679)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrZP-00034T-03
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:45:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20749)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrZM-0000K1-AN
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:45:53 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrZJ-0000Io-CO
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:45:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604868346;
+ s=mimecast20190719; t=1604868343;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mQ1UDmwFMkB+mv0qV2lzTI3NvVyFxAW3riXAc5YeNWc=;
- b=c5tZPxQH+mBoheuTvT49b6+B33W3eA1NDcMt3txlD+0cp3w8e9j41dm//8LBAdwBPKN3zx
- jlOdjn72ExRBQ36UFqH3mgFAActmPSB71Dlcrj4mzYnIa681KLSx3Bxsiq46KN9XHdHIEf
- t6PhSH+MHuvHbGSRt90DaYAQAovnIiw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-Rv_r7s9PPs-1AYpcita5Ow-1; Sun, 08 Nov 2020 15:45:45 -0500
-X-MC-Unique: Rv_r7s9PPs-1AYpcita5Ow-1
-Received: by mail-wr1-f69.google.com with SMTP id b6so3357904wrn.17
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:45:45 -0800 (PST)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=RxbEJTR5B5WMysiDHrphxZCz9A2ItZe7MKIkvIU7hW4=;
+ b=CL7fERA1pt5utnB3CC70pUroK0R8fw9RYpsqHt2s8zuv1YzwKbbz6NBlbznkPfFbBvtZs4
+ +edKwDkqxj1OaRNXpEWId2fP+ZgbGllfHCcwApmaPmRVrtRLNLf96ADISiLL1lKEmJqEVN
+ C2i9FlCNRg6G1Tl+12bysTMTz1HeWkU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-583-H8UtL-O7NWa7P_L9pQHEyg-1; Sun, 08 Nov 2020 15:45:40 -0500
+X-MC-Unique: H8UtL-O7NWa7P_L9pQHEyg-1
+Received: by mail-wr1-f71.google.com with SMTP id q1so3384008wrn.5
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:45:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mQ1UDmwFMkB+mv0qV2lzTI3NvVyFxAW3riXAc5YeNWc=;
- b=GR4rJ8xPf3Uz3L6uarfFbQVj9XtU4PIfiQp3vwV+vgPKFLw2YibtI1xrcEK/Wtj1U8
- PD8pYw2Bp+6nl+BhtyDU6T7eXukORgWgQbB2ME0s+rhO63//x4X8Fk51jm8CdwPAlCYo
- xwvZYnsm7263b71i1Y0teTAgbuldO9CCAtnKb7RM5I91uecpCWPxk7iNrIPn6jSBACw/
- HiMXE5cGTK8S4BmR5P3cweMg+Z1Q0n/Dj8LFCOrXmB8pCxw7y0yyv/HEn3Y9SVSAFrJv
- LzKg6pv4yPE1CpOtb+MhRl6a5FlOQkfu+mSd2Ko+MIyfsg4hWdlg6LnJw8LP1RkgNQET
- kFQg==
-X-Gm-Message-State: AOAM533SdQGVGYTYsbU5KnbTscfqIsmLwb0Dt0HQmxbGkS3xST/xK5zg
- OF0antP02oVIvBOQr81kV9SKJWPRxZd9RNVy/5OPgJ66f+xyXfpxLLqrjGrrI2yPUvOUX6SJYdw
- P8/YSx4YwC9pQU0I=
-X-Received: by 2002:adf:8362:: with SMTP id 89mr14756601wrd.280.1604868344180; 
- Sun, 08 Nov 2020 12:45:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxqbR2cLME5tMAFaS6zqdV88bCqMwHdMWRjbXbn1ZbxbP5a4oBp4JHT3JG58/itaflrBByO3Q==
-X-Received: by 2002:adf:8362:: with SMTP id 89mr14756573wrd.280.1604868343948; 
- Sun, 08 Nov 2020 12:45:43 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YTTl5likalrV4jRgBXddTPjRQdmFwcFdUXBBmjRiJbI=;
+ b=N2FGT/tUvRTZNJ5FT7WhGxZskh2JvjpBgllpugnV7GgaDe8kZoowg6l8LqgWp4AJjU
+ XpPMGkxTLn1qxI9xbK39tI3f4DtQjMoqX4ZwmUcComU8gdd5GsE3OLrAvj7YTE+9C2Lq
+ WxoDd0v9n9CG+IkoMMHpaHnGgd412mJaY2SwRDbfZoD0TY04LBYwru4M3QnUQ7dZN+CA
+ jv0fjJQjDY65QwZ7VvhIuCWVix4n8rkK+5nU3vLrB4vXEXudCXI7mu0BaJIuXfPE5xXn
+ oxQKOYG6YPsRrcFw3TsoYADPwgmVTjtV2sPUN5MmWeKPxIRwwco5BuuNUUSAmcKCCLII
+ Uhiw==
+X-Gm-Message-State: AOAM531HYlOCYVIWfQvHfTsQmPIbjN3HrqdbCItH5pP+9s0r64AcdwF8
+ CBip2ECMs78kGmqwoOw5gvKcOsGkQYHk8G0mHM/AneAVVbvyYYwRioSLLlO28x2cQb9BewivvLP
+ PHnD8pwbLKFUibv8=
+X-Received: by 2002:adf:ed45:: with SMTP id u5mr13868994wro.48.1604868338801; 
+ Sun, 08 Nov 2020 12:45:38 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyWx1vsRY0nVrpgOjLQb37xx9h1u0ObnfO9UEyd6ODULcq7zJxAv8dw9VvBGDKzxPjGxSk7GA==
+X-Received: by 2002:adf:ed45:: with SMTP id u5mr13868971wro.48.1604868338565; 
+ Sun, 08 Nov 2020 12:45:38 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id n10sm561471wrv.77.2020.11.08.12.45.42
+ by smtp.gmail.com with ESMTPSA id n6sm11048802wrj.60.2020.11.08.12.45.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Nov 2020 12:45:43 -0800 (PST)
+ Sun, 08 Nov 2020 12:45:37 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 v4 01/17] configure: Check vhost-user is available to
- build vhost-user-blk-server
-Date: Sun,  8 Nov 2020 21:45:19 +0100
-Message-Id: <20201108204535.2319870-2-philmd@redhat.com>
+Subject: [PATCH-for-5.2 v4 00/17] ci: Move various jobs from Travis to GitLab
+ CI
+Date: Sun,  8 Nov 2020 21:45:18 +0100
+Message-Id: <20201108204535.2319870-1-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201108204535.2319870-1-philmd@redhat.com>
-References: <20201108204535.2319870-1-philmd@redhat.com>
 MIME-Version: 1.0
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 15:45:43
@@ -124,55 +121,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Check vhost-user is available to build vhost-user-blk-server to fix:
-
- $ ../configure \
-      --disable-vhost-user --enable-vhost-user-blk-server && \
-   make qemu-nbd
- ...
- [505/505] Linking target qemu-nbd
- FAILED: qemu-nbd
- cc  -o qemu-nbd qemu-nbd.p/qemu-nbd.c.o -Wl,--as-needed -Wl,--no-undefined -pie -Wl,--whole-archive libblockdev.fa libblock.fa libcrypto.fa libauthz.fa libqom.fa libio.fa -Wl,--no-whole-archive -Wl,--warn-common -Wl,-z,relro -Wl,-z,now -m64 -fstack-protector-strong -Wl,--start-group libqemuutil.a libblockdev.fa libblock.fa libcrypto.fa libauthz.fa libqom.fa libio.fa @block.syms -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -pthread -lgnutls -lutil -lm -lgthread-2.0 -lglib-2.0 -lbz2 -lgthread-2.0 -lglib-2.0 -lssh -lrbd -lrados -lcurl -lxml2 -lzstd -lacl -lgfapi -lglusterfs -lgfrpc -lgfxdr -luuid -laio /usr/lib64/libz.so -L/usr/lib64/iscsi -liscsi -lnettle -lgnutls -lpam -Wl,--end-group
- /usr/bin/ld: libblockdev.fa(block_export_vhost-user-blk-server.c.o): in function `vu_blk_process_vq':
- block/export/vhost-user-blk-server.c:203: undefined reference to `vu_get_queue'
- /usr/bin/ld: block/export/vhost-user-blk-server.c:208: undefined reference to `vu_queue_pop'
- /usr/bin/ld: libblockdev.fa(block_export_vhost-user-blk-server.c.o): in function `vu_blk_queue_set_started':
- block/export/vhost-user-blk-server.c:228: undefined reference to `vu_get_queue'
- /usr/bin/ld: libblockdev.fa(block_export_vhost-user-blk-server.c.o): in function `vu_blk_req_complete':
- block/export/vhost-user-blk-server.c:55: undefined reference to `vu_queue_push'
- /usr/bin/ld: block/export/vhost-user-blk-server.c:56: undefined reference to `vu_queue_notify'
- /usr/bin/ld: libblockdev.fa(block_export_vhost-user-blk-server.c.o): in function `vu_blk_queue_set_started':
- block/export/vhost-user-blk-server.c:229: undefined reference to `vu_set_queue_handler'
- /usr/bin/ld: libqemuutil.a(util_vhost-user-server.c.o): in function `vu_client_trip':
- util/vhost-user-server.c:176: undefined reference to `vu_dispatch'
- /usr/bin/ld: util/vhost-user-server.c:180: undefined reference to `vu_deinit'
- /usr/bin/ld: libqemuutil.a(util_vhost-user-server.c.o): in function `vu_accept':
- util/vhost-user-server.c:291: undefined reference to `vu_init'
- collect2: error: ld returned 1 exit status
- ninja: build stopped: subcommand failed.
- make: *** [Makefile:171: run-ninja] Error 1
-
-Fixes: bc15e44cb21 ("configure: introduce --enable-vhost-user-blk-server")
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- configure | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/configure b/configure
-index 805f7791503..5079ebb416a 100755
---- a/configure
-+++ b/configure
-@@ -2390,6 +2390,9 @@ fi
- 
- # libvhost-user is Linux-only
- test "$vhost_user_blk_server" = "" && vhost_user_blk_server=$linux
-+if test "$vhost_user_blk_server" = "yes" && test "$vhost_user" = "no"; then
-+  error_exit "--enable-vhost-user-blk-server requires --enable-vhost-user"
-+fi
- if test "$vhost_user_blk_server" = "yes" && test "$linux" = "no"; then
-   error_exit "--enable-vhost-user-blk-server is only available on Linux"
- fi
--- 
-2.26.2
+We have various job covered on Travis-CI, but recommend the=0D
+community to use GitLab, so build failures are missed.=0D
+=0D
+We need help to move the jobs to GitLab (we will keep the s390x=0D
+and ppc64 containerized jobs on Travis as there is no similar=0D
+offer on GitLab). Start moving jobs.=0D
+=0D
+Resulting pipelines (96 jobs in 71 minutes and 4 seconds)=0D
+  https://gitlab.com/philmd/qemu/-/pipelines/213351318=0D
+  https://gitlab.com/philmd/qemu/-/pipelines/213378500=0D
+=0D
+Patches 1-3 are included because without them some jobs are=0D
+failing; but they will be merged via different trees.=0D
+=0D
+Since v3:=0D
+- moving various other jobs=0D
+- make some jobs optional=0D
+=0D
+Since v2:=0D
+- Run m68k qtests (Thomas)=0D
+- Reworded hw/9pfs description (Greg)=0D
+- Added tags=0D
+=0D
+Since v1:=0D
+- Fix Xen+9pfs config (Paolo)=0D
+- Run AVR qtests (Thomas)=0D
+=0D
+Based-on: <20201104115706.3101190-1-philmd@redhat.com>=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (16):=0D
+  configure: Check vhost-user is available to build=0D
+    vhost-user-blk-server=0D
+  hw/i386/acpi-build: Fix maybe-uninitialized error when ACPI hotplug=0D
+    off=0D
+  MAINTAINERS: Add gitlab-pipeline-status script to GitLab CI section=0D
+  gitlab-ci: Split CONFIGURE_ARGS one argument per line for=0D
+    build-disabled=0D
+  gitlab-ci: Update 'build-disabled' to cover all configurable options=0D
+  gitlab-ci: Move job testing --without-default-devices across to gitlab=0D
+  gitlab-ci: Move linux-user debug-tcg test across to gitlab=0D
+  gitlab-ci: Move gprof/gcov test across to gitlab=0D
+  gitlab-ci: Move user-static test across to gitlab=0D
+  gitlab-ci: Move tools-only and softfloat tests across to gitlab=0D
+  gitlab-ci: Move coroutine tests across to gitlab=0D
+  tests/docker: Install lttng-ust-devel package in Fedora image=0D
+  gitlab-ci: Move trace backend tests across to gitlab=0D
+  gitlab-ci: Add test for Xen (on CentOS 7)=0D
+  gitlab-ci: Make some ARM 32-bit jobs optional=0D
+  gitlab-ci: Make MIPS user-mode 32-bit little-endian job optional=0D
+=0D
+Stefan Hajnoczi (1):=0D
+  meson: always include contrib/libvhost-user=0D
+=0D
+ configure                                  |   3 +=0D
+ meson.build                                |   6 +-=0D
+ hw/i386/acpi-build.c                       |  45 ++--=0D
+ .gitlab-ci.d/crossbuilds.yml               |   9 +=0D
+ .gitlab-ci.yml                             | 228 +++++++++++++++++++--=0D
+ .travis.yml                                |  78 -------=0D
+ MAINTAINERS                                |   3 +-=0D
+ scripts/{travis =3D> ci}/coverage-summary.sh |   2 +-=0D
+ tests/docker/dockerfiles/fedora.docker     |   1 +=0D
+ 9 files changed, 249 insertions(+), 126 deletions(-)=0D
+ rename scripts/{travis =3D> ci}/coverage-summary.sh (92%)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
