@@ -7,79 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08032C388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FB5C55ABD
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:48:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43DA7206D4
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BF8E206D4
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:48:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bM51iAJS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43DA7206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i0SUZYrw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BF8E206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbrc7-0005Vg-DU
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 15:48:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52984)
+	id 1kbrcJ-0005c1-5F
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 15:48:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbraw-0004B3-1L
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49663)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbray-0004Ff-Tf
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20371)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrau-0000Ul-I6
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:25 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrax-0000V7-3p
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604868443;
+ s=mimecast20190719; t=1604868446;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8HUr0fHdfhDho2cZoSnJ/oforGStCZUlBsw7H/7cVds=;
- b=bM51iAJSCdjc4lA1AlirFybc9OctYg86urgJqyvtPKJAnjkL3yKjbSv3E1e0D4ngCbjb5r
- 4AQUxcD6MsG0ldInbELyRfUy/mNcBbVB/s+PLfp5Fb58JQODbEPfrZJYKOg6HNB7YryBw9
- 6v/+ExypthfGrINrxDSNm/zJq+euPoA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-515-J96fONz9M6iNNG5lh6Dr2w-1; Sun, 08 Nov 2020 15:47:19 -0500
-X-MC-Unique: J96fONz9M6iNNG5lh6Dr2w-1
-Received: by mail-wr1-f71.google.com with SMTP id e18so3366885wrs.23
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:47:19 -0800 (PST)
+ bh=AVjcP+pti2u4PYxK7LerM3qHxrgoqrncvBuoP4reknY=;
+ b=i0SUZYrw8/1tHbLzs7JdAGGKmK/7ha9ifPLl++HoCozDgDD+gc7NtPr0Jz6Q9qnPx60/Hp
+ ROLrTj2DJkSzBj/g8s9pckxgi0k7WUCqERb3/0HCvcAz0S3C7lFJ0gG9Zn2psX/+aUrzsf
+ CBR5eQ3yoJ61ioFSEGig+qWx8zwpoIw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-586-ujktNPoIPL-vuStZPXlhYA-1; Sun, 08 Nov 2020 15:47:25 -0500
+X-MC-Unique: ujktNPoIPL-vuStZPXlhYA-1
+Received: by mail-wr1-f70.google.com with SMTP id q15so3378258wrw.8
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:47:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8HUr0fHdfhDho2cZoSnJ/oforGStCZUlBsw7H/7cVds=;
- b=S/D9rXKcwqB1drAzim/zFZrS794IXIQEXIi5PoKohDrmYAwEVax2zHhV314kQpnYad
- ObiTHPRDiVurVMlOnzelf1sSAMeYHnpdP7CO1cdjQK86aQPpF3TFJLPegebvpNeDo+B/
- N0W6GNqgK7zRdgH3EwaQbJMAcq+GHrp0hUe4gJxDCcl8Y1Qnq7spSgZ/ukjwWKmecoPr
- fvALvprGX6k9yi6zL8j1w4QKReFD81lNvisEdJGKc+Y3gv+K0SEn6aZ0Jsj7xXSDbKIA
- CU7p2AL757Gqv2LVnmV/zBh2Mk0OMiEQ8T77o09+zz+sbu11DWTEIo6hJCPlD3Gc5cdF
- IPIQ==
-X-Gm-Message-State: AOAM532njLr4BsMTTU9WlnUlOvhqrg/8Jvz7DVFF8CpuxR6p2TaKZxkm
- xLwCfTLRNoIKnuwJ75qNVt5eQvriocSU+s39Szp7vnCB2pIiJIEpuXXi13+4rkWXfaJ6QBGUSLI
- Ff+rTgYWLh4xYNFg=
-X-Received: by 2002:a05:6000:1006:: with SMTP id
- a6mr5660619wrx.367.1604868438344; 
- Sun, 08 Nov 2020 12:47:18 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJycRbzTbqlxadnxp7JzfBmKZZ1kdhhofRPP+MS5g8ZgvveHrG+IAX6tV5khhtCVa9f1VT92Lg==
-X-Received: by 2002:a05:6000:1006:: with SMTP id
- a6mr5660601wrx.367.1604868438178; 
- Sun, 08 Nov 2020 12:47:18 -0800 (PST)
+ bh=AVjcP+pti2u4PYxK7LerM3qHxrgoqrncvBuoP4reknY=;
+ b=m8En1RgTn93WiDSEXPgb8E/aepsHmkGrXN5y5YrGgZS6zmNLjSNmK/gXoHWcqPf7O1
+ /LFActMqnoClx5C1f4Bocix5DOObAJYZm+TgtrOwWTFhjQRvpRYK+XgWa9Y1WPfd/q67
+ IzYutLE3BVdyhYWS1Znn256LWhvMBd1wiEYwLK+bnru3469JiZMBhYoIL5/0Iamj8ieH
+ 9sXg+3Hfrmq5KZcW1AJqEGz8rDAG588aAYiDyIc3c3X6BSBtTIaiPRjbhm1suCTBNvdd
+ DgH3cGxUfoH80vEZdaEEAxSZkHusuf1qyr/u3cqd14bjZwI8bUyYXdmuRlCuI0/XUESw
+ GM3A==
+X-Gm-Message-State: AOAM533+FCcoAuD/d48ncILhT/yG2E23yuJidTVlp7gxQFE8b7xyvxQm
+ +XKJeQQy634SjFmuNrSYU5KnNcGjkqqe7TD3V3TCiFuVZjGmALb9SM6BLQZsu7gpKtkklZNL0J7
+ FyBBlhxAtBabpFsQ=
+X-Received: by 2002:a7b:c8c9:: with SMTP id f9mr10553024wml.3.1604868443413;
+ Sun, 08 Nov 2020 12:47:23 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxzAe3q+xAjauzyNHWuwSWjS8Qw0/Uvwxtpr5r7okJhqpWngHAM5/kVWsPibPQvVgylMUkZIw==
+X-Received: by 2002:a7b:c8c9:: with SMTP id f9mr10553001wml.3.1604868443284;
+ Sun, 08 Nov 2020 12:47:23 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id g11sm1965792wrq.7.2020.11.08.12.47.16
+ by smtp.gmail.com with ESMTPSA id c62sm5502227wme.22.2020.11.08.12.47.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Nov 2020 12:47:17 -0800 (PST)
+ Sun, 08 Nov 2020 12:47:22 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-6.0 v4 04/17] MAINTAINERS: Add gitlab-pipeline-status
- script to GitLab CI section
-Date: Sun,  8 Nov 2020 21:45:22 +0100
-Message-Id: <20201108204535.2319870-5-philmd@redhat.com>
+Subject: [PATCH-for-6.0 v4 05/17] gitlab-ci: Split CONFIGURE_ARGS one argument
+ per line for build-disabled
+Date: Sun,  8 Nov 2020 21:45:23 +0100
+Message-Id: <20201108204535.2319870-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201108204535.2319870-1-philmd@redhat.com>
 References: <20201108204535.2319870-1-philmd@redhat.com>
@@ -90,16 +88,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 15:45:43
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 09:03:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -117,7 +115,6 @@ Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
  "Daniel P . Berrange" <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Cleber Rosa <crosa@redhat.com>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
@@ -127,29 +124,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not let the gitlab-pipeline-status script unmaintained,
-add it to the 'GitLab Continuous Integration' section.
+We will keep adding/removing options to our 'configure' script,
+so for easier maintainability it makes sense to have CONFIGURE_ARGS
+declared as one option per line. This way we can review diff easily
+(or rebase/cherry-pick).
 
-Fixes: c02b2eac55e ("GitLab Gating CI: introduce pipeline-status contrib script")
+No logical change.
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
-Cc: Cleber Rosa <crosa@redhat.com>
+Cc: Daniel P . Berrange <berrange@redhat.com>
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ .gitlab-ci.yml | 80 +++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 63 insertions(+), 17 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 63223e1183d..817c7c93f91 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3146,6 +3146,7 @@ S: Maintained
- F: .gitlab-ci.yml
- F: .gitlab-ci.d/crossbuilds.yml
- F: .gitlab-ci.d/*py
-+F: scripts/ci/gitlab-pipeline-status
- 
- Guest Test Compilation Support
- M: Alex Bennée <alex.bennee@linaro.org>
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 3b15ae5c302..9f090cca5e3 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -203,23 +203,69 @@ build-disabled:
+   <<: *native_build_job_definition
+   variables:
+     IMAGE: fedora
+-    CONFIGURE_ARGS: --disable-attr --disable-avx2 --disable-bochs
+-      --disable-brlapi --disable-bzip2 --disable-cap-ng --disable-capstone
+-      --disable-cloop --disable-coroutine-pool --disable-curl --disable-curses
+-      --disable-dmg --disable-docs --disable-glusterfs --disable-gnutls
+-      --disable-gtk --disable-guest-agent --disable-iconv --disable-kvm
+-      --disable-libiscsi --disable-libpmem --disable-libssh --disable-libusb
+-      --disable-libxml2 --disable-linux-aio --disable-live-block-migration
+-      --disable-lzo --disable-malloc-trim --disable-mpath --disable-nettle
+-      --disable-numa --disable-parallels --disable-pie --disable-qcow1
+-      --disable-qed --disable-qom-cast-debug --disable-rbd --disable-rdma
+-      --disable-replication --disable-sdl --disable-seccomp --disable-sheepdog
+-      --disable-slirp --disable-smartcard --disable-snappy --disable-spice
+-      --disable-strip --disable-tpm --disable-usb-redir --disable-vdi
+-      --disable-vhost-crypto --disable-vhost-net --disable-vhost-scsi
+-      --disable-vhost-user --disable-vhost-vdpa --disable-vhost-vsock
+-      --disable-virglrenderer --disable-vnc --disable-vte --disable-vvfat
+-      --disable-xen --disable-zstd
++    CONFIGURE_ARGS:
++      --disable-attr
++      --disable-avx2
++      --disable-bochs
++      --disable-brlapi
++      --disable-bzip2
++      --disable-cap-ng
++      --disable-capstone
++      --disable-cloop
++      --disable-coroutine-pool
++      --disable-curl
++      --disable-curses
++      --disable-dmg
++      --disable-docs
++      --disable-glusterfs
++      --disable-gnutls
++      --disable-gtk
++      --disable-guest-agent
++      --disable-iconv
++      --disable-kvm
++      --disable-libiscsi
++      --disable-libpmem
++      --disable-libssh
++      --disable-libusb
++      --disable-libxml2
++      --disable-linux-aio
++      --disable-live-block-migration
++      --disable-lzo
++      --disable-malloc-trim
++      --disable-mpath
++      --disable-nettle
++      --disable-numa
++      --disable-parallels
++      --disable-pie
++      --disable-qcow1
++      --disable-qed
++      --disable-qom-cast-debug
++      --disable-rbd
++      --disable-rdma
++      --disable-replication
++      --disable-sdl
++      --disable-seccomp
++      --disable-sheepdog
++      --disable-slirp
++      --disable-smartcard
++      --disable-snappy
++      --disable-spice
++      --disable-strip
++      --disable-tpm
++      --disable-usb-redir
++      --disable-vdi
++      --disable-vhost-crypto
++      --disable-vhost-net
++      --disable-vhost-scsi
++      --disable-vhost-user
++      --disable-vhost-vdpa
++      --disable-vhost-vsock
++      --disable-virglrenderer
++      --disable-vnc
++      --disable-vte
++      --disable-vvfat
++      --disable-xen
++      --disable-zstd
+     TARGETS: arm-softmmu i386-softmmu ppc64-softmmu mips64-softmmu
+       s390x-softmmu i386-linux-user
+     MAKE_CHECK_ARGS: check-qtest SPEED=slow
 -- 
 2.26.2
 
