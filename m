@@ -2,108 +2,119 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,
+	RCVD_DOTEDU_SUSP,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36882C388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9AFCC388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:27:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C512C206D8
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:12:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27010206DC
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:27:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eHI2pBVa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C512C206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="AA2nqgPc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27010206DC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kboEa-0001SQ-Qi
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 12:12:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52088)
+	id 1kboTk-000400-AN
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 12:27:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kboDT-0000bL-R3
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:10:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38960)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kboDS-0002Gd-88
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:10:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604855457;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1S3aF/Y0QDWP2EqeSfB4ysIVPA73IFu/evid3JJ/zeI=;
- b=eHI2pBVagNP9LJ5qcmrwhGuNIVo2pPpsDFXpSuKjpYioiwCTERWpf1/98J2QC1qZsW9po7
- FtobCBelMrFu3L8geJb2alZi+RkbprI5k33y/0lXBEHRgh7dvUwAnZ2fA+GtF7ENeI7iF+
- AeF4k969Z6jFxcHKahqIbEmHOSei1pY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-F1gh9VoTOripzbwGMaZ6zw-1; Sun, 08 Nov 2020 12:10:54 -0500
-X-MC-Unique: F1gh9VoTOripzbwGMaZ6zw-1
-Received: by mail-wr1-f72.google.com with SMTP id t17so3181944wrm.13
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:10:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1S3aF/Y0QDWP2EqeSfB4ysIVPA73IFu/evid3JJ/zeI=;
- b=E9Zo+bm84c25fr5KUtBn9z0UH6ZKu/4AHCwlNgCQAnsOSH80B7dRrs3DKfgYSnFgTW
- r+Uk9AzM5yM/rsvH58Cm4ChryJATzFPlkogaOBgof4TfhzQ51t6YrBcH5/VyiI3YPWnH
- NmPTXZcTaUFsuR0ta59/zfvvruHfqd4q/Vvgc60/fFH7IucgUjZ8uKIOCStW/22wBHlm
- oBKR0rn2BaE+jResmWpXsgMbSWeR8Rk3ybm6Mx2v7MxbRrZwnIFzlSWIFTvfyB+ZJvJ7
- hFvgfiwIjuDUDcJGPXvvzJtTemMe27jwoj1o4m0hHK52afNTBO8z/hmb69BIfBpsvDGx
- 6YVQ==
-X-Gm-Message-State: AOAM530pJjbEd0usgaJUVkIiAXiFotHmUU5drqFG6yLkWe9I3zqhtewx
- 5nJWw3oFzx6D6ofWkSNL1oYKwrsDJdxVT8HifoFKEBX9pKmFPqc8QdYxCAssUOjPQOObq2mnOSN
- R57/LczAwqVCF4YQ=
-X-Received: by 2002:a1c:2c43:: with SMTP id s64mr10107241wms.130.1604855452890; 
- Sun, 08 Nov 2020 09:10:52 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwwLPgBBLcp/ONe8DdfUPvGq3yiMzueyg92zDMaxCisConkBWnxKNu/67Dh2pBewrNvO6Oo9w==
-X-Received: by 2002:a1c:2c43:: with SMTP id s64mr10107225wms.130.1604855452761; 
- Sun, 08 Nov 2020 09:10:52 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id v9sm10240943wrp.11.2020.11.08.09.10.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 08 Nov 2020 09:10:52 -0800 (PST)
-Subject: Re: [PATCH-for-5.2 v2] hw/i386/acpi-build: Fix maybe-uninitialized
- error when ACPI hotplug off
-To: Ani Sinha <ani@anisinha.ca>
-References: <20201107194045.438027-1-philmd@redhat.com>
- <CAARzgwxCXmCZsVWKFX6Fp=SBBj0BvY5=ntLwLZva2NZywD48Lw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <752f4cfa-9213-299d-474c-fbccf312009d@redhat.com>
-Date: Sun, 8 Nov 2020 18:10:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <CAARzgwxCXmCZsVWKFX6Fp=SBBj0BvY5=ntLwLZva2NZywD48Lw@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kboSv-0003Xo-35
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:26:57 -0500
+Received: from mail-co1nam11on2121.outbound.protection.outlook.com
+ ([40.107.220.121]:19040 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kboSt-0004EF-1x
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:26:56 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dSGAOtWQE8QPfuDxIwZQvLhYCi3mdt24gaJAHHng3c+rgxYh5zjiWrq88oDXJ0xI04ewqJeiIDp9xinjqxTlBP6KMCHzIVdfs/TBkBuIC9jztBfGEyjuyUWTJmWIREY+Ro7zpGz0KjAtzjOKZq6UwVFrWlE+ObESOy2dGlLIzyTmaCilLw7SKlYNaQesdIS0O8NX3o+jjB3ULqVvcKvjujGqhL3zlEdgNbAUpWfe5F4l5rhgU1y+c/Lf1YoVhfs3MMaf3MCVuTLYoRdE2L8eTslAqkQ2EZrqqaS6f22/JqN5oN5NFMd+YthzV1rEbCSSecVBYhenLhGwLZYvepkYDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B+bcwTaEyoTo0hZ/QgZkx+clWR6/TXdvu4Nr1KbqTLM=;
+ b=jHdoogaQKPNle35kLPuPL6dm++In2oX/MAesJe2pObDg82CmcjHqvzAJQu9NrtcnJC+N4X8i4rPMoe8FBlyolUFM4Vv6d+f/7oOhvZywAJkrLDvpZKOCyiIJoT1HrgTAjNGbS619F0+nGu7poH8aEExK5bYjWXeGHetChRsrT0/eTgVEBfsJJtEfcbmcStid3a4/MumRZ5aizQcIlgpHzE9FSCWZOwWb90+d+NJ2KEeSz06CrtlRDIDyEJRbWe7StO4jVABe/TEX+U0EpV5wPrYd/4JTVnM40gOnqpYdgIUyRl9vQxlDbheIKDj1WpXZHX66Arug9k+NTdBv6x0JkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
+ header.d=bu.edu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B+bcwTaEyoTo0hZ/QgZkx+clWR6/TXdvu4Nr1KbqTLM=;
+ b=AA2nqgPc4+IQSrna+myT+U/iV4PhwVxkng/wBtR0bomnfH5BPEhlmVOIhREot+tkzxpEnruxT+ivqGaUZ5rAvBLcnXWxYerfGGIRksJIi2UislyelMUoiz/rbMVynLqHaHTR3MiFBJL7GfjPAUseQhPnWH31PPT2A140jvuqtKw=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
+ by SA2PR03MB5673.namprd03.prod.outlook.com (2603:10b6:806:fa::22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21; Sun, 8 Nov
+ 2020 17:11:50 +0000
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::d520:4c19:8ce6:7db2]) by SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::d520:4c19:8ce6:7db2%2]) with mapi id 15.20.3541.023; Sun, 8 Nov 2020
+ 17:11:49 +0000
+From: Alexander Bulekov <alxndr@bu.edu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] scripts/oss-fuzz: give all fuzzers -target names
+Date: Sun,  8 Nov 2020 12:11:36 -0500
+Message-Id: <20201108171136.160607-1-alxndr@bu.edu>
+X-Mailer: git-send-email 2.28.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 09:02:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+X-Originating-IP: [72.93.72.163]
+X-ClientProxiedBy: MN2PR16CA0063.namprd16.prod.outlook.com
+ (2603:10b6:208:234::32) To SN6PR03MB3871.namprd03.prod.outlook.com
+ (2603:10b6:805:6d::32)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from stormtrooper.vrmnet (72.93.72.163) by
+ MN2PR16CA0063.namprd16.prod.outlook.com (2603:10b6:208:234::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.33 via Frontend
+ Transport; Sun, 8 Nov 2020 17:11:48 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4fb701ee-4d17-4de8-a8a8-08d8840960ac
+X-MS-TrafficTypeDiagnostic: SA2PR03MB5673:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA2PR03MB56736D5F09B2838803361C35BAEB0@SA2PR03MB5673.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8v2euG96nRVjhNXA/+pR0SxUddS6+zQnId6WzZqpIWY9F2pTpgH2m/Q/4bZef/cGsjv3oT5CEciRXwVvodGoH7rLsJTp7+vGiO7FTmrLj1ZQ6u7/fAJrpQxpg6OFswu6GuUjXrgQf02z3Wy9omU6CQrON339Z+q3Oaqh8RXN1CA8T5N0DF/1Mo+hclvtQVbGH3sHTNl9aX/f9HTv7htxrfto+IXcbFdhdR5RPv4f/FyIZ9yxfAsNBCT26sebltdHVoPjks0WREXWpX8MRZbO1dWIMgxVwdFuYJnMlLWC4QrufgkW27AcIJScwrPYhmERYQf7pKs5iUr0xgau+N5JVW3vS2An4y1ylDIMGzEiz82FdGuOd0Xpfb/ECMz6qG2NvxDlT+/ZfNPWAcsuB0JhZg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(346002)(376002)(39860400002)(396003)(366004)(136003)(956004)(52116002)(186003)(2616005)(36756003)(6506007)(26005)(6486002)(54906003)(1076003)(6512007)(16526019)(4326008)(478600001)(66946007)(6666004)(83380400001)(6916009)(8936002)(2906002)(86362001)(75432002)(786003)(66556008)(66476007)(966005)(5660300002)(316002)(8676002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: hzhXFifXsOb8R5jBZ8TKLpblZDHHxhm6K437ITjLe4fVysPisDg+JNG0rnTwweBI51sdJHrKDG340o0y3YyX1f4fjLpdchNNm1MN774tg9rdcYp6V34qjBwBZ4bLpgLiz/Pyqzezv16QemkEAta7zsXwD92oRY0A8LwJIeP6jZE8dMopBZvYdX2nTi8wCxg9PHa1O3uPKRUFY8UOISKCxFlD9t2yZrfSwmBqGyTPzsYx7E/wZ0H5B/fsgTlk2LS2pZMDjAokDob1dUG3NxBW2UmPxwZXmHc89sSWEx6/82uwxAaCyJNhULSkJRi4V50/HthdzUulK8PHjxCYU4SmxIZ5erzMjg1aUXhDo61Alnwb1tg46CqCkbz8os6OuYosScIsIikUCyqyGooCcb1jfcj+O9hR37zwb1EVjaGADiWqtQstZqwTtVFPcqAsV2bkxC+5AUiwQKhJVSWDoDdTJEbBlq0tOvpvoPc6UvI0KmHgzQaZFPaGQFD6AXohx/cExb0Mvw5GZpSIoj65eFR+3bMwQj7GPhD+GIuh+wb62Belh7ccNcHPKU4++UwFNzkznuNb3xTDQqBnhJ6+qwtzQ9Ho4/PQ4sELfNnmY2M8wOsENBj4eHEgnhVmDBgKtlKKSfAGy9bzDdakz0LpSRtXFw==
+X-OriginatorOrg: bu.edu
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4fb701ee-4d17-4de8-a8a8-08d8840960ac
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2020 17:11:48.6963 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: J+fFBcguUAZaKXZQGvsqm9WzOxoHjHZe7Cc/kSwBtWRssYGN77F08sg7PmnUIarF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR03MB5673
+Received-SPF: pass client-ip=40.107.220.121; envelope-from=alxndr@bu.edu;
+ helo=NAM11-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 12:26:53
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -8
+X-Spam_score: -0.9
+X-Spam_bar: /
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.999,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,34 +127,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Bandan Das <bsd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/8/20 4:58 AM, Ani Sinha wrote:
-> On Sun, Nov 8, 2020 at 1:10 AM Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>
->> GCC 9.3.0 thinks that 'method' can be left uninitialized. This code
->> is already in the "if (bsel || pcihp_bridge_en)" block statement,
->> but it isn't smart enough to figure it out.
->>
->> Restrict the code to be used only in the "if (bsel || pcihp_bridge_en)"
->> block statement to fix (on Ubuntu):
->>
->>   ../hw/i386/acpi-build.c: In function 'build_append_pci_bus_devices':
->>   ../hw/i386/acpi-build.c:496:9: error: 'method' may be used uninitialized
->>   in this function [-Werror=maybe-uninitialized]
->>     496 |         aml_append(parent_scope, method);
->>         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>   cc1: all warnings being treated as errors
-> 
-> OK I looked at the patch closely and it makes sense. Can you please
-> run a "make check" to make sure we have not broken anything?
+We switched to hardlinks in
+a942f64cc4 ("scripts/oss-fuzz: use hardlinks instead of copying")
 
-Yes I did...
+The motivation was to conserve space (50 fuzzers built with ASAN, can
+weigh close to 9 GB).
+
+Unfortunately, OSS-Fuzz (partially) treated the underlying copy of the
+fuzzer as a standalone fuzzer. To attempt to fix, we tried:
+
+f8b8f37463 ("scripts/oss-fuzz: rename bin/qemu-fuzz-i386")
+
+This was also not a complete fix, because though OSS-Fuzz
+ignores the renamed fuzzer, the underlying ClusterFuzz, doesn't:
+https://storage.googleapis.com/clusterfuzz-builds/qemu/targets.list.address
+https://oss-fuzz-build-logs.storage.googleapis.com/log-9bfb55f9-1c20-4aa6-a49c-ede12864eeb2.txt
+(clusterfuzz still lists qemu-fuzz-i386.base as a fuzzer)
+
+This change keeps the hard-links, but makes them all point to a file
+with a qemu-fuzz-i386-target-.. name. If we have targets, A, B, C, the
+result will be:
+
+qemu-fuzz-i386-target-A (base file)
+qemu-fuzz-i386-target-B -> qemu-fuzz-i386-target-A
+qemu-fuzz-i386-target-C -> qemu-fuzz-i386-target-A
+
+The result should be that every file that looks like a fuzzer to
+OSS-Fuzz/ClusterFuzz, can run as a fuzzer (we don't have a separate base
+copy). Unfortunately, there is not simple way to test this locally.
+
+In the future, it might be worth it to link the majority of QEMU in as a
+shared-object (see https://github.com/google/oss-fuzz/issues/4575 )
+
+Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+---
+
+I also have patches ready to get rid of the hard-linking altogether, if
+people prefer that.
+
+ scripts/oss-fuzz/build.sh | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
+index 3b1c82b63d..c1af43fded 100755
+--- a/scripts/oss-fuzz/build.sh
++++ b/scripts/oss-fuzz/build.sh
+@@ -62,9 +62,6 @@ fi
+ 
+ mkdir -p "$DEST_DIR/lib/"  # Copy the shared libraries here
+ 
+-mkdir -p "$DEST_DIR/bin/"  # Copy executables that shouldn't
+-                           # be treated as fuzzers by oss-fuzz here
+-
+ # Build once to get the list of dynamic lib paths, and copy them over
+ ../configure --disable-werror --cc="$CC" --cxx="$CXX" --enable-fuzzing \
+     --prefix="$DEST_DIR" --bindir="$DEST_DIR" --datadir="$DEST_DIR/data/" \
+@@ -91,20 +88,23 @@ make "-j$(nproc)" qemu-fuzz-i386 V=1
+ # Copy over the datadir
+ cp  -r ../pc-bios/ "$DEST_DIR/pc-bios"
+ 
+-cp "./qemu-fuzz-i386" "$DEST_DIR/bin/qemu-fuzz-i386.base"
++targets=$(./qemu-fuzz-i386 | awk '$1 ~ /\*/  {print $2}')
++base_copy="$DEST_DIR/qemu-fuzz-i386-target-$(echo "$targets" | head -n 1)"
++
++cp "./qemu-fuzz-i386" "$base_copy"
+ 
+ # Run the fuzzer with no arguments, to print the help-string and get the list
+ # of available fuzz-targets. Copy over the qemu-fuzz-i386, naming it according
+ # to each available fuzz target (See 05509c8e6d fuzz: select fuzz target using
+ # executable name)
+-for target in $(./qemu-fuzz-i386 | awk '$1 ~ /\*/  {print $2}');
++for target in $(echo "$targets" | tail -n +2);
+ do
+     # Ignore the generic-fuzz target, as it requires some environment variables
+     # to be configured. We have some generic-fuzz-{pc-q35, floppy, ...} targets
+     # that are thin wrappers around this target that set the required
+     # environment variables according to predefined configs.
+     if [ "$target" != "generic-fuzz" ]; then
+-        ln  "$DEST_DIR/bin/qemu-fuzz-i386.base" \
++        ln  $base_copy \
+             "$DEST_DIR/qemu-fuzz-i386-target-$target"
+     fi
+ done
+-- 
+2.28.0
 
 
