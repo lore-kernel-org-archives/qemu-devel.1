@@ -2,82 +2,82 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82DD6C388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 22:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF52C388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 22:27:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7B10206C1
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 22:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2EBD206D8
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 22:27:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hWlBabvL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7B10206C1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JuvnG18T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2EBD206D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbt8s-0004gF-UL
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 17:26:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38002)
+	id 1kbt9H-000580-P9
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 17:26:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbt2Y-0006Pq-Ia
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 17:20:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51853)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbt2k-0006Tr-2s
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 17:20:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48993)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbt2X-00027h-1Y
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 17:20:02 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbt2h-00028j-Sk
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 17:20:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604874000;
+ s=mimecast20190719; t=1604874011;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9mtvwmDQbHZS+o/2u9r9g/ECxc+lEAZnhg4b7CvVWbM=;
- b=hWlBabvLGyX2IPp1Tvv1XbK2hr4kTNHK3ezmlYwLwFe5kGuXFcPsDRvLpu013fg9hwvSNE
- 7G2noUivADLVjZPyksAfGlhzuC3FdMbYtUaVsgHmLliDVrVert3AXVC8srSLDwJRL8FOuW
- J8c3OIuyr9jP3X0KQkFTohcfmgGFdw4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-571-lVbAOaglMDmYxhyaRQTDcg-1; Sun, 08 Nov 2020 17:19:58 -0500
-X-MC-Unique: lVbAOaglMDmYxhyaRQTDcg-1
-Received: by mail-wr1-f69.google.com with SMTP id t17so3474014wrm.13
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 14:19:58 -0800 (PST)
+ bh=tOlQmfFaNvcfnBXreBEQVhcMzqQm6Lj5i87BO0gaUIY=;
+ b=JuvnG18TYMUxYqpAgCi6zOU5ZaNVUQMPQKFpKL10Mvpf2pwJOr6QCIw8lOMqhO2JH5vTOH
+ rHQE9oFhOeO6F5wtsw990Bi30bhTHgYroL5lmi5eJe1ppAXgTQC2vMhK3AmfyKuopAU2P0
+ ukYtZ3uonOOTXn8ho5K0J2E+jKI8/v8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-_fDEa85lMJiypRoiSoTjHg-1; Sun, 08 Nov 2020 17:20:08 -0500
+X-MC-Unique: _fDEa85lMJiypRoiSoTjHg-1
+Received: by mail-wr1-f72.google.com with SMTP id w17so2732833wrp.11
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 14:20:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=9mtvwmDQbHZS+o/2u9r9g/ECxc+lEAZnhg4b7CvVWbM=;
- b=SbhXqGybSmg+kv46QTdq4rsLNq3qtNblWqgCDpRqIDxinT8h6nYaL5M5/5NeljWZVk
- 2tGLzsfoHAnBs/DAyAulYi+Pl1LPbvxNgF0CMcbGAE3+DQGb/zIJKGJJ5xsLsiEkixQx
- GEQJaQdMfbWflWM8e7HIihnv0gY0S1wCToFecPBHEjlWdECyHtOftzHJGJcUQA+pYmzI
- LjzAk+Db8Dch45XMv/1/zwmacVjbW6AroWE1vDMNWNaI8eJCZVrDLeh9fHQ1Qt8ltDQ6
- HYRt9wsQuoUx0D0nLte3O2ZJrnug4Y/mMELg0aJ2RF5wn5OYvDkW40lMAbfX/BlEvV/K
- kbsw==
-X-Gm-Message-State: AOAM533olXbyeJYD62bRIfSR8IUTkGHK4rQHozZpjP9PRv30E7upN0JI
- xSjsAX5l6DfAD+QWhhcBcx+6i22gPgknKgOZqZZUsP1qCSZrQjAW6IEvgpAUvQsPrQ9gBlxhZnY
- hRokOeTEr6rQ7dc8=
-X-Received: by 2002:a7b:c8c9:: with SMTP id f9mr10805561wml.3.1604873997268;
- Sun, 08 Nov 2020 14:19:57 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzakcv/iBkUgS7j1oS0yoV1mLh7oyw+oZKMUHEamTSzjeOgdL/AX9oWy1/cGHnXv6O0INcazg==
-X-Received: by 2002:a7b:c8c9:: with SMTP id f9mr10805555wml.3.1604873997158;
- Sun, 08 Nov 2020 14:19:57 -0800 (PST)
+ bh=tOlQmfFaNvcfnBXreBEQVhcMzqQm6Lj5i87BO0gaUIY=;
+ b=D6PhwGGqTW/kxh7c9mblh32yLLqmfJqwI9Lb1B7fGJtGFCotPD4y2HiSIemNJadOY3
+ LAPXZXo/jEYJPdB5igiYi8GHdHpFfvbZAlAZPV8BQEwdY8IhZhBSlPR9kaVqowPEiNGq
+ v1TAnmLldQzpOBDBMa6XdEInUIGB/iTYI5HDowT/8CdSd8eTPG7lbIMWfk/+I0A5gsEF
+ wQqHHRGwToeZaZDc5TgNsyASn0/PYF+ZhXyc03nG4rGbAdesPwoDHxNpfKw6xvVG3Voi
+ KOHkjJGzkNVZ2i0PrDkmM0jmPC2tecbw4UZrsCd7SsI17Jn9A3hpp1vF4lmcbFl/w9jm
+ jnVQ==
+X-Gm-Message-State: AOAM532JyofL0Dee549pvOQ0PltkRrGergiVv7foo7JlXzfz9TG0WjRO
+ 5ihafMHzvej8eAiW6hj/RRV0KnA601HHbNa9H3PmNFdYHxhiF/cp5GK9rUoS4tferH3sQkeFmZP
+ zsphIqQwkeOJ/aAY=
+X-Received: by 2002:a7b:c2f7:: with SMTP id e23mr11324773wmk.100.1604874006946; 
+ Sun, 08 Nov 2020 14:20:06 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyZQUm+sFj9DoS7Tr778LdHf49FKFtfJ6i5n/KzjhiMfTDBccPg8W21lzQWuTjJS+pMpvvqdw==
+X-Received: by 2002:a7b:c2f7:: with SMTP id e23mr11324756wmk.100.1604874006800; 
+ Sun, 08 Nov 2020 14:20:06 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id c2sm10502050wmf.47.2020.11.08.14.19.56
+ by smtp.gmail.com with ESMTPSA id x6sm4107170wmc.48.2020.11.08.14.20.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Nov 2020 14:19:56 -0800 (PST)
+ Sun, 08 Nov 2020 14:20:06 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 06/11] gitlab-ci: Rename acceptance_test_job ->
- integration_test_job
-Date: Sun,  8 Nov 2020 23:19:20 +0100
-Message-Id: <20201108221925.2344515-7-philmd@redhat.com>
+Subject: [PATCH v3 08/11] gitlab-ci: Extract common job definition as
+ 'native_common_job'
+Date: Sun,  8 Nov 2020 23:19:22 +0100
+Message-Id: <20201108221925.2344515-9-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201108221925.2344515-1-philmd@redhat.com>
 References: <20201108221925.2344515-1-philmd@redhat.com>
@@ -120,68 +120,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Extract the common definitions shared by '.native_build_job'
+and '.native_test_job' to '.native_common_job'.
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- .gitlab-ci.yml | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ .gitlab-ci.yml | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 0ef814764a0..d4526323169 100644
+index d4526323169..f708573884e 100644
 --- a/.gitlab-ci.yml
 +++ b/.gitlab-ci.yml
-@@ -42,7 +42,7 @@ include:
+@@ -13,9 +13,12 @@ include:
+   - local: '/.gitlab-ci.d/containers.yml'
+   - local: '/.gitlab-ci.d/crossbuilds.yml'
+ 
+-.native_build_job:
+-  stage: build
++.native_common_job:
+   image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
++
++.native_build_job:
++  extends: .native_common_job
++  stage: build
+   before_script:
+     - JOBS=$(expr $(nproc) + 1)
+     - sed -i s,git.qemu.org/git,gitlab.com/qemu-project, .gitmodules
+@@ -35,8 +38,8 @@ include:
+       fi
+ 
+ .native_test_job:
++  extends: .native_common_job
+   stage: test
+-  image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
+   script:
+     - cd build
      - find . -type f -exec touch {} +
-     - make $MAKE_CHECK_ARGS
- 
--.acceptance_test_job:
-+.integration_test_job:
-   extends: .native_test_job
-   cache:
-     key: "${CI_JOB_NAME}-cache"
-@@ -89,8 +89,8 @@ check-system-ubuntu:
-     IMAGE: ubuntu2004
-     MAKE_CHECK_ARGS: check
- 
--acceptance-system-ubuntu:
--  extends: .acceptance_test_job
-+integration-system-ubuntu:
-+  extends: .integration_test_job
-   needs:
-     - job: build-system-ubuntu
-       artifacts: true
-@@ -119,8 +119,8 @@ check-system-debian:
-     IMAGE: debian-amd64
-     MAKE_CHECK_ARGS: check
- 
--acceptance-system-debian:
--  extends: .acceptance_test_job
-+integration-system-debian:
-+  extends: .integration_test_job
-   needs:
-     - job: build-system-debian
-       artifacts: true
-@@ -150,8 +150,8 @@ check-system-fedora:
-     IMAGE: fedora
-     MAKE_CHECK_ARGS: check
- 
--acceptance-system-fedora:
--  extends: .acceptance_test_job
-+integration-system-fedora:
-+  extends: .integration_test_job
-   needs:
-     - job: build-system-fedora
-       artifacts: true
-@@ -181,8 +181,8 @@ check-system-centos:
-     IMAGE: centos8
-     MAKE_CHECK_ARGS: check
- 
--acceptance-system-centos:
--  extends: .acceptance_test_job
-+integration-system-centos:
-+  extends: .integration_test_job
-   needs:
-     - job: build-system-centos
-       artifacts: true
 -- 
 2.26.2
 
