@@ -2,76 +2,80 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB37C388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 11:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 523B2C388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 11:53:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E091206ED
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 11:11:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="ENmmIhiM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E091206ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5C6DA206ED
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 11:53:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C6DA206ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbibM-00019l-J0
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 06:11:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54670)
+	id 1kbjFm-0000bE-7j
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 06:53:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kbiaG-0000b4-9w
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 06:10:08 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:58769)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kbiaE-0006IY-3n
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 06:10:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=0f0q3li2As9jxBkSBOhJadzY76y082OBmylEp91b6R4=; b=ENmmIhiM8PCXPqnnLAKeebgjJ1
- XNd9FwU6Zi66UtdUVpwtASfaHz/jnlKiQ2iyLyCxrWMhLsUnJjHkQixk0v4+2aBVOpPrhQamSrhPJ
- zqYJG+6INEtCnwQdl9R9cd2CpBTd16PG3zauDKnDBGX4JOT7mh/KWBXjPApvEXcZKOP0F/aCY1d4q
- iPpd/eBxybviUfiWxWElF7q9+cYUBSerjMduqJcpEAs/6VA5E4bPRT3xmKHlUxbu/QMcps/ijT3IS
- DhGS5Hu/H665ZNqzuI7qAY42JY/s7o785A9Lj763wrRtFyGcRyNc+fxkue/Srt1LC9Jt1eKZjrFui
- MZ9zobxA==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Geoffrey McRae <geoff@hostfission.com>, kraxel@redhat.com,
- pbonzini@redhat.com
-Subject: Re: [PATCH v10 1/1] audio/jack: fix use after free segfault
-Date: Sun, 08 Nov 2020 12:09:59 +0100
-Message-ID: <4202934.l4obcem48q@silver>
-In-Reply-To: <20201108063351.35804-2-geoff@hostfission.com>
-References: <20201107000458.8754-1-geoff@hostfission.com>
- <20201108063351.35804-1-geoff@hostfission.com>
- <20201108063351.35804-2-geoff@hostfission.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kbjDm-0008SB-3H
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 06:50:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40614)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kbjDe-0003Of-Qh
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 06:50:56 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kbjDc-0001Yy-Ja
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 11:50:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8A8DF2E8133
+ for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 11:50:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 06:10:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 08 Nov 2020 11:42:26 -0000
+From: Christian Schoenebeck <1673957@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ekleog schoenebeck th-huth
+X-Launchpad-Bug-Reporter: Leo Gaspard (ekleog)
+X-Launchpad-Bug-Modifier: Christian Schoenebeck (schoenebeck)
+References: <20170318123502.30244.36321.malonedeb@wampee.canonical.com>
+Message-Id: <160483574654.29032.16971345686501809571.malone@chaenomeles.canonical.com>
+Subject: [Bug 1673957] Re: virtfs: mapped-xattr on mount point
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
+X-Launchpad-Hash: 478eb5bab5782b68f780c7ac965e7bcdfc039a23
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 04:10:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -66
+X-Spam_score: -6.7
+X-Spam_bar: ------
+X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,189 +84,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1673957 <1673957@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sonntag, 8. November 2020 07:33:50 CET Geoffrey McRae wrote:
-> This change registers a bottom handler to close the JACK client
-> connection when a server shutdown signal is received. Without this
-> libjack2 attempts to "clean up" old clients and causes a use after free
-> segfault.
-> 
-> Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
+Independent of the planned tracker transition: this issue would require
+more information by original reporter anyway.
 
-Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+>From the information provided so far, I cannot reproduce this problem,
+and the error messages don't look like common misconfigurations on host
+side like wrong permissions, AppArmor policies or something like that.
+Especially the error message "Cannnot allocate memory" looks weird to
+me. So I think there should at least be more details about the host
+system this was deployed on.
 
-Gerd, I think it would be Ok to queue this as fix for 5.2.
+-- =
 
-> ---
->  audio/jackaudio.c | 50 +++++++++++++++++++++++++++++++++++------------
->  1 file changed, 37 insertions(+), 13 deletions(-)
-> 
-> diff --git a/audio/jackaudio.c b/audio/jackaudio.c
-> index 1e714b30bc..3b7c18443d 100644
-> --- a/audio/jackaudio.c
-> +++ b/audio/jackaudio.c
-> @@ -25,6 +25,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu/module.h"
->  #include "qemu/atomic.h"
-> +#include "qemu/main-loop.h"
->  #include "qemu-common.h"
->  #include "audio.h"
-> 
-> @@ -63,6 +64,7 @@ typedef struct QJackClient {
->      QJackState      state;
->      jack_client_t  *client;
->      jack_nframes_t  freq;
-> +    QEMUBH         *shutdown_bh;
-> 
->      struct QJack   *j;
->      int             nchannels;
-> @@ -87,6 +89,7 @@ QJackIn;
->  static int qjack_client_init(QJackClient *c);
->  static void qjack_client_connect_ports(QJackClient *c);
->  static void qjack_client_fini(QJackClient *c);
-> +static QemuMutex qjack_shutdown_lock;
-> 
->  static void qjack_buffer_create(QJackBuffer *buffer, int channels, int
-> frames) {
-> @@ -306,21 +309,27 @@ static int qjack_xrun(void *arg)
->      return 0;
->  }
-> 
-> +static void qjack_shutdown_bh(void *opaque)
-> +{
-> +    QJackClient *c = (QJackClient *)opaque;
-> +    qjack_client_fini(c);
-> +}
-> +
->  static void qjack_shutdown(void *arg)
->  {
->      QJackClient *c = (QJackClient *)arg;
->      c->state = QJACK_STATE_SHUTDOWN;
-> +    qemu_bh_schedule(c->shutdown_bh);
->  }
-> 
->  static void qjack_client_recover(QJackClient *c)
->  {
-> -    if (c->state == QJACK_STATE_SHUTDOWN) {
-> -        qjack_client_fini(c);
-> +    if (c->state != QJACK_STATE_DISCONNECTED) {
-> +        return;
->      }
-> 
->      /* packets is used simply to throttle this */
-> -    if (c->state == QJACK_STATE_DISCONNECTED &&
-> -        c->packets % 100 == 0) {
-> +    if (c->packets % 100 == 0) {
-> 
->          /* if enabled then attempt to recover */
->          if (c->enabled) {
-> @@ -489,15 +498,16 @@ static int qjack_init_out(HWVoiceOut *hw, struct
-> audsettings *as, QJackOut *jo  = (QJackOut *)hw;
->      Audiodev *dev = (Audiodev *)drv_opaque;
-> 
-> -    qjack_client_fini(&jo->c);
-> -
->      jo->c.out       = true;
->      jo->c.enabled   = false;
->      jo->c.nchannels = as->nchannels;
->      jo->c.opt       = dev->u.jack.out;
-> 
-> +    jo->c.shutdown_bh = qemu_bh_new(qjack_shutdown_bh, &jo->c);
-> +
->      int ret = qjack_client_init(&jo->c);
->      if (ret != 0) {
-> +        qemu_bh_delete(jo->c.shutdown_bh);
->          return ret;
->      }
-> 
-> @@ -525,15 +535,16 @@ static int qjack_init_in(HWVoiceIn *hw, struct
-> audsettings *as, QJackIn  *ji  = (QJackIn *)hw;
->      Audiodev *dev = (Audiodev *)drv_opaque;
-> 
-> -    qjack_client_fini(&ji->c);
-> -
->      ji->c.out       = false;
->      ji->c.enabled   = false;
->      ji->c.nchannels = as->nchannels;
->      ji->c.opt       = dev->u.jack.in;
-> 
-> +    ji->c.shutdown_bh = qemu_bh_new(qjack_shutdown_bh, &ji->c);
-> +
->      int ret = qjack_client_init(&ji->c);
->      if (ret != 0) {
-> +        qemu_bh_delete(ji->c.shutdown_bh);
->          return ret;
->      }
-> 
-> @@ -555,7 +566,7 @@ static int qjack_init_in(HWVoiceIn *hw, struct
-> audsettings *as, return 0;
->  }
-> 
-> -static void qjack_client_fini(QJackClient *c)
-> +static void qjack_client_fini_locked(QJackClient *c)
->  {
->      switch (c->state) {
->      case QJACK_STATE_RUNNING:
-> @@ -564,28 +575,40 @@ static void qjack_client_fini(QJackClient *c)
-> 
->      case QJACK_STATE_SHUTDOWN:
->          jack_client_close(c->client);
-> +        c->client = NULL;
-> +
-> +        qjack_buffer_free(&c->fifo);
-> +        g_free(c->port);
-> +
-> +        c->state = QJACK_STATE_DISCONNECTED;
->          /* fallthrough */
-> 
->      case QJACK_STATE_DISCONNECTED:
->          break;
->      }
-> +}
-> 
-> -    qjack_buffer_free(&c->fifo);
-> -    g_free(c->port);
-> -
-> -    c->state = QJACK_STATE_DISCONNECTED;
-> +static void qjack_client_fini(QJackClient *c)
-> +{
-> +    qemu_mutex_lock(&qjack_shutdown_lock);
-> +    qjack_client_fini_locked(c);
-> +    qemu_mutex_unlock(&qjack_shutdown_lock);
->  }
-> 
->  static void qjack_fini_out(HWVoiceOut *hw)
->  {
->      QJackOut *jo = (QJackOut *)hw;
->      qjack_client_fini(&jo->c);
-> +
-> +    qemu_bh_delete(jo->c.shutdown_bh);
->  }
-> 
->  static void qjack_fini_in(HWVoiceIn *hw)
->  {
->      QJackIn *ji = (QJackIn *)hw;
->      qjack_client_fini(&ji->c);
-> +
-> +    qemu_bh_delete(ji->c.shutdown_bh);
->  }
-> 
->  static void qjack_enable_out(HWVoiceOut *hw, bool enable)
-> @@ -662,6 +685,7 @@ static void qjack_info(const char *msg)
-> 
->  static void register_audio_jack(void)
->  {
-> +    qemu_mutex_init(&qjack_shutdown_lock);
->      audio_driver_register(&jack_driver);
->      jack_set_thread_creator(qjack_thread_creator);
->      jack_set_error_function(qjack_error);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673957
 
-Best regards,
-Christian Schoenebeck
+Title:
+  virtfs: mapped-xattr on mount point
 
+Status in QEMU:
+  Incomplete
 
+Bug description:
+  With
+    -virtfs local,path=3D"/tmp",security_model=3Dmapped-xattr,mount_tag=3D"=
+shared2"
+  in the qemu command line,
+    shared2 on /mnt/testbis type 9p (rw,sync,dirsync,relatime,trans=3Dvirti=
+o,version=3D9p2000.L,msize=3D262144)
+  in the guest mount points, and
+    tmpfs on /tmp type tmpfs (rw,nosuid,nodev)
+  in the host mount points (with CONFIG_TMPFS_XATTR=3Dy according to zgrep =
+/proc/config.gz), running qemu as user "vm-test", trying to "touch a" in /m=
+nt/testbis on the VM fails with "Operation not supported". In addition, no =
+file or directory actually present in the host's /tmp can be seen in the gu=
+est's /mnt/testbis.
+
+  When trying to replace "/tmp" with "/tmp/aaa" on the host, with
+  /tmp/aaa owned by root:root, still running qemu as vm-test, trying to
+  run "ls" in the guest's /mnt/testbis fails with the weird "ls: reading
+  directory '.': Cannot allocate memory", while the directory is empty.
+
+  After a "chown vm-test /tmp/aaa", the guest can list the files
+  (despite the permissions already allowing it to do so before), but
+  still not write new files: "cannot touch 'b': Operation not
+  supported".
+
+  Do you have a pointer as to what is happening?
+
+  PS: complete setup is running all this inside a qemu VM that I use for
+  testing, I guess it shouldn't matter but saying it just in case
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673957/+subscriptions
 
