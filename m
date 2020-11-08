@@ -2,82 +2,86 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC762C388F9
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 00:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F00C388F9
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 00:00:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6270D206E3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 00:00:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4ACF0206E3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 00:00:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYKqpL5p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6270D206E3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQicPfxY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ACF0206E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbubn-00035N-9o
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 19:00:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49112)
+	id 1kbucD-0003Es-5Q
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 19:00:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbuae-0002IP-S4
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 18:59:20 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:55738)
+ id 1kbuaj-0002M7-9N
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 18:59:25 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54274)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbuad-0003k3-2b
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 18:59:20 -0500
-Received: by mail-wm1-x329.google.com with SMTP id c9so6447554wml.5
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 15:59:18 -0800 (PST)
+ id 1kbuah-0003kH-Kf
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 18:59:24 -0500
+Received: by mail-wm1-x341.google.com with SMTP id d142so6442895wmd.4
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 15:59:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=789PFm8J90WkO5RJPK4P7q80GNT2jwQoQ0M3AJMcIGA=;
- b=GYKqpL5pfk66p5Z77zaKBF3KVr9kje2/BRfxZENKhifncRE8ZyC3HUiAIBP7Gg73XR
- 5tXoCocSgoVigwGSn2Dk6IKYgZg0v7519/1dwYXnkwIQLgJTJ5kS3ERHhjthbiLwBzSD
- i5lNbtZ1fM+oFtS2HeKLUk2jvM0aHoxObwR2tcMp6hNrEWefEs1hiofJGbNXGn0n2BJ4
- woWJZAgQReR2MoHY+jgCXlTQqxTZURBsFSAyInbvbewbiBWdy2GGUe0dZ/Ot+FwF2IN2
- nfL53bDqqzSX+AeZWNg+u1VKk6yAAKnFQzqOXQQVJimpf2CkQP7N41bZU2ju+2uMj5kW
- 97Sw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Fbb2L6ljoaLuj4iaRLcKsD/qG9dEoDgoSld5R0Iivi0=;
+ b=GQicPfxYMo0A6CNOwywoBMz+pLvQpb5bpiAkc0n991C27IwXHVG/W0+rMHEqclT6Bl
+ 0yq+BdPHU08W1BtKcE3pzaH4y7oq4Qvx5dQAkYq54zTVy3q2ugzX68acYI9zzPDqh/oK
+ ONibC2BZ0CtQw1qGNWR/DUVdMZNwdOZiB6GkaiamCLsUDu6+nhwmonZlsoWmKANvm35k
+ v7KlB2utg4JNqnnOo4rCJqzCYrfGoaeU3RnRYlMeYvLknx2iWZ70qF6Jzgc+EbrhEeYt
+ 8ZEA0wb+n+uRfMQsybsV9TjyCd3Kci/Rl41AGBDjTwhSKpBxeWWfy2XzvntAkGM0VNke
+ ItMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=789PFm8J90WkO5RJPK4P7q80GNT2jwQoQ0M3AJMcIGA=;
- b=F3WrKHu8l+XsX6jxMWbVDw6959v5fGU5JIUQhZVWym79xYWyu9JN2gsJW83ulUlMCv
- xtIxjrKU2ualpSndtsKysXZNyeqGGcoIW4HCOoL6oYZuLjpftO93c+oXlCjzmv4v84jd
- /hZIJYXzyU8uKgfCfifA+EBU77IVbxTJ8W1r1mLnodlh1B1B54OYbSOwl9sQw5JpULKd
- Pr8IYBexsYWC+a6Xh85u2qvbqdcKHh4ic/A86UnQwFtK5oT1AVy8X6qmphovtaJBZD+c
- 1z6hKnCM8RkQIzCQMSHvp6dMUaN8X6mdRiB+9D23yvX3rSk7SmudBOlVnHhEnH4g0y9Z
- 3KYw==
-X-Gm-Message-State: AOAM532Quu8AN/S31ccPRZDQhVhnltpriVOYaN+10AUqK3pbrSFR/sUW
- 6gvM03Zma3K8+EsMBiPoyWhEjk4RUTM=
-X-Google-Smtp-Source: ABdhPJxhGowO7W2OgHxFnPoA+yOmqQ+kRxaR6fvybpI8MKGSIZgwo2Hmm2T7pXTPYxNcyOI5whrQOw==
-X-Received: by 2002:a1c:7d12:: with SMTP id y18mr11492762wmc.103.1604879957283; 
- Sun, 08 Nov 2020 15:59:17 -0800 (PST)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=Fbb2L6ljoaLuj4iaRLcKsD/qG9dEoDgoSld5R0Iivi0=;
+ b=X7sq0ObdLGPLr1m+nmxVpcpEk9OxdVvp54iF1jGIqBRCmtR3ccOr77WlTNsqareCEA
+ 7nSTMLggoGzwkbIRdxkC55nr9wXsAfJt8Sj42XR76Y99wo0cikbrpqtPmMhCpYsBxmUF
+ jatXQ+fvgVedIGBTbNXJNOdJCowto+rMaBGxeqVF4lBRei5CUh3v5RueDnodS45I+am7
+ UkOO8UsLhj5XxFxRqLWIDjfHZcsDgBM7nsS4UIUYmsMIsLrlxhLZc8o+MinQqIpXaE9b
+ Xu5As/88PBs7l8VgozFEuCfT6lYHK3Cjj1AOLm6+KUvZaotCqrZ8xERThrg2j2emJhpz
+ WhgA==
+X-Gm-Message-State: AOAM531zQlusqFAXTmmYQCTusxEd4X6F7/kup0EKqtyw8Pj9dUak5n5S
+ y0wr7rVy6ApeBzEwT8KIngwpeO7Co3Q=
+X-Google-Smtp-Source: ABdhPJy1WbkqedQJ8mTpgoZVdWWpzrTkIBvWyGbeifSHM7Q11Veo1R09ik6767b98paAZ1rSIgfnGg==
+X-Received: by 2002:a1c:6484:: with SMTP id
+ y126mr11012475wmb.141.1604879962012; 
+ Sun, 08 Nov 2020 15:59:22 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id y20sm10620118wma.15.2020.11.08.15.59.16
+ by smtp.gmail.com with ESMTPSA id l3sm12643124wmg.32.2020.11.08.15.59.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Nov 2020 15:59:16 -0800 (PST)
+ Sun, 08 Nov 2020 15:59:21 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/2] Renesas patches for 5.2-rc1
-Date: Mon,  9 Nov 2020 00:59:13 +0100
-Message-Id: <20201108235915.2396150-1-f4bug@amsat.org>
+Subject: [PULL 1/2] MAINTAINERS: Demote Renesas target & hardware to 'Odd
+ Fixes'
+Date: Mon,  9 Nov 2020 00:59:14 +0100
+Message-Id: <20201108235915.2396150-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201108235915.2396150-1-f4bug@amsat.org>
+References: <20201108235915.2396150-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::329;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x329.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -100,48 +104,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 3493c36f0371777c62d1d72b205b0eb6117e2156=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20201106' into st=
-aging (2020-11-06 13:43:28 +0000)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  https://gitlab.com/philmd/qemu.git tags/renesas-fixes-20201109=0D
-=0D
-for you to fetch changes up to 60f6de8fbafa5dc57af63792e3ba1a910239d195:=0D
-=0D
-  hw/rx/rx-gdbsim: Fix memory leak (CID 1432307) (2020-11-09 00:53:07 +0100=
-)=0D
-=0D
-----------------------------------------------------------------=0D
-Renesas patches queue=0D
-=0D
-- Demote target & hardware sections to 'Odd Fixes'=0D
-- Fix memory leak (CID 1432307)=0D
-=0D
-CI jobs results:=0D
-. https://cirrus-ci.com/build/5340929353580544=0D
-. https://gitlab.com/philmd/qemu/-/pipelines/213407241=0D
-. https://travis-ci.org/github/philmd/qemu/builds/742315021=0D
-----------------------------------------------------------------=0D
-=0D
-Philippe Mathieu-Daud=C3=A9 (2):=0D
-  MAINTAINERS: Demote Renesas target & hardware to 'Odd Fixes'=0D
-  hw/rx/rx-gdbsim: Fix memory leak (CID 1432307)=0D
-=0D
- hw/rx/rx-gdbsim.c |  3 +--=0D
- MAINTAINERS       | 10 +++++-----=0D
- 2 files changed, 6 insertions(+), 7 deletions(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+To be fair with other subsystems listed as 'Odd Fixes' but having
+maintainers more present, demote the Renesas sections from being
+'Maintained' to 'Odd Fixes' (has a maintainer but they don't have
+time to do much other than throw the odd patch in.)
+
+This matches Magnus's possibilities so far:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg710319.html
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20201102104001.2062572-1-f4bug@amsat.org>
+---
+ MAINTAINERS | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 63223e1183d..f6da5990aa9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -289,7 +289,7 @@ F: linux-user/host/riscv64/
+ 
+ RENESAS RX CPUs
+ M: Yoshinori Sato <ysato@users.sourceforge.jp>
+-S: Maintained
++S: Odd Fixes
+ F: target/rx/
+ 
+ S390 TCG CPUs
+@@ -1334,7 +1334,7 @@ RX Machines
+ -----------
+ rx-gdbsim
+ M: Yoshinori Sato <ysato@users.sourceforge.jp>
+-S: Maintained
++S: Odd Fixes
+ F: docs/system/target-rx.rst
+ F: hw/rx/rx-gdbsim.c
+ F: tests/acceptance/machine_rx_gdbsim.py
+@@ -1344,7 +1344,7 @@ SH4 Machines
+ R2D
+ M: Yoshinori Sato <ysato@users.sourceforge.jp>
+ R: Magnus Damm <magnus.damm@gmail.com>
+-S: Maintained
++S: Odd Fixes
+ F: hw/sh4/r2d.c
+ F: hw/intc/sh_intc.c
+ F: include/hw/sh4/sh_intc.h
+@@ -2077,7 +2077,7 @@ F: docs/*/*xive*
+ Renesas peripherals
+ M: Yoshinori Sato <ysato@users.sourceforge.jp>
+ R: Magnus Damm <magnus.damm@gmail.com>
+-S: Maintained
++S: Odd Fixes
+ F: hw/char/renesas_sci.c
+ F: hw/char/sh_serial.c
+ F: hw/timer/renesas_*.c
+@@ -2088,7 +2088,7 @@ F: include/hw/timer/renesas_*.h
+ 
+ Renesas RX peripherals
+ M: Yoshinori Sato <ysato@users.sourceforge.jp>
+-S: Maintained
++S: Odd Fixes
+ F: hw/intc/rx_icu.c
+ F: hw/rx/
+ F: include/hw/intc/rx_icu.h
+-- 
+2.26.2
+
 
