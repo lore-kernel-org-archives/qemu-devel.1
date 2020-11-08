@@ -2,119 +2,83 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09AD5C388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78242C388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5036720760
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:47:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jq2OLlC6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5036720760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6B0D520731
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:22:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0D520731
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbomL-0001RC-Ad
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 12:47:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57558)
+	id 1kbrCd-00049U-1A
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 15:22:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbokr-0000fB-6d
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:45:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24889)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbokm-000654-E8
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:45:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604857522;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pKcr5vUXMJh6j6z/E1BNk/wJeVOexwL5vSDM/421TEA=;
- b=Jq2OLlC63QglC4/X9yYUMjCeNiO9TxP9lMfb95AMNxWufrS4ecytbD/o2ofoc7IoKvjLQx
- ndthC5i6xK7ttz6Woxcq87uzOXZiEElG8zIy5/MtV8+QrwvVEFfpxFVIFb2tNIFePfqdm9
- DnDRg36eLepmlmFAqlEM9fG+LHhTNuU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-VN-UTJT2OXyMSBAuPPrVxg-1; Sun, 08 Nov 2020 12:45:20 -0500
-X-MC-Unique: VN-UTJT2OXyMSBAuPPrVxg-1
-Received: by mail-wr1-f72.google.com with SMTP id w6so3215693wrk.1
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:45:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pKcr5vUXMJh6j6z/E1BNk/wJeVOexwL5vSDM/421TEA=;
- b=FmzAHwSlCDXrQI1HXy/IxZkz6zredcqDgZvmbYbI17kMsio/K9fa4laM0F8gsrGvIv
- lLtWvk70AgKc11PJKzL5tNWSXQfFELDA4dd1+BDji6gwGHOilAsy3IoY2h5faz9m6x53
- dVAmVASAdwamM5lgdDIzI44pmqvUQDWSbcNk26rntyN1ZVPigtyEe9ObWaB3B+6nWt55
- 7mOANRbNq8pOxJAYU1F4UMB2FXOh25eM0CqHfbsSqZsvgJ9ozXmvEwgwfBcHtyFdpMpS
- NfcKzm7IL92kfcpO76kKPjICizQAgCLeAqf8fBvj6ZD1uvDxHdnA/m6+bYxELwz3TRMH
- BFBg==
-X-Gm-Message-State: AOAM532FtRAxvPZCoG0pTlSSgT32ywLEt0mhvXOeCGcNtZrNvfc1YOdm
- nOkMsSyNbNWcyV00tgKqGZXblj8rlr58DLxR/0eNDz8igieIae1Wi5JtrpU/ctW1PeqTwnDBPCY
- Ar3UD6ySQ4nHA5L4=
-X-Received: by 2002:a1c:6302:: with SMTP id x2mr10602942wmb.56.1604857519876; 
- Sun, 08 Nov 2020 09:45:19 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx1+MmTs2lallUAly8YG6ttAFAIc9qc4UR8osQBdD9ziPolvVhuWzyWw6bD4azHYpnqWfdQ3g==
-X-Received: by 2002:a1c:6302:: with SMTP id x2mr10602917wmb.56.1604857519689; 
- Sun, 08 Nov 2020 09:45:19 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id i33sm10548606wri.79.2020.11.08.09.45.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 08 Nov 2020 09:45:18 -0800 (PST)
-Subject: Re: --enable-xen on gitlab CI? (was Re: [PATCH 09/36] qdev: Make
- qdev_get_prop_ptr() get Object* arg)
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20201029220246.472693-1-ehabkost@redhat.com>
- <20201029220246.472693-10-ehabkost@redhat.com>
- <CAJ+F1CKqo3D20=qSAovVKWCGz4otctaWnGC0O5p-Z1ZG9Pj_Mw@mail.gmail.com>
- <20201030113516.GP5733@habkost.net>
- <7645972e-5cad-6511-b057-bd595b91c4aa@redhat.com>
- <e35c50b6-e795-d901-61e4-4879c5eadd61@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e3e3d331-fd4f-7365-1e2f-bf8bfdb11396@redhat.com>
-Date: Sun, 8 Nov 2020 18:45:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kbrB5-0003Gd-Qo
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:20:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36008)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kbrB2-0005lC-R6
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:20:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kbrB0-0008Ld-KY
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 20:20:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 98D322E811E
+ for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 20:20:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <e35c50b6-e795-d901-61e4-4879c5eadd61@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 09:02:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 08 Nov 2020 20:13:13 -0000
+From: =?utf-8?b?0JrQvtGA0LXQvdCx0LXRgNCzINCc0LDRgNC6?=
+ <1652459@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: socketpair th-huth
+X-Launchpad-Bug-Reporter: =?utf-8?b?0JrQvtGA0LXQvdCx0LXRgNCzINCc0LDRgNC6?=
+ =?utf-8?q?_=28socketpair=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?b?0JrQvtGA0LXQvdCx0LXRgNCzINCc0LDRgNC6?=
+ =?utf-8?q?_=28socketpair=29?=
+References: <20161224192528.14563.19329.malonedeb@wampee.canonical.com>
+Message-Id: <160486639393.28629.16510436669305416288.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1652459] Re: kvm rbd driver (and maybe others, i.e. qcow2,
+ qed and so on)  does not report DISCARD-ZERO flag
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
+X-Launchpad-Hash: 7df35f71690ca71e3d991d159968b1646eefe02b
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 15:20:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -66
+X-Spam_score: -6.7
+X-Spam_bar: ------
+X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -123,46 +87,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
- QEMU <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>,
- David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Qemu-s390x list <qemu-s390x@nongnu.org>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Reply-To: Bug 1652459 <1652459@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/31/20 11:25 AM, Thomas Huth wrote:
-> On 30/10/2020 18.13, Paolo Bonzini wrote:
->> On 30/10/20 12:35, Eduardo Habkost wrote:
->>>
->>> What is necessary to make sure we have a CONFIG_XEN=y job in
->>> gitlab CI?  Maybe just including xen-devel in some of the
->>> container images is enough?
->>
->> Fedora already has it, but build-system-fedora does not include
->> x86_64-softmmu.
-> 
-> Eduardo, could you try to add xen-devel to the centos8 container? If that
-> does not work, we can still move the x86_64-softmmu target to the fedora
-> pipeline instead.
+** Changed in: qemu
+       Status: Incomplete =3D> New
 
-On CentOS 8:
+-- =
 
-  #6 10.70 No match for argument: xen-devel
-  #6 10.71 Error: Unable to find a match: xen-devel
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1652459
 
-Regards,
+Title:
+  kvm rbd driver (and maybe others, i.e. qcow2, qed and so on)  does not
+  report DISCARD-ZERO flag
 
-Phil.
+Status in QEMU:
+  New
 
+Bug description:
+  # lsblk -D
+  NAME   DISC-ALN DISC-GRAN DISC-MAX DISC-ZERO
+  sda           0        4K       1G         0
+  =E2=94=9C=E2=94=80sda1        0        4K       1G         0
+  =E2=94=9C=E2=94=80sda2     1024        4K       1G         0
+  =E2=94=94=E2=94=80sda5        0        4K       1G         0
+
+  Last column should be `1` at least for "RBD+discard=3Dunmap" since
+  reading from discarded regions in RBD MUST return zeroes. The same
+  with QCOW2, QED and sparse raw images. KVM should copy value of this
+  flag when real raw device (i.e. real SSD) with discard capability is
+  used as virtual disk.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1652459/+subscriptions
 
