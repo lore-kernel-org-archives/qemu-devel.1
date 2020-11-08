@@ -2,108 +2,100 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B4FC388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 22:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A0E1C388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 22:20:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC8D1206A5
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 22:02:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5C67206E3
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 22:20:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WSV1tUsR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC8D1206A5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FzKmFNmj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5C67206E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbslJ-0003I9-Lg
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 17:02:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35902)
+	id 1kbt3J-000710-JX
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 17:20:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbsjs-0002ek-Hu
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 17:00:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34670)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbt26-0005kd-ND
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 17:19:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54005)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbsjo-0000J7-Bw
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 17:00:43 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbt24-00024s-ED
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 17:19:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604872836;
+ s=mimecast20190719; t=1604873971;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UFPY0cQ/Jorg5vSPE+0tEmA6/5gFXK6WA5ifFlgle7c=;
- b=WSV1tUsRd9xmE9stLEOYdBkkN2r47z8bUFOt7n+WfDo2dOtlOqH2dbyuS4EI1inTqLNSSG
- k5DxMKNDYpJJj1SMHp/nfA6HbZPgvh43kBlXzmn3svmyUCvJvbPHOKmeEyY4vmO+chgAqq
- 280ulPNZPjpI5dxV2dhmGMq6W9VkeTU=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=B17PjAEChMxAQOnEt0Ifp1nUaSgA3OaOjNx04Ed1BzQ=;
+ b=FzKmFNmjRBcngiDo3i5TIWuWZISFhk5wdffw/gwaBAncRf6kd7UX6fDFs0hnZcrhGn7Vha
+ aM1baq7o0ufV/2lEZunzBCdqcSNBJag5YpypgwRWbfLVbfcQLx9O+kyu8i0wU4BmJgFAX7
+ sEU93QvJlp8JdmIxNId1iAF8AWoQxa0=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-qSyqvBF5OAakbWdt_Glz4A-1; Sun, 08 Nov 2020 17:00:35 -0500
-X-MC-Unique: qSyqvBF5OAakbWdt_Glz4A-1
-Received: by mail-wr1-f71.google.com with SMTP id e18so3435677wrs.23
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 14:00:35 -0800 (PST)
+ us-mta-293-zzFjREOIOFiU6HKbCix3pA-1; Sun, 08 Nov 2020 17:19:29 -0500
+X-MC-Unique: zzFjREOIOFiU6HKbCix3pA-1
+Received: by mail-wr1-f71.google.com with SMTP id 67so3488028wra.2
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 14:19:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=UFPY0cQ/Jorg5vSPE+0tEmA6/5gFXK6WA5ifFlgle7c=;
- b=jOwsV75ZSzPK/idiTDszXJszmet4UOhsbkhlyLmaaAYjREFTUq6YJZX12kXfXmKOJ1
- C8MupfzSa3CZAkaQ0zUN83awo8nn27HCe3ivye8NsKF5j+36vCE+o4YabubDnBXPfgKU
- pYNG1omllM7Vg7BI0t0PIAsO2cm6HXhJQXGxKnbVU9v/2w4BgH6gEBk43RFki6vIpsZy
- BNrfMX1+qNVqUTt+Geqdy1FRbSu1H5COcQvfTg9MxObQsCDuspiUHqiRPwtFYhl6JlsV
- DDsJNsuCvV9CabcZeXkSjN8D7sGqQPbp9wx8EkYdKRjAvNKQbIMP9RcWqdjr14215zs9
- T9Og==
-X-Gm-Message-State: AOAM530a6/eIOdMV7QaK4hA2EbSmqw4F6+WeeL/TucwiOuyttmS4Qaa2
- F4w/W6hQL89I8z114pN8rRXJ4LT3ny19yxfL2wS+cAX8wPDAO3FWOIuxgOAxOOhFempOCK7/AmT
- 1UO5jCp3uQdvtjsk=
-X-Received: by 2002:adf:e28c:: with SMTP id v12mr14354272wri.230.1604872834068; 
- Sun, 08 Nov 2020 14:00:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyWCHj3u9Mo629xUoIGpY/66HM0oeKI+oQeqzo2evblZwtdDFx/pOaWZfkqQsEOW4nOOGjTXQ==
-X-Received: by 2002:adf:e28c:: with SMTP id v12mr14354238wri.230.1604872833743; 
- Sun, 08 Nov 2020 14:00:33 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ bh=XXxr586VY7UbyUc6vzBVmuBrzXY3zQ+1zDR0I1A3Ijc=;
+ b=b/pYlE2YsHIuH/etdnxOHrOUbk3dvKTv7EsmR+d2UxN3QjuXEmvSOsoCwDxFAJV3tb
+ Uf6LhbhUT5GIWMVrDUVaO1X+8hU+TzZchpkEXG9kftfWbA4HdBEDRCmZKJZ6lmOAByD/
+ H2wzMZ4rLc/28gwutfb7ApvxinPYS0dyDCwWmnjfSteZG0PDrOChJtga1QXsrkBZN7r1
+ kUrpOR215ERh7xyGQjjZConAJg35r5o1ktGF+ExRMKyjKLO8paxNE4tumdJoFcznN6cQ
+ BaB6cXuVXIvqhDCzMcL1+dhQ/IavWwPOjmy8vU8i8tPYUkcqWPki/90uJ2ckQYw6P1r8
+ rzQA==
+X-Gm-Message-State: AOAM531lgrsmRbay5yhLeXIIhDPDLNG/plujSzSY8m+Lm5Nu+i/RUPBh
+ sli0UFmCqFeTTUJPhLFRxY+wUEptvWhrZQ/GTrCopDlrvRYJx2kIQmWESjM7WH59LP4d5bqUVqR
+ YsTmUSREmoppYZck=
+X-Received: by 2002:a7b:c00b:: with SMTP id c11mr11325285wmb.175.1604873968358; 
+ Sun, 08 Nov 2020 14:19:28 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyyL6Dw8t8yKNZuoWokjckwB7MlXNhMtUIRGFeAG1+pz2ArbILTPro2Thhu4GfKjXLOu6yJtg==
+X-Received: by 2002:a7b:c00b:: with SMTP id c11mr11325266wmb.175.1604873968167; 
+ Sun, 08 Nov 2020 14:19:28 -0800 (PST)
+Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id h4sm10865916wrp.52.2020.11.08.14.00.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 08 Nov 2020 14:00:33 -0800 (PST)
-Subject: Re: [PATCH-for-6.0 v4 16/17] gitlab-ci: Make some ARM 32-bit jobs
- optional
+ by smtp.gmail.com with ESMTPSA id i10sm2384716wrs.22.2020.11.08.14.19.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 08 Nov 2020 14:19:27 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-References: <20201108204535.2319870-1-philmd@redhat.com>
- <20201108204535.2319870-17-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <901a30ce-1a72-90a5-dea7-f9eab9fac7fb@redhat.com>
-Date: Sun, 8 Nov 2020 23:00:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+Subject: [PATCH v3 00/11] gitlab-ci: Allow forks to select & restrict build
+ jobs
+Date: Sun,  8 Nov 2020 23:19:14 +0100
+Message-Id: <20201108221925.2344515-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20201108204535.2319870-17-philmd@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 09:03:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 15:45:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,75 +108,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/8/20 9:45 PM, Philippe Mathieu-Daudé wrote:
-> The armel/armhf targets have a lot in common. Instead of
-> testing both user/system emulation on each target, test
-> each one once. Mark the other combination optional, so
-> user can still run the tests manually.
-> 
-> We now test system-mode emulation on armel target, and
-> user-mode emulation to armhf target:
-> 
-> - armel-system          Yes
-> - armel-user            Optional
-> - armhf-system          Optional
-> - armhf-user            Yes
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> Cc: qemu-arm@nongnu.org
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> ---
->  .gitlab-ci.d/crossbuilds.yml | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
-> index 03ebfabb3fa..e4526e98232 100644
-> --- a/.gitlab-ci.d/crossbuilds.yml
-> +++ b/.gitlab-ci.d/crossbuilds.yml
-> @@ -32,11 +32,17 @@ cross-armel-user:
->    <<: *cross_user_build_job_definition
->    variables:
->      IMAGE: debian-armel-cross
-> +  rules:
-
-As I only want to restrict this to push events, I'll add:
-
-       - if: '$CI_PIPELINE_SOURCE != "push"'
-         when: always
-
-So all other events (merge request, pipeline triggered via WebUI)
-the job is automatically executed.
-
-> +    - when: manual
-> +      allow_failure: true
->  
->  cross-armhf-system:
->    <<: *cross_system_build_job_definition
->    variables:
->      IMAGE: debian-armhf-cross
-> +  rules:
-> +    - when: manual
-> +      allow_failure: true
-
-Ditto (and in the MIPS job in next patch).
-
->  
->  cross-armhf-user:
->    <<: *cross_user_build_job_definition
-> 
+Hi,=0D
+=0D
+2 months ago GitLab added time limit to their free CI offer [1].=0D
+This series provide developers with the possibility to not run=0D
+all jobs. By default all jobs are started, but we can restrict=0D
+by selecting a subset of them.=0D
+=0D
+Since v2:=0D
+- no more RFC=0D
+- project-wide environment variable works=0D
+- do not remove the jobs from the pipeline, mark them 'manual'=0D
+  so user can still run them=0D
+=0D
+Since v1:=0D
+- switch from "all but skip some" to "all or select some"=0D
+=0D
+A friendly way to use this feature is with git aliases [3]:=0D
+=0D
+ $ git config alias.pushci_system \=0D
+    'push -o ci.variable=3D"QEMU_BUILD=3Dsystem"'=0D
+ $ git config alias.pushci_debian \=0D
+    'push -o ci.variable=3D"QEMU_BUILD=3Ddebian"'=0D
+=0D
+Then you can run the jobs based on Debian images (only) using:=0D
+=0D
+ $ git pushci_debian gitlab_repo my_branch_for_debian=0D
+=0D
+Or run all system-mode emulation jobs only using:=0D
+=0D
+  $ git pushci_system my_gitlab_repo branch_with_system_feature=0D
+=0D
+You can also set the default QEMU_BUILD you want for your fork=0D
+adding a project-wide environment variable [2]. Your pipelines=0D
+will be restricted to this set, but you can overwrite it from=0D
+the git-push command line (using QEMU_BUILD=3Dall).=0D
+=0D
+Comments welcomed!=0D
+=0D
+Regards,=0D
+=0D
+Phil.=0D
+=0D
+[1] https://about.gitlab.com/releases/2020/09/01/ci-minutes-update-free-use=
+rs/=0D
+[2] https://docs.gitlab.com/ee/ci/variables/README.html#create-a-custom-var=
+iable-in-the-ui=0D
+[3] https://docs.gitlab.com/ee/user/project/push_options.html#useful-git-al=
+iases=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (11):=0D
+  gitlab-ci: Drop generic cache rule=0D
+  gitlab-ci: Replace YAML anchors by extends (cross_system_build_job)=0D
+  gitlab-ci: Replace YAML anchors by extends (native_build_job)=0D
+  gitlab-ci: Replace YAML anchors by extends (native_test_job)=0D
+  gitlab-ci: Replace YAML anchors by extends (acceptance_test_job)=0D
+  gitlab-ci: Rename acceptance_test_job -> integration_test_job=0D
+  gitlab-ci: Extract common job definition as 'cross_common_job'=0D
+  gitlab-ci: Extract common job definition as 'native_common_job'=0D
+  gitlab-ci: Add rules to select cross-jobs to build=0D
+  gitlab-ci: Add rules to select building/testing native jobs=0D
+  gitlab-ci: Move artifacts expiry rule to common 'native_build_job'=0D
+=0D
+ .gitlab-ci.d/crossbuilds.yml |  82 +++++++++++++------=0D
+ .gitlab-ci.yml               | 153 ++++++++++++++++++++---------------=0D
+ 2 files changed, 146 insertions(+), 89 deletions(-)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
