@@ -2,99 +2,107 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9036C388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B33ECC388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:10:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ABE9206D4
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30796206D4
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:10:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPNf8pzB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ABE9206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/arm1AF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30796206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kboAV-0006q5-0P
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 12:07:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51410)
+	id 1kboCj-0008KG-Ck
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 12:10:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbo9C-0006Ha-PE
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:06:34 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:38384)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kbo9A-0001li-W7
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:06:34 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id h62so5828600wme.3
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:06:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:cc:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=X9wG/augCwD4emVIFXeAwiZAEZ7Vmh+C27gpCvPqtTQ=;
- b=bPNf8pzB6CUHIQBvgJw1vMoANhZ3HZhlEri2y+/kkMyxbFEkxvqDSLE6FLNQkgE2b1
- +hPtNkPjXSa4hWmFAE/uspQhnH7TX35ZWXUKb3BHjSsxXq7zOMo6wrcEH0y0yj3wHzJf
- F0GgTXSex+0SjdGwtn3kT0VCBC2B8u8TUxxyShe+wUsQOKDMCXej2TdZTUHjSvKRA0J5
- q2biqHznnruXY3X08lEr8fqTk5GRqXoicmGmhw3hlBa/ga7CDh3ZaVR9qR+5efPpBc8O
- EmJsH+Ep5T3Pwm8WimWNo53+ycUUdYGM3ZuQpv3TTAYmD/4S9OSe5AMtGxLrNSgoNnT5
- qszA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kboBl-0007eB-Vp
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:09:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23140)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kboBj-00020t-2D
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:09:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604855349;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gNQE3wirPN0dx6XpKBUjTiRoIvDDd7OROJyQgDN0Uhk=;
+ b=R/arm1AFWJSQlegF+Fxt7Zn9LlZzrkRALkNc+ZhTQ9nGLud/s1/IAzhxlYvIbgj5SY1V8/
+ yWPlDCHZDBGAC9SDv9TVZHl2lzMqOefp5blGupwuvr2JC/9t8dY1ak5aes5O6dQ2UU6z1s
+ F8mbNy8hfqHJXGYZMDxbZHa+PWPZjHw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-457-M-PywCs9PYeJhVOfjYugbQ-1; Sun, 08 Nov 2020 12:09:07 -0500
+X-MC-Unique: M-PywCs9PYeJhVOfjYugbQ-1
+Received: by mail-wr1-f70.google.com with SMTP id j15so3174658wrd.16
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:09:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:cc:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=X9wG/augCwD4emVIFXeAwiZAEZ7Vmh+C27gpCvPqtTQ=;
- b=Gkx954QofM0VRNQOliqIXLB99IJxDyzJpaB4WxTvLCMo4dE3hgkbA1NPXERBxwSVCl
- iP9u3mUv5WxYluEyE+DtBxoTbpBDosi9oMUORzPHMSltoonkZ4hsbvHYxXI/oB1wIxHQ
- uQXvc5gAQGUseuFUopUxGbT3VWF/GtgNvUX/yscVjVPa3LSw9/5ZiCUgnRtCkqHaok89
- 4UoGNl22BNSVZZZ90Fzwn4Ed7HY1/DQ1+fIezGzipg4B4bXLTJCd5NaY8bUdaLQ3Wzq6
- EeFIqLFsAyuZb4SuzxHM+X024rQDRfSF75DrkJ3pI+VWgitT+QlUfWx4LRzxvOd5bUtt
- 0T3Q==
-X-Gm-Message-State: AOAM531b0KELV0dFcLxyGmxrU0R2h9m/JB/+KGdkal2oa2waLq3eCAkT
- vOV+bZs4P1DeZ5l2GHUV686zaT5aec8=
-X-Google-Smtp-Source: ABdhPJwSxz97WTvwmjUIAX4AW/DHqAZOOxG91d43vqaI7Kni6fqBmOlZTmwfSylXBmiKP4v9n/4b3Q==
-X-Received: by 2002:a1c:4b18:: with SMTP id y24mr10750005wma.154.1604855190684; 
- Sun, 08 Nov 2020 09:06:30 -0800 (PST)
+ bh=gNQE3wirPN0dx6XpKBUjTiRoIvDDd7OROJyQgDN0Uhk=;
+ b=OkzVtUF/kifbqtrYslvlkUeoWZZWTf90By6M/rdCnrDEfTsMK0AyoOxi5dhRtzOJaw
+ JU980vW17Dl3bkPlmhc8IvPtmU6lg4dXFkWYS2ddj45DiwdKhj31nH/1LiA3kQwXHHAK
+ hFl/GXN2B3CzK6QpKm7tdhYsZ+V3zyfiFdGUnNl0ElTlvBFWIr4RVguwah1Ws+Diwe2Z
+ qr3BdHR8y864JBVj4bx0gBpt6Rxm6WemDVkDCNktjTn3OlDFGuTY3qFpocPh4W+MFH2n
+ ROuW5+I37WM+yWXl+5Lircu1xbrP+T2isIgaQI/s1wog1T7V9XqHY16u/LAOqW8MvkbT
+ vPBQ==
+X-Gm-Message-State: AOAM532vWiZ7lPopA40+tbEN92OVyqISjmMMrVbmVWLI7/5sxFSEHDx/
+ yvrr9F6TA+vqSlTj+8+MTmJN0F7+bJxPhSCa5bn8WxqKBYTfOoP1V4nMI4UDyrlEQyg6IWmIkLs
+ hJhLtYda8Ki/3QiA=
+X-Received: by 2002:a5d:5701:: with SMTP id a1mr13534735wrv.414.1604855345142; 
+ Sun, 08 Nov 2020 09:09:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzeysOyuzArcbWUSc+yoajADk7ek6WpeE/8NBqcS+kDjamCTjW1eZVJfMoCzY7M6AhvhzqrWA==
+X-Received: by 2002:a5d:5701:: with SMTP id a1mr13534723wrv.414.1604855345025; 
+ Sun, 08 Nov 2020 09:09:05 -0800 (PST)
 Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id u23sm2304880wmc.32.2020.11.08.09.06.29
+ by smtp.gmail.com with ESMTPSA id t11sm9998623wmf.35.2020.11.08.09.09.03
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 08 Nov 2020 09:06:29 -0800 (PST)
-Subject: Re: mmap2 is probably still broken in linux-user & other things
-To: "Catherine A. Frederick" <agrecascino123@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <cceb3d0d-958f-91f0-770e-4acb01fedd7f@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <eea778cf-205f-cc10-bccc-ba8311949d49@amsat.org>
-Date: Sun, 8 Nov 2020 18:06:28 +0100
+ Sun, 08 Nov 2020 09:09:04 -0800 (PST)
+Subject: Re: [PATCH for-5.2] qga: fix missing closedir() in
+ qmp_guest_get_disks()
+To: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org
+References: <20201108161112.187945-1-michael.roth@amd.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b8ef4b32-ef30-a1ac-5ea1-525402821eae@redhat.com>
+Date: Sun, 8 Nov 2020 18:09:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <cceb3d0d-958f-91f0-770e-4acb01fedd7f@gmail.com>
+In-Reply-To: <20201108161112.187945-1-michael.roth@amd.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 09:02:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,45 +115,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing user-mode team.
+On 11/8/20 5:11 PM, Michael Roth wrote:
+> We opendir("/sys/block") at the beginning of the function, but we never
+> close it prior to returning.
+> 
+> Fixes: Coverity CID 1436130
+> Fixes: fed3956429d5 ("qga: add implementation of guest-get-disks for Linux")
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Cc: Tomáš Golembiovský <tgolembi@redhat.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  qga/commands-posix.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-On 11/8/20 4:53 PM, Catherine A. Frederick wrote:
-> Hi, I submitted a patch a while ago and then dropped off the face of the
-> planet like most people do. In my journey to fix DRM/radeonsi in
-> user-mode emulation I discovered a few bugs. I don't really have the
-> time to write the infrastructure to make wrapping DRM IOCTLs remotely
-> not-ugly, but I do want to get patches in for the last bug I encountered
-> as it's kinda sneaky.
-> 
-> Currently(as of 6 months ago, and I doubt anyone noticed) mmap2 is
-> completely broken for it's intended use(mapping pages outside the
-> address limit). The value of the address input to mmap is clipped to an
-> abi_ulong(4 bytes of 32 bit platforms afaik?) and because of this the
-> value in pages when converted to addresses and passed to mmap on the
-> host is invalid and this breaks radeonsi(and probably any other GPU
-> driver in linux-user.
-> 
-> I don't really know how to fix this in a sane way so I'm looking for ideas.
-> 
-> Another thing I'm looking for ideas wrt is I'm thinking about is some
-> form of automagic(opt-in, through a new type) pointer/union translation
-> in IOCTLs over the guest barrier. Currently it's really ugly to wrap
-> most of the IOCTLs in DRM and amdgpu because the DRM ioctls frequently
-> pass pointers to the kernel and because of this I don't feel comfortable
-> merging my patches(manually translating the struct to the types of the
-> host sucks and feels like redundant work). On top of that AMDGPU uses a
-> lot of structs where currently having one type for the call would
-> corrupt the data in the return union.
-> 
-> Last thing: I never really got any performance benefit out of my
-> scheduler, but I think that's mostly from bad implementation. Is there
-> any information on TCG's performance characteristics? Thanks.
-> 
-> 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
