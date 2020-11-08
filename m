@@ -2,69 +2,71 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF8CC388F2
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 05:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23665C388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 05:32:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00CE320897
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 05:32:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00CE320897
+	by mail.kernel.org (Postfix) with ESMTPS id 95B2F20897
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 05:32:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B2F20897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbdJ3-0006ji-4O
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 00:32:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42472)
+	id 1kbdJQ-00074A-Jp
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 00:32:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kbdDR-0001QT-Iu
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 00:26:13 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:34611)
+ id 1kbdDW-0001WC-Rt
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 00:26:18 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:44405)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kbdDO-0004ts-C1
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 00:26:13 -0500
-Received: by mail-pl1-f193.google.com with SMTP id p4so2963381plr.1
- for <qemu-devel@nongnu.org>; Sat, 07 Nov 2020 21:26:09 -0800 (PST)
+ id 1kbdDU-0004wN-Qx
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 00:26:18 -0500
+Received: by mail-pf1-f193.google.com with SMTP id y7so5079663pfq.11
+ for <qemu-devel@nongnu.org>; Sat, 07 Nov 2020 21:26:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=xlXS8bTLGmgrI4jv8lK1KhWtrhRRrwvn4l+tYjVvwMM=;
- b=XCST/y2J5wQNBh3Z75SE8vqjbTyLCDtYY9JSf2NamwVyYO7HigeYAN2/S//f2AKRrV
- IduiT5PoJd/McNiaqnUIIi9W47hBG/i9PyfJDaOvJ7y+RG+SdRcf5mldF39wxid/+HXD
- zOeldII38Ds3+43vuFbH33HKLzN60ZZZ30DttqtLpmjuwtts0e1/pXbrEHH5S2VhT7fK
- 3SpOh7hVhfFreKstlLVKw8vc590W2dpK3cVSbr5VFgg/7k9E1eKZ5JjH+zCKutHthLxq
- ToAwlYpmsx4RzgmZ5iVHgdQ4yuFBwZvINukcatrzz4TZUp5TaXqtnG5kC0ZULNtz+roD
- i97g==
-X-Gm-Message-State: AOAM531s7eg5xcRK4tIOEnn840MBeutisAxjh1Z+eq5mcmLeyD1tneu0
- 7h5iEHc4pjDkK5LWNdijVdmsUXEK07Q=
-X-Google-Smtp-Source: ABdhPJzj1N19iPTBByCzfJ+Qd1KNdNugCJd3xn+eO9Fx8Vg6TGMnL3ZYZcxMfWaRdXm9gs71rqZp5Q==
-X-Received: by 2002:a17:90a:d201:: with SMTP id
- o1mr6856556pju.46.1604813167888; 
- Sat, 07 Nov 2020 21:26:07 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=oqTRRse3ML08CbYMBMir3imYmfVxmJCy/vR5/9jdsfA=;
+ b=iq/+8XBwGSfV6XbcqWHwwt4/5XnkPgFolgewlSfbA0SvzsgYTGUef594J2EM61RKvq
+ Li+9bjmGcPBanwmqPYXVdO5LbeO7Qp29cjAYN1Dz6o/JKrw0zscY9Mt/2pJa7AfOGlB2
+ YGwd7JGM66cQ2tvw23yuS5Akcn+FZzJghtnLzzfVIBNYYV4EKREaqDTyBegpyGYSypCP
+ h/kQ/yMHYHhNxgjhEc7NmTn45OgaOahd1AWlLjVoMhfxIUCffP0pHVXYdvICHLFULugL
+ Bmq7UWbzHk34+Nv7hCyJywwdROl0JNzdt3Y1Ib/pGZUtZH8tiAGSNNaYLP48kXb1LxgE
+ 0tHQ==
+X-Gm-Message-State: AOAM530nPs5O+yVHuA3cBX/YM6f+mnf8Vl0XYhoJj57zpapYg3MWrrR5
+ sOhRUz1AyPo2rMf7IUuqV7pBHekNUv8=
+X-Google-Smtp-Source: ABdhPJxy7bogSBqMmNMScL1eQM8fhefsTZJebgG6OEHzQn+L+bN/TeV7XjGi93Z/8zBkTpmHg8o6OA==
+X-Received: by 2002:a63:de07:: with SMTP id f7mr7893829pgg.27.1604813175266;
+ Sat, 07 Nov 2020 21:26:15 -0800 (PST)
 Received: from localhost.localdomain ([73.93.155.42])
- by smtp.gmail.com with ESMTPSA id hz18sm6994406pjb.13.2020.11.07.21.26.06
+ by smtp.gmail.com with ESMTPSA id hz18sm6994406pjb.13.2020.11.07.21.26.14
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 07 Nov 2020 21:26:07 -0800 (PST)
+ Sat, 07 Nov 2020 21:26:14 -0800 (PST)
 From: Joelle van Dyne <j@getutm.app>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 0/7] iOS and Apple Silicon host support
-Date: Sat,  7 Nov 2020 21:25:58 -0800
-Message-Id: <20201108052605.45840-1-j@getutm.app>
+Subject: [PATCH v4 6/7] tcg: implement JIT for iOS and Apple Silicon
+Date: Sat,  7 Nov 2020 21:26:04 -0800
+Message-Id: <20201108052605.45840-7-j@getutm.app>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201108052605.45840-1-j@getutm.app>
+References: <20201108052605.45840-1-j@getutm.app>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=209.85.214.193;
- envelope-from=osy86github@gmail.com; helo=mail-pl1-f193.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 00:26:08
+Received-SPF: pass client-ip=209.85.210.193;
+ envelope-from=osy86github@gmail.com; helo=mail-pf1-f193.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 00:26:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -13
 X-Spam_score: -1.4
@@ -85,92 +87,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joelle van Dyne <j@getutm.app>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Joelle van Dyne <j@getutm.app>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based-on: 20201106032921.600200-1-richard.henderson@linaro.org
-([PATCH v3 00/41] Mirror map JIT memory for TCG)
+When entitlements are available (macOS or jailbroken iOS), a hardware
+feature called APRR exists on newer Apple Silicon that can cheaply mark JIT
+pages as either RX or RW. Reverse engineered functions from
+libsystem_pthread.dylib are implemented to handle this.
 
-These set of changes brings QEMU TCG to iOS devices and future Apple Silicon
-devices. They were originally developed last year and have been working in the
-UTM app. Recently, we ported the changes to master, re-wrote a lot of the build
-script changes for meson, and broke up the patches into more distinct units.
+The following rules apply for JIT write protect:
+  * JIT write-protect is enabled before tcg_qemu_tb_exec()
+  * JIT write-protect is disabled after tcg_qemu_tb_exec() returns
+  * JIT write-protect is disabled inside do_tb_phys_invalidate() but if it
+    is called inside of tcg_qemu_tb_exec() then write-protect will be
+    enabled again before returning.
+  * JIT write-protect is disabled by cpu_loop_exit() for interrupt handling.
+  * JIT write-protect is disabled everywhere else.
 
-A summary of the changes:
+See https://developer.apple.com/documentation/apple_silicon/porting_just-in-time_compilers_to_apple_silicon
 
-* `CONFIG_IOS` defined when building for iOS and iOS specific changes (as well
-  as unsupported code) are gated behind it.
-* A new dependency, libucontext is added since iOS does not have native ucontext
-  and broken support for sigaltstack. libucontext is available as a new option
-  for coroutine backend.
-* For (recent) jailbroken iOS devices as well as upcoming Apple Silicon devices,
-  there are new rules for applications supporting JIT (with the proper
-  entitlement). These rules are implemented as well.
-
-Since v4:
-
-* Updated QAPI schema for CONFIG_HOST_BLOCK_DEVICE
-* Updated maintainers file for iOS host support
-* Moved system() changes to osdep.h
-* Fixed typo in libucontext meson.build change
-
-Since v3:
-
-* Moved mirror JIT support to a different patch set.
-* Removed dependency on `pthread_jit_write_protect_np` because it was redundent
-  and also crashes if called on a non-jailbroken iOS device.
-* Removed `--enable-cross-compile` option
-* Fixed checkpatch errors
-* Fixed iOS build on master due to new test recently added which calls system()
-
-Since v2:
-
-* Changed getting mirror pointer from a macro to inline functions
-* Split constification of TCG code pointers to separate patch
-* Removed slirp updates (will send future patch once slirp changes are in)
-* Removed shared library patch (will send future patch)
-
--j
-
-Joelle van Dyne (7):
-  configure: option to disable host block devices
-  configure: cross-compiling with empty cross_prefix
-  qemu: add support for iOS host
-  coroutine: add libucontext as external library
-  slirp: update build flags for iOS resolv fix
-  tcg: implement JIT for iOS and Apple Silicon
-  block: check availablity for preadv/pwritev on mac
-
- docs/devel/index.rst        |  1 +
- docs/devel/ios.rst          | 28 ++++++++++++
- configure                   | 76 +++++++++++++++++++++++++++++---
- meson.build                 | 33 +++++++++++++-
- qapi/block-core.json        |  4 +-
+Signed-off-by: Joelle van Dyne <j@getutm.app>
+---
  include/exec/exec-all.h     |  2 +
- include/qemu/osdep.h        | 11 +++++
  include/tcg/tcg-apple-jit.h | 86 +++++++++++++++++++++++++++++++++++++
  include/tcg/tcg.h           |  3 ++
  accel/tcg/cpu-exec-common.c |  2 +
  accel/tcg/cpu-exec.c        |  2 +
  accel/tcg/translate-all.c   | 46 ++++++++++++++++++++
- block.c                     |  2 +-
- block/file-posix.c          | 51 ++++++++++++++++------
- net/slirp.c                 | 16 +++----
- qga/commands-posix.c        |  6 +++
  tcg/tcg.c                   |  4 ++
- util/coroutine-ucontext.c   |  9 ++++
- .gitmodules                 |  3 ++
- MAINTAINERS                 |  7 +++
- libucontext                 |  1 +
- meson_options.txt           |  2 +
- tests/qtest/meson.build     |  7 ++-
- 23 files changed, 367 insertions(+), 35 deletions(-)
- create mode 100644 docs/devel/ios.rst
+ 7 files changed, 145 insertions(+)
  create mode 100644 include/tcg/tcg-apple-jit.h
- create mode 160000 libucontext
 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index aa65103702..3829f3d470 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -549,6 +549,8 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+                                    target_ulong cs_base, uint32_t flags,
+                                    uint32_t cf_mask);
+ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr);
++void tb_exec_lock(void);
++void tb_exec_unlock(void);
+ 
+ /* GETPC is the true target of the return instruction that we'll execute.  */
+ #if defined(CONFIG_TCG_INTERPRETER)
+diff --git a/include/tcg/tcg-apple-jit.h b/include/tcg/tcg-apple-jit.h
+new file mode 100644
+index 0000000000..9efdb2000d
+--- /dev/null
++++ b/include/tcg/tcg-apple-jit.h
+@@ -0,0 +1,86 @@
++/*
++ * Apple Silicon functions for JIT handling
++ *
++ * Copyright (c) 2020 osy
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef TCG_APPLE_JIT_H
++#define TCG_APPLE_JIT_H
++
++/*
++ * APRR handling
++ * Credits to: https://siguza.github.io/APRR/
++ * Reversed from /usr/lib/system/libsystem_pthread.dylib
++ */
++
++#if defined(__aarch64__) && defined(CONFIG_DARWIN)
++
++#define _COMM_PAGE_START_ADDRESS        (0x0000000FFFFFC000ULL) /* In TTBR0 */
++#define _COMM_PAGE_APRR_SUPPORT         (_COMM_PAGE_START_ADDRESS + 0x10C)
++#define _COMM_PAGE_APPR_WRITE_ENABLE    (_COMM_PAGE_START_ADDRESS + 0x110)
++#define _COMM_PAGE_APRR_WRITE_DISABLE   (_COMM_PAGE_START_ADDRESS + 0x118)
++
++static __attribute__((__always_inline__)) bool jit_write_protect_supported(void)
++{
++    /* Access shared kernel page at fixed memory location. */
++    uint8_t aprr_support = *(volatile uint8_t *)_COMM_PAGE_APRR_SUPPORT;
++    return aprr_support > 0;
++}
++
++/* write protect enable = write disable */
++static __attribute__((__always_inline__)) void jit_write_protect(int enabled)
++{
++    /* Access shared kernel page at fixed memory location. */
++    uint8_t aprr_support = *(volatile uint8_t *)_COMM_PAGE_APRR_SUPPORT;
++    if (aprr_support == 0 || aprr_support > 3) {
++        return;
++    } else if (aprr_support == 1) {
++        __asm__ __volatile__ (
++            "mov x0, %0\n"
++            "ldr x0, [x0]\n"
++            "msr S3_4_c15_c2_7, x0\n"
++            "isb sy\n"
++            :: "r" (enabled ? _COMM_PAGE_APRR_WRITE_DISABLE
++                            : _COMM_PAGE_APPR_WRITE_ENABLE)
++            : "memory", "x0"
++        );
++    } else {
++        __asm__ __volatile__ (
++            "mov x0, %0\n"
++            "ldr x0, [x0]\n"
++            "msr S3_6_c15_c1_5, x0\n"
++            "isb sy\n"
++            :: "r" (enabled ? _COMM_PAGE_APRR_WRITE_DISABLE
++                            : _COMM_PAGE_APPR_WRITE_ENABLE)
++            : "memory", "x0"
++        );
++    }
++}
++
++#else /* defined(__aarch64__) && defined(CONFIG_DARWIN) */
++
++static __attribute__((__always_inline__)) bool jit_write_protect_supported(void)
++{
++    return false;
++}
++
++static __attribute__((__always_inline__)) void jit_write_protect(int enabled)
++{
++}
++
++#endif
++
++#endif /* define TCG_APPLE_JIT_H */
+diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
+index 477919aeb6..b16b687d0b 100644
+--- a/include/tcg/tcg.h
++++ b/include/tcg/tcg.h
+@@ -625,6 +625,9 @@ struct TCGContext {
+     size_t code_gen_buffer_size;
+     void *code_gen_ptr;
+     void *data_gen_ptr;
++#if defined(CONFIG_DARWIN) && !defined(CONFIG_TCG_INTERPRETER)
++    bool code_gen_locked; /* on Darwin each thread tracks W^X flags */
++#endif
+ 
+     /* Threshold to flush the translated code buffer.  */
+     void *code_gen_highwater;
+diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
+index 12c1e3e974..f1eb767b02 100644
+--- a/accel/tcg/cpu-exec-common.c
++++ b/accel/tcg/cpu-exec-common.c
+@@ -64,6 +64,8 @@ void cpu_reloading_memory_map(void)
+ 
+ void cpu_loop_exit(CPUState *cpu)
+ {
++    /* Unlock JIT write protect if applicable. */
++    tb_exec_unlock();
+     /* Undo the setting in cpu_tb_exec.  */
+     cpu->can_do_io = 1;
+     siglongjmp(cpu->jmp_env, 1);
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 8df0a1782e..960e0c1f36 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -176,7 +176,9 @@ static inline TranslationBlock *cpu_tb_exec(CPUState *cpu,
+     }
+ #endif /* DEBUG_DISAS */
+ 
++    tb_exec_lock();
+     ret = tcg_qemu_tb_exec(env, tb_ptr);
++    tb_exec_unlock();
+     cpu->can_do_io = 1;
+     /*
+      * TODO: Delay swapping back to the read-write region of the TB
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 06102871e7..5773c561cb 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -27,6 +27,9 @@
+ #include "disas/disas.h"
+ #include "exec/exec-all.h"
+ #include "tcg/tcg.h"
++#if defined(CONFIG_DARWIN)
++#include "tcg/tcg-apple-jit.h"
++#endif
+ #if defined(CONFIG_USER_ONLY)
+ #include "qemu.h"
+ #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+@@ -61,6 +64,9 @@
+ #include "sysemu/tcg.h"
+ #include "qapi/error.h"
+ 
++static bool tb_exec_is_locked(void);
++static void tb_exec_change(bool locked);
++
+ /* #define DEBUG_TB_INVALIDATE */
+ /* #define DEBUG_TB_FLUSH */
+ /* make various TB consistency checks */
+@@ -1339,6 +1345,7 @@ void tcg_exec_init(unsigned long tb_size, int splitwx)
+                                splitwx, &error_fatal);
+     assert(ok);
+ 
++    tb_exec_unlock();
+ #if defined(CONFIG_SOFTMMU)
+     /* There's no guest base to take into account, so go ahead and
+        initialize the prologue now.  */
+@@ -1615,8 +1622,11 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool rm_from_page_list)
+     PageDesc *p;
+     uint32_t h;
+     tb_page_addr_t phys_pc;
++    bool code_gen_locked;
+ 
+     assert_memory_lock();
++    code_gen_locked = tb_exec_is_locked();
++    tb_exec_unlock();
+ 
+     /* make sure no further incoming jumps will be chained to this TB */
+     qemu_spin_lock(&tb->jmp_lock);
+@@ -1629,6 +1639,7 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool rm_from_page_list)
+                      tb->trace_vcpu_dstate);
+     if (!(tb->cflags & CF_NOCACHE) &&
+         !qht_remove(&tb_ctx.htable, tb, h)) {
++        tb_exec_change(code_gen_locked);
+         return;
+     }
+ 
+@@ -1661,6 +1672,8 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool rm_from_page_list)
+ 
+     qatomic_set(&tcg_ctx->tb_phys_invalidate_count,
+                tcg_ctx->tb_phys_invalidate_count + 1);
++
++    tb_exec_change(code_gen_locked);
+ }
+ 
+ static void tb_phys_invalidate__locked(TranslationBlock *tb)
+@@ -2899,3 +2912,36 @@ void tcg_flush_softmmu_tlb(CPUState *cs)
+     tlb_flush(cs);
+ #endif
+ }
++
++#if defined(CONFIG_DARWIN) && !defined(CONFIG_TCG_INTERPRETER)
++static bool tb_exec_is_locked(void)
++{
++    return tcg_ctx->code_gen_locked;
++}
++
++static void tb_exec_change(bool locked)
++{
++    if (jit_write_protect_supported()) {
++        jit_write_protect(locked);
++    }
++    tcg_ctx->code_gen_locked = locked;
++}
++#else /* not needed on non-Darwin platforms */
++static bool tb_exec_is_locked(void)
++{
++    return false;
++}
++
++static void tb_exec_change(bool locked) {}
++#endif
++
++void tb_exec_lock(void)
++{
++    /* assumes sys_icache_invalidate already called */
++    tb_exec_change(true);
++}
++
++void tb_exec_unlock(void)
++{
++    tb_exec_change(false);
++}
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index d3052031cb..5ed79d2724 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -809,6 +809,8 @@ static void alloc_tcg_plugin_context(TCGContext *s)
+ void tcg_register_thread(void)
+ {
+     tcg_ctx = &tcg_init_ctx;
++
++    tb_exec_unlock();
+ }
+ #else
+ void tcg_register_thread(void)
+@@ -843,6 +845,8 @@ void tcg_register_thread(void)
+     err = tcg_region_initial_alloc__locked(tcg_ctx);
+     g_assert(!err);
+     qemu_mutex_unlock(&region.lock);
++
++    tb_exec_unlock();
+ }
+ #endif /* !CONFIG_USER_ONLY */
+ 
 -- 
 2.28.0
 
