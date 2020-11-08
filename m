@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97528C388F2
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:26:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5A4C388F2
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:27:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BC70206E3
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:26:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC70206E3
+	by mail.kernel.org (Postfix) with ESMTPS id D8155206E3
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:27:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8155206E3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbgyF-0007Pg-DB
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 04:26:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40156)
+	id 1kbgyy-0000BV-TW
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 04:27:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kbgxE-00069w-Ql
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:25:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55364)
+ id 1kbgsX-0000GQ-KT
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:20:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54586)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kbgxD-00032S-04
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:25:44 -0500
+ id 1kbgsP-0001Kd-NG
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:20:53 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kbgxB-0007Gl-TV
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:25:41 +0000
+ id 1kbgsN-00070z-NT
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:20:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DE2D12E8023
- for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 09:25:41 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id A4BAD2E8023
+ for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 09:20:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 08 Nov 2020 09:17:15 -0000
-From: Thomas Huth <1671677@bugs.launchpad.net>
+Date: Sun, 08 Nov 2020 09:11:13 -0000
+From: Thomas Huth <1662600@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
@@ -50,18 +50,18 @@ X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: queuecumber th-huth
-X-Launchpad-Bug-Reporter: Max Ehrlich (queuecumber)
+X-Launchpad-Bug-Commenters: kozkey th-huth
+X-Launchpad-Bug-Reporter: Corey Olson (kozkey)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20170310022816.24904.27346.malonedeb@wampee.canonical.com>
-Message-Id: <160482703532.12454.14104391271542709219.malone@gac.canonical.com>
-Subject: [Bug 1671677] Re: vfio-pci passthrough issue after resume from suspend
+References: <20170207172049.29850.43816.malonedeb@gac.canonical.com>
+Message-Id: <160482667402.12454.17458922077197766280.malone@gac.canonical.com>
+Subject: [Bug 1662600] Re: error while building from source on Ubuntu 16.04
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: b64d76f364ec0cd92803bf0b966f6c4098639b60
+X-Launchpad-Hash: 13b065b855e0ae405694a3f931b71add25cd9462
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 04:10:58
@@ -84,7 +84,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1671677 <1671677@bugs.launchpad.net>
+Reply-To: Bug 1662600 <1662600@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -105,51 +105,60 @@ rked as "Expired". Thank you and sorry for the inconvenience.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1671677
+https://bugs.launchpad.net/bugs/1662600
 
 Title:
-  vfio-pci passthrough issue after resume from suspend
+  error while building from source on Ubuntu 16.04
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  =
+  I'm trying to build Qemu from source (from git) as specified here:
+  http://www.qemu-project.org/download/#source
 
-  I'm running into a weird issue with the vfio-pci driver through qemu
+  Here is the git commit hash for the source:
+  7d2c6c95511e42dffe2b263275e09957723d0ff4
 
-  I use it on a laptop and I passthrough an external GPU connected via
-  PCI express. In general this works well, however if the laptop has
-  *ever* suspended since its last boot, then the windows guest reports
-  an error 43 on the card and I get no output on the monitor that it is
-  connected to. This is really weird to me since it works fine if I boot
-  the latop from power-off, and hotplug the card. It's only if the
-  laptop has ever suspended since it's last boot that I see this issue.
-  Even if it was suspended before the card was ever hotplugged.
+  During the 'make' step, I get the following error:
 
-  In other words:
-  laptop off -> boot -> hotplug GPU : works great
-  laptop off -> boot -> do stuff (GPU *NOT* connected) -> sleep -> resume -=
-> hotplug GPU: problem
-  laptop off -> boot -> hotplug GPU -> unplug GPU -> hotplug GPU : works gr=
-eat
-  laptop off -> boot -> hotplug GPU -> unplug GPU -> sleep -> resume -> hot=
-plug GPU: problem
+  migration/rdma.c: In function =E2=80=98qemu_rdma_dump_id=E2=80=99:
+  migration/rdma.c:749:21: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:750:22: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:750:37: error: =E2=80=98IBV_LINK_LAYER_INFINIBAND=E2=80=
+=99 undeclared (first use in this function)
+  migration/rdma.c:750:37: note: each undeclared identifier is reported onl=
+y once for each function it appears in
+  migration/rdma.c:751:24: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:751:39: error: =E2=80=98IBV_LINK_LAYER_ETHERNET=E2=80=99=
+ undeclared (first use in this function)
+  migration/rdma.c: In function =E2=80=98qemu_rdma_broken_ipv6_kernel=E2=80=
+=99:
+  migration/rdma.c:850:26: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:850:41: error: =E2=80=98IBV_LINK_LAYER_INFINIBAND=E2=80=
+=99 undeclared (first use in this function)
+  migration/rdma.c:852:33: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:852:48: error: =E2=80=98IBV_LINK_LAYER_ETHERNET=E2=80=99=
+ undeclared (first use in this function)
+  migration/rdma.c:891:18: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  make: *** [migration/rdma.o] Error 1
 
-  Weird stuff...
+  I searched around a bit, my problem seems related to this:
+  https://patchwork.kernel.org/patch/992952/
 
-  I'm honestly not sure that vfio-pci/qemu is to blame here since there
-  are so many moving parts, but im not really sure where else to report
-  this to
+  That issue makes me think my libibverbs may be out of date, but I
+  checked and I have libibverbs-dev installed.  Is that the correct
+  version?
 
-  What I have tried is using the sysfs interface to
-  remove/rescan/poweroff/etc the PCI devices in questions (graphics card
-  and it's HDMI audio) and this also does help.
-
-  QEMU version: 2.6.1
-
-  Please let me know what other information I can provide
+  FYI, I installed libibverbs-dev as suggested here: http://wiki.qemu-
+  project.org/index.php/Hosts/Linux#Recommended_additional_packages
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1671677/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1662600/+subscriptions
 
