@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 637C0C55178
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:12:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED63EC388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:13:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5903206E3
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:12:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5903206E3
+	by mail.kernel.org (Postfix) with ESMTPS id 9732B206E3
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:13:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9732B206E3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbgk0-0003SH-Tb
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 04:12:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38312)
+	id 1kbglg-0005dw-Ks
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 04:13:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kbgj0-0002AM-HY
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:11:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54130)
+ id 1kbgj1-0002Ah-QJ
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:11:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54096)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kbgiy-0006XD-Kt
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:11:02 -0500
+ id 1kbgiy-0006XC-WE
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:11:03 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kbgix-0006W0-Eh
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:10:59 +0000
+ id 1kbgiw-0006Zl-J2
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:10:58 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6C4AB2E800F
- for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 09:10:59 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 8CD412E811E
+ for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 09:10:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 08 Nov 2020 09:04:33 -0000
-From: Thomas Huth <1649236@bugs.launchpad.net>
+Date: Sun, 08 Nov 2020 09:05:04 -0000
+From: Thomas Huth <1652373@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug-Tags: commit daemonize
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 6sense.ru th-huth
-X-Launchpad-Bug-Reporter: Vasya (6sense.ru)
+X-Launchpad-Bug-Commenters: lluis.vilanova th-huth
+X-Launchpad-Bug-Reporter: =?utf-8?q?Llu=C3=ADs_Vilanova_=28lluis=2Evilanova?=
+ =?utf-8?q?=29?=
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20161212102447.23016.40899.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160482627343.12514.2799438470542177483.malone@gac.canonical.com>
-Subject: [Bug 1649236] Re: Commit snapshot fails with Permission denied when
- daemonized
+References: <20161223191237.2387.49621.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160482630486.17957.14427069267155343547.malone@soybean.canonical.com>
+Subject: [Bug 1652373] Re: User-mode QEMU is not deterministic
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 8c089307491a6a8366cd35d513309dee56ad0d75
+X-Launchpad-Hash: ee6484fdca01dc05bdcd26981500e072dd87ab1f
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 04:10:58
@@ -86,7 +85,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1649236 <1649236@bugs.launchpad.net>
+Reply-To: Bug 1652373 <1652373@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -107,39 +106,28 @@ rked as "Expired". Thank you and sorry for the inconvenience.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1649236
+https://bugs.launchpad.net/bugs/1652373
 
 Title:
-  Commit snapshot fails with Permission denied when daemonized
+  User-mode QEMU is not deterministic
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  When running qemu with daemonize option it is impossible to run
-  "commit all" in monitor.
+  QEMU in user-mode (linux-user or bsd-user) has no way to get the
+  equivalent of the "-icount" argument found in softmmu mode.
 
-  I run qemu 2.7.0 under gentoo 64 bit distribution with following
-  command line:
+  It is true that some system calls in user-mode can prevent
+  deterministic execution, but it would be very simple to patch time-
+  related syscalls to return a number based on icount when in
+  deterministic mode.
 
-  qemu-system-x86_64 -m 4096 -cpu host -smp 2 -enable-kvm -snapshot \
-      -drive file=3Dvm.img,if=3Dvirtio \
-      -net nic,model=3Dvirtio,macaddr=3D11:11:11:11:11:11 \
-      -net tap,ifname=3Dtap$PORT,script=3Dno,downscript=3Dno \
-      -vnc :1 -daemonize \
-      -chardev vc,id=3Dmon0 -mon chardev=3Dmon0,mode=3Dreadline \
-      -chardev socket,id=3Dmon1,host=3Dlocalhost,port=3D10001,server,nowait=
- -mon chardev=3Dmon1,mode=3Dcontrol =
-
-
-  I connect to vm through VNC viewer and press CTRL+ALT+2 and run "commit a=
-ll" command.
-  Following error is shown:
-  `commit` error for `all`: Permission denied
-
-  When I run my VM without `daemonize` option the command "commit all"
-  works without errors.
+  Putting both changes together (icount + time-related syscalls) would
+  cover the needs for deterministic execution of most benchmarks (i.e.,
+  those not interacting with the network or other programs in the
+  system).
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1649236/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1652373/+subscriptions
 
