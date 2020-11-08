@@ -2,88 +2,89 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B33ECC388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36882C388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:12:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30796206D4
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:10:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C512C206D8
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 17:12:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/arm1AF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30796206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eHI2pBVa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C512C206D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kboCj-0008KG-Ck
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 12:10:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51788)
+	id 1kboEa-0001SQ-Qi
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 12:12:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kboBl-0007eB-Vp
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:09:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23140)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kboDT-0000bL-R3
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:10:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38960)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kboBj-00020t-2D
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:09:13 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kboDS-0002Gd-88
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 12:10:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604855349;
+ s=mimecast20190719; t=1604855457;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gNQE3wirPN0dx6XpKBUjTiRoIvDDd7OROJyQgDN0Uhk=;
- b=R/arm1AFWJSQlegF+Fxt7Zn9LlZzrkRALkNc+ZhTQ9nGLud/s1/IAzhxlYvIbgj5SY1V8/
- yWPlDCHZDBGAC9SDv9TVZHl2lzMqOefp5blGupwuvr2JC/9t8dY1ak5aes5O6dQ2UU6z1s
- F8mbNy8hfqHJXGYZMDxbZHa+PWPZjHw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-457-M-PywCs9PYeJhVOfjYugbQ-1; Sun, 08 Nov 2020 12:09:07 -0500
-X-MC-Unique: M-PywCs9PYeJhVOfjYugbQ-1
-Received: by mail-wr1-f70.google.com with SMTP id j15so3174658wrd.16
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:09:06 -0800 (PST)
+ bh=1S3aF/Y0QDWP2EqeSfB4ysIVPA73IFu/evid3JJ/zeI=;
+ b=eHI2pBVagNP9LJ5qcmrwhGuNIVo2pPpsDFXpSuKjpYioiwCTERWpf1/98J2QC1qZsW9po7
+ FtobCBelMrFu3L8geJb2alZi+RkbprI5k33y/0lXBEHRgh7dvUwAnZ2fA+GtF7ENeI7iF+
+ AeF4k969Z6jFxcHKahqIbEmHOSei1pY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-F1gh9VoTOripzbwGMaZ6zw-1; Sun, 08 Nov 2020 12:10:54 -0500
+X-MC-Unique: F1gh9VoTOripzbwGMaZ6zw-1
+Received: by mail-wr1-f72.google.com with SMTP id t17so3181944wrm.13
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:10:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=gNQE3wirPN0dx6XpKBUjTiRoIvDDd7OROJyQgDN0Uhk=;
- b=OkzVtUF/kifbqtrYslvlkUeoWZZWTf90By6M/rdCnrDEfTsMK0AyoOxi5dhRtzOJaw
- JU980vW17Dl3bkPlmhc8IvPtmU6lg4dXFkWYS2ddj45DiwdKhj31nH/1LiA3kQwXHHAK
- hFl/GXN2B3CzK6QpKm7tdhYsZ+V3zyfiFdGUnNl0ElTlvBFWIr4RVguwah1Ws+Diwe2Z
- qr3BdHR8y864JBVj4bx0gBpt6Rxm6WemDVkDCNktjTn3OlDFGuTY3qFpocPh4W+MFH2n
- ROuW5+I37WM+yWXl+5Lircu1xbrP+T2isIgaQI/s1wog1T7V9XqHY16u/LAOqW8MvkbT
- vPBQ==
-X-Gm-Message-State: AOAM532vWiZ7lPopA40+tbEN92OVyqISjmMMrVbmVWLI7/5sxFSEHDx/
- yvrr9F6TA+vqSlTj+8+MTmJN0F7+bJxPhSCa5bn8WxqKBYTfOoP1V4nMI4UDyrlEQyg6IWmIkLs
- hJhLtYda8Ki/3QiA=
-X-Received: by 2002:a5d:5701:: with SMTP id a1mr13534735wrv.414.1604855345142; 
- Sun, 08 Nov 2020 09:09:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzeysOyuzArcbWUSc+yoajADk7ek6WpeE/8NBqcS+kDjamCTjW1eZVJfMoCzY7M6AhvhzqrWA==
-X-Received: by 2002:a5d:5701:: with SMTP id a1mr13534723wrv.414.1604855345025; 
- Sun, 08 Nov 2020 09:09:05 -0800 (PST)
+ bh=1S3aF/Y0QDWP2EqeSfB4ysIVPA73IFu/evid3JJ/zeI=;
+ b=E9Zo+bm84c25fr5KUtBn9z0UH6ZKu/4AHCwlNgCQAnsOSH80B7dRrs3DKfgYSnFgTW
+ r+Uk9AzM5yM/rsvH58Cm4ChryJATzFPlkogaOBgof4TfhzQ51t6YrBcH5/VyiI3YPWnH
+ NmPTXZcTaUFsuR0ta59/zfvvruHfqd4q/Vvgc60/fFH7IucgUjZ8uKIOCStW/22wBHlm
+ oBKR0rn2BaE+jResmWpXsgMbSWeR8Rk3ybm6Mx2v7MxbRrZwnIFzlSWIFTvfyB+ZJvJ7
+ hFvgfiwIjuDUDcJGPXvvzJtTemMe27jwoj1o4m0hHK52afNTBO8z/hmb69BIfBpsvDGx
+ 6YVQ==
+X-Gm-Message-State: AOAM530pJjbEd0usgaJUVkIiAXiFotHmUU5drqFG6yLkWe9I3zqhtewx
+ 5nJWw3oFzx6D6ofWkSNL1oYKwrsDJdxVT8HifoFKEBX9pKmFPqc8QdYxCAssUOjPQOObq2mnOSN
+ R57/LczAwqVCF4YQ=
+X-Received: by 2002:a1c:2c43:: with SMTP id s64mr10107241wms.130.1604855452890; 
+ Sun, 08 Nov 2020 09:10:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwwLPgBBLcp/ONe8DdfUPvGq3yiMzueyg92zDMaxCisConkBWnxKNu/67Dh2pBewrNvO6Oo9w==
+X-Received: by 2002:a1c:2c43:: with SMTP id s64mr10107225wms.130.1604855452761; 
+ Sun, 08 Nov 2020 09:10:52 -0800 (PST)
 Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id t11sm9998623wmf.35.2020.11.08.09.09.03
+ by smtp.gmail.com with ESMTPSA id v9sm10240943wrp.11.2020.11.08.09.10.51
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 08 Nov 2020 09:09:04 -0800 (PST)
-Subject: Re: [PATCH for-5.2] qga: fix missing closedir() in
- qmp_guest_get_disks()
-To: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org
-References: <20201108161112.187945-1-michael.roth@amd.com>
+ Sun, 08 Nov 2020 09:10:52 -0800 (PST)
+Subject: Re: [PATCH-for-5.2 v2] hw/i386/acpi-build: Fix maybe-uninitialized
+ error when ACPI hotplug off
+To: Ani Sinha <ani@anisinha.ca>
+References: <20201107194045.438027-1-philmd@redhat.com>
+ <CAARzgwxCXmCZsVWKFX6Fp=SBBj0BvY5=ntLwLZva2NZywD48Lw@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b8ef4b32-ef30-a1ac-5ea1-525402821eae@redhat.com>
-Date: Sun, 8 Nov 2020 18:09:03 +0100
+Message-ID: <752f4cfa-9213-299d-474c-fbccf312009d@redhat.com>
+Date: Sun, 8 Nov 2020 18:10:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201108161112.187945-1-michael.roth@amd.com>
+In-Reply-To: <CAARzgwxCXmCZsVWKFX6Fp=SBBj0BvY5=ntLwLZva2NZywD48Lw@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -115,27 +116,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/8/20 5:11 PM, Michael Roth wrote:
-> We opendir("/sys/block") at the beginning of the function, but we never
-> close it prior to returning.
+On 11/8/20 4:58 AM, Ani Sinha wrote:
+> On Sun, Nov 8, 2020 at 1:10 AM Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>
+>> GCC 9.3.0 thinks that 'method' can be left uninitialized. This code
+>> is already in the "if (bsel || pcihp_bridge_en)" block statement,
+>> but it isn't smart enough to figure it out.
+>>
+>> Restrict the code to be used only in the "if (bsel || pcihp_bridge_en)"
+>> block statement to fix (on Ubuntu):
+>>
+>>   ../hw/i386/acpi-build.c: In function 'build_append_pci_bus_devices':
+>>   ../hw/i386/acpi-build.c:496:9: error: 'method' may be used uninitialized
+>>   in this function [-Werror=maybe-uninitialized]
+>>     496 |         aml_append(parent_scope, method);
+>>         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>   cc1: all warnings being treated as errors
 > 
-> Fixes: Coverity CID 1436130
-> Fixes: fed3956429d5 ("qga: add implementation of guest-get-disks for Linux")
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Cc: Tomáš Golembiovský <tgolembi@redhat.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  qga/commands-posix.c | 3 +++
->  1 file changed, 3 insertions(+)
+> OK I looked at the patch closely and it makes sense. Can you please
+> run a "make check" to make sure we have not broken anything?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Yes I did...
 
 
