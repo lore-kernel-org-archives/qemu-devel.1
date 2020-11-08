@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5424C388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9829C388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 21:00:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 295D2206D4
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:59:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29E1A206D4
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 21:00:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWbSGoTI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 295D2206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K5ow46BE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29E1A206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbrmV-0000Zt-8C
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 15:59:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53212)
+	id 1kbrna-0001f0-8k
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 16:00:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbd-0005E0-Gh
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:48:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56539)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbj-0005Q8-Lg
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:48:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59659)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbb-0000Yz-VI
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:48:09 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbh-0000Za-OL
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:48:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604868487;
+ s=mimecast20190719; t=1604868493;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VembaEi0P815WTgBWwDrxMRk/B71iS1mYulR9D5rz1U=;
- b=iWbSGoTIffM/iJ2LReTcDwoJ3KfxlT+fk+ScW71IcYwmwZ2+zkkavwKZO1Zajg1eSOswoH
- ORWJFKb2oTJgT1Vb1+IVUfeX9yAlTst7DNVvpy57Tjn+kGCVX8C2dYnZXWBb5/W06rUYN8
- jEdYtIBUfdcYyMhxBw1bt4aUiIdjT2o=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-ZBafgUPvO6OEJ8rhQDxNWg-1; Sun, 08 Nov 2020 15:48:05 -0500
-X-MC-Unique: ZBafgUPvO6OEJ8rhQDxNWg-1
-Received: by mail-wr1-f69.google.com with SMTP id h11so3363719wrq.20
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:48:05 -0800 (PST)
+ bh=rWMQsAvtqC0WE8v0M1RNJ2U+39lhWWyJUeSsL34QAK8=;
+ b=K5ow46BEeqvxx0rWEiYoXgeJGS9He4SwUNfOzfcgBeC/uu9Um7GzaE3J8RBGXPQLY0EAW1
+ WEPb5pHK0jfItoQ7STjmXed1i2pFZz0iRwvz0PLkVuKRdtJbUDrB6vRzaIr/DVUGQ+8HSL
+ 8bXmQGhzOeToMN1AbgsaUrqr7rIhxQc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-568-kN5Ae5iMO9ybiWyUvmuh6w-1; Sun, 08 Nov 2020 15:48:11 -0500
+X-MC-Unique: kN5Ae5iMO9ybiWyUvmuh6w-1
+Received: by mail-wr1-f70.google.com with SMTP id f4so323754wru.21
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:48:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=VembaEi0P815WTgBWwDrxMRk/B71iS1mYulR9D5rz1U=;
- b=D2Npt2mG1Tf2rQxn1AcZsH+VUU4WqXJjyLxVVPXIWE8X3kBVVSq9g2NW5jdXOjXGmj
- 83u/7wM+GeIK9n/52DT/xvpIrVyFbe8WPPPkWHRAfeRfJ59Jak2kpzw+nc+Nh8sdcy4B
- 6ZER+MdS9SobEL0AbHB3OtJ+54UT1Qs7i4WDGjgJg4ggxxc099dGGsxqDuyiEaebrHs0
- Qc6FWLXzr+0FoPw7UC/Ch6urgXvykaYhopRdapgK39VRYgU8qbZVrEcFKgwBm2axcMRm
- X5duJjHIjqxU+E5vr/yINkUkTHbk4Hm5OotLo0NHUW6nPqDkwRgfu3Jst1VSPN3xz7bs
- yH1g==
-X-Gm-Message-State: AOAM532cQoB9E4ZkbN8icdbI96acQvV35+kNHtxMHM2loT0amRn6chz9
- daYGsmadj2NGtcFPnL0q3FzlaQmYY0yYnMWWVM7JXdXjRk2VQM5kyilitYmQfeizxKqXhfoihUq
- 7aoq9ue7tVYofZdk=
-X-Received: by 2002:a1c:4b0c:: with SMTP id y12mr11599733wma.91.1604868484032; 
- Sun, 08 Nov 2020 12:48:04 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzDSfSSvk83ZmMrpSPvHG0hDYJnBhNv/LahK+I0uhMV4owX1XH7sr3ujor41PfntdoWIPhTjg==
-X-Received: by 2002:a1c:4b0c:: with SMTP id y12mr11599707wma.91.1604868483850; 
- Sun, 08 Nov 2020 12:48:03 -0800 (PST)
+ bh=rWMQsAvtqC0WE8v0M1RNJ2U+39lhWWyJUeSsL34QAK8=;
+ b=Sb5DiWYpLffUu3wrbZLuGCj3DanIyfenS6AoLgCO9CtrR7YMlx4z0ewTrAEp5N8TVv
+ lACd9cBfvEg+nJSr982vtGNX8KWBjM/b+mbNwqZeTbKO+Di4BvxW3dQSEP1XcscDq8eV
+ EMyScEN6f+NQoac2pQNOufVya33LdH8jetxJo11ZSV3OBtIG8IHS6AwZwwbs4ZB35ZZ5
+ qjsZa7xbelTkCRv2qKMrT0aYIXBC0QOTjEDsIoO2Ejnj3VPD8Y/cHokoqbbSpJS/iKgi
+ Zox8Zj5ym0prCF3HSSy7j59hxpLzK3ePvyVnYuodXWi4Ga8CtV3Rkdfgg2mo4Z/uWuaM
+ gNFA==
+X-Gm-Message-State: AOAM530zZKqQuPVlZQCaTetMmpRiH1w7ROKr+FUVeG8y2+XMIrlVqYxH
+ 3NnzEvQRxT/amDFNEWY6zJSwtLrW+6NSYwpqlWDhKgUIzVhZojtk2way/q2QsUE3IqHoovf/4Gd
+ eR4VYuyov2J5FZxQ=
+X-Received: by 2002:a5d:4d86:: with SMTP id b6mr14219543wru.369.1604868489815; 
+ Sun, 08 Nov 2020 12:48:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz5KIw28IEKLopghF8Sog5NuhQrebzg0pLnt+1F+zZtnsS/GWhe5p+4QuAmzbLUY97J9CqaQQ==
+X-Received: by 2002:a5d:4d86:: with SMTP id b6mr14219526wru.369.1604868489635; 
+ Sun, 08 Nov 2020 12:48:09 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id b73sm2144764wmb.0.2020.11.08.12.48.02
+ by smtp.gmail.com with ESMTPSA id z191sm10506016wme.30.2020.11.08.12.48.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Nov 2020 12:48:03 -0800 (PST)
+ Sun, 08 Nov 2020 12:48:09 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-6.0 v4 13/17] tests/docker: Install lttng-ust-devel
- package in Fedora image
-Date: Sun,  8 Nov 2020 21:45:31 +0100
-Message-Id: <20201108204535.2319870-14-philmd@redhat.com>
+Subject: [PATCH-for-6.0 v4 14/17] gitlab-ci: Move trace backend tests across
+ to gitlab
+Date: Sun,  8 Nov 2020 21:45:32 +0100
+Message-Id: <20201108204535.2319870-15-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201108204535.2319870-1-philmd@redhat.com>
 References: <20201108204535.2319870-1-philmd@redhat.com>
@@ -125,30 +125,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Install the lttng-ust-devel package to be able to
-build QEMU using the User-Space Tracer trace backend
-(configure --enable-trace-backends=ust).
+Similarly to commit 8cdb2cef3f1, move the trace backend
+tests to GitLab.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
 Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Daniel P . Berrange <berrange@redhat.com>
 ---
- tests/docker/dockerfiles/fedora.docker | 1 +
- 1 file changed, 1 insertion(+)
+ .gitlab-ci.yml | 18 ++++++++++++++++++
+ .travis.yml    | 19 -------------------
+ 2 files changed, 18 insertions(+), 19 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 0b5053f2d09..ac90f187882 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -44,6 +44,7 @@ ENV PACKAGES \
-     libxml2-devel \
-     libzstd-devel \
-     llvm \
-+    lttng-ust-devel \
-     lzo-devel \
-     make \
-     mingw32-bzip2 \
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 6552a832939..2f0da7b3dc1 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -557,6 +557,24 @@ check-crypto-only-gnutls:
+     IMAGE: centos7
+     MAKE_CHECK_ARGS: check
+ 
++# We don't need to exercise every backend with every front-end
++build-trace-multi-user:
++  <<: *native_build_job_definition
++  variables:
++    IMAGE: ubuntu2004
++    CONFIGURE_ARGS: --enable-trace-backends=log,simple,syslog --disable-system
++
++build-trace-ftrace-system:
++  <<: *native_build_job_definition
++  variables:
++    IMAGE: ubuntu2004
++    CONFIGURE_ARGS: --enable-trace-backends=ftrace --target-list=aarch64-softmmu
++
++build-trace-ust-system:
++  <<: *native_build_job_definition
++  variables:
++    IMAGE: fedora
++    CONFIGURE_ARGS: --enable-trace-backends=ust --target-list=x86_64-softmmu --disable-tcg
+ 
+ check-patch:
+   stage: build
+diff --git a/.travis.yml b/.travis.yml
+index 8ef31f8d8b6..ff5d5ead579 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -182,25 +182,6 @@ jobs:
+       compiler: clang
+ 
+ 
+-    # We don't need to exercise every backend with every front-end
+-    - name: "GCC trace log,simple,syslog (user)"
+-      env:
+-        - CONFIG="--enable-trace-backends=log,simple,syslog --disable-system"
+-        - TEST_CMD=""
+-
+-
+-    - name: "GCC trace ftrace (x86_64-softmmu)"
+-      env:
+-        - CONFIG="--enable-trace-backends=ftrace --target-list=x86_64-softmmu"
+-        - TEST_CMD=""
+-
+-
+-    - name: "GCC trace ust (x86_64-softmmu)"
+-      env:
+-        - CONFIG="--enable-trace-backends=ust --target-list=x86_64-softmmu"
+-        - TEST_CMD=""
+-
+-
+     # Using newer GCC with sanitizers
+     - name: "GCC9 with sanitizers (softmmu)"
+       dist: bionic
 -- 
 2.26.2
 
