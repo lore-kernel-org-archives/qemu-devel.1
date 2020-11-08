@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B12C55ABD
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E50C388F9
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:53:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82EF1206ED
+	by mail.kernel.org (Postfix) with ESMTPS id 3A5E8206D4
 	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:53:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zb+da5hS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82EF1206ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6WliViq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A5E8206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbrgx-0003P2-K9
+	id 1kbrgx-0003NO-62
 	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 15:53:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53072)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbG-0004lY-3V
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32437)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrao-00041g-Gq
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42040)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbD-0000W2-FL
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:45 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbram-0000UM-Q8
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604868462;
+ s=mimecast20190719; t=1604868436;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=yakfnEsHk6Ij0rP4RLzjNfGHB0Gt59W8s1haMGr98pU=;
- b=Zb+da5hSidDQNY+ONhU4UAIN6YkpF7/RQB46rY50dYeVrJ9PPJ3Lo9XjjNsAgPH6FmNett
- dwIYcrp2OrW+Iad7cA0umDvDbqgSooNaP9EoyVjsfyp/yZsEa6ABY+5eAdxTcozpJd+YCb
- tzMl7y/hUciWmgXtdPsQCunlbw9w0Z4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-qB4L3TDRP6CWolhhgSs7Dw-1; Sun, 08 Nov 2020 15:47:41 -0500
-X-MC-Unique: qB4L3TDRP6CWolhhgSs7Dw-1
-Received: by mail-wr1-f70.google.com with SMTP id j15so3382295wrd.16
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:47:41 -0800 (PST)
+ bh=AQZWhvSbI5p4N1e0B4bgocntEDGXJm7E/SmoI1MVHIY=;
+ b=g6WliViqkM2k4oOMEgfGaZM0d/Ar8OmHtUeOZyufEO1WDIeytLuunpIU1wdm29CYwiUKIW
+ HuGS5EVV4YsOh0Ifyr0tBUnBy98zzhYbJHEXxLHP0/xzt2VJeI2NiWpip6txjegrh8fuCK
+ impssMZsVJrstzZVHfw6y+zsJWorX6Y=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-mjH24TeMPI6EePx5xKTxVQ-1; Sun, 08 Nov 2020 15:47:14 -0500
+X-MC-Unique: mjH24TeMPI6EePx5xKTxVQ-1
+Received: by mail-wr1-f69.google.com with SMTP id w17so2646403wrp.11
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:47:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=yakfnEsHk6Ij0rP4RLzjNfGHB0Gt59W8s1haMGr98pU=;
- b=SQXIiIn8gIced/Cbpbyr3HHx+cKE71ykjsS+6OnMuJ1Q0CAtQJK6OyIsLaEF4+L8qR
- hUUGOAXPbBM0x/H7dHoF2LbQ+ZJOT3koFQmC3D1/P0QINvpCUPTKtmUiHzUYNyRVH8GM
- +PZWShcV1Wenn8AVvMAGu1PDn9y5oVIx72xfauUEWfEyGgbH/p6ER/Z3uqmFsEvlyjk9
- +BqEEO+OZO/wuTGYMgeaYeEwia8hJFDwoAakfN+iEgUaCMtoaNxuQYO/bqR6gXCwJYDa
- 3MOILhV93fCYAV+xsNEeNNlpN1fwdTWi9erC+XQ5GUWv9FrsE7/BK7HuUM6RtpjN9LHw
- dXrw==
-X-Gm-Message-State: AOAM5314tJmVXOZDQROanXhFmT1Pr5XXviq84eqq4I6hLqvJZs5r4QD4
- vnkeSt5l+iBMTv3ncOeeoMF/RdwLUG0+2e+xxF4WTOVXX6w5Be/98jthex3AviIuD1ubcFrPKdc
- x75uhzeR/Z51Udrc=
-X-Received: by 2002:a5d:56d0:: with SMTP id m16mr14057134wrw.120.1604868458582; 
- Sun, 08 Nov 2020 12:47:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwc6D9nzixZgf5IT3HIK2w/iaCgr7Qin3ZRUgDJZa2AR8PQJ0V1C2J/eu9Y+rMQNniG4SsU1w==
-X-Received: by 2002:a5d:56d0:: with SMTP id m16mr14057111wrw.120.1604868458405; 
- Sun, 08 Nov 2020 12:47:38 -0800 (PST)
+ bh=AQZWhvSbI5p4N1e0B4bgocntEDGXJm7E/SmoI1MVHIY=;
+ b=fUeOQWVwJWqQtcYvl2XSjLHePo9uY1pLXfPafzqwq19zlbBbkEJ/2JogopYJDAl4WI
+ Z/q85a7HMrF65k1CZvODUJ6cAVpxX7jA1oaAoyIQ8bUHuNbJqS/g+8Nt/ztkUvKcotU/
+ P5+xoY9BWsXu+XCoCPD5YT4oC/MfVx6Lz3iDj/IwZc4dT3A5C6SvaYtwU190JNq0ENN6
+ IpdcP5Su6KrOB2oxXWK+qTFZez9Za47dTWAcLYk/b1DNUGnUtp+VXzmi2t9pPB2vpRQH
+ 3rRZoacC+xWamJJOtRhPuOf0UexidSG7Rcwby5tsYEGxLvFrCLdoLzGkN6AT+b9VYiJJ
+ cKUA==
+X-Gm-Message-State: AOAM531L697A8D9QqK+1EcQKgiPt+zsV6VeV6aTeob+/s01xXMuKbxr5
+ C1QOmbJAY+K3R9L5NW6RZGNRDZv2IanehSzvE5jf6CiUsOof/akK7xQmOulQzIQfZ1e1Jcc6QGM
+ uMeGiW8YvXGE3Wo8=
+X-Received: by 2002:adf:bb43:: with SMTP id x3mr14453193wrg.250.1604868433210; 
+ Sun, 08 Nov 2020 12:47:13 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx6xiS2T1BEEsf+xEKz+wrtpCamxQytQ9n9oVGcCZnWvRwoLrlXkZ4xtOR6+A5AWfTYfv+vzw==
+X-Received: by 2002:adf:bb43:: with SMTP id x3mr14453174wrg.250.1604868433074; 
+ Sun, 08 Nov 2020 12:47:13 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id k22sm10365890wmi.34.2020.11.08.12.47.37
+ by smtp.gmail.com with ESMTPSA id t13sm11244180wru.67.2020.11.08.12.47.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Nov 2020 12:47:37 -0800 (PST)
+ Sun, 08 Nov 2020 12:47:12 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-6.0 v4 08/17] gitlab-ci: Move linux-user debug-tcg test
- across to gitlab
-Date: Sun,  8 Nov 2020 21:45:26 +0100
-Message-Id: <20201108204535.2319870-9-philmd@redhat.com>
+Subject: [PATCH-for-5.2 v4 03/17] hw/i386/acpi-build: Fix maybe-uninitialized
+ error when ACPI hotplug off
+Date: Sun,  8 Nov 2020 21:45:21 +0100
+Message-Id: <20201108204535.2319870-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201108204535.2319870-1-philmd@redhat.com>
 References: <20201108204535.2319870-1-philmd@redhat.com>
@@ -116,7 +116,6 @@ Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Laurent Vivier <laurent@vivier.eu>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
@@ -125,55 +124,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similarly to commit 8cdb2cef3f1, move the linux-user (debug-tcg)
-test to GitLab.
+GCC 9.3.0 thinks that 'method' can be left uninitialized. This code
+is already in the "if (bsel || pcihp_bridge_en)" block statement,
+but it isn't smart enough to figure it out.
 
+Restrict the code to be used only in the "if (bsel || pcihp_bridge_en)"
+block statement to fix (on Ubuntu):
+
+  ../hw/i386/acpi-build.c: In function 'build_append_pci_bus_devices':
+  ../hw/i386/acpi-build.c:496:9: error: 'method' may be used uninitialized
+  in this function [-Werror=maybe-uninitialized]
+    496 |         aml_append(parent_scope, method);
+        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  cc1: all warnings being treated as errors
+
+Fixes: df4008c9c59 ("piix4: don't reserve hw resources when hotplug is off globally")
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
-Cc: Laurent Vivier <laurent@vivier.eu>
----
- .gitlab-ci.yml | 7 +++++++
- .travis.yml    | 9 ---------
- 2 files changed, 7 insertions(+), 9 deletions(-)
+ hw/i386/acpi-build.c | 45 +++++++++++++++++++++-----------------------
+ 1 file changed, 21 insertions(+), 24 deletions(-)
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 3fc3d0568c6..80082a602b8 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -304,6 +304,13 @@ build-user:
-     CONFIGURE_ARGS: --disable-tools --disable-system
-     MAKE_CHECK_ARGS: check-tcg
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 4f66642d887..1f5c2112452 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -465,34 +465,31 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+      */
+     if (bsel || pcihp_bridge_en) {
+         method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
+-    }
+-    /* If bus supports hotplug select it and notify about local events */
+-    if (bsel) {
+-        uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
  
-+build-user-debug:
-+  <<: *native_build_job_definition
-+  variables:
-+    IMAGE: debian-all-test-cross
-+    CONFIGURE_ARGS: --disable-tools --disable-system --enable-debug-tcg
-+    MAKE_CHECK_ARGS: check-tcg
+-        aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
+-        aml_append(method,
+-            aml_call2("DVNT", aml_name("PCIU"), aml_int(1) /* Device Check */)
+-        );
+-        aml_append(method,
+-            aml_call2("DVNT", aml_name("PCID"), aml_int(3)/* Eject Request */)
+-        );
+-    }
++        /* If bus supports hotplug select it and notify about local events */
++        if (bsel) {
++            uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+ 
+-    /* Notify about child bus events in any case */
+-    if (pcihp_bridge_en) {
+-        QLIST_FOREACH(sec, &bus->child, sibling) {
+-            int32_t devfn = sec->parent_dev->devfn;
+-
+-            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
+-                continue;
+-            }
+-
+-            aml_append(method, aml_name("^S%.02X.PCNT", devfn));
++            aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
++            aml_append(method, aml_call2("DVNT", aml_name("PCIU"),
++                                         aml_int(1))); /* Device Check */
++            aml_append(method, aml_call2("DVNT", aml_name("PCID"),
++                                         aml_int(3))); /* Eject Request */
++        }
 +
- # Run check-tcg against linux-user (with plugins)
- # we skip sparc64-linux-user until it has been fixed somewhat
- # we skip cris-linux-user as it doesn't use the common run loop
-diff --git a/.travis.yml b/.travis.yml
-index 15d92291358..bee6197290d 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -293,15 +293,6 @@ jobs:
-         - ${SRC_DIR}/configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread" || { cat config.log meson-logs/meson-log.txt && exit 1; }
++        /* Notify about child bus events in any case */
++        if (pcihp_bridge_en) {
++            QLIST_FOREACH(sec, &bus->child, sibling) {
++                int32_t devfn = sec->parent_dev->devfn;
++
++                if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
++                    continue;
++                }
++
++                aml_append(method, aml_name("^S%.02X.PCNT", devfn));
++            }
+         }
+-    }
  
- 
--    # Run check-tcg against linux-user
--    - name: "GCC check-tcg (user)"
--      env:
--        - CONFIG="--disable-system --enable-debug-tcg"
--        - TEST_BUILD_CMD="make build-tcg"
--        - TEST_CMD="make check-tcg"
--        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
--
--
-     # Run check-tcg against softmmu targets
-     - name: "GCC check-tcg (some-softmmu)"
-       env:
+-    if (bsel || pcihp_bridge_en) {
+         aml_append(parent_scope, method);
+     }
+     qobject_unref(bsel);
 -- 
 2.26.2
 
