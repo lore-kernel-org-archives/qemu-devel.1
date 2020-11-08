@@ -2,79 +2,78 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 682C7C4741F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 00:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C3AC388F9
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 00:07:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDC5520637
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 00:05:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3BEA2065C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 00:07:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="aDDXHfcd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDC5520637
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="nFevnyHb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3BEA2065C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbugi-00007L-1r
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 19:05:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49394)
+	id 1kbuiI-0001Wl-4J
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 19:07:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kbucE-0003nw-NO
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 19:00:58 -0500
-Received: from forwardcorp1p.mail.yandex.net
- ([2a02:6b8:0:1472:2741:0:8b6:217]:54444)
+ id 1kbuc7-0003cW-3C
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 19:00:51 -0500
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:47298)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kbucC-0003xn-Cy
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 19:00:58 -0500
+ id 1kbuc2-0003v4-QT
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 19:00:50 -0500
 Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net
  (sas1-ec30c78b6c5b.qloud-c.yandex.net
  [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id F1EED2E14A4;
- Mon,  9 Nov 2020 03:00:54 +0300 (MSK)
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 7DFA12E14C1;
+ Mon,  9 Nov 2020 03:00:42 +0300 (MSK)
 Received: from sas2-c156b1cb922a.qloud-c.yandex.net
  (sas2-c156b1cb922a.qloud-c.yandex.net [2a02:6b8:c08:b78e:0:640:c156:b1cb])
  by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- PaDJTaGbEL-0pweK6v4; Mon, 09 Nov 2020 03:00:54 +0300
+ 02tw8KoPcl-0fwiJSrr; Mon, 09 Nov 2020 03:00:42 +0300
 Precedence: bulk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1604880054; bh=4UT9zLwR/HbyGJkWxMzsQ6xPZvU8eI6Qk1oOhho2jsQ=;
+ t=1604880042; bh=//cdbs/HdJExa8nsAxw/6M2kRf2cAZj9PUuxtBNhFb0=;
  h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=aDDXHfcdr1oyKmiIbGcfanR3c0rTx6s9cDeM6P4xhVjJQfhfyr2o79x6fZsOc/cjF
- 72uKG6uMwJXxIjLADNhfbPwA99ENqzpPC2//FNARc/C1E19sCSLVQUBfDLegN8xGD/
- 7XgEKAxY3ZfGVCciPNVvB3uj5Y7Y2tuqbAoyr7X8=
+ b=nFevnyHbl6MQB8DqiV00ahEBTGSmvmHvmKmFHAMYZL9sXa69n2OqnNdP/px0i/wph
+ PBq3oVklW79QYMUH0H7RD8HbZel2uuzXSjE5pkA//RjwW8mHOv+8jEnaG6bmxiDHDD
+ sY3GS6WwEj/HVa666dLD6hT2fVH48rIZDHRErPXE=
 Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
  [2a02:6b8:b081:425::1:0])
  by sas2-c156b1cb922a.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- AEjcvNO5zB-05nCNlmg; Mon, 09 Nov 2020 03:00:51 +0300
+ AEjcvNO5zB-05nCNlmg; Mon, 09 Nov 2020 03:00:41 +0300
  (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
  (Client certificate not present)
 From: Alexey Kirillov <lekiravi@yandex-team.ru>
 To: Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>,
  Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
-Subject: [PATCH v5 4/4] net: Do not use legacy info_str for backends
-Date: Mon,  9 Nov 2020 02:59:52 +0300
-Message-Id: <20201108235952.107961-5-lekiravi@yandex-team.ru>
+Subject: [PATCH v5 3/4] hmp: Use QMP query-netdev in hmp_info_network
+Date: Mon,  9 Nov 2020 02:59:51 +0300
+Message-Id: <20201108235952.107961-4-lekiravi@yandex-team.ru>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201108235952.107961-1-lekiravi@yandex-team.ru>
 References: <20201108235952.107961-1-lekiravi@yandex-team.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
- envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 19:00:34
-X-ACL-Warn: Detected OS   = ???
+Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
+ envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -102,228 +101,317 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we use QMP query-netdev to store and get information about
-backend network devices, we can drop usage legacy field info_str
-for them.
-We still use this field for NIC and hubports, so we can not
-completely remove it.
+Replace usage of legacy field info_str of NetClientState for
+backend network devices with result of QMP command query-netdev.
+NIC and hubports still use legacy info_str field.
 
 Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
 ---
- net/l2tpv3.c     |  2 --
- net/slirp.c      |  4 ----
- net/socket.c     | 22 ----------------------
- net/tap-win32.c  |  3 ---
- net/tap.c        | 12 ------------
- net/vde.c        |  3 ---
- net/vhost-user.c |  2 --
- net/vhost-vdpa.c |  1 -
- 8 files changed, 49 deletions(-)
+ include/net/net.h |   3 +-
+ net/clients.h     |   1 +
+ net/hub.c         |   4 +-
+ net/hub.h         |   2 +-
+ net/net.c         | 181 ++++++++++++++++++++++++++++++++++++++++++++--
+ net/vde.c         |  10 +++
+ 6 files changed, 192 insertions(+), 9 deletions(-)
 
-diff --git a/net/l2tpv3.c b/net/l2tpv3.c
-index 881fc6f7c1..7f2a590155 100644
---- a/net/l2tpv3.c
-+++ b/net/l2tpv3.c
-@@ -745,8 +745,6 @@ int net_init_l2tpv3(const Netdev *netdev,
-         stored->dstport = g_strdup(l2tpv3->dstport);
+diff --git a/include/net/net.h b/include/net/net.h
+index 16700f715e..ed77f444de 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -172,7 +172,8 @@ void qemu_check_nic_model(NICInfo *nd, const char *model);
+ int qemu_find_nic_model(NICInfo *nd, const char * const *models,
+                         const char *default_model);
+ 
+-void print_net_client(Monitor *mon, NetClientState *nc);
++void print_net_client(Monitor *mon, NetClientState *nc,
++                      NetdevInfoList *ni_list);
+ void hmp_info_network(Monitor *mon, const QDict *qdict);
+ void net_socket_rs_init(SocketReadState *rs,
+                         SocketReadStateFinalize *finalize,
+diff --git a/net/clients.h b/net/clients.h
+index 92f9b59aed..fdf257f641 100644
+--- a/net/clients.h
++++ b/net/clients.h
+@@ -51,6 +51,7 @@ int net_init_l2tpv3(const Netdev *netdev, const char *name,
+ #ifdef CONFIG_VDE
+ int net_init_vde(const Netdev *netdev, const char *name,
+                  NetClientState *peer, Error **errp);
++int net_vde_get_fd(const NetClientState *nc);
+ #endif
+ 
+ #ifdef CONFIG_NETMAP
+diff --git a/net/hub.c b/net/hub.c
+index 1375738bf1..7815248650 100644
+--- a/net/hub.c
++++ b/net/hub.c
+@@ -221,7 +221,7 @@ NetClientState *net_hub_port_find(int hub_id)
+ /**
+  * Print hub configuration
+  */
+-void net_hub_info(Monitor *mon)
++void net_hub_info(Monitor *mon, NetdevInfoList *ni_list)
+ {
+     NetHub *hub;
+     NetHubPort *port;
+@@ -232,7 +232,7 @@ void net_hub_info(Monitor *mon)
+             monitor_printf(mon, " \\ %s", port->nc.name);
+             if (port->nc.peer) {
+                 monitor_printf(mon, ": ");
+-                print_net_client(mon, port->nc.peer);
++                print_net_client(mon, port->nc.peer, ni_list);
+             } else {
+                 monitor_printf(mon, "\n");
+             }
+diff --git a/net/hub.h b/net/hub.h
+index ce45f7b399..2c9a384077 100644
+--- a/net/hub.h
++++ b/net/hub.h
+@@ -17,7 +17,7 @@
+ 
+ NetClientState *net_hub_add_port(int hub_id, const char *name,
+                                  NetClientState *hubpeer);
+-void net_hub_info(Monitor *mon);
++void net_hub_info(Monitor *mon, NetdevInfoList *ninfo);
+ void net_hub_check_clients(void);
+ bool net_hub_flush(NetClientState *nc);
+ 
+diff --git a/net/net.c b/net/net.c
+index 551acadabc..4d3719434c 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1178,14 +1178,182 @@ static void netfilter_print_info(Monitor *mon, NetFilterState *nf)
+     monitor_printf(mon, "\n");
+ }
+ 
+-void print_net_client(Monitor *mon, NetClientState *nc)
++static NetdevInfo *get_netdev_info(NetdevInfoList *ni_list, char *name)
++{
++    NetdevInfo *ni;
++
++    while (ni_list) {
++        ni = ni_list->value;
++        if (g_str_equal(ni->id, name)) {
++            return ni;
++        }
++        ni_list = ni_list->next;
++    }
++
++    return NULL;
++}
++
++static char *generate_info_str(NetdevInfo *ni, NetClientState *nc)
++{
++    char *info_str;
++
++    /* Use legacy field info_str for NIC and hubports */
++    if ((nc->info->type == NET_CLIENT_DRIVER_NIC) ||
++        (nc->info->type == NET_CLIENT_DRIVER_HUBPORT)) {
++        return g_strdup(nc->info_str);
++    }
++
++    if (!ni) {
++        return g_malloc0(1);
++    }
++
++    switch (ni->type) {
++#ifdef CONFIG_SLIRP
++        case NET_BACKEND_USER: {
++            size_t len = strchr(ni->u.user.net, '/') - ni->u.user.net;
++            char *net = g_strndup(ni->u.user.net, len);
++
++            info_str = g_strdup_printf("net=%s,restrict=%s",
++                                       net,
++                                       ni->u.user.q_restrict ? "on" : "off");
++            g_free(net);
++            break;
++        }
++#endif /* CONFIG_SLIRP */
++        case NET_BACKEND_TAP: {
++#ifndef _WIN32
++            if (ni->u.tap.has_fds) {
++                char **fds = g_strsplit(ni->u.tap.fds, ":", -1);
++
++                info_str = g_strdup_printf("fd=%s", fds[nc->queue_index]);
++                g_strfreev(fds);
++            } else if (ni->u.tap.has_helper) {
++                info_str = g_strdup_printf("helper=%s", ni->u.tap.helper);
++            } else {
++                info_str = g_strdup_printf("ifname=%s,script=%s,downscript=%s",
++                    ni->u.tap.ifname,
++                    nc->queue_index == 0 ? ni->u.tap.script : "no",
++                    nc->queue_index == 0 ? ni->u.tap.downscript : "no");
++            }
++#else
++            info_str = g_strdup_printf("tap: ifname=%s", ni->u.tap.ifname);
++#endif /* _WIN32 */
++            break;
++        }
++#ifdef CONFIG_L2TPV3
++        case NET_BACKEND_L2TPV3: {
++            info_str = g_strdup_printf("l2tpv3: connected");
++            break;
++        }
++#endif /* CONFIG_L2TPV3 */
++        case NET_BACKEND_SOCKET: {
++            if (ni->u.socket.has_listen) {
++                if (ni->u.socket.has_fd) {
++                    info_str = g_strdup_printf("socket: connection from %s",
++                                               ni->u.socket.listen);
++                } else {
++                    info_str = g_strdup_printf("socket: wait from %s",
++                                               ni->u.socket.listen);
++                }
++            } else if (ni->u.socket.has_connect && ni->u.socket.has_fd) {
++                info_str = g_strdup_printf("socket: connect to %s",
++                                           ni->u.socket.connect);
++            } else if (ni->u.socket.has_mcast && ni->u.socket.has_fd) {
++                info_str = g_strdup_printf("socket: mcast=%s",
++                                           ni->u.socket.mcast);
++            } else if (ni->u.socket.has_udp && ni->u.socket.has_fd) {
++                info_str = g_strdup_printf("socket: udp=%s", ni->u.socket.udp);
++            } else {
++                g_assert(ni->u.socket.has_fd);
++                int so_type = -1;
++                int optlen = sizeof(so_type);
++                int fd = atoi(ni->u.socket.fd);
++
++                getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
++                           (socklen_t *)&optlen);
++                if (so_type == SOCK_STREAM) {
++                    info_str = g_strdup_printf("socket: fd=%s",
++                                               ni->u.socket.fd);
++                } else {
++                    if (ni->u.socket.has_mcast) {
++                        /*
++                         * This branch is unreachable, according to how it is in
++                         * net/socket.c at this moment
++                         */
++                        info_str = g_strdup_printf("socket: fd=%s "
++                                                   "(cloned mcast=%s)",
++                                                   ni->u.socket.fd,
++                                                   ni->u.socket.mcast);
++                    } else {
++                        SocketAddress *sa = socket_local_address(fd, NULL);
++
++                        info_str = g_strdup_printf("socket: fd=%s %s",
++                            ni->u.socket.fd,
++                            SocketAddressType_str(sa->type));
++                        qapi_free_SocketAddress(sa);
++                    }
++                }
++            }
++            break;
++        }
++#ifdef CONFIG_VDE
++        case NET_BACKEND_VDE: {
++            info_str = g_strdup_printf("sock=%s,fd=%d",
++                                       ni->u.vde.sock,
++                                       net_vde_get_fd(nc));
++            break;
++        }
++#endif /* CONFIG_VDE */
++#ifdef CONFIG_NET_BRIDGE
++        case NET_BACKEND_BRIDGE: {
++            info_str = g_strdup_printf("helper=%s,br=%s",
++                                       ni->u.bridge.helper,
++                                       ni->u.bridge.br);
++            break;
++        }
++#endif /* CONFIG_NET_BRIDGE */
++#ifdef CONFIG_NETMAP
++        case NET_BACKEND_NETMAP: {
++            info_str = g_strdup_printf("netmap: ifname=%s",
++                                       ni->u.netmap.ifname);
++            break;
++        }
++#endif /* CONFIG_NETMAP */
++#ifdef CONFIG_VHOST_NET_USER
++        case NET_BACKEND_VHOST_USER: {
++            info_str = g_strdup_printf("vhost-user%d to %s",
++                                       nc->queue_index,
++                                       ni->u.vhost_user.chardev);
++            break;
++        }
++#endif /* CONFIG_VHOST_NET_USER */
++#ifdef CONFIG_VHOST_NET_VDPA
++        case NET_BACKEND_VHOST_VDPA: {
++            info_str = g_strdup("vhost-vdpa");
++            break;
++        }
++#endif /* CONFIG_VHOST_NET_VDPA */
++        default: {
++            info_str = g_malloc0(1);
++            break;
++        }
++    }
++
++    return info_str;
++}
++
++void print_net_client(Monitor *mon, NetClientState *nc, NetdevInfoList *ni_list)
+ {
+     NetFilterState *nf;
++    NetdevInfo *ni = get_netdev_info(ni_list, nc->name);
++    char *info_str = generate_info_str(ni, nc);
+ 
+     monitor_printf(mon, "%s: index=%d,type=%s,%s\n", nc->name,
+                    nc->queue_index,
+                    NetClientDriver_str(nc->info->type),
+-                   nc->info_str);
++                   info_str);
++    g_free(info_str);
++
+     if (!QTAILQ_EMPTY(&nc->filters)) {
+         monitor_printf(mon, "filters:\n");
      }
+@@ -1289,8 +1457,9 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
+ {
+     NetClientState *nc, *peer;
+     NetClientDriver type;
++    NetdevInfoList *ni_list = qmp_query_netdev(NULL);
  
--    snprintf(s->nc.info_str, sizeof(s->nc.info_str),
--             "l2tpv3: connected");
-     return 0;
- outerr:
-     qemu_del_net_client(nc);
-diff --git a/net/slirp.c b/net/slirp.c
-index 65d3f2639c..14fa64227d 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -670,10 +670,6 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-         stored->tftp_server_name = g_strdup(tftp_server_name);
-     }
+-    net_hub_info(mon);
++    net_hub_info(mon, ni_list);
  
--    snprintf(nc->info_str, sizeof(nc->info_str),
--             "net=%s,restrict=%s", inet_ntoa(net),
--             restricted ? "on" : "off");
--
-     s = DO_UPCAST(SlirpState, nc, nc);
- 
-     s->slirp = slirp_init(restricted, ipv4, net, mask, host,
-diff --git a/net/socket.c b/net/socket.c
-index 1614523b82..93b5163f0e 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -180,7 +180,6 @@ static void net_socket_send(void *opaque)
-         s->fd = -1;
-         net_socket_rs_init(&s->rs, net_socket_rs_finalize, false);
-         s->nc.link_down = true;
--        memset(s->nc.info_str, 0, sizeof(s->nc.info_str));
- 
-         return;
-     }
-@@ -400,16 +399,10 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
-         stored->mcast = g_strdup(mcast);
- 
-         s->dgram_dst = saddr;
--        snprintf(nc->info_str, sizeof(nc->info_str),
--                 "socket: fd=%d (cloned mcast=%s:%d)",
--                 fd, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-     } else {
-         if (sa_type == SOCKET_ADDRESS_TYPE_UNIX) {
-             s->dgram_dst.sin_family = AF_UNIX;
+     QTAILQ_FOREACH(nc, &net_clients, next) {
+         peer = nc->peer;
+@@ -1302,13 +1471,15 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
          }
--
--        snprintf(nc->info_str, sizeof(nc->info_str),
--                 "socket: fd=%d %s", fd, SocketAddressType_str(sa_type));
-     }
  
-     return s;
-@@ -444,8 +437,6 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
- 
-     nc = qemu_new_net_client(&net_socket_info, peer, model, name);
- 
--    snprintf(nc->info_str, sizeof(nc->info_str), "socket: fd=%d", fd);
--
-     s = DO_UPCAST(NetSocketState, nc, nc);
- 
-     s->fd = fd;
-@@ -527,10 +518,6 @@ static void net_socket_accept(void *opaque)
- 
-     stored->has_fd = true;
-     stored->fd = g_strdup_printf("%d", fd);
--
--    snprintf(s->nc.info_str, sizeof(s->nc.info_str),
--             "socket: connection from %s:%d",
--             inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
- }
- 
- static int net_socket_listen_init(NetClientState *peer,
-@@ -645,9 +632,6 @@ static int net_socket_connect_init(NetClientState *peer,
-     stored->has_connect = true;
-     stored->connect = g_strdup(host_str);
- 
--    snprintf(s->nc.info_str, sizeof(s->nc.info_str),
--             "socket: connect to %s:%d",
--             inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-     return 0;
- }
- 
-@@ -704,9 +688,6 @@ static int net_socket_mcast_init(NetClientState *peer,
-         stored->localaddr = g_strdup(localaddr_str);
-     }
- 
--    snprintf(s->nc.info_str, sizeof(s->nc.info_str),
--             "socket: mcast=%s:%d",
--             inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-     return 0;
- 
- }
-@@ -769,9 +750,6 @@ static int net_socket_udp_init(NetClientState *peer,
-     stored->has_udp = true;
-     stored->udp = g_strdup(rhost);
- 
--    snprintf(s->nc.info_str, sizeof(s->nc.info_str),
--             "socket: udp=%s:%d",
--             inet_ntoa(raddr.sin_addr), ntohs(raddr.sin_port));
-     return 0;
- }
- 
-diff --git a/net/tap-win32.c b/net/tap-win32.c
-index b60933bd1a..21e451107b 100644
---- a/net/tap-win32.c
-+++ b/net/tap-win32.c
-@@ -787,9 +787,6 @@ static int tap_win32_init(NetClientState *peer, const char *model,
-     stored->has_ifname = true;
-     stored->ifname = g_strdup(ifname);
- 
--    snprintf(s->nc.info_str, sizeof(s->nc.info_str),
--             "tap: ifname=%s", ifname);
--
-     s->handle = handle;
- 
-     qemu_add_wait_object(s->handle->tap_semaphore, tap_win32_send, s);
-diff --git a/net/tap.c b/net/tap.c
-index 57af49ad51..908cb8e7bd 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -625,9 +625,6 @@ int net_init_bridge(const Netdev *netdev, const char *name,
-         stored->helper = g_strdup(helper);
-     }
- 
--    snprintf(s->nc.info_str, sizeof(s->nc.info_str), "helper=%s,br=%s", helper,
--             br);
--
-     return 0;
- }
- 
-@@ -713,8 +710,6 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-             stored->fds = g_strdup_printf("%s:%d", stored->fds, fd);
-             g_free(tmp_s);
+         if (!peer || type == NET_CLIENT_DRIVER_NIC) {
+-            print_net_client(mon, nc);
++            print_net_client(mon, nc, ni_list);
+         } /* else it's a netdev connected to a NIC, printed with the NIC */
+         if (peer && type == NET_CLIENT_DRIVER_NIC) {
+             monitor_printf(mon, " \\ ");
+-            print_net_client(mon, peer);
++            print_net_client(mon, peer, ni_list);
          }
--
--        snprintf(s->nc.info_str, sizeof(s->nc.info_str), "fd=%d", fd);
-     } else if (tap->has_helper) {
-         if (!stored->has_helper) {
-             stored->has_helper = true;
-@@ -726,9 +721,6 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-             stored->br = tap->has_br ? g_strdup(tap->br) :
-                                        g_strdup(DEFAULT_BRIDGE_INTERFACE);
-         }
--
--        snprintf(s->nc.info_str, sizeof(s->nc.info_str), "helper=%s",
--                 tap->helper);
-     } else {
-         if (ifname && !stored->has_ifname) {
-             stored->has_ifname = true;
-@@ -745,10 +737,6 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-             stored->downscript = g_strdup(downscript);
-         }
+     }
++
++    qapi_free_NetdevInfoList(ni_list);
+ }
  
--        snprintf(s->nc.info_str, sizeof(s->nc.info_str),
--                 "ifname=%s,script=%s,downscript=%s", ifname, script,
--                 downscript);
--
-         if (strcmp(downscript, "no") != 0) {
-             snprintf(s->down_script, sizeof(s->down_script), "%s", downscript);
-             snprintf(s->down_script_arg, sizeof(s->down_script_arg),
+ void colo_notify_filters_event(int event, Error **errp)
 diff --git a/net/vde.c b/net/vde.c
-index 041eadbcf9..bda8444d1a 100644
+index 1af9175060..041eadbcf9 100644
 --- a/net/vde.c
 +++ b/net/vde.c
-@@ -100,9 +100,6 @@ static int net_vde_init(NetClientState *peer, const char *model,
+@@ -153,3 +153,13 @@ int net_init_vde(const Netdev *netdev, const char *name,
  
-     nc = qemu_new_net_client(&net_vde_info, peer, model, name);
- 
--    snprintf(nc->info_str, sizeof(nc->info_str), "sock=%s,fd=%d",
--             sock, vde_datafd(vde));
--
-     s = DO_UPCAST(VDEState, nc, nc);
- 
-     s->vde = vde;
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index 5b7056be25..e443c4b2b5 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -327,8 +327,6 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-     user = g_new0(struct VhostUserState, 1);
-     for (i = 0; i < queues; i++) {
-         nc = qemu_new_net_client(&net_vhost_user_info, peer, device, name);
--        snprintf(nc->info_str, sizeof(nc->info_str), "vhost-user%d to %s",
--                 i, chr->label);
-         nc->queue_index = i;
-         if (!nc0) {
-             nc0 = nc;
-diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-index 8c27ea0142..5a28bbcd7b 100644
---- a/net/vhost-vdpa.c
-+++ b/net/vhost-vdpa.c
-@@ -200,7 +200,6 @@ static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
-     stored->has_queues = true;
-     stored->queues = 1; /* TODO: change when support multiqueue */
- 
--    snprintf(nc->info_str, sizeof(nc->info_str), TYPE_VHOST_VDPA);
-     nc->queue_index = 0;
-     s = DO_UPCAST(VhostVDPAState, nc, nc);
-     vdpa_device_fd = qemu_open_old(vhostdev, O_RDWR);
+     return 0;
+ }
++
++int net_vde_get_fd(const NetClientState *nc)
++{
++    VDEState *s;
++    assert(nc->info->type == NET_CLIENT_DRIVER_VDE);
++
++    s = DO_UPCAST(VDEState, nc, nc);
++
++    return vde_datafd(s->vde);
++}
 -- 
 2.25.1
 
