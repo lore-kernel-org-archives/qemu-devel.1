@@ -2,70 +2,69 @@ Return-Path: <SRS0=zSEs=EO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F92C388F9
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 23:28:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B4F2C5517A
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 23:28:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A714D206DB
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 23:28:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A714D206DB
+	by mail.kernel.org (Postfix) with ESMTPS id EFFFF206DB
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 23:28:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFFFF206DB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbu6M-0002Zh-GH
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 18:28:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45192)
+	id 1kbu6N-0002cR-Sx
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 18:28:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kbu2w-0000ky-LK
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 18:24:30 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:43376)
+ id 1kbu2y-0000lC-6W; Sun, 08 Nov 2020 18:24:32 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:45187)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kbu2v-0000FG-2g
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 18:24:30 -0500
-Received: by mail-pf1-f196.google.com with SMTP id z3so6110543pfb.10
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 15:24:28 -0800 (PST)
+ id 1kbu2w-0000FN-HF; Sun, 08 Nov 2020 18:24:31 -0500
+Received: by mail-pg1-f196.google.com with SMTP id 62so5230341pgg.12;
+ Sun, 08 Nov 2020 15:24:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=QR6l0oO0N33nF2HH4gIWqjkSU1Ga2pDLwCrBr86eCSQ=;
- b=OMJzt6JPxDBxFwA+uyo8PbW54rjcaVq0NQkCFduhmgvyFPUmITutGXFFJvpg1W2ffh
- ctnwre6kfWo3lL2ytFNEeJLvXXr7vrrwnZeeSqTZn2A06ewyyNZlP/BSNzDPk4uDAgVV
- OF+gFP52OERneLsfu5ti3FlOhHVV7fdCtedZefRx6Vp5SXpRNBBH7AYBbkBQ1rpckDMb
- BkTc4/1DnZsB69zLlRixYFgqCGResFZljHLiiEx4Cfvlid7eQgm+454Gfdl7jqy3jPrM
- mYamR0LVka7s9JErzGNtjO+uw8jp+g+qOhZI9+X6kfK/fhuW0WdrZ2u9tkFDTJQDJWZ3
- etkg==
-X-Gm-Message-State: AOAM530vhxTFgTTGgSymfx6THALU9XaZK1Fhb+IBjadNt6rSc4Hbpp0Q
- zjRFEmFo+ICZZOxC19XVKasADGTWqGk=
-X-Google-Smtp-Source: ABdhPJwNhyDdOY6/uVRKS1tiA+SprHAWz6eFwhHfGpNWUQ7fC0mVUla6XgoG+MT1hSsfY8nPNUWhIQ==
-X-Received: by 2002:a05:6a00:6:b029:18b:b5a:494c with SMTP id
- h6-20020a056a000006b029018b0b5a494cmr11418252pfk.81.1604877867306; 
- Sun, 08 Nov 2020 15:24:27 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=eTDNRgkwVFVIO6gfDAlg28i26N+Iawwag3UMxHNMUOo=;
+ b=fCdr5u3B4kR7B2u6hwcAro5q6k/MXZ6ae8Tk4DWQoQ27nuquovu7s4nNZMFRkVW5Zh
+ tG5wd7qJRZ3It//H5mkKPgjE1ZKKpVkdcmVAUKF/GMmqDh6UgzRdSOT8bVmv1rLkg8Zf
+ bX8dLkuQg9EUGhScK7f4cdCmdRy0ALARvFD6eNuuCDOJIx1/zjuajFu2k1e1Isnm+1vT
+ zDJ3USIYlv8YmdER2RDf83SMkyea2atcj5GhaLxeTbpAknX0RQtyM2Qq/B5kRUtEjEhU
+ IBgIGlJGTDRhVVO5ccE+Zg5PGhz83mKcuYtQ21U8MUjRTd21VzhxJb9oQ4gXOsTBoC0U
+ RGfw==
+X-Gm-Message-State: AOAM53003WFon/rZxBTXnN/OAU5rymQp1TrRXl+dRXkvOl3QdFgNP9uI
+ n7BjxlP/bkHQk3lrivOD6YZEbVUcuk8=
+X-Google-Smtp-Source: ABdhPJzAmwZwiKBAmCqLw77426IMKrUqwxHuY/jI+c/8k6HlnAcDPZqfwKeOpjNR14vN2MJJKZ1Lxw==
+X-Received: by 2002:a63:4c12:: with SMTP id z18mr6379260pga.143.1604877868542; 
+ Sun, 08 Nov 2020 15:24:28 -0800 (PST)
 Received: from localhost.localdomain ([73.93.154.215])
- by smtp.gmail.com with ESMTPSA id z3sm8275171pgl.73.2020.11.08.15.24.26
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id z3sm8275171pgl.73.2020.11.08.15.24.27
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 08 Nov 2020 15:24:26 -0800 (PST)
+ Sun, 08 Nov 2020 15:24:28 -0800 (PST)
 From: Joelle van Dyne <j@getutm.app>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 0/7] iOS and Apple Silicon host support
-Date: Sun,  8 Nov 2020 15:24:17 -0800
-Message-Id: <20201108232425.1705-1-j@getutm.app>
+Subject: [PATCH v5 1/7] configure: option to disable host block devices
+Date: Sun,  8 Nov 2020 15:24:18 -0800
+Message-Id: <20201108232425.1705-2-j@getutm.app>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201108232425.1705-1-j@getutm.app>
+References: <20201108232425.1705-1-j@getutm.app>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=209.85.210.196;
- envelope-from=osy86github@gmail.com; helo=mail-pf1-f196.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 18:24:27
+Received-SPF: pass client-ip=209.85.215.196;
+ envelope-from=osy86github@gmail.com; helo=mail-pg1-f196.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 18:24:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -13
 X-Spam_score: -1.4
@@ -86,96 +85,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:raw" <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Joelle van Dyne <j@getutm.app>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based-on: 20201106032921.600200-1-richard.henderson@linaro.org
-([PATCH v3 00/41] Mirror map JIT memory for TCG)
+Some hosts (iOS) have a sandboxed filesystem and do not provide low-level
+APIs for interfacing with host block devices.
 
-These set of changes brings QEMU TCG to iOS devices and future Apple Silicon
-devices. They were originally developed last year and have been working in the
-UTM app. Recently, we ported the changes to master, re-wrote a lot of the build
-script changes for meson, and broke up the patches into more distinct units.
+Signed-off-by: Joelle van Dyne <j@getutm.app>
+---
+ configure            |  4 ++++
+ meson.build          |  1 +
+ qapi/block-core.json | 10 +++++++---
+ block/file-posix.c   | 10 +++++++++-
+ 4 files changed, 21 insertions(+), 4 deletions(-)
 
-A summary of the changes:
-
-* `CONFIG_IOS` defined when building for iOS and iOS specific changes (as well
-  as unsupported code) are gated behind it.
-* A new dependency, libucontext is added since iOS does not have native ucontext
-  and broken support for sigaltstack. libucontext is available as a new option
-  for coroutine backend.
-* For (recent) jailbroken iOS devices as well as upcoming Apple Silicon devices,
-  there are new rules for applications supporting JIT (with the proper
-  entitlement). These rules are implemented as well.
-
-Since v5:
-
-* Fixed some more instances of QAPI define of CONFIG_HOST_BLOCK_DEVICE
-* Fixed libucontext build on newer version of GCC
-
-Since v4:
-
-* Updated QAPI schema for CONFIG_HOST_BLOCK_DEVICE
-* Updated maintainers file for iOS host support
-* Moved system() changes to osdep.h
-* Fixed typo in libucontext meson.build change
-
-Since v3:
-
-* Moved mirror JIT support to a different patch set.
-* Removed dependency on `pthread_jit_write_protect_np` because it was redundent
-  and also crashes if called on a non-jailbroken iOS device.
-* Removed `--enable-cross-compile` option
-* Fixed checkpatch errors
-* Fixed iOS build on master due to new test recently added which calls system()
-
-Since v2:
-
-* Changed getting mirror pointer from a macro to inline functions
-* Split constification of TCG code pointers to separate patch
-* Removed slirp updates (will send future patch once slirp changes are in)
-* Removed shared library patch (will send future patch)
-
--j
-
-Joelle van Dyne (7):
-  configure: option to disable host block devices
-  configure: cross-compiling with empty cross_prefix
-  qemu: add support for iOS host
-  coroutine: add libucontext as external library
-  slirp: update build flags for iOS resolv fix
-  tcg: implement JIT for iOS and Apple Silicon
-  block: check availablity for preadv/pwritev on mac
-
- docs/devel/index.rst        |  1 +
- docs/devel/ios.rst          | 28 ++++++++++++
- configure                   | 76 +++++++++++++++++++++++++++++---
- meson.build                 | 33 +++++++++++++-
- qapi/block-core.json        | 10 +++--
- include/exec/exec-all.h     |  2 +
- include/qemu/osdep.h        | 11 +++++
- include/tcg/tcg-apple-jit.h | 86 +++++++++++++++++++++++++++++++++++++
- include/tcg/tcg.h           |  3 ++
- accel/tcg/cpu-exec-common.c |  2 +
- accel/tcg/cpu-exec.c        |  2 +
- accel/tcg/translate-all.c   | 46 ++++++++++++++++++++
- block.c                     |  2 +-
- block/file-posix.c          | 53 +++++++++++++++++------
- net/slirp.c                 | 16 +++----
- qga/commands-posix.c        |  6 +++
- tcg/tcg.c                   |  4 ++
- util/coroutine-ucontext.c   |  9 ++++
- .gitmodules                 |  3 ++
- MAINTAINERS                 |  7 +++
- libucontext                 |  1 +
- meson_options.txt           |  2 +
- tests/qtest/meson.build     |  7 ++-
- 23 files changed, 373 insertions(+), 37 deletions(-)
- create mode 100644 docs/devel/ios.rst
- create mode 100644 include/tcg/tcg-apple-jit.h
- create mode 160000 libucontext
-
+diff --git a/configure b/configure
+index 2c3c69f118..97a879808d 100755
+--- a/configure
++++ b/configure
+@@ -448,6 +448,7 @@ meson=""
+ ninja=""
+ skip_meson=no
+ gettext=""
++host_block_device_support="yes"
+ 
+ bogus_os="no"
+ malloc_trim="auto"
+@@ -5907,6 +5908,9 @@ if test "$default_devices" = "yes" ; then
+ else
+   echo "CONFIG_MINIKCONF_MODE=--allnoconfig" >> $config_host_mak
+ fi
++if test "$host_block_device_support" = "yes" ; then
++  echo "CONFIG_HOST_BLOCK_DEVICE=y" >> $config_host_mak
++fi
+ if test "$debug_tcg" = "yes" ; then
+   echo "CONFIG_DEBUG_TCG=y" >> $config_host_mak
+ fi
+diff --git a/meson.build b/meson.build
+index 39ac5cf6d8..fd822346e7 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2166,6 +2166,7 @@ summary_info += {'vvfat support':     config_host.has_key('CONFIG_VVFAT')}
+ summary_info += {'qed support':       config_host.has_key('CONFIG_QED')}
+ summary_info += {'parallels support': config_host.has_key('CONFIG_PARALLELS')}
+ summary_info += {'sheepdog support':  config_host.has_key('CONFIG_SHEEPDOG')}
++summary_info += {'host block dev support': config_host.has_key('CONFIG_HOST_BLOCK_DEVICE')}
+ summary_info += {'capstone':          capstone_opt == 'disabled' ? false : capstone_opt}
+ summary_info += {'libpmem support':   config_host.has_key('CONFIG_LIBPMEM')}
+ summary_info += {'libdaxctl support': config_host.has_key('CONFIG_LIBDAXCTL')}
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 1b8b4156b4..408be635ae 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -980,7 +980,8 @@
+   'discriminator': 'driver',
+   'data': {
+       'file': 'BlockStatsSpecificFile',
+-      'host_device': 'BlockStatsSpecificFile',
++      'host_device': { 'type': 'BlockStatsSpecificFile',
++                       'if': 'defined(CONFIG_HOST_BLOCK_DEVICE)' },
+       'nvme': 'BlockStatsSpecificNvme' } }
+ 
+ ##
+@@ -2848,7 +2849,9 @@
+ { 'enum': 'BlockdevDriver',
+   'data': [ 'blkdebug', 'blklogwrites', 'blkreplay', 'blkverify', 'bochs',
+             'cloop', 'compress', 'copy-on-read', 'dmg', 'file', 'ftp', 'ftps',
+-            'gluster', 'host_cdrom', 'host_device', 'http', 'https', 'iscsi',
++            'gluster', 'host_cdrom',
++            {'name': 'host_device', 'if': 'defined(CONFIG_HOST_BLOCK_DEVICE)' },
++            'http', 'https', 'iscsi',
+             'luks', 'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels',
+             'qcow', 'qcow2', 'qed', 'quorum', 'raw', 'rbd',
+             { 'name': 'replication', 'if': 'defined(CONFIG_REPLICATION)' },
+@@ -4016,7 +4019,8 @@
+       'ftps':       'BlockdevOptionsCurlFtps',
+       'gluster':    'BlockdevOptionsGluster',
+       'host_cdrom': 'BlockdevOptionsFile',
+-      'host_device':'BlockdevOptionsFile',
++      'host_device': { 'type': 'BlockdevOptionsFile',
++                       'if': 'defined(CONFIG_HOST_BLOCK_DEVICE)' },
+       'http':       'BlockdevOptionsCurlHttp',
+       'https':      'BlockdevOptionsCurlHttps',
+       'iscsi':      'BlockdevOptionsIscsi',
+diff --git a/block/file-posix.c b/block/file-posix.c
+index c63926d592..a0fa9aad3a 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -41,7 +41,7 @@
+ #include "scsi/pr-manager.h"
+ #include "scsi/constants.h"
+ 
+-#if defined(__APPLE__) && (__MACH__)
++#if defined(CONFIG_HOST_BLOCK_DEVICE) && defined(__APPLE__) && (__MACH__)
+ #include <paths.h>
+ #include <sys/param.h>
+ #include <IOKit/IOKitLib.h>
+@@ -3014,6 +3014,7 @@ static BlockStatsSpecific *raw_get_specific_stats(BlockDriverState *bs)
+     return stats;
+ }
+ 
++#if defined(CONFIG_HOST_BLOCK_DEVICE)
+ static BlockStatsSpecific *hdev_get_specific_stats(BlockDriverState *bs)
+ {
+     BlockStatsSpecific *stats = g_new(BlockStatsSpecific, 1);
+@@ -3023,6 +3024,7 @@ static BlockStatsSpecific *hdev_get_specific_stats(BlockDriverState *bs)
+ 
+     return stats;
+ }
++#endif /* CONFIG_HOST_BLOCK_DEVICE */
+ 
+ static QemuOptsList raw_create_opts = {
+     .name = "raw-create-opts",
+@@ -3247,6 +3249,8 @@ BlockDriver bdrv_file = {
+ /***********************************************/
+ /* host device */
+ 
++#if defined(CONFIG_HOST_BLOCK_DEVICE)
++
+ #if defined(__APPLE__) && defined(__MACH__)
+ static kern_return_t GetBSDPath(io_iterator_t mediaIterator, char *bsdPath,
+                                 CFIndex maxPathSize, int flags);
+@@ -3872,6 +3876,8 @@ static BlockDriver bdrv_host_cdrom = {
+ };
+ #endif /* __FreeBSD__ */
+ 
++#endif /* CONFIG_HOST_BLOCK_DEVICE */
++
+ static void bdrv_file_init(void)
+ {
+     /*
+@@ -3879,6 +3885,7 @@ static void bdrv_file_init(void)
+      * registered last will get probed first.
+      */
+     bdrv_register(&bdrv_file);
++#if defined(CONFIG_HOST_BLOCK_DEVICE)
+     bdrv_register(&bdrv_host_device);
+ #ifdef __linux__
+     bdrv_register(&bdrv_host_cdrom);
+@@ -3886,6 +3893,7 @@ static void bdrv_file_init(void)
+ #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+     bdrv_register(&bdrv_host_cdrom);
+ #endif
++#endif /* CONFIG_HOST_BLOCK_DEVICE */
+ }
+ 
+ block_init(bdrv_file_init);
 -- 
 2.28.0
 
