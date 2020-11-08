@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B348EC388F2
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECFD3C388F2
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41412206E3
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:38:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41412206E3
+	by mail.kernel.org (Postfix) with ESMTPS id 81C62206E3
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:41:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81C62206E3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbh9X-00017l-AS
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 04:38:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41640)
+	id 1kbhCw-0003Pv-Dl
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 04:41:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42608)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kbh6m-0006cu-19
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:35:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56988)
+ id 1kbhBu-0002gO-0b
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:40:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57316)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kbh6k-0006Vf-92
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:35:35 -0500
+ id 1kbhBs-0000BT-5i
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:40:53 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kbh6i-0008NL-68
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:35:32 +0000
+ id 1kbhBq-0000UD-FZ
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:40:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2BE872E811E
- for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 09:35:32 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 744172E8131
+ for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 09:40:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 08 Nov 2020 09:25:43 -0000
-From: Thomas Huth <1636770@bugs.launchpad.net>
+Date: Sun, 08 Nov 2020 09:35:12 -0000
+From: Thomas Huth <1642011@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
@@ -50,18 +50,19 @@ X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bugreport-mailinator programmingkidx th-huth
-X-Launchpad-Bug-Reporter: Bug Report (bugreport-mailinator)
+X-Launchpad-Bug-Commenters: elitebadger th-huth
+X-Launchpad-Bug-Reporter: Nathan (elitebadger)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20161026101903.20135.18801.malonedeb@soybean.canonical.com>
-Message-Id: <160482754344.13670.15007286379419003189.malone@gac.canonical.com>
-Subject: [Bug 1636770] Re: mouse wheel works only with -usbdevice tablet
+References: <20161115175129.19509.70345.malonedeb@gac.canonical.com>
+Message-Id: <160482811280.27550.798114183056461722.malone@chaenomeles.canonical.com>
+Subject: [Bug 1642011] Re: Mouse wheel events not forwarded to guest using GTK
+ display
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 9b50d87cbf2156f7d7c9b4424c1324713538a7f4
+X-Launchpad-Hash: bdcdc57ab691994a9600b5247269310acc3ab9f9
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 04:10:58
@@ -84,7 +85,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1636770 <1636770@bugs.launchpad.net>
+Reply-To: Bug 1642011 <1642011@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -105,19 +106,41 @@ rked as "Expired". Thank you and sorry for the inconvenience.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1636770
+https://bugs.launchpad.net/bugs/1642011
 
 Title:
-  mouse wheel works only with -usbdevice tablet
+  Mouse wheel events not forwarded to guest using GTK display
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  2.7.0
+  Using QEMU 2.7.0 with KVM enabled, when I launch the guest without
+  options (using the default of gtk), the mouse wheel events are not
+  propagated to the guest.
 
-  tested with windows 10 1607
+  When I start qemu using -display sdk, mouse wheel events are properly
+  forwarded.
+
+  I can determine that the guest is not receiving mouse wheel events by
+  doing cat /dev/input/by-id/usb-QEMU_QEMU_USB_Mouse_42-event-mouse.
+  When I scroll the wheel, no output is printed to the screen.
+
+  The guest is ChromiumOS.
+
+  The command line is:
+
+  qemu-system-x86_64 -enable-kvm -m 2G -smp 4 -vga cirrus -usbdevice
+  mouse -pidfile /tmp/kvm.pid -chardev
+  pipe,id=3Dcontrol_pipe,path=3D/tmp/kvm.pipe -serial file:/tmp/kvm.serial
+  -mon chardev=3Dcontrol_pipe -net nic,model=3Dvirtio -net
+  user,hostfwd=3Dtcp:127.0.0.1:9222-:22 -drive
+  file=3Dchromiumos/src/build/images/amd64-generic/latest/chromiumos_qemu_i=
+mage.bin,index=3D0,media=3Ddisk,cache=3Dunsafe
+
+  (Most of that invocation sets up Linux fifos for various and nefarious
+  purposes and can be profitably ignored).
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1636770/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1642011/+subscriptions
 
