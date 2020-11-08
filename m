@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9813AC5517A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95092C388F9
 	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:56:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0903320702
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:56:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0521D206D4
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 20:56:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cK+/zKhf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0903320702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FFhJF3OO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0521D206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbrjZ-0006TL-Rs
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 15:56:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53132)
+	id 1kbrja-0006Tz-2L
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 15:56:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbT-0004yj-8r
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44545)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbJ-0004o1-V8
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54620)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbR-0000Xw-CH
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:58 -0500
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kbrbI-0000XG-1k
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 15:47:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604868476;
+ s=mimecast20190719; t=1604868467;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rhakXTZKDCfk5v0jA5X38unAStmiYcMWfSFyfuJH4rI=;
- b=cK+/zKhfN2p8O1HlQgrNvB1F0tku7CDLa61mIBbGHjE7MlcQsz4I4BD0dLBPVqyM/iqqr3
- lTnMmUqhvJVqRW+zblDAzxP1FtF3fs5lMD0BvpY0DAwiENM7N09ANpLGh74ArsR4JRGGp5
- RDZ5xelEXMMduRRnC3iOUbxfGuUQ6mM=
+ bh=Llw+O6PjDVffHPJXTH+hz+9KQjdl+Bz3DI9UFB5K8Pg=;
+ b=FFhJF3OOkVbYns6t2WA2ACVd1qmbKGhSJ6BuCSiO9JCCbidXkZzlxPSo1+mSMGUk5HJywT
+ K4xvpwpHM7nQDOU2it4APw4UVN32aYEXuBYtYCMB/CvH/yAP0DeZm1ZrHyg7J0XT3hnVbf
+ X0crY5/+iml1kSEHONGJtxgw6fgK8Kw=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-dXnrJQ4bMyWfkzNnBaA2TA-1; Sun, 08 Nov 2020 15:47:55 -0500
-X-MC-Unique: dXnrJQ4bMyWfkzNnBaA2TA-1
-Received: by mail-wr1-f70.google.com with SMTP id p16so745234wrx.4
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:47:55 -0800 (PST)
+ us-mta-148-NMewwbp9NIWkbrG3s05d8A-1; Sun, 08 Nov 2020 15:47:45 -0500
+X-MC-Unique: NMewwbp9NIWkbrG3s05d8A-1
+Received: by mail-wr1-f70.google.com with SMTP id e18so3367231wrs.23
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 12:47:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rhakXTZKDCfk5v0jA5X38unAStmiYcMWfSFyfuJH4rI=;
- b=uoMIi8SAvQT9ItNGh7qtDQFePlI+kU4KfAwuMf3h6eVG621vB9ir324JmcLorStMaT
- gMjmHxa0IdwttuizB22cxEomSB6b7T2w1S5CRze37Qjssib53Hj05i8YJftbrKMEoeMS
- kLTJh7XBWYrxUTXN3aG2T9grSdnk8gwWQcifsfUf3f0OU3SQkizTGqiEOQv462pDag93
- LlCrUQu8GOKnAK8rv2adsUCJUj3TFFxdLof3uqrjM8SjMfFRB9XV46UoLBRTYGlMAPQF
- pAop3AomiA3QtzsUcOcFEu88SIN1pLy2PD/4EzpWSoWJwZW2VyKAJDKJLVsKtDVRv+SE
- gM0w==
-X-Gm-Message-State: AOAM531MWug/Pg9GWeDDF7ti5AV3u7RE//DBBN3NyiN1HydXobXpAfth
- 0wVA+jRLuvnYCFw3iULMzVv7Bum7WAkZ07n+XDmTAOuuTLsxm2TGm9WAipHGGSNXeotbyxd1C17
- KkSAJGUNAodhXpNo=
-X-Received: by 2002:adf:a343:: with SMTP id d3mr14320028wrb.91.1604868473880; 
- Sun, 08 Nov 2020 12:47:53 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzwXUsLg84qFW6TNCrr31EkRaFQ6RSke179RmTyo0mH0vTqxhUxc5Efn85PvZCBUqwPXNXVhw==
-X-Received: by 2002:adf:a343:: with SMTP id d3mr14320009wrb.91.1604868473746; 
- Sun, 08 Nov 2020 12:47:53 -0800 (PST)
+ bh=Llw+O6PjDVffHPJXTH+hz+9KQjdl+Bz3DI9UFB5K8Pg=;
+ b=RM1LS/T0Xqfd/VaWcuoDic561wJMZGYRuMBJBqLEQ/NjGrMNK6Ec4LVwsbZE0QsmEF
+ X9DH49UOOtoJmaOlT4sshJ8UIyLzdf+yi+J3LnlgtFk5Ii1FAwLrqm8qckrxpMWsfYNj
+ GPTaAbJuVEz2K9p+NzuhIv5kJZbdxTKHdyEerSw0zluEHU/UzZe8p+DPtdIOljhOJ1ZE
+ Bntr/L3KcQ4oCYgK7LPlMl4VU4iHbdMYmlS2LwtyByYfWBzqwUNBtO6w1EmJRy09foHB
+ cS937HIU3aVfnMtEakGs5cGbLqQuLsG4zVLLNF0nJfiazhkdDtH/bQ0eSIUMKaGUu+8N
+ l+MA==
+X-Gm-Message-State: AOAM532Y0AweYnZIzTMFPyPDtG9a4dF1fjTx9azaR5k7/foOMo945h7M
+ zE2x/VjG1yBRFDy1BHXjjSmXJn+XdxUUlGXtWT9gW9860xm/4EOq6WodvVc1CK5RBr+6a0hzwhq
+ /xWbx5L1QHyxVNZs=
+X-Received: by 2002:adf:dc4c:: with SMTP id m12mr14575587wrj.177.1604868463616; 
+ Sun, 08 Nov 2020 12:47:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwkj28UmF0WqSpVBRRdSdfGeHF3IvrynkcwtYIunXVEaZY+ARIVIS65pjsXOzbmuxsvwsteuw==
+X-Received: by 2002:adf:dc4c:: with SMTP id m12mr14575568wrj.177.1604868463426; 
+ Sun, 08 Nov 2020 12:47:43 -0800 (PST)
 Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id b14sm10713523wrx.35.2020.11.08.12.47.52
+ by smtp.gmail.com with ESMTPSA id h81sm10593305wmf.44.2020.11.08.12.47.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 08 Nov 2020 12:47:53 -0800 (PST)
+ Sun, 08 Nov 2020 12:47:42 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-6.0 v4 11/17] gitlab-ci: Move tools-only and softfloat
- tests across to gitlab
-Date: Sun,  8 Nov 2020 21:45:29 +0100
-Message-Id: <20201108204535.2319870-12-philmd@redhat.com>
+Subject: [PATCH-for-6.0 v4 09/17] gitlab-ci: Move gprof/gcov test across to
+ gitlab
+Date: Sun,  8 Nov 2020 21:45:27 +0100
+Message-Id: <20201108204535.2319870-10-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201108204535.2319870-1-philmd@redhat.com>
 References: <20201108204535.2319870-1-philmd@redhat.com>
@@ -116,7 +116,6 @@ Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- "Emilio G . Cota" <cota@braap.org>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
@@ -125,63 +124,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similarly to commit 8cdb2cef3f1, move the tools-only and softfloat
-test to GitLab (splitting it in 2 different jobs).
+Similarly to commit 8cdb2cef3f1, move the gprof/gcov test to GitLab.
+
+The coverage-summary.sh script is not Travis-CI specific, make it
+generic.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
-Cc: Alex Bennée <alex.bennee@linaro.org>
-Cc: Emilio G. Cota <cota@braap.org>
----
- .gitlab-ci.yml | 14 ++++++++++++++
- .travis.yml    |  9 ---------
- 2 files changed, 14 insertions(+), 9 deletions(-)
+ .gitlab-ci.yml                             | 12 ++++++++++++
+ .travis.yml                                | 14 --------------
+ MAINTAINERS                                |  2 +-
+ scripts/{travis => ci}/coverage-summary.sh |  2 +-
+ 4 files changed, 14 insertions(+), 16 deletions(-)
+ rename scripts/{travis => ci}/coverage-summary.sh (92%)
 
 diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index a91870cf85e..a799803afb9 100644
+index 80082a602b8..d1583cee5db 100644
 --- a/.gitlab-ci.yml
 +++ b/.gitlab-ci.yml
-@@ -297,6 +297,20 @@ build-tcg-disabled:
-             208 209 215 216 218 222 227 234 246 247 248 250 254 255 257 258
-             260 261 262 263 264 270 272 273 277 279
+@@ -403,6 +403,18 @@ check-deprecated:
+     MAKE_CHECK_ARGS: check-tcg
+   allow_failure: true
  
-+build-tools:
++# gprof/gcov are GCC features
++build-gprof-gcov:
 +  <<: *native_build_job_definition
 +  variables:
-+    IMAGE: debian-all-test-cross
-+    CONFIGURE_ARGS: --enable-tools --disable-system --disable-user
++    IMAGE: ubuntu2004
++    CONFIGURE_ARGS: --enable-gprof --enable-gcov
++    MAKE_CHECK_ARGS: build-tcg
++    TARGETS: aarch64-softmmu mips64-softmmu ppc64-softmmu
++             riscv64-softmmu s390x-softmmu x86_64-softmmu
++  after_script:
++    - ${CI_PROJECT_DIR}/scripts/ci/coverage-summary.sh
 +
-+# run minimal unit and softfloat checks
-+build-softfloat:
-+  <<: *native_build_job_definition
-+  variables:
-+    IMAGE: debian-all-test-cross
-+    CONFIGURE_ARGS: --disable-tools --disable-system --disable-user
-+    MAKE_CHECK_ARGS: check-unit check-softfloat
-+
- build-user:
+ build-oss-fuzz:
    <<: *native_build_job_definition
    variables:
 diff --git a/.travis.yml b/.travis.yml
-index 5fb69c5fb02..15550fb023f 100644
+index bee6197290d..6087e2909cd 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -119,15 +119,6 @@ after_script:
+@@ -210,20 +210,6 @@ jobs:
+       compiler: clang
  
- jobs:
-   include:
--    # Just build tools and run minimal unit and softfloat checks
--    - name: "GCC check-unit and check-softfloat"
+ 
+-    # gprof/gcov are GCC features
+-    - name: "GCC gprof/gcov"
+-      dist: bionic
+-      addons:
+-        apt:
+-          packages:
+-            - ninja-build
 -      env:
--        - BASE_CONFIG="--enable-tools"
--        - CONFIG="--disable-user --disable-system"
--        - TEST_CMD="make check-unit check-softfloat -j${JOBS}"
--        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
+-        - CONFIG="--enable-gprof --enable-gcov --disable-libssh
+-                  --target-list=${MAIN_SOFTMMU_TARGETS}"
+-      after_success:
+-        - ${SRC_DIR}/scripts/travis/coverage-summary.sh
 -
 -
-     # --enable-debug implies --enable-debug-tcg, also runs quite a bit slower
-     - name: "GCC debug (main-softmmu)"
+     # We don't need to exercise every backend with every front-end
+     - name: "GCC trace log,simple,syslog (user)"
        env:
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 817c7c93f91..3d8c586d444 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3121,7 +3121,7 @@ R: Philippe Mathieu-Daudé <philmd@redhat.com>
+ S: Maintained
+ F: .github/lockdown.yml
+ F: .travis.yml
+-F: scripts/travis/
++F: scripts/ci/
+ F: .shippable.yml
+ F: tests/docker/
+ F: tests/vm/
+diff --git a/scripts/travis/coverage-summary.sh b/scripts/ci/coverage-summary.sh
+similarity index 92%
+rename from scripts/travis/coverage-summary.sh
+rename to scripts/ci/coverage-summary.sh
+index d7086cf9ca6..8d9fb4de401 100755
+--- a/scripts/travis/coverage-summary.sh
++++ b/scripts/ci/coverage-summary.sh
+@@ -3,7 +3,7 @@
+ # Author: Alex Bennée <alex.bennee@linaro.org>
+ #
+ # Summerise the state of code coverage with gcovr and tweak the output
+-# to be more sane on Travis hosts. As we expect to be executed on a
++# to be more sane on CI runner. As we expect to be executed on a
+ # throw away CI instance we do spam temp files all over the shop. You
+ # most likely don't want to execute this script but just call gcovr
+ # directly. See also "make coverage-report"
 -- 
 2.26.2
 
