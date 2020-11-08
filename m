@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0637C388F2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC9C9C55178
 	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:46:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 625DB206ED
+	by mail.kernel.org (Postfix) with ESMTPS id 3464220702
 	for <qemu-devel@archiver.kernel.org>; Sun,  8 Nov 2020 09:46:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 625DB206ED
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3464220702
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbhHh-0005oC-CG
+	id 1kbhHh-0005o7-8C
 	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 04:46:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43310)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43312)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kbhGZ-0004SS-QU
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:45:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57430)
+ id 1kbhGa-0004TZ-Hr
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:45:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57454)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kbhGX-0001ns-UI
- for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:45:43 -0500
+ id 1kbhGY-0001og-IR
+ for qemu-devel@nongnu.org; Sun, 08 Nov 2020 04:45:44 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kbhGW-0000cN-Me
- for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:45:40 +0000
+ id 1kbhGX-0000ae-EI
+ for <qemu-devel@nongnu.org>; Sun, 08 Nov 2020 09:45:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A10632E812F
- for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 09:45:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 6A2322E811E
+ for <qemu-devel@nongnu.org>; Sun,  8 Nov 2020 09:45:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 08 Nov 2020 09:37:27 -0000
-From: Thomas Huth <1644754@bugs.launchpad.net>
+Date: Sun, 08 Nov 2020 09:36:22 -0000
+From: Thomas Huth <1642421@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
@@ -50,18 +50,19 @@ X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dominik-csapak th-huth
-X-Launchpad-Bug-Reporter: flumm (dominik-csapak)
+X-Launchpad-Bug-Commenters: mail-wz6bkyhu4uqpfausw0ege9b0y3 rodrivg th-huth
+X-Launchpad-Bug-Reporter: manut (mail-wz6bkyhu4uqpfausw0ege9b0y3)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20161125090323.28092.26978.malonedeb@soybean.canonical.com>
-Message-Id: <160482824732.28892.5575841129569270941.malone@chaenomeles.canonical.com>
-Subject: [Bug 1644754] Re: gluster partial reads refusal conflicts with qcow2
+References: <20161116225238.8681.9123.malonedeb@gac.canonical.com>
+Message-Id: <160482818298.28244.16570311093552108179.malone@chaenomeles.canonical.com>
+Subject: [Bug 1642421] Re: qemu-system-x86_64: ipv6 and dns is broken with
+ netdev user
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 134a7fea4332f412a611dc7caa30b1f74275ed2d
+X-Launchpad-Hash: 8a9dde9b3c500e60573508ac22f2c429440ddad4
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 04:10:58
@@ -84,7 +85,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1644754 <1644754@bugs.launchpad.net>
+Reply-To: Bug 1642421 <1642421@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -105,129 +106,92 @@ rked as "Expired". Thank you and sorry for the inconvenience.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1644754
+https://bugs.launchpad.net/bugs/1642421
 
 Title:
-  gluster partial reads refusal conflicts with qcow2
+  qemu-system-x86_64: ipv6 and dns is broken with netdev user
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  there is an inconsistency in how qemu creates qcow2 files, which
-  causes an error in the gluster (and possibly other block drivers)
+  Hi,
 
-  the problem is that the gluster backend expects the filesize to be 512
-  byte aligned, which is not the case anymore since 2.7.0 when using the
-  file backend for qcow2 files with a backing file
+  dhcp inside qemu returns an ipv6 address as dns-server. However this is n=
+ot
+  working. If i replace it with the ipv4 address '10.0.0.2' dns is working
+  again. I would expect that the qemu emulated dhcp server responds either =
+an
+  ipv4 configuration that is working or its dns server/forwarder listens on=
+ the
+  ipv6 address returned by the emulated dhcp server.
 
-  the error is then
-  Could not open 'gluster://gluster01/gv0/bar2.qcow2': Could not read L1 ta=
-ble: Input/output error
+  I used latest qemu from git (
+  b0bcc86d2a87456f5a276f941dc775b265b309cf) and used the following
+  commands:
 
-  steps to reproduce:
+  $ ./qemu-system-x86_64 -enable-kvm -M pc -device virtio-rng-pci -device
+  virtio-net-pci,netdev=3Duser.0 -drive file=3Dbuildenv.img,if=3Dvirtio,bus=
+=3D1,unit=3D0
+  -no-reboot -netdev user,id=3Duser.0,hostfwd=3Dtcp::5022-:22,hostfwd=3Dtcp=
+::7587-:7588
+  -m 1024 -usb -nographic -smp 4
 
-   * create a.qcow2
-   * create b.qcow2 with a.qcow2 as base via filesystem (without gluster)
-     b.qcow2 filesize is not a multiple of 512 bytes
-   * move both files to a gluster share
-   * access to b.qcow2 via gluster block driver fails
+  buildenv.img is a debian jessie amd64 installation.
 
-  example:
+  Inside qemu the network is configured to use dhcp:
 
-  have a gluster server at 'gluster01' with a volume 'gv0' (gluster
-  versions tested: 3.7.15,3.8.5,3.8.5)
+  $ cat /etc/network/interfaces
+  allow-hotplug eth0
+  iface eth0 inet dhcp
 
-  root@pc:~# mount -t glusterfs gluster01:/gv0 /mnt/gluster
-  root@pc:~# qemu-img create -f qcow2 gluster://gluster01/gv0/foo.qcow2 100M
-  Formatting 'gluster://gluster01/gv0/foo.qcow2', fmt=3Dqcow2 size=3D104857=
-600 encryption=3Doff cluster_size=3D65536 lazy_refcounts=3Doff refcount_bit=
-s=3D16
-  root@pc:~# qemu-img info /mnt/gluster/foo.qcow2 =
+  $ ifconfig eth0
+  eth0      Link encap:Ethernet  HWaddr 52:54:00:12:34:56
+            inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+            inet6 addr: fe80::5054:ff:fe12:3456/64 Scope:Link
+            inet6 addr: fec0::5054:ff:fe12:3456/64 Scope:Site
+            UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+            RX packets:10 errors:0 dropped:0 overruns:0 frame:0
+            TX packets:28 errors:0 dropped:0 overruns:0 carrier:0
+            collisions:0 txqueuelen:1000
+            RX bytes:3215 (3.1 KiB)  TX bytes:3638 (3.5 KiB)
 
-  image: /mnt/gluster/foo.qcow2
-  file format: qcow2
-  virtual size: 100M (104857600 bytes)
-  disk size: 193K
-  cluster_size: 65536
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-      refcount bits: 16
-      corrupt: false
-  root@pc:~# qemu-img info gluster://gluster01/gv0/foo.qcow2
-  image: gluster://gluster01/gv0/foo.qcow2
-  file format: qcow2
-  virtual size: 100M (104857600 bytes)
-  disk size: 193K
-  cluster_size: 65536
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-      refcount bits: 16
-      corrupt: false
-  root@pc:~# qemu-img create -f qcow2 -b foo.qcow2 gluster://gluster01/gv0/=
-bar.qcow2
-  Formatting 'gluster://gluster01/gv0/bar.qcow2', fmt=3Dqcow2 size=3D104857=
-600 backing_file=3Dfoo.qcow2 encryption=3Doff cluster_size=3D65536 lazy_ref=
-counts=3Doff refcount_bits=3D16
-  root@pc:~# qemu-img info /mnt/gluster/bar.qcow2
-  image: /mnt/gluster/bar.qcow2
-  file format: qcow2
-  virtual size: 100M (104857600 bytes)
-  disk size: 193K
-  cluster_size: 65536
-  backing file: foo.qcow2 (actual path: /mnt/gluster/foo.qcow2)
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-      refcount bits: 16
-      corrupt: false
-  root@pc:~# qemu-img info gluster://gluster01/gv0/bar.qcow2
-  image: gluster://gluster01/gv0/bar.qcow2
-  file format: qcow2
-  virtual size: 100M (104857600 bytes)
-  disk size: 193K
-  cluster_size: 65536
-  backing file: foo.qcow2 (actual path: gluster://gluster01/gv0/foo.qcow2)
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-      refcount bits: 16
-      corrupt: false
-  root@pc:~# qemu-img create -f qcow2 -b foo.qcow2 /mnt/gluster/bar2.qcow2
-  Formatting '/mnt/gluster/bar2.qcow2', fmt=3Dqcow2 size=3D104857600 backin=
-g_file=3Dfoo.qcow2 encryption=3Doff cluster_size=3D65536 lazy_refcounts=3Do=
-ff refcount_bits=3D16
-  root@pc:~# qemu-img info /mnt/gluster/bar2.qcow2
-  image: /mnt/gluster/bar2.qcow2
-  file format: qcow2
-  virtual size: 100M (104857600 bytes)
-  disk size: 193K
-  cluster_size: 65536
-  backing file: foo.qcow2 (actual path: /mnt/gluster/foo.qcow2)
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-      refcount bits: 16
-      corrupt: false
-  root@pc:~# qemu-img info gluster://gluster01/gv0/bar2.qcow2
-  qemu-img: Could not open 'gluster://gluster01/gv0/bar2.qcow2': Could not =
-read L1 table: Input/output error
-  root@pc:~# ls -l /mnt/gluster/
-  total 578
-  -rw-r--r-- 1 root root 196616 Nov 25 09:07 bar2.qcow2
-  -rw------- 1 root root 197120 Nov 25 09:07 bar.qcow2
-  -rw------- 1 root root 197120 Nov 25 09:06 foo.qcow2
-  drwxr-xr-x 6 root root     46 Nov 24 16:51 images
+  $ cat /etc/resolv.conf
+  nameserver fec0::3
 
-  here you can see that the file created with directory path is not 512
-  byte aligned, while the one created through the gluster api is
+  $ arp google.de
+  google.de: Host name lookup failure
 
-  also, when creating a qcow2 with the nfs block driver, the filesize is
-  also a multiple of 512, but reading a non aligned file with nfs works
-  however
+  $ strace -f arp google.de
+  ...
+  socket(PF_INET6, SOCK_DGRAM|SOCK_NONBLOCK, IPPROTO_IP) =3D 4
+  connect(4, {sa_family=3DAF_INET6, sin6_port=3Dhtons(53), inet_pton(AF_INE=
+T6, "fec0::3", &sin6_addr), sin6_flowinfo=3D0, sin6_scope_id=3D0}, 28) =3D 0
+  poll([{fd=3D4, events=3DPOLLOUT}], 1, 0)    =3D 1 ([{fd=3D4, revents=3DPO=
+LLOUT}])
+  sendto(4, "\17\320\1\0\0\1\0\0\0\0\0\0\6google\2de\0\0\1\0\1", 27, MSG_NO=
+SIGNAL, NULL, 0) =3D 27
+  poll([{fd=3D4, events=3DPOLLIN}], 1, 5000)  =3D 0 (Timeout)
+  poll([{fd=3D4, events=3DPOLLOUT}], 1, 0)    =3D 1 ([{fd=3D4, revents=3DPO=
+LLOUT}])
+  sendto(4, "\17\320\1\0\0\1\0\0\0\0\0\0\6google\2de\0\0\1\0\1", 27, MSG_NO=
+SIGNAL, NULL, 0) =3D 27
+  poll([{fd=3D4, events=3DPOLLIN}], 1, 5000)  =3D 0 (Timeout)
+  close(4)                                =3D 0
+  ...
+
+  $ echo nameserver 10.0.0.2 > /etc/resolv.conf
+
+  $ arp google.de
+  google.de (216.58.208.35) -- no entry
+
+  Note: I reported this bug also to debian: https://bugs.debian.org/cgi-
+  bin/bugreport.cgi?bug=3D844566
+
+  Regards,
+
+    Manuel
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1644754/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1642421/+subscriptions
 
