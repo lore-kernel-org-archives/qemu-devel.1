@@ -2,92 +2,88 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F8CC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D48BC4741F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59FCC206ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:05:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CAD5206ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:05:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AoAHRHT2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59FCC206ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeE1Va8Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CAD5206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc37H-0000hL-8m
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:05:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52176)
+	id 1kc37S-00011o-LD
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:05:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kc36C-0007dy-Nv
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:04:28 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:33013)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kc36B-0005Fg-3D
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:04:28 -0500
-Received: by mail-wm1-x335.google.com with SMTP id p19so5004447wmg.0
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 01:04:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=eCXHKYh4lVPWKiXFFFX5qUAEWPiMN2L7aJ2HSBoHyCw=;
- b=AoAHRHT2Ric26fZZYxd9czir48a3ypfboI1LOQZ614ETnM3YOxu6DDjyDQ6P74aYP8
- kWgkILPBYR1b3uA4lFlyMeyRTFNcMj2lD2XV+XSXvG0go5RozTLMJdxhm0Fi2t0BoAfw
- 2dfY11Jo++N0NZDda2NBOk5UPBa2HivLmaPAHPQvg6sOUDf98bdM/hOqhfWgzoYC0sLF
- WwXWhGgAwtc1vr5YUQcUV1GFifyFOjiNTcfpwbsJKxz/SJdR9Sgt6IMy3XxbJVfK8VJQ
- YjXvHewPePjG4O5R1LESz03X9qkU4agEArNpmCPFOHD9tJE6FclzKaBw3q/Nh1CDokHO
- eWYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=eCXHKYh4lVPWKiXFFFX5qUAEWPiMN2L7aJ2HSBoHyCw=;
- b=DgGwB8qTYcbGQOhzhj7YkWG0uQaJIPt3MSOwkZTgoC5I9ltnNfqrNXqpYEvUwraRjX
- BFp/aCq/GD2CrCb4r0SopHgjXOoCn5181zHwrvhaMS3zKrzawCtXK185Ry/YYFvrPa7h
- YolUy2hRSk/2xn9h31tcbaxf22HPU/elvvgP8JzsGTiFYGofidc3rtpEs+5j24JgJvcx
- Y74dcT8SzIOmAJBLqN2F08xgzqORsrzqcEK5/2bsJXiNxrqcVHubdwETYpyHZ8zdO/vs
- chb9psQhRY7qAhJCaHFfbvgpPrDGGrW4a57n9GOhtkONu9Dco+WDI36ybzTv/ECsFxV1
- elqg==
-X-Gm-Message-State: AOAM533Zmn+azoVjoktCcR6b0jNLoBXnKyMPhqBaPuOwvOQLygVqQtH/
- bpTwg0NpEF8pPhqBaWB+Io29mv7PJb4=
-X-Google-Smtp-Source: ABdhPJyNRTjnoYPXKgAkJi0MIDLef/cJUEy3MZ2/dE4EPKShYA8JuHTZJ1SWOf/81FV+Gvr8+RBBDw==
-X-Received: by 2002:a1c:9e0e:: with SMTP id h14mr13099214wme.18.1604912665436; 
- Mon, 09 Nov 2020 01:04:25 -0800 (PST)
-Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id c6sm9330364wrh.74.2020.11.09.01.04.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Nov 2020 01:04:24 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kc34K-0005Af-6t
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:02:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35219)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kc34H-0004aP-4S
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:02:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604912548;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=prc1AXXpQQAIjpm/dfebeyQVScUnlPg51yiyfwUenHA=;
+ b=PeE1Va8Zog0iTc8f3wKmYR6uoiYyWk3QhqzB9op02Yo1fA7BJu7vGM53oRuC1384yevubS
+ rRHNwB1WvLwO9siTgBPAOMntYyI5q9mVp1hR6w4JNvTBM69ZqOLoSRmloisFSfZBd0V48C
+ OhKwPXIWkcsduhNctm4XI8cwJAiy3Ug=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-YxjeJSkcMhWkEThm-DIn5w-1; Mon, 09 Nov 2020 04:02:26 -0500
+X-MC-Unique: YxjeJSkcMhWkEThm-DIn5w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CDA58030A2;
+ Mon,  9 Nov 2020 09:02:25 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
+ [10.36.112.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 270565C1D7;
+ Mon,  9 Nov 2020 09:02:22 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C2B821132780; Mon,  9 Nov 2020 10:02:20 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-6.0 0/2] target/mips: CP0 housekeeping patches for Nov 2020
-Date: Mon,  9 Nov 2020 10:04:20 +0100
-Message-Id: <20201109090422.2445166-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
+Subject: [PULL 3/5] qapi: Fix missing headers in QMP Reference Manual
+Date: Mon,  9 Nov 2020 10:02:18 +0100
+Message-Id: <20201109090220.825764-4-armbru@redhat.com>
+In-Reply-To: <20201109090220.825764-1-armbru@redhat.com>
+References: <20201109090220.825764-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x335.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,27 +96,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, "Daniel P . Berrange" <berrange@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based-on: <20201108234234.2389789-1-f4bug@amsat.org>=0D
-=0D
-Philippe Mathieu-Daud=C3=A9 (2):=0D
-  target/mips: Replace magic values by CP0PM_MASK or=0D
-    TARGET_PAGE_BITS_MIN=0D
-  target/mips: Do not include CP0 helpers in user-mode emulation=0D
-=0D
- target/mips/cp0_helper.c | 9 +++------=0D
- target/mips/helper.c     | 4 ++--=0D
- target/mips/meson.build  | 2 +-=0D
- 3 files changed, 6 insertions(+), 9 deletions(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+Audio stuff is under "Miscellanea", and authorization stuff is under
+"Input".  Add suitable header doc comments to correct that.
+
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20201102081550.171061-3-armbru@redhat.com>
+Acked-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ qapi/audio.json | 4 ++++
+ qapi/authz.json | 6 ++++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/qapi/audio.json b/qapi/audio.json
+index 3b843878d2..072ed79def 100644
+--- a/qapi/audio.json
++++ b/qapi/audio.json
+@@ -5,6 +5,10 @@
+ # This work is licensed under the terms of the GNU GPL, version 2 or later.
+ # See the COPYING file in the top-level directory.
+ 
++##
++# = Audio
++##
++
+ ##
+ # @AudiodevPerDirectionOptions:
+ #
+diff --git a/qapi/authz.json b/qapi/authz.json
+index f3e9745426..42afe752d1 100644
+--- a/qapi/authz.json
++++ b/qapi/authz.json
+@@ -1,7 +1,9 @@
+ # -*- Mode: Python -*-
+ # vim: filetype=python
+-#
+-# QAPI authz definitions
++
++##
++# = User authorization
++##
+ 
+ ##
+ # @QAuthZListPolicy:
+-- 
+2.26.2
+
 
