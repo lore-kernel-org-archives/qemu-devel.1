@@ -2,117 +2,86 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57661C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 18:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2FDBC5517A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 18:57:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0F04206D8
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 18:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53320206E3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 18:57:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bqDGomep"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0F04206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AphrmjOy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53320206E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcCJB-0002A0-RV
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 13:54:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57488)
+	id 1kcCML-0003wx-C9
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 13:57:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1kcCIW-0001R3-6t; Mon, 09 Nov 2020 13:53:48 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58414)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1kcCIT-00038f-7P; Mon, 09 Nov 2020 13:53:47 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0A9IX10N024456; Mon, 9 Nov 2020 13:53:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=8q4ztlAq+7J45tg76YHpckv66q6jW2ALQMtgEHZG9m0=;
- b=bqDGomepVfK3p30H5i7F/sVaDVhpY2Os/zTB3zhsR9Hvj84jGqV3H1UlU5fxoutn2iNA
- 4kLhRLuUEIzxIp9Pm1dyW9NCPrStQIcrOS0PDCbTuYDsICtSp2Xd3MFmA3KfdmV2X6IK
- 4hN0Urmr074IEA1ZcJAzJNDXM9QD4NmVXtT43HhlQkaONx8mUUdMSo1FN76cFzxOjeiH
- /u2IcUqtJkwE/GKi9V8YuMahG/Yy2lydHkhll//dw46YVk0qlqvDSY22a3rBVnf1KfMg
- Gb8AzqruK95N1O08PYD73PHU4wwfVuk+OUjK3sNN+o1TwNr89WW0pV03AKXSQb68zBwE Iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34q71n308d-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 09 Nov 2020 13:53:42 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0A9IYu6i031881;
- Mon, 9 Nov 2020 13:53:41 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.102])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34q71n306j-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 09 Nov 2020 13:53:41 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
- by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0A9Im86r023143;
- Mon, 9 Nov 2020 18:53:39 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com
- (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
- by ppma06ams.nl.ibm.com with ESMTP id 34njuh2b31-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 09 Nov 2020 18:53:39 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0A9IraMr58917328
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 9 Nov 2020 18:53:36 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 184D0A4067;
- Mon,  9 Nov 2020 18:53:36 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A19ACA405B;
- Mon,  9 Nov 2020 18:53:35 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.80.17])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  9 Nov 2020 18:53:35 +0000 (GMT)
-Date: Mon, 9 Nov 2020 19:53:03 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH 1/1] virtio-blk-ccw: tweak the default for num_queues
-Message-ID: <20201109195303.459f6fba.pasic@linux.ibm.com>
-In-Reply-To: <20201109170616.6875f610.cohuck@redhat.com>
-References: <20201109154831.20779-1-pasic@linux.ibm.com>
- <20201109170616.6875f610.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kcCKy-00034S-AQ
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 13:56:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55834)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kcCKu-0003W2-9m
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 13:56:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604948173;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=39Vz5xwcf5ftMWX/kvXd3/2gTZkN2mIj5A51OZpR0Nw=;
+ b=AphrmjOyOZiz+m6Gc/1b/OO5baBMmQs0aIm+Zn7ucdhxZopGjIhK4FUSBjQcvrxpVLw61L
+ QQ43fKs4xbX5LI9oE4XsNQGfFmtaqBfcUqEM1Rsms2XRz2NxP20+OW7KWLZ7C016xNWO7+
+ AlpQMD509QPPm9yC64dUGxuIu2Burto=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-262-DNVUhddbOxm7meyMBT5YVQ-1; Mon, 09 Nov 2020 13:56:10 -0500
+X-MC-Unique: DNVUhddbOxm7meyMBT5YVQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E81B134912;
+ Mon,  9 Nov 2020 18:56:08 +0000 (UTC)
+Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 63B1360E1C;
+ Mon,  9 Nov 2020 18:56:03 +0000 (UTC)
+Subject: [RFC PATCH for-QEMU-5.2] vfio: Make migration support experimental
+From: Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 09 Nov 2020 11:56:02 -0700
+Message-ID: <160494787833.1473.10514376876696596117.stgit@gimli.home>
+User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312, 18.0.737
- definitions=2020-11-09_11:2020-11-05,
- 2020-11-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 mlxscore=0
- phishscore=0 priorityscore=1501 bulkscore=0 impostorscore=0 adultscore=0
- malwarescore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011090127
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 13:53:43
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+Received-SPF: pass client-ip=63.128.21.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,45 +94,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Michael Mueller <mimu@linux.ibm.com>
+Cc: Neo Jia <cjia@nvidia.com>, Juan Quintela <quintela@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Nov 2020 17:06:16 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+Per the proposed documentation for vfio device migration:
 
-> > @@ -20,6 +21,11 @@ static void virtio_ccw_blk_realize(VirtioCcwDevice *ccw_dev, Error **errp)
-> >  {
-> >      VirtIOBlkCcw *dev = VIRTIO_BLK_CCW(ccw_dev);
-> >      DeviceState *vdev = DEVICE(&dev->vdev);
-> > +    VirtIOBlkConf *conf = &dev->vdev.conf;
-> > +
-> > +    if (conf->num_queues == VIRTIO_BLK_AUTO_NUM_QUEUES) {
-> > +        conf->num_queues = MIN(4, current_machine->smp.cpus);
-> > +    }  
-> 
-> I would like to have a comment explaining the numbers here, however.
-> 
-> virtio-pci has a pretty good explanation (use 1:1 for vqs:vcpus if
-> possible, apply some other capping). 4 seems to be a bit arbitrary
-> without explanation, although I'm sure you did some measurements :)
+  Dirty pages are tracked when device is in stop-and-copy phase
+  because if pages are marked dirty during pre-copy phase and
+  content is transfered from source to destination, there is no
+  way to know newly dirtied pages from the point they were copied
+  earlier until device stops. To avoid repeated copy of same
+  content, pinned pages are marked dirty only during
+  stop-and-copy phase.
 
-Frankly, I don't have any measurements yet. For the secure case,
-I think Mimu has assessed the impact of multiqueue, hence adding Mimu to
-the cc list. @Mimu can you help us out.
+Essentially, since we don't have hardware dirty page tracking for
+assigned devices at this point, we consider any page that is pinned
+by an mdev vendor driver or pinned and mapped through the IOMMU to
+be perpetually dirty.  In the worst case, this may result in all of
+guest memory being considered dirty during every iteration of live
+migration.  The current vfio implementation of migration has chosen
+to mask device dirtied pages until the final stages of migration in
+order to avoid this worst case scenario.
 
-Regarding the normal non-protected VMs I'm in a middle of producing some
-measurement data. This was admittedly a bit rushed because of where we
-are in the cycle. Sorry to disappoint you.
+Allowing the device to implement a policy decision to prioritize
+reduced migration data like this jeopardizes QEMU's overall ability
+to implement any degree of service level guarantees during migration.
+For example, any estimates towards achieving acceptable downtime
+margins cannot be trusted when such a device is present.  The vfio
+device should participate in dirty page tracking to the best of its
+ability throughout migration, even if that means the dirty footprint
+of the device impedes migration progress, allowing both QEMU and
+higher level management tools to decide whether to continue the
+migration or abort due to failure to achieve the desired behavior.
 
-The number 4 was suggested by Christian, maybe Christian does have some
-readily available measurement data for the normal VM case. @Christian:
-can you help me out?
+Link: https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg00807.html
+Cc: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: Neo Jia <cjia@nvidia.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
 
-Regards,
-Halil
+Given that our discussion in the link above seems to be going in
+circles, I'm afraid it seems necessary to both have a contigency
+plan and to raise the visibility of the current behavior to
+determine whether others agree that this is a sufficiently
+troubling behavior to consider migration support experimental
+at this stage.  Please voice your opinion or contribute patches
+to resolve this before QEMU 5.2.  Thanks,
+
+Alex
+
+ hw/vfio/migration.c           |    2 +-
+ hw/vfio/pci.c                 |    2 ++
+ include/hw/vfio/vfio-common.h |    1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index 3ce285ea395d..cd44d465a50b 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -882,7 +882,7 @@ int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+     Error *local_err = NULL;
+     int ret = -ENOTSUP;
+ 
+-    if (!container->dirty_pages_supported) {
++    if (!vbasedev->enable_migration || !container->dirty_pages_supported) {
+         goto add_blocker;
+     }
+ 
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 58c0ce8971e3..1349b900e513 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -3194,6 +3194,8 @@ static Property vfio_pci_dev_properties[] = {
+                     VFIO_FEATURE_ENABLE_REQ_BIT, true),
+     DEFINE_PROP_BIT("x-igd-opregion", VFIOPCIDevice, features,
+                     VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
++    DEFINE_PROP_BOOL("x-enable-migration", VFIOPCIDevice,
++                     vbasedev.enable_migration, false),
+     DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
+     DEFINE_PROP_BOOL("x-balloon-allowed", VFIOPCIDevice,
+                      vbasedev.ram_block_discard_allowed, false),
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index baeb4dcff102..2119872c8af1 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -123,6 +123,7 @@ typedef struct VFIODevice {
+     bool needs_reset;
+     bool no_mmap;
+     bool ram_block_discard_allowed;
++    bool enable_migration;
+     VFIODeviceOps *ops;
+     unsigned int num_irqs;
+     unsigned int num_regions;
+
 
