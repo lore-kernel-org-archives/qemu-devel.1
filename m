@@ -2,38 +2,38 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14E83C388F7
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4F3C388F7
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:36:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A4412083B
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:34:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A4412083B
+	by mail.kernel.org (Postfix) with ESMTPS id 434B720897
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:36:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 434B720897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcB3t-0000kD-9K
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:34:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38302)
+	id 1kcB5R-0002ds-4h
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:36:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kcAxo-0002ur-As
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:28:20 -0500
-Received: from mx2.suse.de ([195.135.220.15]:56768)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kcAxY-0002R5-JF
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:28:04 -0500
+Received: from mx2.suse.de ([195.135.220.15]:56518)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kcAxm-0005SS-8R
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:28:19 -0500
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kcAxW-0005PK-3R
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:28:04 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id E658AAD2D;
- Mon,  9 Nov 2020 17:28:06 +0000 (UTC)
+ by mx2.suse.de (Postfix) with ESMTP id C51C5AD0F;
+ Mon,  9 Nov 2020 17:28:00 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Richard Henderson <rth@twiddle.net>,
@@ -42,9 +42,9 @@ To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>,
  Sunil Muthuswamy <sunilmut@microsoft.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [RFC v1 10/10] module: add priority to module_init
-Date: Mon,  9 Nov 2020 18:27:55 +0100
-Message-Id: <20201109172755.16500-11-cfontana@suse.de>
+Subject: [RFC v1 03/10] i386: move hax accel files to accel/hax/
+Date: Mon,  9 Nov 2020 18:27:48 +0100
+Message-Id: <20201109172755.16500-4-cfontana@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201109172755.16500-1-cfontana@suse.de>
 References: <20201109172755.16500-1-cfontana@suse.de>
@@ -83,102 +83,141 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-add a new version of module_init that also takes a priority argument,
-and use it to be able to run a constructor last for INIT_ACCEL_CPU,
-
-and thus avoid the manual work of keeping track how to conditionalize
-the generic x86 cpu models registration.
-
 Signed-off-by: Claudio Fontana <cfontana@suse.de>
 ---
- include/qemu/module.h | 17 ++++++++++++++++-
- target/i386/cpu.c     | 16 ++++++++++++----
- 2 files changed, 28 insertions(+), 5 deletions(-)
+ MAINTAINERS                                 | 2 +-
+ target/i386/{ => accel/hax}/hax-all.c       | 0
+ target/i386/{ => accel/hax}/hax-cpus.c      | 0
+ target/i386/{ => accel/hax}/hax-cpus.h      | 0
+ target/i386/{ => accel/hax}/hax-i386.h      | 6 +++---
+ target/i386/{ => accel/hax}/hax-interface.h | 0
+ target/i386/{ => accel/hax}/hax-mem.c       | 0
+ target/i386/{ => accel/hax}/hax-posix.c     | 0
+ target/i386/{ => accel/hax}/hax-posix.h     | 0
+ target/i386/{ => accel/hax}/hax-windows.c   | 0
+ target/i386/{ => accel/hax}/hax-windows.h   | 0
+ target/i386/accel/hax/meson.build           | 7 +++++++
+ target/i386/meson.build                     | 8 +-------
+ 13 files changed, 12 insertions(+), 11 deletions(-)
+ rename target/i386/{ => accel/hax}/hax-all.c (100%)
+ rename target/i386/{ => accel/hax}/hax-cpus.c (100%)
+ rename target/i386/{ => accel/hax}/hax-cpus.h (100%)
+ rename target/i386/{ => accel/hax}/hax-i386.h (95%)
+ rename target/i386/{ => accel/hax}/hax-interface.h (100%)
+ rename target/i386/{ => accel/hax}/hax-mem.c (100%)
+ rename target/i386/{ => accel/hax}/hax-posix.c (100%)
+ rename target/i386/{ => accel/hax}/hax-posix.h (100%)
+ rename target/i386/{ => accel/hax}/hax-windows.c (100%)
+ rename target/i386/{ => accel/hax}/hax-windows.h (100%)
+ create mode 100644 target/i386/accel/hax/meson.build
 
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 485eda986a..1f4fac6791 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -30,6 +30,13 @@ static void __attribute__((constructor)) do_qemu_init_ ## function(void)    \
- {                                                                           \
-     register_dso_module_init(function, type);                               \
- }
-+
-+#define module_init_prio(function, type, prio)                                 \
-+static void __attribute__((constructor(prio))) do_qemu_init_ ## function(void) \
-+{                                                                              \
-+    register_dso_module_init(function, type);                                  \
-+}
-+
- #else
- /* This should not be used directly.  Use block_init etc. instead.  */
- #define module_init(function, type)                                         \
-@@ -37,6 +44,11 @@ static void __attribute__((constructor)) do_qemu_init_ ## function(void)    \
- {                                                                           \
-     register_module_init(function, type);                                   \
- }
-+#define module_init_prio(function, type, prio)                                 \
-+static void __attribute__((constructor(prio))) do_qemu_init_ ## function(void) \
-+{                                                                              \
-+    register_module_init(function, type);                                      \
-+}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 41b613b6a6..6dabd972c9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -486,7 +486,7 @@ W: https://github.com/intel/haxm/issues
+ S: Maintained
+ F: accel/stubs/hax-stub.c
+ F: include/sysemu/hax.h
+-F: target/i386/hax-*
++F: target/i386/accel/hax/
+ 
+ Hosts
+ -----
+diff --git a/target/i386/hax-all.c b/target/i386/accel/hax/hax-all.c
+similarity index 100%
+rename from target/i386/hax-all.c
+rename to target/i386/accel/hax/hax-all.c
+diff --git a/target/i386/hax-cpus.c b/target/i386/accel/hax/hax-cpus.c
+similarity index 100%
+rename from target/i386/hax-cpus.c
+rename to target/i386/accel/hax/hax-cpus.c
+diff --git a/target/i386/hax-cpus.h b/target/i386/accel/hax/hax-cpus.h
+similarity index 100%
+rename from target/i386/hax-cpus.h
+rename to target/i386/accel/hax/hax-cpus.h
+diff --git a/target/i386/hax-i386.h b/target/i386/accel/hax/hax-i386.h
+similarity index 95%
+rename from target/i386/hax-i386.h
+rename to target/i386/accel/hax/hax-i386.h
+index 48c4abe14e..efbb346238 100644
+--- a/target/i386/hax-i386.h
++++ b/target/i386/accel/hax/hax-i386.h
+@@ -84,13 +84,13 @@ void hax_memory_init(void);
+ 
+ 
+ #ifdef CONFIG_POSIX
+-#include "target/i386/hax-posix.h"
++#include "hax-posix.h"
  #endif
  
- typedef enum {
-@@ -55,7 +67,10 @@ typedef enum {
- #define block_init(function) module_init(function, MODULE_INIT_BLOCK)
- #define opts_init(function) module_init(function, MODULE_INIT_OPTS)
- #define type_init(function) module_init(function, MODULE_INIT_QOM)
--#define accel_cpu_init(function) module_init(function, MODULE_INIT_ACCEL_CPU)
-+#define accel_cpu_init(function) \
-+    module_init_prio(function, MODULE_INIT_ACCEL_CPU, 101)
-+#define accel_cpu_init_last(function) \
-+    module_init_prio(function, MODULE_INIT_ACCEL_CPU, 65535)
- #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
- #define xen_backend_init(function) module_init(function, \
-                                                MODULE_INIT_XEN_BACKEND)
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b547c9d39d..aeaebfde02 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -7050,8 +7050,16 @@ static TypeInfo x86_base_cpu_type_info = {
-  */
- void x86_cpu_register_cpu_models(const char *parent_type)
- {
-+    static bool x86_cpu_models_registered;
-     int i;
+ #ifdef CONFIG_WIN32
+-#include "target/i386/hax-windows.h"
++#include "hax-windows.h"
+ #endif
  
-+    if (x86_cpu_models_registered) {
-+        /*
-+         * already registered by an accelerator-specific specialization
-+         * of x86_cpu
-+         */
-+        return;
-+    }
-     for (i = 0; i < ARRAY_SIZE(builtin_x86_defs); i++) {
-         x86_register_cpudef(&builtin_x86_defs[i], parent_type);
-     }
-@@ -7060,6 +7068,8 @@ void x86_cpu_register_cpu_models(const char *parent_type)
+-#include "target/i386/hax-interface.h"
++#include "hax-interface.h"
  
-     x86_base_cpu_type_info.parent = parent_type;
-     type_register(&x86_base_cpu_type_info);
-+
-+    x86_cpu_models_registered = true;
- }
+ #endif
+diff --git a/target/i386/hax-interface.h b/target/i386/accel/hax/hax-interface.h
+similarity index 100%
+rename from target/i386/hax-interface.h
+rename to target/i386/accel/hax/hax-interface.h
+diff --git a/target/i386/hax-mem.c b/target/i386/accel/hax/hax-mem.c
+similarity index 100%
+rename from target/i386/hax-mem.c
+rename to target/i386/accel/hax/hax-mem.c
+diff --git a/target/i386/hax-posix.c b/target/i386/accel/hax/hax-posix.c
+similarity index 100%
+rename from target/i386/hax-posix.c
+rename to target/i386/accel/hax/hax-posix.c
+diff --git a/target/i386/hax-posix.h b/target/i386/accel/hax/hax-posix.h
+similarity index 100%
+rename from target/i386/hax-posix.h
+rename to target/i386/accel/hax/hax-posix.h
+diff --git a/target/i386/hax-windows.c b/target/i386/accel/hax/hax-windows.c
+similarity index 100%
+rename from target/i386/hax-windows.c
+rename to target/i386/accel/hax/hax-windows.c
+diff --git a/target/i386/hax-windows.h b/target/i386/accel/hax/hax-windows.h
+similarity index 100%
+rename from target/i386/hax-windows.h
+rename to target/i386/accel/hax/hax-windows.h
+diff --git a/target/i386/accel/hax/meson.build b/target/i386/accel/hax/meson.build
+new file mode 100644
+index 0000000000..77ea431b30
+--- /dev/null
++++ b/target/i386/accel/hax/meson.build
+@@ -0,0 +1,7 @@
++i386_softmmu_ss.add(when: 'CONFIG_HAX', if_true: files(
++  'hax-all.c',
++  'hax-mem.c',
++  'hax-cpus.c',
++))
++i386_softmmu_ss.add(when: ['CONFIG_HAX', 'CONFIG_POSIX'], if_true: files('hax-posix.c'))
++i386_softmmu_ss.add(when: ['CONFIG_HAX', 'CONFIG_WIN32'], if_true: files('hax-windows.c'))
+diff --git a/target/i386/meson.build b/target/i386/meson.build
+index 6c43b7bfb0..34ec93dbef 100644
+--- a/target/i386/meson.build
++++ b/target/i386/meson.build
+@@ -27,15 +27,9 @@ i386_softmmu_ss.add(files(
+   'machine.c',
+   'monitor.c',
+ ))
+-i386_softmmu_ss.add(when: 'CONFIG_HAX', if_true: files(
+-  'hax-all.c',
+-  'hax-mem.c',
+-  'hax-cpus.c',
+-))
+-i386_softmmu_ss.add(when: ['CONFIG_HAX', 'CONFIG_POSIX'], if_true: files('hax-posix.c'))
+-i386_softmmu_ss.add(when: ['CONFIG_HAX', 'CONFIG_WIN32'], if_true: files('hax-windows.c'))
  
- static void x86_cpu_register_base_type(void)
-@@ -7077,9 +7087,7 @@ static void x86_cpu_type_init(void)
-     /*
-      * I would like something better than this check.
-      */
--    if (!tcg_enabled() && !kvm_enabled() && !hvf_enabled()) {
--        x86_cpu_register_cpu_models(TYPE_X86_CPU);
--    }
-+    x86_cpu_register_cpu_models(TYPE_X86_CPU);
- }
+ subdir('accel/kvm')
++subdir('accel/hax')
+ subdir('accel/whpx')
+ subdir('hvf')
  
--accel_cpu_init(x86_cpu_type_init);
-+accel_cpu_init_last(x86_cpu_type_init);
 -- 
 2.26.2
 
