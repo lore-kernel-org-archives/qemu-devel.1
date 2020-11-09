@@ -2,81 +2,114 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C70C5517A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B9DFC388F7
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:20:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B29A221D93
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:18:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B29A221D93
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0234E20E65
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:20:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FEhZ/SMC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0234E20E65
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcAnn-0004nj-Ii
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:17:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35032)
+	id 1kcApp-0006wT-0I
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:20:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35560)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kcAll-0003jX-W5
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:15:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42220)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kcAlj-0001Li-Te
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:15:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kcAli-0005Og-1J
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 17:15:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 05AD72E804E
- for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 17:15:49 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kcAnl-00059f-Ih
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:17:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42075)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kcAnj-0001z6-8E
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:17:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604942274;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bk9TRqbHoDaQFLjOz+ZQwrThs9Qtbwj0JY8lzsvEfPk=;
+ b=FEhZ/SMCz/N2UMq7QgMzyzM1qrW+1jnf+TD6Sn5FwewRq1X9Qf0Mbl41Jwr0vQFjbn5wyd
+ IAWB+tSTLAXw6L7zUBn3W5Al7NzAn0LEGLkRAIxtqcO3U/s7ZeXVTbj3r20T83x6q9m49E
+ fQjzCGVQIO57djV4p1uw9Vm6JCVxWaE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-211-ZWowo924MUiYtzZMhLe5lQ-1; Mon, 09 Nov 2020 12:17:52 -0500
+X-MC-Unique: ZWowo924MUiYtzZMhLe5lQ-1
+Received: by mail-wr1-f71.google.com with SMTP id k1so3266864wrg.12
+ for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 09:17:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bk9TRqbHoDaQFLjOz+ZQwrThs9Qtbwj0JY8lzsvEfPk=;
+ b=llvW00FuJJz8AkRAAu/bnMf225fqkAkXA4QpetdAK/81l+/Cv/fZ2q/z4Yd16AN3Jp
+ 6AkybRypISR0pTlFLWVaGo0VlwmeJuXPBlutaj0/4THzQ/lQpBrml/DQ8qu/IkAJeF+C
+ S2TIycuaGo7aIctTDpb0JwQjSSfyDAeRT+elkNxfOb5y2PrXeCmzQ2Yh1jnLxy5N7NdW
+ PK3ukJ6LZtYGbbxpMFihCAt+cDYdaZKE9AX7WeJuwbQeE1RygqkBB5u2X73VuNHiRHHU
+ GbRhKeYYdzoun1ECzs5RX4prGJgV7r36QUCJnsVdF6yjBkTCxQ5YBKpLh+QoQZofBCCn
+ HBcA==
+X-Gm-Message-State: AOAM53243FG1e+DE5KJ40snlPHSrUhboqGVOKJPJ1xg/+FAFSUOqGLKC
+ 0IstQvUrH8JBwx0G5G6/eJEjowMsebPoP0JDmIzfruiC+nNWxp7WYtRbUYn7QB6dX3Eq/x6M/ar
+ tup+8gOaxx5dN0bY=
+X-Received: by 2002:adf:9b95:: with SMTP id d21mr18325108wrc.335.1604942270635; 
+ Mon, 09 Nov 2020 09:17:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyax26Hg1lYbhqgeJHrDV3gMm4SNBSfn5pvVPXJSa0cwidr6ym2x6uD8sa4DNC8BekKXlUEuQ==
+X-Received: by 2002:adf:9b95:: with SMTP id d21mr18325093wrc.335.1604942270462; 
+ Mon, 09 Nov 2020 09:17:50 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id s4sm7103902wro.10.2020.11.09.09.17.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Nov 2020 09:17:49 -0800 (PST)
+To: Markus Armbruster <armbru@redhat.com>
+References: <20201109133931.979563-1-pbonzini@redhat.com>
+ <20201109133931.979563-5-pbonzini@redhat.com>
+ <87wnyu4gf9.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 4/6] qemu-option: clean up id vs. list->merge_lists
+Message-ID: <736a0053-83b9-3510-82ad-99ea59ea00fe@redhat.com>
+Date: Mon, 9 Nov 2020 18:17:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Nov 2020 17:03:34 -0000
-From: Thomas Huth <1689003@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mhaertel th-huth
-X-Launchpad-Bug-Reporter: =?utf-8?q?Manfred_H=C3=A4rtel_=28mhaertel=29?=
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20170507042529.2427.25374.malonedeb@wampee.canonical.com>
-Message-Id: <160494141420.19181.13693056488692374713.malone@wampee.canonical.com>
-Subject: [Bug 1689003] Re: USB passthrough should not fail if SET
- CONFIGURATION fails
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 3589fa96ec32a47e2dab9874c51cd757a7959928
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 11:16:03
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <87wnyu4gf9.fsf@dusky.pond.sub.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,54 +118,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1689003 <1689003@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The QEMU project is currently considering to move its bug tracking to anoth=
-er system. For this we need to know which bugs are still valid and which co=
-uld be closed already. Thus we are setting older bugs to "Incomplete" now.
-If you still think this bug report here is valid, then please switch the st=
-ate back to "New" within the next 60 days, otherwise this report will be ma=
-rked as "Expired". Thank you and sorry for the inconvenience.
+On 09/11/20 17:56, Markus Armbruster wrote:
+> Just like any other QemuOptsList, "machine" may have any number of
+> QemuOpts.  The ones with non-null ID happen to be ignored silently.
+> Known[*] trap for the unwary.
+> 
+> Are these all singletons?
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+They are never qemu_opts_find'd with non-NULL id, so I'd say they are.
 
--- =
+> If lists>merge_lists, you no longer check id_wellformed().  Easy enough
+> to fix: lift the check before this conditional.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1689003
+Intentional: we always error with INVALID_PARAMETER, so it's pointless 
+to check if the id is well-formed.
 
-Title:
-  USB passthrough should not fail if SET CONFIGURATION fails
+> After the patch:
+> 
+>     id        fail_if_exists  merge_lists  |  return
+>     non-null  don't care      true         |  fail
+>     null      don't care      true         |  existing or else new opts
+>     non-null  false           false        |  abort
+>     non-null  true            false        |  new opts / fail if exist
+>     null      don't care      false        |  new opts
+> 
+> Still too many 
 
-Status in QEMU:
-  Incomplete
+Discounting the case that aborts as it's not user-controlled (it's 
+"just" a matter of inspecting qemu_opts_create callers), the rest can be 
+summarized as:
 
-Bug description:
-  QEMU's USB passthrough was not working for my new smartphone.
+- merge_lists = false: singleton opts with NULL id; non-NULL id fails
 
-  While analyzing the problem, I found out that a SET CONFIGURATION
-  Request was NACKed by the USB device (probably because a SET
-  CONFIGURATION request was already sent from the host to the device).
+- merge_lists = true: always return new opts; non-NULL id fails if dup
 
-  So I wrote a simple program to fake a successful call to
-  libusb_set_configuration and did an LD_PRELOAD on this program before
-  starting qemu, and it worked.
+> [*] Known to the QemuOpts cognoscenti, whose number could be
+> embarrasingly close to one.
 
-  Looking at QEMU's code in host-libusb.c, I can see that QEMU does not
-  try to claim the interface if its call to libusb_set_configuration
-  fails.
+Maybe not one, but a single hand certainly has a surplus of fingers.
 
-  I think QEMU should try to claim the device anyway even if
-  libusb_set_configuration fails.
+Paolo
 
-  I did my tests against QEMU 2.6.2, but as I can see from the source
-  code, this problem should happen on all versions.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1689003/+subscriptions
 
