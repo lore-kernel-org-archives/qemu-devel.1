@@ -2,95 +2,66 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93613C4741F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D03C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:10:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCCAB20702
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:10:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIZv3aY3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCCAB20702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id B8F7720702
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:10:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8F7720702
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc3CI-0005RY-Rt
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:10:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52190)
+	id 1kc3CQ-0005hn-ER
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:10:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kc36H-0007ph-K4
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:04:33 -0500
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:52231)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kc36G-0005Gg-2U
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:04:33 -0500
-Received: by mail-wm1-x32e.google.com with SMTP id 10so6450449wml.2
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 01:04:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=5aSUYg2Mch9yEMUswE4iSf091+MmmBptqeNiWdRkEPc=;
- b=lIZv3aY3Gz3khvYeiLr4vLd86FdoG938AtFtCLgew6LAQ5QhOK7PTxqQixdcYRP/sS
- OZcDa5WQaiTQQeHp8wFGLbTDiSg8H9eOqEBF1aqY4C+XzmFY5ImG/NnHLy+vw3buQVkE
- WTtU6319QNwHVreMiXuWJJPMSA01Ox++vmlL77sxy+tok/sMeSO9eHo1nhUogXHmBQF9
- +zPO1B44Bu/t8PKqvCIUtjJoUq/Gtdbo4hizV9O28lilTMW/d2pvtoDT9ZFY2bhLzTva
- ZY4sgezZolGpKVyetOu27ErIyhxcXbQtovZ0TrZVD3xPAcNGpYne4z8d+e4XI4k6DThq
- UKCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=5aSUYg2Mch9yEMUswE4iSf091+MmmBptqeNiWdRkEPc=;
- b=ZE+WVinZFQeUvf2PP2bnzjewAif7gk833uFKFKxuL4w2KL2ZdI4jEwZ65xppKAvoMG
- YV4HAcEP6R5uI0vxkoJ8ui+5R2KsZGOE+n6be8qJbToEFO1PMdnbvKJ+i/aEW+M6QdEv
- sgch0cVmLhW7Jg9UMPBemLg4LIp7SX3jC/rMYUAxx4F28SWeiQvSMqHt3gu38411UPya
- 3Vwnu9J8J8B0m/2bb+CVyCQAZnSPXkDNbnsbr0CqEIl1xUEBU/XA1tIlSQyu0dKVj6c4
- zq+GQtr71utIAzNOJG0b2DDb/AoS83KFXZnmva/mkuOP+m/quUbVrQx9vwceYHT6yjwf
- 9Rkg==
-X-Gm-Message-State: AOAM530xNNoHp04vZZY5YrMNkmyn1rsszok6Ya9zJTCQZ57DtnFi9bPX
- qZUS0nAXRJtSxHWYtfqh6hTrcWhUY3M=
-X-Google-Smtp-Source: ABdhPJx/hVFfIGjxCZwPejObwmTYI5537kNcDShkbsz60iR7H6l0ExEe2kpekgrXoV4WAOFjSCFRZQ==
-X-Received: by 2002:a1c:6182:: with SMTP id v124mr13035118wmb.94.1604912670197; 
- Mon, 09 Nov 2020 01:04:30 -0800 (PST)
-Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id v189sm12897575wmg.14.2020.11.09.01.04.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Nov 2020 01:04:29 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-6.0 1/2] target/mips: Replace magic values by CP0PM_MASK
- or TARGET_PAGE_BITS_MIN
-Date: Mon,  9 Nov 2020 10:04:21 +0100
-Message-Id: <20201109090422.2445166-2-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201109090422.2445166-1-f4bug@amsat.org>
-References: <20201109090422.2445166-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <jinzeyu@huawei.com>)
+ id 1kc3Ax-0004Pd-I0
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:09:23 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2511)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jinzeyu@huawei.com>)
+ id 1kc3At-0006xo-1g
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:09:23 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CV4tR0f48zhhGL;
+ Mon,  9 Nov 2020 17:09:03 +0800 (CST)
+Received: from localhost (10.174.186.67) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Mon, 9 Nov 2020
+ 17:09:03 +0800
+From: Zeyu Jin <jinzeyu@huawei.com>
+To: <quintela@redhat.com>, <dgilbert@redhat.com>
+Subject: [RFC PATCH 4/6] migration: Add zstd support in multi-thread
+ compression
+Date: Mon, 9 Nov 2020 17:08:48 +0800
+Message-ID: <20201109090850.2424-5-jinzeyu@huawei.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20201109090850.2424-1-jinzeyu@huawei.com>
+References: <20201109090850.2424-1-jinzeyu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain
+X-Originating-IP: [10.174.186.67]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191; envelope-from=jinzeyu@huawei.com;
+ helo=szxga05-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 03:39:34
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,64 +74,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+Cc: Ying Fang <fangying1@huawei.com>, qemu-devel@nongnu.org,
+ Zeyu Jin <jinzeyu@huawei.com>, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace magic values related to page size:
+This patch enables zstd option in multi-thread compression.
 
-  12 -> TARGET_PAGE_BITS_MIN
-  13 -> CP0PM_MASK
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Zeyu Jin <jinzeyu@huawei.com>
+Signed-off-by: Ying Fang <fangying1@huawei.com>
 ---
- target/mips/cp0_helper.c | 5 +++--
- target/mips/helper.c     | 4 ++--
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ hw/core/qdev-properties-system.c |   2 +-
+ migration/ram.c                  | 128 ++++++++++++++++++++++++++++++-
+ qapi/migration.json              |   2 +-
+ 3 files changed, 129 insertions(+), 3 deletions(-)
 
-diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-index a1b5140ccaf..e8b9343ec9c 100644
---- a/target/mips/cp0_helper.c
-+++ b/target/mips/cp0_helper.c
-@@ -904,7 +904,7 @@ void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask)
-         goto invalid;
-     }
-     /* We don't support VTLB entry smaller than target page */
--    if ((maskbits + 12) < TARGET_PAGE_BITS) {
-+    if ((maskbits + TARGET_PAGE_BITS_MIN) < TARGET_PAGE_BITS) {
-         goto invalid;
-     }
-     env->CP0_PageMask = mask << CP0PM_MASK;
-@@ -913,7 +913,8 @@ void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask)
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index d757b2cd70..54760d94b3 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -667,7 +667,7 @@ const PropertyInfo qdev_prop_multifd_compression = {
+ const PropertyInfo qdev_prop_compress_method = {
+     .name = "CompressMethod",
+     .description = "multi-thread compression method, "
+-                   "zlib",
++                   "zlib/zstd",
+     .enum_table = &CompressMethod_lookup,
+     .get = qdev_propinfo_get_enum,
+     .set = qdev_propinfo_set_enum,
+diff --git a/migration/ram.c b/migration/ram.c
+index 94a7422204..a732d80db2 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -57,6 +57,10 @@
+ #include "qemu/iov.h"
+ #include "multifd.h"
  
- invalid:
-     /* When invalid, set to default target page size. */
--    env->CP0_PageMask = (~TARGET_PAGE_MASK >> 12) << CP0PM_MASK;
-+    mask = (~TARGET_PAGE_MASK >> TARGET_PAGE_BITS_MIN);
-+    env->CP0_PageMask = mask << CP0PM_MASK;
++#ifdef CONFIG_ZSTD
++#include <zstd.h>
++#include <zstd_errors.h>
++#endif
+ /***********************************************************/
+ /* ram save/restore */
+ 
+@@ -424,6 +428,11 @@ struct CompressParam {
+     /* for zlib compression */
+     z_stream stream;
+ 
++#ifdef CONFIG_ZSTD
++    ZSTD_CStream *zstd_cs;
++    ZSTD_inBuffer in;
++    ZSTD_outBuffer out;
++#endif
+ };
+ typedef struct CompressParam CompressParam;
+ 
+@@ -438,6 +447,12 @@ struct DecompressParam {
+ 
+     /* for zlib compression */
+     z_stream stream;
++
++#ifdef CONFIG_ZSTD
++    ZSTD_DStream *zstd_ds;
++    ZSTD_inBuffer in;
++    ZSTD_outBuffer out;
++#endif
+ };
+ typedef struct DecompressParam DecompressParam;
+ 
+@@ -571,6 +586,102 @@ static int zlib_check_len(int len)
+     return len < 0 || len > compressBound(TARGET_PAGE_SIZE);
  }
  
- void helper_mtc0_pagemask(CPUMIPSState *env, target_ulong arg1)
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 063b65c0528..041432489d6 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -858,8 +858,8 @@ refill:
-             break;
-         }
-     }
--    pw_pagemask = m >> 12;
--    update_pagemask(env, pw_pagemask << 13, &pw_pagemask);
-+    pw_pagemask = m >> TARGET_PAGE_BITS_MIN;
-+    update_pagemask(env, pw_pagemask << CP0PM_MASK, &pw_pagemask);
-     pw_entryhi = (address & ~0x1fff) | (env->CP0_EntryHi & 0xFF);
-     {
-         target_ulong tmp_entryhi = env->CP0_EntryHi;
++#ifdef CONFIG_ZSTD
++static int zstd_save_setup(CompressParam *param)
++{
++    int res;
++    param->zstd_cs = ZSTD_createCStream();
++    if (!param->zstd_cs) {
++        return -1;
++    }
++    res = ZSTD_initCStream(param->zstd_cs, migrate_compress_level());
++    if (ZSTD_isError(res)) {
++        return -1;
++    }
++    return 0;
++}
++static void zstd_save_cleanup(CompressParam *param)
++{
++    ZSTD_freeCStream(param->zstd_cs);
++    param->zstd_cs = NULL;
++}
++static ssize_t zstd_compress_data(CompressParam *param, size_t size)
++{
++    int ret;
++    uint8_t *dest = NULL;
++    uint8_t *p = param->originbuf;
++    QEMUFile *f = f = param->file;
++    ssize_t blen = qemu_put_compress_start(f, &dest);
++    if (blen < ZSTD_compressBound(size)) {
++        return -1;
++    }
++    param->out.dst = dest;
++    param->out.size = blen;
++    param->out.pos = 0;
++    param->in.src = p;
++    param->in.size = size;
++    param->in.pos = 0;
++    do {
++        ret = ZSTD_compressStream2(param->zstd_cs, &param->out,
++                                   &param->in, ZSTD_e_end);
++    } while (ret > 0 && (param->in.size - param->in.pos > 0)
++            && (param->out.size - param->out.pos > 0));
++    if (ret > 0 && (param->in.size - param->in.pos > 0)) {
++        return -1;
++    }
++    if (ZSTD_isError(ret)) {
++        return -1;
++    }
++    blen = param->out.pos;
++    qemu_put_compress_end(f, blen);
++    return blen + sizeof(int32_t);
++}
++static int zstd_load_setup(DecompressParam *param)
++{
++    int ret;
++    param->zstd_ds = ZSTD_createDStream();
++    if (!param->zstd_ds) {
++        return -1;
++    }
++    ret = ZSTD_initDStream(param->zstd_ds);
++    if (ZSTD_isError(ret)) {
++        return -1;
++    }
++    return 0;
++}
++static void zstd_load_cleanup(DecompressParam *param)
++{
++    ZSTD_freeDStream(param->zstd_ds);
++    param->zstd_ds = NULL;
++}
++static int
++zstd_decompress_data(DecompressParam *param, uint8_t *dest, size_t size)
++{
++    int ret;
++    param->out.dst = dest;
++    param->out.size = size;
++    param->out.pos = 0;
++    param->in.src = param->compbuf;
++    param->in.size = param->len;
++    param->in.pos = 0;
++    do {
++        ret = ZSTD_decompressStream(param->zstd_ds, &param->out, &param->in);
++    } while (ret > 0 && (param->in.size - param->in.pos > 0)
++                    && (param->out.size - param->out.pos > 0));
++    if (ret > 0 && (param->in.size - param->in.pos > 0)) {
++        return -1;
++    }
++    if (ZSTD_isError(ret)) {
++        return -1;
++    }
++    return ret;
++}
++static int zstd_check_len(int len)
++{
++    return len < 0 || len > ZSTD_compressBound(TARGET_PAGE_SIZE);
++}
++#endif
++
+ static int set_compress_ops(void)
+ {
+    compress_ops = g_new0(MigrationCompressOps, 1);
+@@ -581,9 +692,16 @@ static int set_compress_ops(void)
+         compress_ops->save_cleanup = zlib_save_cleanup;
+         compress_ops->compress_data = zlib_compress_data;
+         break;
++#ifdef CONFIG_ZSTD
++    case COMPRESS_METHOD_ZSTD:
++        compress_ops->save_setup = zstd_save_setup;
++        compress_ops->save_cleanup = zstd_save_cleanup;
++        compress_ops->compress_data = zstd_compress_data;
++        break;
++#endif
+     default:
+         return -1;
+-    }
++   }
+ 
+     return 0;
+ }
+@@ -599,6 +717,14 @@ static int set_decompress_ops(void)
+         decompress_ops->decompress_data = zlib_decompress_data;
+         decompress_ops->check_len = zlib_check_len;
+         break;
++#ifdef CONFIG_ZSTD
++    case COMPRESS_METHOD_ZSTD:
++        decompress_ops->load_setup = zstd_load_setup;
++        decompress_ops->load_cleanup = zstd_load_cleanup;
++        decompress_ops->decompress_data = zstd_decompress_data;
++        decompress_ops->check_len = zstd_check_len;
++        break;
++#endif
+     default:
+         return -1;
+    }
+diff --git a/qapi/migration.json b/qapi/migration.json
+index d262683a38..ac6d06c683 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -536,7 +536,7 @@
+ #
+ ##
+ { 'enum': 'CompressMethod',
+-  'data': [ 'zlib' ] }
++  'data': [ 'zlib', { 'name': 'zstd', 'if': 'defined(CONFIG_ZSTD)' } ] }
+ 
+ ##
+ # @BitmapMigrationBitmapAlias:
 -- 
-2.26.2
+2.23.0
 
 
