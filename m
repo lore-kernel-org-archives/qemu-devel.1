@@ -2,91 +2,95 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BC7C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E015BC4741F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:12:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C744B20731
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:12:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 568E620731
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:12:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PDJkIP2V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C744B20731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K2Eyj06b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 568E620731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc3E3-000868-IO
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:12:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52242)
+	id 1kc3E5-0008AO-Bi
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:12:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kc36N-00082R-TS
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:04:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38388)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kc36M-0005Ix-0G
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:04:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604912677;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6UiU4+vOqQRdeShxxCCByY9nDzcomRRGqCeZkheSqEU=;
- b=PDJkIP2VC9U7rWHEeiIeHQatuz1EOEQ+lBPUWoL8AP26BCNG+2u6NdqNlvcw+HyWJnm4XV
- vznPSrw6yll00MJDEnaojFT7VCyx16sHSajOaI+NPD9BFhhBHIPbpIpd/q4cgl8kg6ncZQ
- Qm+t592lkpUFT2nXxhJNjk+4wyvLsCU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-mkVvFqkfNC6-ATUYjJDWUA-1; Mon, 09 Nov 2020 04:04:34 -0500
-X-MC-Unique: mkVvFqkfNC6-ATUYjJDWUA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 434001868425;
- Mon,  9 Nov 2020 09:04:32 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-53.ams2.redhat.com [10.36.112.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE6CA10023A5;
- Mon,  9 Nov 2020 09:04:24 +0000 (UTC)
-Subject: Re: [RFC PATCH-for-5.2] tests/acceptance: Disable Spartan-3A DSP
- 1800A test
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20201109080747.2408489-1-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a991b796-0d03-6a2a-1008-6e7d2edc9e54@redhat.com>
-Date: Mon, 9 Nov 2020 10:04:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kc36M-0007z6-Br
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:04:38 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:52233)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kc36K-0005In-Ob
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:04:38 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id 10so6450684wml.2
+ for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 01:04:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=4iA14pMte+lLwGaPb2y/KEmFhKOga8L8HWf/hgu+TMo=;
+ b=K2Eyj06bf3tPKrM81ShncH+o9UPUrlfNh/gVA+0lHvDz4nGwvAjrLFm+EwlTJbJl9T
+ hhwKJpQH1Mlh47ec1jkMdBGEjwOpLFTBNAhvNfuMujEJSLjk0hbdOReSC3IHMa/sdoV5
+ OvIeOmDtJQaFiWdLBVh7uCJV7Ho0yzOafxAI5M5J5uvCThC6aKLAUO1m56bNJnl5i5rQ
+ 0WfVQd3g2nkw21oVGmZtLGNHAMngjFrgsJYDoH72++ufLYQzs2LvoENTPq/RJM1mel8Z
+ 1ujQVUIuNdH5U1sIrwM6L2GaPBu5YMx7eZwyz/BHZCNtp/8AET1ThOS8oC0R066M1hOY
+ 09GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=4iA14pMte+lLwGaPb2y/KEmFhKOga8L8HWf/hgu+TMo=;
+ b=aq+x0WDqDTYesNP08sy0KsF9H/yQ5A+zTOPacR+N1kwnMf3uRuhQ9tm8VPCsB+bKuZ
+ C808dLd9CCnzrKDA7tx12Rr1CJzux7fKLiGlj7Sys9PV/LLws6zasfLzv127rQfYsLXH
+ NxDDsltBHmmv77L3W0MrHeEqT4sW/p9t8jLgwImc3gjbrYWP+CDbVPz7jBg10mY7U5yT
+ UpmnXjvCfqoYUI0qS3gDhqurk/shMHE8V4icNJ0PIRZB356U8NBSprSR8vRWCCg5aJdK
+ a9YayT7wMD2N2bx7YmwTu6N++3+047Vcr8/C9nbauZo1JgykYEN1JDZj1ooDTgfykYg7
+ 8ptg==
+X-Gm-Message-State: AOAM533a8IxfSC13BwtwbDXhVWKeUdZtxm3ycNsgMmEJdPKh35dVPs4Z
+ KwbQNwFYmpUifYPhn0dyFCFrc3L9dbo=
+X-Google-Smtp-Source: ABdhPJwkK9vDeSl0oD2yv3kQkwg9Uvw+UGDmoySB+VICWikI8scJa04k8TMlI3iOBmonFWBEZIqNEw==
+X-Received: by 2002:a1c:4957:: with SMTP id w84mr13283993wma.84.1604912675079; 
+ Mon, 09 Nov 2020 01:04:35 -0800 (PST)
+Received: from localhost.localdomain (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id c6sm9331031wrh.74.2020.11.09.01.04.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Nov 2020 01:04:34 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-6.0 2/2] target/mips: Do not include CP0 helpers in
+ user-mode emulation
+Date: Mon,  9 Nov 2020 10:04:22 +0100
+Message-Id: <20201109090422.2445166-3-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201109090422.2445166-1-f4bug@amsat.org>
+References: <20201109090422.2445166-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20201109080747.2408489-1-f4bug@amsat.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,57 +103,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Cleber Rosa <crosa@redhat.com>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/11/2020 09.07, Philippe Mathieu-Daudé wrote:
-> This test is regularly failing on CI :( Do not run it automatically.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  tests/acceptance/boot_linux_console.py | 1 +
->  tests/acceptance/replay_kernel.py      | 1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 8f433a67f84..010e8790c0f 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -1025,6 +1025,7 @@ def test_m68k_mcf5208evb(self):
->          tar_hash = 'ac688fd00561a2b6ce1359f9ff6aa2b98c9a570c'
->          self.do_test_advcal_2018('07', tar_hash, 'sanity-clause.elf')
->  
-> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeout')
->      def test_microblaze_s3adsp1800(self):
->          """
->          :avocado: tags=arch:microblaze
-> diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-> index 00c228382bd..c1f5fa4de71 100644
-> --- a/tests/acceptance/replay_kernel.py
-> +++ b/tests/acceptance/replay_kernel.py
-> @@ -280,6 +280,7 @@ def test_m68k_mcf5208evb(self):
->          file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
->          self.do_test_advcal_2018(file_path, 'sanity-clause.elf')
->  
-> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeout')
->      def test_microblaze_s3adsp1800(self):
->          """
->          :avocado: tags=arch:microblaze
+CP0 helpers are restricted to system-mode emulation.
+Do not intent do build cp0_helper.c in user-mode (this
+allows to simplify some #ifdef'ry).
 
-I think this is a recent regression - it hasn't been failing in the past. We
-should first try to find out why it is failing now before sending it to the
-@skipUnless nirvana... could you maybe add it to the "Known issues" at
-https://wiki.qemu.org/Planning/5.2 instead?
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ target/mips/cp0_helper.c | 4 ----
+ target/mips/meson.build  | 2 +-
+ 2 files changed, 1 insertion(+), 5 deletions(-)
 
- Thomas
+diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
+index e8b9343ec9c..caaaefcc8ad 100644
+--- a/target/mips/cp0_helper.c
++++ b/target/mips/cp0_helper.c
+@@ -32,7 +32,6 @@
+ #include "sysemu/kvm.h"
+ 
+ 
+-#ifndef CONFIG_USER_ONLY
+ /* SMP helpers.  */
+ static bool mips_vpe_is_wfi(MIPSCPU *c)
+ {
+@@ -1667,10 +1666,8 @@ target_ulong helper_evpe(CPUMIPSState *env)
+     }
+     return prev;
+ }
+-#endif /* !CONFIG_USER_ONLY */
+ 
+ /* R6 Multi-threading */
+-#ifndef CONFIG_USER_ONLY
+ target_ulong helper_dvp(CPUMIPSState *env)
+ {
+     CPUState *other_cs = first_cpu;
+@@ -1709,4 +1706,3 @@ target_ulong helper_evp(CPUMIPSState *env)
+     }
+     return prev;
+ }
+-#endif /* !CONFIG_USER_ONLY */
+diff --git a/target/mips/meson.build b/target/mips/meson.build
+index fa1f024e782..681a5524c0e 100644
+--- a/target/mips/meson.build
++++ b/target/mips/meson.build
+@@ -1,6 +1,5 @@
+ mips_ss = ss.source_set()
+ mips_ss.add(files(
+-  'cp0_helper.c',
+   'cpu.c',
+   'dsp_helper.c',
+   'fpu_helper.c',
+@@ -15,6 +14,7 @@
+ 
+ mips_softmmu_ss = ss.source_set()
+ mips_softmmu_ss.add(files(
++  'cp0_helper.c',
+   'cp0_timer.c',
+   'machine.c',
+   'mips-semi.c',
+-- 
+2.26.2
 
 
