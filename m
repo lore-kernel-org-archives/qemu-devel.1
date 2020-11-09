@@ -2,77 +2,77 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D48BC4741F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F87C4741F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:06:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CAD5206ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:05:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CA69206ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:06:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeE1Va8Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CAD5206ED
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjqGDQOo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CA69206ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc37S-00011o-LD
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:05:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51628)
+	id 1kc37f-00019C-BK
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:05:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kc34K-0005Af-6t
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:02:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35219)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kc34G-00056X-AL
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:02:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26052)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kc34H-0004aP-4S
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:02:31 -0500
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kc34E-0004Z8-JI
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:02:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604912548;
+ s=mimecast20190719; t=1604912545;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=prc1AXXpQQAIjpm/dfebeyQVScUnlPg51yiyfwUenHA=;
- b=PeE1Va8Zog0iTc8f3wKmYR6uoiYyWk3QhqzB9op02Yo1fA7BJu7vGM53oRuC1384yevubS
- rRHNwB1WvLwO9siTgBPAOMntYyI5q9mVp1hR6w4JNvTBM69ZqOLoSRmloisFSfZBd0V48C
- OhKwPXIWkcsduhNctm4XI8cwJAiy3Ug=
+ bh=iDvvt1yKkSwe7BIjolzHKCMnGtVeYevZcFWtbX7oWrc=;
+ b=WjqGDQOoyPHBjgn2VyRTxo5ugCfxRdFGlYtTfhp/I3WQb+39pcFNTgMELxQQMAAmDwDByP
+ q4bosA265TjMy89lDcGKS9aLspGZxX4FWj9DxleXAl+YiYHzXXpQjvR4dj3NgdaUKC1iSa
+ JOlmCBKgpZcAwE8qIWY+kXQ7gbqk568=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-YxjeJSkcMhWkEThm-DIn5w-1; Mon, 09 Nov 2020 04:02:26 -0500
-X-MC-Unique: YxjeJSkcMhWkEThm-DIn5w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-136-lKzxeb9cN524VDhuVtyVdg-1; Mon, 09 Nov 2020 04:02:23 -0500
+X-MC-Unique: lKzxeb9cN524VDhuVtyVdg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CDA58030A2;
- Mon,  9 Nov 2020 09:02:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 650635F9DB;
+ Mon,  9 Nov 2020 09:02:22 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
  [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 270565C1D7;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3270B619C4;
  Mon,  9 Nov 2020 09:02:22 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C2B821132780; Mon,  9 Nov 2020 10:02:20 +0100 (CET)
+ id C57B01129947; Mon,  9 Nov 2020 10:02:20 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/5] qapi: Fix missing headers in QMP Reference Manual
-Date: Mon,  9 Nov 2020 10:02:18 +0100
-Message-Id: <20201109090220.825764-4-armbru@redhat.com>
+Subject: [PULL 4/5] qapi/block-core: Improve MapEntry documentation
+Date: Mon,  9 Nov 2020 10:02:19 +0100
+Message-Id: <20201109090220.825764-5-armbru@redhat.com>
 In-Reply-To: <20201109090220.825764-1-armbru@redhat.com>
 References: <20201109090220.825764-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
@@ -96,56 +96,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, "Daniel P . Berrange" <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: peter.maydell@linaro.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Audio stuff is under "Miscellanea", and authorization stuff is under
-"Input".  Add suitable header doc comments to correct that.
+From: Max Reitz <mreitz@redhat.com>
 
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Daniel P. Berrange <berrange@redhat.com>
+MapEntry and BlockDeviceMapEntry are kind of the same thing, and the
+latter is not used, so we want to remove it.  However, the documentation
+it provides for some fields is better than that of MapEntry, so steal
+some of it for the latter.
+
+(And adjust them a bit in the process, because I feel like we can make
+them even clearer.)
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20201104165513.72720-2-mreitz@redhat.com>
+Acked-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20201102081550.171061-3-armbru@redhat.com>
-Acked-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- qapi/audio.json | 4 ++++
- qapi/authz.json | 6 ++++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ qapi/block-core.json | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/qapi/audio.json b/qapi/audio.json
-index 3b843878d2..072ed79def 100644
---- a/qapi/audio.json
-+++ b/qapi/audio.json
-@@ -5,6 +5,10 @@
- # This work is licensed under the terms of the GNU GPL, version 2 or later.
- # See the COPYING file in the top-level directory.
- 
-+##
-+# = Audio
-+##
-+
- ##
- # @AudiodevPerDirectionOptions:
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 1b8b4156b4..3f86675357 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -244,17 +244,25 @@
  #
-diff --git a/qapi/authz.json b/qapi/authz.json
-index f3e9745426..42afe752d1 100644
---- a/qapi/authz.json
-+++ b/qapi/authz.json
-@@ -1,7 +1,9 @@
- # -*- Mode: Python -*-
- # vim: filetype=python
--#
--# QAPI authz definitions
-+
-+##
-+# = User authorization
-+##
- 
- ##
- # @QAuthZListPolicy:
+ # Mapping information from a virtual block range to a host file range
+ #
+-# @start: the start byte of the mapped virtual range
++# @start: virtual (guest) offset of the first byte described by this
++#         entry
+ #
+ # @length: the number of bytes of the mapped virtual range
+ #
+-# @data: whether the mapped range has data
++# @data: reading the image will actually read data from a file (in
++#        particular, if @offset is present this means that the sectors
++#        are not simply preallocated, but contain actual data in raw
++#        format)
+ #
+-# @zero: whether the virtual blocks are zeroed
++# @zero: whether the virtual blocks read as zeroes
+ #
+-# @depth: the depth of the mapping
++# @depth: number of layers (0 = top image, 1 = top image's backing
++#         file, ..., n - 1 = bottom image (where n is the number of
++#         images in the chain)) before reaching one for which the
++#         range is allocated
+ #
+-# @offset: the offset in file that the virtual sectors are mapped to
++# @offset: if present, the image file stores the data for this range
++#          in raw format at the given (host) offset
+ #
+ # @filename: filename that is referred to by @offset
+ #
 -- 
 2.26.2
 
