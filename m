@@ -2,81 +2,93 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B28E3C4741F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 22:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D3F2C4741F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 23:24:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ED8220665
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 22:57:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ED8220665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0E8E9206A1
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 23:24:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sxDThbvM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E8E9206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcG60-0004D2-W6
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 17:57:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52888)
+	id 1kcGWB-0000se-Sd
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 18:24:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kcG4m-0003gg-0c
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 17:55:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41238)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kcGVc-0000SN-1n; Mon, 09 Nov 2020 18:23:36 -0500
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:40212)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kcG4d-00086W-P9
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 17:55:51 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kcG4b-0006ZI-4A
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 22:55:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1D9EC2E8132
- for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 22:55:41 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kcGVa-0002yZ-6X; Mon, 09 Nov 2020 18:23:35 -0500
+Received: by mail-io1-xd44.google.com with SMTP id r9so11667718ioo.7;
+ Mon, 09 Nov 2020 15:23:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=/CiICKz+2B4vpnhgWNO7lP4LrrkBoaFELKFIpWJ8nuQ=;
+ b=sxDThbvMD6h4roH6euJWOZGUlF4OW3I6WBktBVEnIKGCYQp0cOpcUJ9YzlEyA1iRCK
+ peRsLJlle2CTTTv/kGDx9e/JsVbdeFDVyMQzat+VwV4uM8JwFgt0NOL6vcoKZNf2Hwzv
+ eqaRdEQu+GTTQv+qnhC4Pe35nML7Ymmqe+r2I70FPfte/fxGyGXr+akUG+MMITmOhiI4
+ SKgTJLz5NdWcAmciXJ2i3AqdwJdfCduAA2xJi1aSxgPLI0bX0VVHNypC2oF+YLcUDVkb
+ dIzLbwHlFhR+g90bnpkK6/+T/2j8LUHEHrP6RvYMsJ7eU/CGo2J6hRVVYjdAwnWtWF4M
+ 7/Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=/CiICKz+2B4vpnhgWNO7lP4LrrkBoaFELKFIpWJ8nuQ=;
+ b=Ub7OxHM5jmgqMk636FXWs4i5/c2LAUKWOZDbtZGuEvTEsJB5baVHMmZsdbaDLrPOln
+ uDpmH6QdlReCgkdzAMxDzgJ3JL8lrvNx9B7E84L0K16Re1JoZKXWJICuLUoID1Cz8jSK
+ Squ9YPTCCQbxEa/VeEsfjIzRHKjVPIl09uW/mPbTD2IAyGCOqWBllaoyyaWfe9VpVlIv
+ SF0Eg5FRyq2gZxk0UVs8O5KWDUg3JjNHfGlH8Yr3Jbd7mf4w8xqfFcHmwrrkX/HOHKfa
+ PltxRVcWnCJMR/euI9MTPqLVZ3IDAuR40/2r9zYkD85q5yZE8cYP9ut10IdpCX4Ms7sw
+ EGuA==
+X-Gm-Message-State: AOAM533vV+7Wh7v8ODDODF/0F1jza+k380CMoVPtB5DR8N5C3n4IJlq4
+ K4tvsalJTxQjknXj/IIgvLJ49ynmPoE9ptYzlXQ=
+X-Google-Smtp-Source: ABdhPJxaBO50xD8Wc31vTN9B1vm/hK1RntMTsv2LnyvfGmhQyXy8JavfwX+2dVD4WzLUYGjzmc1Oell7dwcEI8xyguc=
+X-Received: by 2002:a02:6c09:: with SMTP id w9mr1476298jab.135.1604964212294; 
+ Mon, 09 Nov 2020 15:23:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <68d4575deef2559b7a747f3bda193fcf43af4558.1604629928.git.alistair.francis@wdc.com>
+ <1ef9a373-9c67-d12f-014a-9a88520b9635@amsat.org>
+In-Reply-To: <1ef9a373-9c67-d12f-014a-9a88520b9635@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 9 Nov 2020 15:11:31 -0800
+Message-ID: <CAKmqyKPLg+-gmGBj0iKryOYz8VfCWFZqPccS+qLZa2qAoAwggQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] hw/intc/ibex_plic: Clear the claim register when
+ read
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Nov 2020 22:46:02 -0000
-From: Peter Maydell <1734474@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm maemo n800 nokia qemu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mvoloshin pmaydell
-X-Launchpad-Bug-Reporter: MVoloshin (mvoloshin)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <151163832560.18460.16214125618253771985.malonedeb@gac.canonical.com>
-Message-Id: <160496196292.13144.7061093537986186397.malone@gac.canonical.com>
-Subject: [Bug 1734474] Re: Maemo does not boot on emulated N800
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 42ecfb713f6a8e5a66d68c7d136a884a372ef1f5
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 11:16:03
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,58 +97,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1734474 <1734474@bugs.launchpad.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change on current head-of-git, which is effectively just reverting the=
- logic-change part of commit cb5ef3fa1871522a08, is sufficient to allow the=
- n800 image to boot again. =
+On Fri, Nov 6, 2020 at 6:20 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+>
+> On 11/6/20 3:32 AM, Alistair Francis wrote:
+> > After claiming the interrupt by reading the claim register we want to
+> > clear the register to make sure the interrupt doesn't appear at the nex=
+t
+> > read.
+> >
+> > This matches the documentation for the claim register as it clears the
+> > pending bit (which we already do): https://docs.opentitan.org/hw/ip/rv_=
+plic/doc/index.html
+>
+> "When an interrupt is claimed by a target the relevant bit of IP is
+> cleared." Correct.
 
-But that commit was trying to fix a bug, so we probably need to look more c=
-arefully at the logic rather than just reverting it...
+Yep, I improved this.
 
-diff --git a/hw/misc/tmp105.c b/hw/misc/tmp105.c
-index b47120492a..1813477268 100644
---- a/hw/misc/tmp105.c
-+++ b/hw/misc/tmp105.c
-@@ -161,14 +161,12 @@ static int tmp105_tx(I2CSlave *i2c, uint8_t data)
- {
-     TMP105State *s =3D TMP105(i2c);
- =
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
--    if (s->len =3D=3D 0) {
-+    if (!s->len++) {
-         s->pointer =3D data;
--        s->len++;
-     } else {
-         if (s->len <=3D 2) {
-             s->buf[s->len - 1] =3D data;
-         }
--        s->len++;
-         tmp105_write(s);
-     }
+Thanks
 
--- =
+Alistair
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1734474
-
-Title:
-  Maemo does not boot on emulated N800
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  I start QEMU with qemu-system-arm-m 130 -M n800 -kernel zImage.1 -mtdbloc=
-k maemo.img -append "root=3D/dev/mtdblock3 rootfstype=3Djffs2"
-  On QEMU 1.2.0 see "NOKIA" logo and then desktop appears, but on 1.5.0 and=
- newer (including latest versions) I see only white screen and no signs of =
-life. Was this caused by regression or any syntax change?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1734474/+subscriptions
+>
+> >
+> > This also matches the current hardware.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  hw/intc/ibex_plic.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/hw/intc/ibex_plic.c b/hw/intc/ibex_plic.c
+> > index f49fa67c91..235e6b88ff 100644
+> > --- a/hw/intc/ibex_plic.c
+> > +++ b/hw/intc/ibex_plic.c
+> > @@ -139,6 +139,9 @@ static uint64_t ibex_plic_read(void *opaque, hwaddr=
+ addr,
+> >          /* Return the current claimed interrupt */
+> >          ret =3D s->claim;
+> >
+> > +        /* Clear the claimed interrupt */
+> > +        s->claim =3D 0x00000000;
+> > +
+> >          /* Update the interrupt status after the claim */
+> >          ibex_plic_update(s);
+> >      }
+> >
+>
 
