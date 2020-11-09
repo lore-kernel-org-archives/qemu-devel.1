@@ -2,90 +2,99 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5818C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1D2C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:38:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DCD8206D8
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:38:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAABC206D8
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:38:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wOnT+GT1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DCD8206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bWxq8cYc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAABC206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc8JJ-0000Lm-66
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:38:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42214)
+	id 1kc8JU-0000nQ-UD
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:38:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kc80B-0004HL-RD
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 09:18:35 -0500
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:35095)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kc8IR-0007nX-Ec
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 09:37:27 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42903)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kc809-0005QU-R1
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 09:18:35 -0500
-Received: by mail-ed1-x541.google.com with SMTP id ay21so8914314edb.2
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 06:18:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=6SL67MXDkpqciKU21DWb7uh9VzXvqZsGe2hTyZdTxHI=;
- b=wOnT+GT1WRI/ds4g9hjGaMY912qArJpfRgUm3JgsPD8It0RpIP6VSfH/05yCXpRi1J
- l2IK8IksKNo1Zkrei+NhTKU2uEMFAh9Le3xhIw5dflANv5WTvjlqnvewcbPFnTkF+Eu2
- rZXaKtbCOOaQ2xK50Z8jt5guQ/9kjescicHK6oHXpAo1dJqfzR6J2UX2vPVpFZGUAU9A
- 1hgWmzqppc/2M0mOtBiZ4tnH5W37dQoJrlRPnRiXuruuVhM9kuPQQexoOeGgpshU6PbT
- XJkIR6yP+xdB8OhPZ+klJTA0xruODAR17X1UBFQOpktHqihI+FigkyCXihiiFSjkxWyF
- 3+7g==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kc8IP-0003Jx-Fx
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 09:37:27 -0500
+Received: by mail-wr1-x442.google.com with SMTP id l1so4521591wrb.9
+ for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 06:37:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ngJStzspPwt5gcj0E6T51Y8vDq+smHVcH66xON+ao7A=;
+ b=bWxq8cYc0SicTjTi5o4FI6EFQFbf3IAgjbGtdZ0sJv/oBYwsX3GxkzUeWMD2jz8yOF
+ 39dMVWiFmSaVeYE8BbE87HteOdnWSQmGV+7UQYb/hJyx9hlu6LZmgFbX507xmXlZ41SR
+ lTPOGxUq5KpTHhny+XF55iamEEIyvvrRPqfg3OcLwOtwhS5+txr/5Zts7i+gIzEHNlRS
+ ZUbO+2He7vvJerB29UzwV3pPyuxRr0SliVpmepes1cykx1JYIQgRRWLLyEMp2mqMH9/K
+ 4KDD9tHZUZpSjAdf2OTSK3QnrrkqLyFov657gwpUee6wMYFgd1APYlqNq0Y1chluGCvh
+ KMIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=6SL67MXDkpqciKU21DWb7uh9VzXvqZsGe2hTyZdTxHI=;
- b=b7LeWNqOjgQ62nMUngJAmQlmnhjTK3FVJlvVBlaBgIGdgxVvjiO12ENbJ1jDHIatnr
- YEbxtc7it2UW6NxLx9t/PMBB98Hr5QN/Kv2ZwvDqvmTPDB51L5WfjJaDh3/5MLXjU3i+
- iK1KXU21cTJaUJNnS66PyVn72HbN+HGRVFfn1GfmEKTVIcMLUYQBRlKDIeQQu4odWjUO
- a+1Bi66WMZ30pMzeGdGgzj/D9jLKY23CTW4yskCVyfMpwJCPl091ZMVieCB8CLBdSQl/
- 313BeEU+/HuNoEf9kxGQSRFO0Wo0EWWLACUyqGIkLUXzNlMO1PqneS5DG/UlpS1cc0pP
- MYIQ==
-X-Gm-Message-State: AOAM532wwMyfCcMIu+VVULw2l3cNbqIo/Wo591K1cDONnZUR8+GxPGl2
- V5eADNxXrTlkgq22ly8X6ew8aFMyZcfmCNujnToM3cAyx9c=
-X-Google-Smtp-Source: ABdhPJyiPWGofBrc+i133q5FqNYXfxgjsV7K22adwJwnvt8kTGnsSDI2r6oBsuAHWENcbIduL3CdIFosPnGr1GJLB0c=
-X-Received: by 2002:aa7:df82:: with SMTP id b2mr15032647edy.251.1604931512072; 
- Mon, 09 Nov 2020 06:18:32 -0800 (PST)
+ h=x-gm-message-state:sender:subject:from:to:cc:references:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ngJStzspPwt5gcj0E6T51Y8vDq+smHVcH66xON+ao7A=;
+ b=iefTJ4cHBxGgLP/RtfzvpCT5WAKnyA8MxfTWYahm7ZcGjwdAi2vLTD4Wesw7A/ckUn
+ zIIcZtlHEOkLGe5RHHd8FX6lldIF9SeiTv6wUqvCEmtIhyQ5bsokj4AW1bDogB81QpEe
+ BX6qGgRiEQMS8Iz2uJvk7NuXza76SsnXp9xkWXAB4uR1QxQOpgkI+uQHjbTzYkPTZnpE
+ hXKb4iAbi3JTCbeo8UHAJtE22PFR3xTlRWDPVs2pqFu9v5zYmii1RILGz2gVznEa8wKy
+ hbUntGUBDYM4Z++AB2U624cja/NYa8KQbiGXxy+cAj+r9WddfxKNP0NAD2CXOVnBH94V
+ J5BA==
+X-Gm-Message-State: AOAM5300dCzBRynYanxGaybW0O2DeZ1mK0T9sZAYcXlzxhv+28se7jn3
+ a7wtv58jizo7mZGraC2oBB+TIe5Z1iU=
+X-Google-Smtp-Source: ABdhPJzkvD38YJlRqvngOnvrh5864cJZhJw5UYMWbOK075L+7sBhSOKu/lBxdPhDLyRTF+wy+P6RxA==
+X-Received: by 2002:adf:82cc:: with SMTP id 70mr17972760wrc.74.1604932643542; 
+ Mon, 09 Nov 2020 06:37:23 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id w11sm13359487wmg.36.2020.11.09.06.37.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Nov 2020 06:37:22 -0800 (PST)
+Subject: Re: [PATCH] qtest: add a reproducer for LP#1878642
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+References: <20201102163336.115444-1-alxndr@bu.edu>
+ <7825a2e7-dd79-c4ea-c3f7-673743619d89@redhat.com>
+ <d2fee64d-8ad3-7c84-1988-084ab416b7e1@amsat.org>
+Message-ID: <0d27a5b3-1a20-6889-6de1-defdfe418266@amsat.org>
+Date: Mon, 9 Nov 2020 15:37:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <20201106235109.7066-1-peter.maydell@linaro.org>
- <20201106235109.7066-3-peter.maydell@linaro.org>
- <b957ada3-cbc7-d1fa-750d-f201c3bef2c6@amsat.org>
-In-Reply-To: <b957ada3-cbc7-d1fa-750d-f201c3bef2c6@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Nov 2020 14:18:20 +0000
-Message-ID: <CAFEAcA_UjvGGX7juQmX-tXh8Phs8oOnNcXAHzmidtYRxcDamMA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] hw/m68k/q800.c: Make the GLUE chip an actual QOM
- device
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
+In-Reply-To: <d2fee64d-8ad3-7c84-1988-084ab416b7e1@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,119 +107,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Laurent Vivier <lvivier@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Nov 2020 at 14:15, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->
-> Hi Peter,
->
-> On 11/7/20 12:51 AM, Peter Maydell wrote:
-> > The handling of the GLUE (General Logic Unit) device is
-> > currently open-coded. Make this into a proper QOM device.
-> >
-> > This minor piece of modernisation gets rid of the free
-> > floating qemu_irq array 'pic', which Coverity points out
-> > is technically leaked when we exit the machine init function.
-> > (The replacement glue device is not leaked because it gets
-> > added to the sysbus, so it's accessible via that.)
-> >
-> > Fixes: Coverity CID 1421883
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> >  hw/m68k/q800.c | 82 ++++++++++++++++++++++++++++++++++++++++++--------
-> >  1 file changed, 70 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-> > index dc13007aaf2..05bb372f958 100644
-> > --- a/hw/m68k/q800.c
-> > +++ b/hw/m68k/q800.c
-> > @@ -47,6 +47,7 @@
-> >  #include "sysemu/qtest.h"
-> >  #include "sysemu/runstate.h"
-> >  #include "sysemu/reset.h"
-> > +#include "migration/vmstate.h"
-> >
-> >  #define MACROM_ADDR     0x40800000
-> >  #define MACROM_SIZE     0x00100000
-> > @@ -94,10 +95,14 @@
-> >   * CPU.
-> >   */
-> >
-> > -typedef struct {
-> > +#define TYPE_GLUE "q800-glue"
-> > +OBJECT_DECLARE_SIMPLE_TYPE(GLUEState, GLUE)
-> > +
-> > +struct GLUEState {
-> > +    SysBusDevice parent_obj;
-> >      M68kCPU *cpu;
-> >      uint8_t ipr;
-> > -} GLUEState;
-> > +};
-> >
-> >  static void GLUE_set_irq(void *opaque, int irq, int level)
-> >  {
-> > @@ -119,6 +124,58 @@ static void GLUE_set_irq(void *opaque, int irq, in=
-t level)
-> >      m68k_set_irq_level(s->cpu, 0, 0);
-> >  }
-> >
-> > +static void glue_reset(DeviceState *dev)
-> > +{
-> > +    GLUEState *s =3D GLUE(dev);
-> > +
-> > +    s->ipr =3D 0;
-> > +}
-> > +
-> > +static const VMStateDescription vmstate_glue =3D {
-> > +    .name =3D "q800-glue",
-> > +    .version_id =3D 0,
-> > +    .minimum_version_id =3D 0,
-> > +    .fields =3D (VMStateField[]) {
-> > +        VMSTATE_UINT8(ipr, GLUEState),
-> > +        VMSTATE_END_OF_LIST(),
-> > +    },
-> > +};
-> > +
-> > +/*
-> > + * If the m68k CPU implemented its inbound irq lines as GPIO lines
-> > + * rather than via the m68k_set_irq_level() function we would not need
-> > + * this cpu link property and could instead provide outbound IRQ lines
-> > + * that the board could wire up to the CPU.
-> > + */
-> > +static Property glue_properties[] =3D {
-> > +    DEFINE_PROP_LINK("cpu", GLUEState, cpu, TYPE_M68K_CPU, M68kCPU *),
-> > +    DEFINE_PROP_END_OF_LIST(),
-> > +};
-> > +
-> > +static void glue_init(Object *obj)
-> > +{
-> > +    DeviceState *dev =3D DEVICE(obj);
-> > +
-> > +    qdev_init_gpio_in(dev, GLUE_set_irq, 8);
-> > +}
-> > +
-> > +static void glue_class_init(ObjectClass *klass, void *data)
-> > +{
-> > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > +
-> > +    dc->vmsd =3D &vmstate_glue;
-> > +    dc->reset =3D glue_reset;
->
-> Don't we need a realize() handler checking s->cpu is non-NULL?
->
-> Otherwise:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On 11/2/20 7:58 PM, Philippe Mathieu-Daudé wrote:
+> On 11/2/20 7:23 PM, Paolo Bonzini wrote:
+>> On 02/11/20 17:33, Alexander Bulekov wrote:
+>>> https://bugs.launchpad.net/qemu/+bug/1878642
+>>>
+>>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+>>> ---
+>>>
+>>> Based-on: <20200717151705.18611-1-f4bug@amsat.org>
+>>>
+>>> The added testcase will fail, unless this ^^^ patch is applied.
+>>>
+>>>  tests/qtest/fuzz-test.c | 15 +++++++++++++++
+>>>  1 file changed, 15 insertions(+)
+>>>
+>>> diff --git a/tests/qtest/fuzz-test.c b/tests/qtest/fuzz-test.c
+>>> index 2f38bb1ec2..9cb4c42bde 100644
+>>> --- a/tests/qtest/fuzz-test.c
+>>> +++ b/tests/qtest/fuzz-test.c
+>>> @@ -34,6 +34,19 @@ static void test_lp1878263_megasas_zero_iov_cnt(void)
+>>>      qtest_quit(s);
+>>>  }
+>>>  
+>>> +static void test_lp1878642_pci_bus_get_irq_level_assert(void)
+>>> +{
+>>> +    QTestState *s;
+>>> +
+>>> +    s = qtest_init("-M pc-q35-5.0 "
+>>> +                   "-nographic -monitor none -serial none "
+>>> +                   "-d guest_errors -trace pci*");
+>>> +
+>>> +    qtest_outl(s, 0xcf8, 0x8400f841);
+>>> +    qtest_outl(s, 0xcfc, 0xebed205d);
+>>> +    qtest_outl(s, 0x5d02, 0xebed205d);
+>>> +}
+>>> +
+>>>  int main(int argc, char **argv)
+>>>  {
+>>>      const char *arch = qtest_get_arch();
+>>> @@ -43,6 +56,8 @@ int main(int argc, char **argv)
+>>>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+>>>          qtest_add_func("fuzz/test_lp1878263_megasas_zero_iov_cnt",
+>>>                         test_lp1878263_megasas_zero_iov_cnt);
+>>> +        qtest_add_func("fuzz/test_lp1878642_pci_bus_get_irq_level_assert",
+>>> +                       test_lp1878642_pci_bus_get_irq_level_assert);
+>>>      }
+>>>  
+>>>      return g_test_run();
+>>>
+>>
+>> Queued, thanks.
+> 
+> Great, did you queued the fix too?
+> (https://www.mail-archive.com/qemu-devel@nongnu.org/msg725783.html)
 
-Doesn't seem very necessary to me -- it's a sysbus device
-used for a special purpose, the one user has to wire
-it up correctly, and the failure mode if they get it wrong
-is pretty obvious. But I guess we could add in the explicit
-error check.
+Ah I see it has been merged in time for rc1 (commit 4177b062fc58d),
+thanks. IIRC few months ago there was a bot responding to patches
+"your patch has been merged", was it patchew? Maybe we can a job
+to do that on GitLab, but the problem is to expose SMTP credentials
+in a runner.
 
-thanks
--- PMM
+> 
+> Regards,
+> 
+> Phil.
+> 
 
