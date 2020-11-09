@@ -2,83 +2,96 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F57C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:45:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53CC5C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:48:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F374206E3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:45:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CBB022074F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:48:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T1sLpx70"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F374206E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t0SG5iTD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBB022074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc8Q5-0007Ho-7x
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:45:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46248)
+	id 1kc8So-0000nh-PN
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:48:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kc8H4-0006fx-0R
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 09:36:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37023)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kc8H1-0002uF-Tp
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 09:36:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604932558;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=kcdU9aJbEaren7E4fZsP2g6uWz2aJVVVLlffCGmH/tI=;
- b=T1sLpx70RX6oPM8vKX1wHBp5YlhRamJWSizJofOH1kDQxheCVgPqHgL1DG00QHKvVJMtR2
- uLtM81YW1Vaal4UMmhCN4Y63ZmDtkXDj8F9KSIc2kJQpZwrNzdZ1HlJU+vZM52Ko103RjK
- mrOWdzkDM6q/CTLtWedx4+hocVSITjI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-483-4OaZxlkANGKWCF4t7g8vxA-1; Mon, 09 Nov 2020 09:35:56 -0500
-X-MC-Unique: 4OaZxlkANGKWCF4t7g8vxA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 834171016CE5;
- Mon,  9 Nov 2020 14:35:55 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-115-201.rdu2.redhat.com [10.10.115.201])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 43BC975128;
- Mon,  9 Nov 2020 14:35:49 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id C5CD7222E35; Mon,  9 Nov 2020 09:35:48 -0500 (EST)
-Date: Mon, 9 Nov 2020 09:35:48 -0500
-From: Vivek Goyal <vgoyal@redhat.com>
-To: qemu-devel@nongnu.org, virtio-fs-list <virtio-fs@redhat.com>
-Subject: [PATCH V2] virtiofsd: Use --thread-pool-size=0 to mean no thread pool
-Message-ID: <20201109143548.GA1479853@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kc8Q7-0007fw-2o; Mon, 09 Nov 2020 09:45:23 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39451)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kc8Q5-000680-9Q; Mon, 09 Nov 2020 09:45:22 -0500
+Received: by mail-wm1-x341.google.com with SMTP id s13so8166317wmh.4;
+ Mon, 09 Nov 2020 06:45:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=5GSgk6kQ6yXsnJXDMm15hYEtz1aUgz+bK4w0F6YNx5c=;
+ b=t0SG5iTDqzLYCtrEgDxmsitwPaieRJCS04Ph7KlAsyeiOstmPpOSGu84rqoPiuDSaz
+ uCx8Ck8sURxH6tfdYaUeg0it42e5yAFvtFMYEbOPUfGRJU0LvWlRBU1GSTPo4fK71FxW
+ kWTpqCQD5k/7rMB2OhBMcszW9p/G1XH0ya+gvEdgNqTRnaopBA+pDJDctugNL9ai7s2n
+ R2TDUJW7WHl/4/JDmxE9ee2Eaz8rBKcDOKftKndN2o69pKMAC1lktlKyiS7hDEv2t1vo
+ blsJd2xlG0zPcf902OXenMykC8B4EI8TPKtoykQNQ6FmXnoYa8uwQoDOEipImgMV0dI5
+ o4BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5GSgk6kQ6yXsnJXDMm15hYEtz1aUgz+bK4w0F6YNx5c=;
+ b=TX/npbDLmQFsa+N8WGC5rZ0idVUBEu04YZAtO70P0L4CqXvq3XTfW/0mi8rubF2qQU
+ BYJetKmwS3/1jKAjlo/ziTbQqKf3TOL+hNRDro+BazIYJPktDaCTheR5yRJzlPyMAh1d
+ MTQrcg61WQyfF/Omrb3vprE+JpA5tW8FZKE4URTCX0R8noFPqBlOdz60KkWSriBQ/zMm
+ jKNnMV+uRQgauRGhfcRj/O1vdzOB0m05yZipsEFZh+kv4OHlO7bo6h0fZpTvImV+Tv0o
+ K9lCrbiulxPS3medrwOKu2oxUgXyFm9bWQovVwfAfIRYg9ptCT5trQaXqNWfb0frgYWU
+ 8VSg==
+X-Gm-Message-State: AOAM53095S1n+EH5XVSdqFuAZp90/ZbHI6v2lQLBTiIRsI2eDdaAipyG
+ WCH4+wVqF+nfW+k7IQgFgAA=
+X-Google-Smtp-Source: ABdhPJw87ZgNiMOZjM32n0SZCmBzCHVDXvQbZKwqdsY2Br6TGAh2yHZVUrYt3A3DqnRtXmnjH87bLg==
+X-Received: by 2002:a7b:c202:: with SMTP id x2mr8957861wmi.48.1604933118960;
+ Mon, 09 Nov 2020 06:45:18 -0800 (PST)
+Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id g66sm13369945wmg.37.2020.11.09.06.45.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Nov 2020 06:45:18 -0800 (PST)
+Subject: Re: [PATCH-for-5.2 0/5] hw/arm: Fix various incorrect IRQ handling
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20201107193403.436146-1-f4bug@amsat.org>
+ <CAFEAcA-O7vrAAaMpMWyeUzAO3BOQf3A28XoSY72SB7zOgeedkw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b78c53ba-8330-fd60-4741-a1ce172a7097@amsat.org>
+Date: Mon, 9 Nov 2020 15:45:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=vgoyal@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA-O7vrAAaMpMWyeUzAO3BOQf3A28XoSY72SB7zOgeedkw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,98 +104,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jose.carlos.venegas.munoz@intel.com,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Right now we create a thread pool and main thread hands over the request
-to thread in thread pool to process. Number of threads in thread pool
-can be managed by option --thread-pool-size.
+On 11/9/20 3:23 PM, Peter Maydell wrote:
+> On Sat, 7 Nov 2020 at 19:34, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> This series is inspired by Peter's following patch:
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg758178.html
+>>
+>> I started to audit the IRQ uses and fixed the easy problems.
+>>
+>> Unresolved ones:
+>> - stellaris_init() connects different TYPE_STELLARIS_GPTM
+>>   to the same ADC input (seems some weird kludge)
+>> - platform_bus_link_device() uses sysbus_has_irq() to check
+>>   if an device has IRQ mapped but it doesn't seem to work.
+> 
+> Were you finding these by inspection, or did you add some
+> kind of assert or other check for double-irq-line-connections?
 
-In tests we have noted that many of the workloads are getting better
-performance if we don't use a thread pool at all and process all
-the requests in the context of a thread receiving the request.
+I was not sure adding a field to IRQState would be accepted,
+so I added a trace event in qdev_connect_gpio_out_named():
 
-Hence give user an option to be able to run virtiofsd without using
-a thread pool.
+ trace_qdev_connect_gpio_out(pin, n, name,
+                             object_get_typename(OBJECT(dev)));
 
-To implement this, I have used existing option --thread-pool-size. This
-option defines how many maximum threads can be in the thread pool.
-Thread pool size zero freezes thead pool. I can't see why will one
-start virtiofsd with a frozen thread pool (hence frozen file system).
-So I am redefining --thread-pool-size=0 to mean, don't use a thread pool.
-Instead process the request in the context of thread receiving request
-from the queue.
+And lookup up when 'pin' pointer value appears more than 1 time.
 
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
----
- tools/virtiofsd/fuse_virtio.c | 36 ++++++++++++++++++++++++++---------
- 1 file changed, 27 insertions(+), 9 deletions(-)
+For 6.0 I am wondering about replacing --enable-qom-cast-debug
+by --maintainer-mode and add a field in IRQState guarded for
+that mode. Maybe it is not too bad and we can use it normally.
 
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 83ba07c6cd..944b9a577c 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -588,13 +588,18 @@ static void *fv_queue_thread(void *opaque)
-     struct VuDev *dev = &qi->virtio_dev->dev;
-     struct VuVirtq *q = vu_get_queue(dev, qi->qidx);
-     struct fuse_session *se = qi->virtio_dev->se;
--    GThreadPool *pool;
--
--    pool = g_thread_pool_new(fv_queue_worker, qi, se->thread_pool_size, FALSE,
--                             NULL);
--    if (!pool) {
--        fuse_log(FUSE_LOG_ERR, "%s: g_thread_pool_new failed\n", __func__);
--        return NULL;
-+    GThreadPool *pool = NULL;
-+    GList *req_list = NULL;
-+
-+    if (se->thread_pool_size) {
-+        fuse_log(FUSE_LOG_DEBUG, "%s: Creating thread pool for Queue %d\n",
-+                 __func__, qi->qidx);
-+        pool = g_thread_pool_new(fv_queue_worker, qi, se->thread_pool_size,
-+                                 FALSE, NULL);
-+        if (!pool) {
-+            fuse_log(FUSE_LOG_ERR, "%s: g_thread_pool_new failed\n", __func__);
-+            return NULL;
-+        }
-     }
- 
-     fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __func__,
-@@ -669,14 +674,27 @@ static void *fv_queue_thread(void *opaque)
- 
-             req->reply_sent = false;
- 
--            g_thread_pool_push(pool, req, NULL);
-+            if (!se->thread_pool_size) {
-+                req_list = g_list_prepend(req_list, req);
-+            } else {
-+                g_thread_pool_push(pool, req, NULL);
-+            }
-         }
- 
-         pthread_mutex_unlock(&qi->vq_lock);
-         pthread_rwlock_unlock(&qi->virtio_dev->vu_dispatch_rwlock);
-+
-+        /* Process all the requests. */
-+        if (!se->thread_pool_size && req_list != NULL) {
-+            g_list_foreach(req_list, fv_queue_worker, qi);
-+            g_list_free(req_list);
-+            req_list = NULL;
-+        }
-     }
- 
--    g_thread_pool_free(pool, FALSE, TRUE);
-+    if (pool) {
-+        g_thread_pool_free(pool, FALSE, TRUE);
-+    }
- 
-     return NULL;
- }
--- 
-2.25.4
+> 
+> Applied to target-arm.next, thanks (deletion of omap_uart_attach()
+> can be a separate followup cleanup).
 
+Yes, I have *some* OMAP patches for 6.0 ;)
+
+> 
+> -- PMM
+> 
 
