@@ -6,84 +6,86 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0095C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 11:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C75C2C4741F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 11:10:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F7F3206E3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 11:08:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B29C2080C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 11:10:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OIq0EYdo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F7F3206E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ho4FVtSt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B29C2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc52d-0002kw-41
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 06:08:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50192)
+	id 1kc54H-0003Wq-M5
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 06:10:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kc51D-0001eU-QN
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 06:07:32 -0500
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:43539)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kc51B-0006Pn-4g
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 06:07:27 -0500
-Received: by mail-ej1-x642.google.com with SMTP id me8so2192037ejb.10
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 03:07:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9Bz9D3QcrFR97yRVevYA+dbsOZ+Ocysw/k/oP578BaE=;
- b=OIq0EYdoAiBvVNE6N5+IDFisG+pA5ZNaFmP/VaRA1FcZhJ5fovlSEMeeG/mso4U+Oz
- 3ZhEdoLgLbR2n8lrdVk5k8hE6z1gz+zgdygL0DZL4/Kj7tq9h8rblV37sWQKMXy37Ctj
- gSH9nJebkTsDJOVD0wK3+1kO9JStnhe2J59prF9Nt/0Z1KY6zIb6jLw8rWwYyR/5Q4Dc
- 9ByES8yVELFnQ2FuoOIyw+LtWtJJdyCNMrd5cJiUnI3LjeiomUbIFikctWMv0nm3VZUy
- VlndZgIVzOPsWbPSFrkFsBuTaeQlls0jSb3QVIlogX8HH3Xj+vI0IatcmwBRvsNa7Fcs
- uOYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9Bz9D3QcrFR97yRVevYA+dbsOZ+Ocysw/k/oP578BaE=;
- b=Adn1KyFtJJt0NlW0nfpiOkFF2t9wAIfx+d1WJM9EievT9Rj5m/gmpEv4Si6IM+wK32
- JOFYOtSlJ4hmRo7lqFDgNYmfz2UXebMFjaTqAB4Y43KN/J0tvTRGSusaduZguqxqL7eB
- C2ztIL5TZ2aW0pYBV4fAbiDEbBSToA2Kyv4jEiFpFOFS+GqbAz9NhYl6rGDh2YBqX95r
- n/HLF5AHMDXdVbs1xzFbbYU8BvpnmWGOX55K+iWqy+wVujcr4i7OTgCdF9ymqaoSq0so
- /SxN+YrX87RH9c+VX+U0CRcN2GTmJFkxWxEKwtXgHiXKnVFJ4srdCYZ5pI1SdT+eES9T
- QFYQ==
-X-Gm-Message-State: AOAM530zinr/AukY04XjbgIcF6j4mklPWUDwqvqRdDBYaiSpikcPbQyV
- VfGX6C6pQarJtn5Or08kfOMms9K3AYOu8KwgQzEPng==
-X-Google-Smtp-Source: ABdhPJyrZe7PHqgftecTrssPthmxb1TWJRNua5IHr/vW8AhjxgZq/mttF8z3VA7eFk+tSUcnz1ABh5P7A23KKMKaVuI=
-X-Received: by 2002:a17:907:9e3:: with SMTP id
- ce3mr14613788ejc.4.1604920042911; 
- Mon, 09 Nov 2020 03:07:22 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kc52J-0002f6-Vb
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 06:08:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44452)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kc52G-0006nW-Aw
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 06:08:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604920111;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UAn0Vu4TSz7HSWIz611N8MztXtNQkjIl+rFoniV9ihk=;
+ b=Ho4FVtStQbcq0j2uUuxF1R3XnEhigkd8uZ0AomYhcs8bScXk3asO4dFBX6AVQPMPkUSsDw
+ sw0tgyRc7fOIo9kewdqUoAC5DVWxAgeINRn7k+Bhyl3STCjxkuVuY/u0wIFVok8UJ9dIDT
+ Dn3YVWFl72r7Wcx6Vl84DuOtP0fAA6w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-480-7FDXy5lAOuqV-N4OijRLYg-1; Mon, 09 Nov 2020 06:08:29 -0500
+X-MC-Unique: 7FDXy5lAOuqV-N4OijRLYg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 510B86D244;
+ Mon,  9 Nov 2020 11:08:28 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-130.ams2.redhat.com
+ [10.36.112.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 15CE96EF5B;
+ Mon,  9 Nov 2020 11:08:28 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 27E2D16E0A; Mon,  9 Nov 2020 12:08:27 +0100 (CET)
+Date: Mon, 9 Nov 2020 12:08:27 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.2 2/5] hw/usb/Kconfig: Fix USB_XHCI_NEC (depends on
+ USB_XHCI_PCI)
+Message-ID: <20201109110827.6nbbru34d26z7li4@sirius.home.kraxel.org>
+References: <20201107111307.262263-1-philmd@redhat.com>
+ <20201107111307.262263-3-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20201106171153.32673-1-peter.maydell@linaro.org>
- <20201106171153.32673-3-peter.maydell@linaro.org>
- <202011061911.23866.pisa@cmp.felk.cvut.cz>
-In-Reply-To: <202011061911.23866.pisa@cmp.felk.cvut.cz>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Nov 2020 11:07:11 +0000
-Message-ID: <CAFEAcA-j4NLk8E8WtAC3e18A27E8BDJTnHkOk+ykK+xKtU+Zuw@mail.gmail.com>
-Subject: Re: [PATCH for-5.2 2/4] hw/net/can/ctucan: Avoid unused value in
- ctucan_send_ready_buffers()
-To: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201107111307.262263-3-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,61 +98,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Vikram Garhwal <fnu.vikram@xilinx.com>,
- Ondrej Ille <ondrej.ille@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?B?SmFuIENoYXJ2w6F0?= <charvj10@fel.cvut.cz>
+Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Nov 2020 at 18:12, Pavel Pisa <pisa@cmp.felk.cvut.cz> wrote:
->
-> Hello Peter,
->
-> this one is a little problematic. I understand that you want
-> to have clean code and no warnings reports from coverity.
->
-> On Friday 06 of November 2020 18:11:51 Peter Maydell wrote:
+On Sat, Nov 07, 2020 at 12:13:04PM +0100, Philippe Mathieu-Daudé wrote:
+> Since commit 755fba11fbc and 8ddab8dd3d8 we can not build
+> USB_XHCI_NEC without USB_XHCI_PCI. Correct the Kconfig
+> dependency.
 
-> > @@ -271,10 +266,7 @@ static void ctucan_send_ready_buffers(CtuCanCoreState
-> > *s) if (buff2tx_idx == -1) {
-> >              break;
-> >          }
-> > -        buff_st_mask = 0xf << (buff2tx_idx * 4);
-> > -        buff_st = (s->tx_status.u32 >> (buff2tx_idx * 4)) & 0xf;
->
-> There I would kept extracted state in the variable. Actual model is really
-> simplified to real hardware. Tx succeeds in zero time.
->
-> >          int_stat.u32 = 0;
-> > -        buff_st = TXT_RDY;
->
-> This is why the TXT_RDY state immediately changes to TXT_TOK. It works well
-> for actual simple CAN subsystem implementation. But if we want to implement
-> priorization of messages on emulated bus and even simulate real bus latency
-> by delay to state change and interrut delivery, then we need to proceed
-> through TXT_RDY state. If it is a problem for release, that your want to have
-> coverity clean source tree, then please left the line as a comment there
-> or use some trick with
->            (void)buff_st;
->
-> Or if you prefer, use
->
->   +        s->tx_status.u32 = deposit32(s->tx_status.u32,
->   +                                     buff2tx_idx * 4, 4, TXT_RDY);
->
-> if it silent the coverity.
+Fails make check too:
 
-I was going to put a comment in v2 of this patch series to
-document that this is where the status goes to TXT_RDY,
-but looking at the code, at this point the buffer status field
-is *already* TXT_RDY -- the preceding loop does not allow
-us to get to this point for an entry which is in any other
-state. So while I agree with your suggestion that it's worth
-having at least a documentation comment to indicate where the
-state is changing, I think there is no intermediate state
-transition to document here.
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} QTEST_QEMU_IMG=./qemu-img G_TEST_DBUS_DAEMON=/home/kraxel/projects/qemu/tests/dbus-vmstate-daemon.sh QTEST_QEMU_BINARY=./qemu-system-ppc64 tests/qtest/device-plug-test --tap -k
+**
+ERROR:../../qom/object.c:711:object_new_with_type: assertion failed: (type != NULL)
 
-thanks
--- PMM
+take care,
+  Gerd
+
 
