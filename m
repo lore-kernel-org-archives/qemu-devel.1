@@ -2,81 +2,107 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UPPERCASE_50_75,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A85C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5413FC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:21:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2519C206CB
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:18:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2519C206CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D40532074F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:21:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYzdwORS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40532074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc9sS-0007Ii-4e
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 11:18:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45108)
+	id 1kc9uo-0000nf-Rr
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 11:21:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kc9pw-0006Xt-VQ
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:16:08 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60758)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kc9pt-0005y6-6L
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:16:08 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kc9pp-0007v4-K6
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 16:16:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A838A2E813A
- for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 16:16:00 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Nov 2020 16:07:26 -0000
-From: John Snow <1681439@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kc9tL-0007os-Pp
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:19:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55592)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kc9tJ-0006qf-O5
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:19:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604938775;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=c74r/9TB1kiGAwlYOpNyd1EBlTZRCTXB5lpRTVp0bzg=;
+ b=ZYzdwORSflRq3yJaIju5+NcG7d/QeGirTpMB6LW2aFYt2bK1lGxmWnvHMgBHjwIzaRgeJp
+ k/OOX14wX33DN2kmlzmFnMmZtXsFJEKlN17F9k89Rswrqnx/LyX+yymez6GpKnTgmXaKFK
+ cxfS1MAPnD6PGTeIQBNV3wT9n6IBrfg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-DsX5R3x3OJyEeyM6N47C3A-1; Mon, 09 Nov 2020 11:19:33 -0500
+X-MC-Unique: DsX5R3x3OJyEeyM6N47C3A-1
+Received: by mail-wm1-f71.google.com with SMTP id y26so2203966wmj.7
+ for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 08:19:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=c74r/9TB1kiGAwlYOpNyd1EBlTZRCTXB5lpRTVp0bzg=;
+ b=aXxL86HuZlmRzEcFWOCsWHkn7m18ynX++GW+PEccQUFgdfAp9Xvf8GGiQi8CkQCNH5
+ tg3uNEp4xTIgbrp5LX86j8D5qHwURHIw9SA0XrCb7FXDfdovAot4JgyUA3QJR+xlmo3Z
+ tREyKaI1lxideJipiQC0f9SgkiCORgFoditHOnZTzxBbf7VGCFzpzyH1CwhfH59oJWy5
+ 3Wzsz4hT/awSaf1YyOUAJW9IyZt8GBUqdMa/mKBx7kqWeWdc0k0YjPRiH3sfn5paWqLJ
+ pRvh4n7fVBIxG9jVYvs7FESSR4Zpx0eB3Oi2OBJHu+omUr21tdAg34bVw7RlKlzoA1GJ
+ R8GQ==
+X-Gm-Message-State: AOAM530S0SIYs27gHL+H0Nn3AOfNhd1uva/petTxGqjVH0VUeB1ipFg4
+ DqzLT65uU2nleA1u4zqNSl6D/urDd4c4yR6YKUrscpipxCb4epivUIvQCRyPWX0aNE6J5HnEoj7
+ VmSK4Yn58EXKXTfU=
+X-Received: by 2002:a5d:4f92:: with SMTP id d18mr19846131wru.118.1604938771360; 
+ Mon, 09 Nov 2020 08:19:31 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyzs8vVpm0Fv7ncn8kSQ+bN8IAXk00vXnIdj4nWaTKtl1jG0LP0qvrvapNMF8PX0a6kw6Opww==
+X-Received: by 2002:a5d:4f92:: with SMTP id d18mr19846117wru.118.1604938771220; 
+ Mon, 09 Nov 2020 08:19:31 -0800 (PST)
+Received: from x1w.redhat.com (234.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.234])
+ by smtp.gmail.com with ESMTPSA id y4sm12747714wmj.2.2020.11.09.08.19.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Nov 2020 08:19:30 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr bugs-syssec janitor jnsnow kempniu stefanha
- th-huth
-X-Launchpad-Bug-Reporter: =?utf-8?b?TWljaGHFgiBLxJlwaWXFhCAoa2VtcG5pdSk=?=
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
-Message-Id: <160493804659.13670.1472345129996642897.malone@gac.canonical.com>
-Subject: [Bug 1681439] Re: dma_blk_cb leaks memory map handles on misaligned IO
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 1a7582bee34b12119c84965504b4d8db193ee1f6
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 11:16:03
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [NOTFORMERGE PATCH 1/2] hw/net: Test line with 342 chars
+Date: Mon,  9 Nov 2020 17:19:22 +0100
+Message-Id: <20201109161923.2632747-2-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201109161923.2632747-1-philmd@redhat.com>
+References: <20201109161923.2632747-1-philmd@redhat.com>
+MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ UPPERCASE_50_75=0.008 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,99 +111,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-OK, I can probably fix the alignment and use the new undo function to at
-least improve the characteristics of this failure considerably. Thanks
-for the pointer on the new iov function.
+Applying using unrestricted checkpatch:
 
-I see two potential problems still:
+ WARNING: line over 100 characters
+ #16: FILE: include/hw/net/imx_fec.h:118:
 
-(1) The IDE device will allow partial transfers to succeed, by doing
-partial sector writes. AFAIUI the IDE state machine is supposed to do
-full sector or nothing at all, but maybe I am wrong about that being a
-requirement. It is at least not a regression, exactly. I can file a
-separate bug for this.
+This change is not easy to review in gitk.
 
-(2) The invalid device inputs are just completely unknown to me right
-now, and I don't have any hardware in my own house to test this, so I
-have to deprioritize that until I can get back into the office and
-regain access to more testing equipment. HELP WANTED, if anyone has a
-PCI BMDMA that they can orchestrate in a virtual environment to prod it
-for how it handles certain errant inputs.
+  $ xwininfo -root | egrep "Width|Height"
+    Width: 1920
+    Height: 2160
 
--- =
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ include/hw/net/imx_fec.h | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1681439
+diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
+index e3a8755db92..c3ac7d25823 100644
+--- a/include/hw/net/imx_fec.h
++++ b/include/hw/net/imx_fec.h
+@@ -115,13 +115,7 @@ OBJECT_DECLARE_SIMPLE_TYPE(IMXFECState, IMX_FEC)
+ #define ENET_INT_TXF1          (1 <<  3)
+ #define ENET_INT_TXB1          (1 <<  2)
+ 
+-#define ENET_INT_MAC           (ENET_INT_HB | ENET_INT_BABR | ENET_INT_BABT | \
+-                                ENET_INT_GRA | ENET_INT_TXF | ENET_INT_TXB | \
+-                                ENET_INT_RXF | ENET_INT_RXB | ENET_INT_MII | \
+-                                ENET_INT_EBERR | ENET_INT_LC | ENET_INT_RL | \
+-                                ENET_INT_UN | ENET_INT_PLR | ENET_INT_WAKEUP | \
+-                                ENET_INT_TS_AVAIL | ENET_INT_TXF1 | \
+-                                ENET_INT_TXB1 | ENET_INT_TXF2 | ENET_INT_TXB2)
++#define ENET_INT_MAC           (ENET_INT_HB | ENET_INT_BABR | ENET_INT_BABT | ENET_INT_GRA | ENET_INT_TXF | ENET_INT_TXB | ENET_INT_RXF | ENET_INT_RXB | ENET_INT_MII | ENET_INT_EBERR | ENET_INT_LC | ENET_INT_RL | ENET_INT_UN | ENET_INT_PLR | ENET_INT_WAKEUP | ENET_INT_TS_AVAIL | ENET_INT_TXF1 | ENET_INT_TXB1 | ENET_INT_TXF2 | ENET_INT_TXB2)
+ 
+ /* RDAR */
+ #define ENET_RDAR_RDAR         (1 << 24)
+-- 
+2.26.2
 
-Title:
-  dma_blk_cb leaks memory map handles on misaligned IO
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Maintainer Edit:
-
-  The functions in dma-helpers mismanage misaligned IO, badly enough to
-  cause an infinite loop where no progress can be made. This allows the
-  IDE state machine to get wedged such that cancelling DMA can fail;
-  because the DMA helpers have bodged the state of the DMA transfer. See
-  Comment #15 for the in-depth analysis.
-
-  I've updated the name of this bug to reflect the current status as I
-  understand it.
-
-  --js
-
-  =
-
-  Original report:
-
-  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
-  started crashing due to the assertion quoted in the summary failing.
-  The assertion in question was added by commit 9972354856 ("block: add
-  BDS field to count in-flight requests").  My tests show that setting
-  discard=3Dunmap is needed to reproduce the issue.  Speaking of
-  reproduction, it is a bit flaky, because I have been unable to come up
-  with specific instructions that would allow the issue to be triggered
-  outside of my environment, but I do have a semi-sane way of testing that
-  appears to depend on a specific initial state of data on the underlying
-  storage volume, actions taken within the VM and waiting for about 20
-  minutes.
-
-  Here is the shortest QEMU command line that I managed to reproduce the
-  bug with:
-
-  =C2=A0=C2=A0=C2=A0=C2=A0qemu-system-x86_64 \
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-machine pc-i440fx-2.7,ac=
-cel=3Dkvm \
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-m 3072 \
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-drive file=3D/dev/lvm/qe=
-mu,format=3Draw,if=3Dide,discard=3Dunmap \
-  =C2=A0-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno=
-,vhost=3Don \
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,ne=
-tdev=3Dhostnet0 \
-  =C2=A0-vnc :0
-
-  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
-
-  QEMU was compiled using:
-
-  =C2=A0=C2=A0=C2=A0=C2=A0./configure --python=3D/usr/bin/python2.7 --targe=
-t-list=3Dx86_64-softmmu
-  =C2=A0=C2=A0=C2=A0=C2=A0make -j3
-
-  My virtualization environment is not really a critical one and
-  reproduction is not that much of a hassle, so if you need me to gather
-  further diagnostic information or test patches, I will be happy to help.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
 
