@@ -2,92 +2,87 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE44C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:25:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E75BC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:26:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6A92206ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:25:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06938206ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:26:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LYdiVCLg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6A92206ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fJ1LgZPN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06938206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc3QE-0003Y8-NR
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:25:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55072)
+	id 1kc3RO-0004kx-1N
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:26:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kc3IJ-0004gD-Do
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:16:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38993)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kc3IH-0001LN-86
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:16:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604913416;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ACrHmPB7jxjTWDEz48cSmcbUT7WzxHmWY0bYSyQ6838=;
- b=LYdiVCLgTTpLljimEuPzJpM/PWB2tmG5v8Vw8N8vGF5rfa0/VNsDLIo/uA3lrSbAdpcqFc
- dzjY5Jw3rE/B3LMoVKdeCj+Ru6w151i6bJ1StK/rHpuPJNqzgEZ+bDX6lnVah0HfECz23V
- RB4eNZSPeTGHfkMJq1+pX6mvm9gNcAE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-pgwCWruFPIiBHHOC5V-uaA-1; Mon, 09 Nov 2020 04:16:52 -0500
-X-MC-Unique: pgwCWruFPIiBHHOC5V-uaA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2E5F809DCD;
- Mon,  9 Nov 2020 09:16:50 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-53.ams2.redhat.com [10.36.112.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A18D56EF4A;
- Mon,  9 Nov 2020 09:16:44 +0000 (UTC)
-Subject: Re: [RFC PATCH-for-5.2] tests/acceptance: Disable Spartan-3A DSP
- 1800A test
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20201109080747.2408489-1-f4bug@amsat.org>
- <a991b796-0d03-6a2a-1008-6e7d2edc9e54@redhat.com>
- <f7d65bef-846d-6880-937b-c3095bda9a09@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9cbf49af-ebc7-f4aa-b968-176925ce3a7c@redhat.com>
-Date: Mon, 9 Nov 2020 10:16:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <thatlemon@gmail.com>)
+ id 1kc3KY-0008HD-BN; Mon, 09 Nov 2020 04:19:18 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:32817)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <thatlemon@gmail.com>)
+ id 1kc3KW-00024q-CW; Mon, 09 Nov 2020 04:19:18 -0500
+Received: by mail-wr1-x433.google.com with SMTP id b8so7868258wrn.0;
+ Mon, 09 Nov 2020 01:19:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=KBIjlQM66mJvwO/muE6YXc28qkIsRWc0niT1cUKfknY=;
+ b=fJ1LgZPNGSy3Wb2hZhpgHglCYuLT8Mw/qmjP73CPdsCz8Xpr6UR2Wf/BlBaE+EwjdV
+ yXEueTt00/CxPOeWkgbLZebT3fG2QUGwAhRQ15AO8mbb8QoVUJKkkARR7D1WpUK264PM
+ x0DcWBEqaS/mscv1WJMq+9QdX1RmP/cQyRocft8wIEwL3LSw0P6q2Q1IGPBsD7z+yj8D
+ JXsWcfZku+k0T9Xv2rksYuEMH+EH8SMmV46uy4B27LT7MnRqbeofR7oJAFGOSQbUd9u7
+ N6WW2lpdO1bfaH1AafLFKtKbGiP+tDK2Dzqr4GLJYk4yHwl6O+4dyTbwQSc/yFtWB1+Y
+ gG+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=KBIjlQM66mJvwO/muE6YXc28qkIsRWc0niT1cUKfknY=;
+ b=AukUZ+E+VokOAhUFGe03+VwnYX/5cIsm9MoVnSNmcw/LTm0dE2YgIIQ12pChZIL8kn
+ FHtLdx3y0wXJp9XJRafmFY0p1gaon9KJjG/T5od2rDIMsBIkt37ooBLDnXMCuGYmz8Kh
+ en1MmGcxg+EaM1VlGOjxgI9rcOuefwNkBZk1zltTXYBmd7/xq117UihIYkgjCmothp3t
+ YtHdhJlW1k7qC3xQY40EL7Ik4mGLUs1DwszMZjyKjqyhii2bEiwFBVQf3Hmv32PjXhQ7
+ AHda18RHdXBuv2RMLlJABWL1Iq9HsjBJErCmwTUsvP3RRPbtlk7nhDdTO7eBo7m5cwbR
+ svmA==
+X-Gm-Message-State: AOAM531P+38t8IF0GUfBk65vrXPQNnGDMbeY+BXpVZwwfkw+yclQI1wz
+ 1bEMO6wV16D9UCQHWZKFohrchgZwEyZZdw==
+X-Google-Smtp-Source: ABdhPJwAvrKzsAY1WxKOyDSJ7evDponzb9OPlEbMH6zD3L+kIGyNFCXK3uBbD8GZBwWN6N3vojOk5Q==
+X-Received: by 2002:adf:bb06:: with SMTP id r6mr1742886wrg.286.1604913553775; 
+ Mon, 09 Nov 2020 01:19:13 -0800 (PST)
+Received: from localhost.localdomain ([151.33.227.77])
+ by smtp.gmail.com with ESMTPSA id o17sm12281612wmd.34.2020.11.09.01.19.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Nov 2020 01:19:13 -0800 (PST)
+From: LemonBoy <thatlemon@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/2] ppc/translate: Implement lxvwsx opcode
+Date: Mon,  9 Nov 2020 10:17:10 +0100
+Message-Id: <d7d533e18c2bc10d924ee3e09907ff2b41fddb3a.1604912739.git.thatlemon@gmail.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-In-Reply-To: <f7d65bef-846d-6880-937b-c3095bda9a09@amsat.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=thatlemon@gmail.com; helo=mail-wr1-x433.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,69 +96,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Cleber Rosa <crosa@redhat.com>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Giuseppe Musacchio <thatlemon@gmail.com>, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/11/2020 10.09, Philippe Mathieu-Daudé wrote:
-> On 11/9/20 10:04 AM, Thomas Huth wrote:
->> On 09/11/2020 09.07, Philippe Mathieu-Daudé wrote:
->>> This test is regularly failing on CI :( Do not run it automatically.
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> ---
->>>  tests/acceptance/boot_linux_console.py | 1 +
->>>  tests/acceptance/replay_kernel.py      | 1 +
->>>  2 files changed, 2 insertions(+)
->>>
->>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
->>> index 8f433a67f84..010e8790c0f 100644
->>> --- a/tests/acceptance/boot_linux_console.py
->>> +++ b/tests/acceptance/boot_linux_console.py
->>> @@ -1025,6 +1025,7 @@ def test_m68k_mcf5208evb(self):
->>>          tar_hash = 'ac688fd00561a2b6ce1359f9ff6aa2b98c9a570c'
->>>          self.do_test_advcal_2018('07', tar_hash, 'sanity-clause.elf')
->>>  
->>> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeout')
->>>      def test_microblaze_s3adsp1800(self):
->>>          """
->>>          :avocado: tags=arch:microblaze
->>> diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
->>> index 00c228382bd..c1f5fa4de71 100644
->>> --- a/tests/acceptance/replay_kernel.py
->>> +++ b/tests/acceptance/replay_kernel.py
->>> @@ -280,6 +280,7 @@ def test_m68k_mcf5208evb(self):
->>>          file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
->>>          self.do_test_advcal_2018(file_path, 'sanity-clause.elf')
->>>  
->>> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeout')
->>>      def test_microblaze_s3adsp1800(self):
->>>          """
->>>          :avocado: tags=arch:microblaze
->>
->> I think this is a recent regression - it hasn't been failing in the past. We
->> should first try to find out why it is failing now before sending it to the
->> @skipUnless nirvana... could you maybe add it to the "Known issues" at
->> https://wiki.qemu.org/Planning/5.2 instead?
-> 
-> I agree it looks like a regression.
-> 
-> I disagree we should keep broken tests failing the pipeline,
-> even if we are not using a Gating CI.
+Implement the "Load VSX Vector Word & Splat Indexed" opcode, introduced
+in Power ISA v3.0.
 
-But what happens if you disable the test at this point in time now? I think
-nobody is going to look into this issue anymore since nobody feels
-responsible. Thus the bug simply get completely ignored. Please add it at
-least the the "Known issues" section.
+Buglink: https://bugs.launchpad.net/qemu/+bug/1793608
+Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+---
+ target/ppc/translate/vsx-impl.c.inc | 30 +++++++++++++++++++++++++++++
+ target/ppc/translate/vsx-ops.c.inc  |  1 +
+ 2 files changed, 31 insertions(+)
 
- Thomas
+diff --git a/target/ppc/translate/vsx-impl.c.inc b/target/ppc/translate/vsx-impl.c.inc
+index b518de46db..075f063e98 100644
+--- a/target/ppc/translate/vsx-impl.c.inc
++++ b/target/ppc/translate/vsx-impl.c.inc
+@@ -139,6 +139,36 @@ static void gen_lxvw4x(DisasContext *ctx)
+     tcg_temp_free_i64(xtl);
+ }
+ 
++static void gen_lxvwsx(DisasContext *ctx)
++{
++    TCGv EA;
++    TCGv_i32 data;
++
++    if (xT(ctx->opcode) < 32) {
++        if (unlikely(!ctx->vsx_enabled)) {
++            gen_exception(ctx, POWERPC_EXCP_VSXU);
++            return;
++        }
++    } else {
++        if (unlikely(!ctx->altivec_enabled)) {
++            gen_exception(ctx, POWERPC_EXCP_VPU);
++            return;
++        }
++    }
++
++    gen_set_access_type(ctx, ACCESS_INT);
++    EA = tcg_temp_new();
++
++    gen_addr_reg_index(ctx, EA);
++
++    data = tcg_temp_new_i32();
++    tcg_gen_qemu_ld_i32(data, EA, ctx->mem_idx, MO_TEUL);
++    tcg_gen_gvec_dup_i32(MO_UL, vsr_full_offset(xT(ctx->opcode)), 16, 16, data);
++
++    tcg_temp_free(EA);
++    tcg_temp_free_i32(data);
++}
++
+ static void gen_bswap16x8(TCGv_i64 outh, TCGv_i64 outl,
+                           TCGv_i64 inh, TCGv_i64 inl)
+ {
+diff --git a/target/ppc/translate/vsx-ops.c.inc b/target/ppc/translate/vsx-ops.c.inc
+index 7fd3942b84..1d41beef26 100644
+--- a/target/ppc/translate/vsx-ops.c.inc
++++ b/target/ppc/translate/vsx-ops.c.inc
+@@ -5,6 +5,7 @@ GEN_HANDLER_E(lxsibzx, 0x1F, 0x0D, 0x18, 0, PPC_NONE, PPC2_ISA300),
+ GEN_HANDLER_E(lxsihzx, 0x1F, 0x0D, 0x19, 0, PPC_NONE, PPC2_ISA300),
+ GEN_HANDLER_E(lxsspx, 0x1F, 0x0C, 0x10, 0, PPC_NONE, PPC2_VSX207),
+ GEN_HANDLER_E(lxvd2x, 0x1F, 0x0C, 0x1A, 0, PPC_NONE, PPC2_VSX),
++GEN_HANDLER_E(lxvwsx, 0x1F, 0x0C, 0x0B, 0, PPC_NONE, PPC2_ISA300),
+ GEN_HANDLER_E(lxvdsx, 0x1F, 0x0C, 0x0A, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(lxvw4x, 0x1F, 0x0C, 0x18, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(lxvh8x, 0x1F, 0x0C, 0x19, 0, PPC_NONE,  PPC2_ISA300),
+-- 
+2.27.0
 
 
