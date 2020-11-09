@@ -2,88 +2,87 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D70EC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4B6C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:41:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 898F2206CB
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:38:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EECE82074F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:41:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UnAhup7/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 898F2206CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JB3utGtm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EECE82074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcAC1-0005fK-Ch
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 11:38:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52672)
+	id 1kcAEU-0006u8-45
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 11:41:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kcAAo-0004pB-Nm
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:37:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46007)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kcACS-0005vG-ET
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:39:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50657)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kcAAl-000504-Ua
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:37:41 -0500
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kcACQ-0005YX-KN
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:39:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604939859;
+ s=mimecast20190719; t=1604939961;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=+g5hXVF/6tHVrSt/PoVz0WCJEPMqhhQeSGsCxE1qRto=;
- b=UnAhup7/HbXl4hjc5WX1pQ7C2HspDDvykYD0NyU8FSl1ztpkBVr6Wx4GeKKEw8E0vcpI04
- g9fLu54SJowAN06hisSBh9fvFFPAEpLCzXg5JYsm0k+uotVjHqBdrLR97hSCaQhQmVsZ0N
- sMMO0rwtecA6FzO6Br7v/PFdWA/2K2E=
+ bh=K576SkkFpk5eNT30oARyCZ7bat7Gc96ic7/rpSCFk8Y=;
+ b=JB3utGtmew9I7UP5Ndh7eC8het1Yy2resjF3Qlsp2aJTXSLDtSdawyYRTkHQutz1QF1p2o
+ vN39IsK3z4grFqXK0RGDzTJNDgoCbu/dkPwDcYvtLYJ+NGpGxDiJGnK9Z5ytzC1o69tr/W
+ w+Ze4CqvQJITRlVaGtPUc/d5mS17lHA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-R9-dunfhNgWkHUo_U7Wo-A-1; Mon, 09 Nov 2020 11:37:35 -0500
-X-MC-Unique: R9-dunfhNgWkHUo_U7Wo-A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-531-iNe4vPq_NJ-8Wvh_1uBdXQ-1; Mon, 09 Nov 2020 11:39:17 -0500
+X-MC-Unique: iNe4vPq_NJ-8Wvh_1uBdXQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE2798C898C;
- Mon,  9 Nov 2020 16:37:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDE4E1019624;
+ Mon,  9 Nov 2020 16:39:15 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
  [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8086910074EA;
- Mon,  9 Nov 2020 16:37:28 +0000 (UTC)
-Date: Mon, 9 Nov 2020 11:37:26 -0500
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 050D875132;
+ Mon,  9 Nov 2020 16:39:10 +0000 (UTC)
+Date: Mon, 9 Nov 2020 11:39:09 -0500
 From: Cleber Rosa <crosa@redhat.com>
-To: Andrea Bolognani <abologna@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
 Subject: Re: [PATCH v4 2/4] Jobs based on custom runners: build environment
  docs and playbook
-Message-ID: <20201109163726.GC3874327@localhost.localdomain>
+Message-ID: <20201109163909.GD3874327@localhost.localdomain>
 References: <20201019015003.1527746-1-crosa@redhat.com>
  <20201019015003.1527746-3-crosa@redhat.com>
- <c0e7bd88bf64c0b22023810192fdb6e38d96fd97.camel@redhat.com>
+ <d2b1f4e8-c257-ef80-9ceb-6fcaf15c3430@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c0e7bd88bf64c0b22023810192fdb6e38d96fd97.camel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <d2b1f4e8-c257-ef80-9ceb-6fcaf15c3430@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="vOmOzSkFvhd7u8Ms"
+ protocol="application/pgp-signature"; boundary="uxuisgdDHaNETlh8"
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,132 +97,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
  Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
  Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
  Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>,
  Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
  Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---vOmOzSkFvhd7u8Ms
+--uxuisgdDHaNETlh8
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 20, 2020 at 07:52:43PM +0200, Andrea Bolognani wrote:
-> On Sun, 2020-10-18 at 21:50 -0400, Cleber Rosa wrote:
-> > +++ b/scripts/ci/setup/build-environment.yml
-> > @@ -0,0 +1,233 @@
-> > +---
-> > +- name: Installation of basic packages to build QEMU
-> > +  hosts: all
-> > +  tasks:
->=20
-> My Ansible-fu is a bit rusty at the moment, so please double-check my
-> claims and apologies in advance for the ones that I will get wrong O:-)
->=20
-> > +    - name: Install basic packages to build QEMU on Ubuntu 18.04/20.04
-> > +      apt:
-> > +        update_cache: yes
-> > +        # Originally from tests/docker/dockerfiles/ubuntu1804.docker
-> > +        pkg:
-> > +          - ccache
-> > +          - clang
->=20
-> Instead of using the 'apt' module here, and the equivalent module
-> further down, you could just do
->=20
->   package:
->     name:
->       - pkg1
->       - pkg2
->         ...
->     state: present
->=20
-> every single time and let Ansible take care of the differences for
-> you.
->
-
-I'm almost sure that this was a conscious decision.  I remeber it had
-to do with not being able to set `update_cache`, and failures on
-recently installed systems and containers that did not update the APT
-cache.  There may be something else, but I'll have to give it another
-round of testing.
-
-FIY, under the hood, package is not really a module, but an action
-plugin that forwards these very limited options to the set or detected
-package manager, so it brings uniformity in the playbook, but limits
-the control too.  IMO, it's very low impact to leave it AS IS.
-
-> > +      when: "ansible_facts['distribution'] =3D=3D 'Ubuntu'"
->=20
-> Quoting the entire condition is not necessary, you can just have
->=20
->   when: ansible_facts['distribution'] =3D=3D 'Ubuntu'
->=20
-> or, my preference,
->=20
->   when:
->     - ansible_facts['distribution'] =3D=3D 'Ubuntu'
->
-
-Yep, I've used the explicit lists when there was more than one
-condition, but having a standard style is better indeed.
-
-> which results in a nicer diff when you add/remove conditions.
->=20
-> > +    - name: Install packages to build QEMU on Ubuntu 18.04/20.04 on no=
-n-s390x
-> > +      apt:
-> > +        update_cache: yes
-> > +        pkg:
-> > +         - libspice-server-dev
-> > +         - libxen-dev
->=20
-> Indentation of list items is inconsistent here.
->
-
-True.  Fixed, thanks!
-
-> > +    - name: Install basic packages to build QEMU on FreeBSD 12.x
-> > +      pkgng:
-> > +        # Originally from packages on .cirrus.yml under the freebsd_12=
-_task
-> > +        name: bash,curl,cyrus-sasl,git,glib,gmake,gnutls,gsed,nettle,n=
-inja,perl5,pixman,pkgconf,png,usbredir
->
-> See above for 'pkgng' vs 'package', but at the very least this should
-> be
->=20
->   pkgng:
->     name:
->       - bash
->       - curl
->         ...
->=20
-> or each time the list is touched the resulting diff is going to be
-> unmanageable.
->
-
-The documentation suggests a comma separated list of package names:
-
-   https://docs.ansible.com/ansible/2.8/modules/pkgng_module.html#pkgng-mod=
-ule
-
-And the reason is that this module is not as smart as others, and will
-run one separate command for each individual package name value:
-
-   https://github.com/ansible/ansible/blob/v2.10.3/test/support/integration=
-/plugins/modules/pkgng.py#L214
-
-It's a tradeoff indeed, but I think we're aligned with the docs.
-
+On Wed, Oct 21, 2020 at 09:00:27AM +0200, Thomas Huth wrote:
+> On 19/10/2020 03.50, Cleber Rosa wrote:
+> > To run basic jobs on custom runners, the environment needs to be
+> > properly set up.  The most common requirement is having the right
+> > packages installed.
+> >=20
+> > The playbook introduced here covers a number of different Linux
+> > distributions and FreeBSD, and are intended to provide a reproducible
+> > environment.
+> >=20
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > ---
+> [...]
 > > +    - name: Enable PowerTools repo on CentOS 8
 > > +      ini_file:
 > > +        path: /etc/yum.repos.d/CentOS-PowerTools.repo
@@ -233,48 +137,44 @@ It's a tradeoff indeed, but I think we're aligned with the docs.
 > > +      when:
 > > +        - "ansible_facts['distribution'] =3D=3D 'CentOS'"
 > > +        - "ansible_facts['distribution_major_version'] =3D=3D '8'"
+> > +
+> > +    - name: Install basic packages to build QEMU on CentOS 8
+> > +      dnf:
+> > +        # Originally from tests/docker/dockerfiles/centos8.docker
+> > +        name:
+> > +          - SDL-devel
 >=20
-> Another option would be to use
+> We do not support SDL1 in QEMU anymore, so this should be SDL2-devel now.
+> Yes, we've also got it wrong in the docker files ... I'll send a patch to
+> fix it there.
 >=20
->   command: 'dnf config-manager --set-enabled Stream-PowerTools -y'
->   args:
->     warn: no
->=20
-> but I have to admit the way you're doing it is very clever ;)
->
+>  Thomas
 
-Yeah, that would require another package to be installed, and then the
-command executed... So I think this is cheaper and eaiser indeed.
-
-> --=20
-> Andrea Bolognani / Red Hat / Virtualization
->=20
-
-Thanks for the review, I'll report on the additional points as soon as
-I test them.  If appropriate, I'll put notes on the v5.
+Nice catch.  I see the dockerfile changes are already merged, so
+updating them here.
 
 - Cleber.
 
---vOmOzSkFvhd7u8Ms
+--uxuisgdDHaNETlh8
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+pcEMACgkQZX6NM6Xy
-CfN+mBAAh1i8Rjzlp/JFOVlXinnXczgon1s/Zn6wK+j/YXh0faaf4LCRasbBlHxd
-ynQMTcd8ycT1kwFuRFN4YRx9WXC0H/TCese4i1TmjeMGCAC8tmOoKSGQ7FOZX/Sr
-UUAR5p1vyPgMz/DB/utLxJjukGsD/mIWPt4Zo36B2b1aUxN22jDzXAsCzpqxE/d9
-5Vo8aLgfKUbaxv06iJJCr+wHsGvGOziiNG+wXv9a08FONj2h1lFKJe6dghmNmbUm
-FJfgkdCbijllljzGdDEA70kPyLfZD9ewZWIKxfXGIwjXpMGskc+PrRKPks38xI/z
-QMjCc9ZdBtCNQ4XB1G/0yfbH3j8iqjzauIUYXHzuk6KaJ13jHIVRGMb/Ai/0gSaG
-bRXlKYJZq3m+nAtz1wVoVT3rkP5bfuY1FyLD2ZmOUmzW4J+9uQyzbiU+QMLbbXMj
-dX7BpJtA9ew9vrziGbDs7uvSJBR7Dxoddn2yqQkNnCM30/92+cC2SkcjKwkNf0rH
-HkEdllbzA4Li1rc4QW60LYaxpW/iET5BWcDVgLvZhB3svjl8I4xnr7dB6zZhhMcv
-vuRU3S3oQjjW/3IJ/BE7KYlyPgsJ9fdtYS13xYf2cjg+3Wa+NJkX1wFEgKTNKROB
-48GFS0xn62nKbwS7M6UbSfACIAA8F0qAQIBoVFU/Uy4i2koOOMc=
-=IgZY
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+pcK0ACgkQZX6NM6Xy
+CfNGehAAt1yFUQTsi+vLkXAOD0Gv5s0/fsDT1hBKx5kGH5u6ZnVAwIlF/r5ZqMsi
+0nFUdplW3oRDwG6A9yiDGXVColXTel1K45+iLt+8fXK5lgQ9KduIJfuLmzaYKBKS
+8Zz55ZKhcNAzOer3W1J7Z1ul4oCDr8J2lg5hpNdbiqIwoHa3ja6VILdso7bafgrs
+aiVMaF20+boC9UFMnAuw+cOTd2k18uQHgDRARaVnXrdDXRxRJgroNWBaqF6ZxV3/
+/dMgn+fshGE4HdoJARRtYkAjl4PCFtyB3lsn9kRpuX0YpjQUdD6RyP5O7BZBCXHv
+mizptsVfRUXgC34pCXPm0bUAOCHECxXe7FlPLmt0EjbePnf6lGqAtwDYDjzxerYc
+Ewx3WwHnxz2rjRIYQKhUI+Vr4yzqgam6CbI7WU3hZvasK7wXHsg5mldSzobLE+ax
+yxd/wkADh9QNc44PWwMYebYvSKeASJggu/EGMND0yA46g1mIy5+MZxKsBTrhwHG1
+SVvHgVo470XYc1QSr48xyE4Nkb6rwsnzmgD+rSu22Z4onReUc6Eo+peWNENqJk4G
+Ar3hPC2wGOrI3J5N4xWJtWNgIE0pNme2JY/sKig3UoRiy5kM2WCEhtnGEJcXQTA9
+t0i+RXKx18VdXbphixi1mhTWTH+IuRYKLzhNBGRygkuZR2AI4fo=
+=cT6A
 -----END PGP SIGNATURE-----
 
---vOmOzSkFvhd7u8Ms--
+--uxuisgdDHaNETlh8--
 
 
