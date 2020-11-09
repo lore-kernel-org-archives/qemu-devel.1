@@ -2,85 +2,80 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9189C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C511DC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:23:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 434EF20789
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADA9920789
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:23:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PJJyFkFN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 434EF20789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aEOKMOIb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADA9920789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcArl-0000Ku-AJ
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:22:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35224)
+	id 1kcAt2-0001HZ-Jk
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:23:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kcAmW-0004Ci-PF
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:16:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32787)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kcAs9-0000pL-Ot
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:22:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49917)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kcAmL-0001cG-CT
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:16:38 -0500
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kcAs7-0003Y9-8f
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:22:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604942187;
+ s=mimecast20190719; t=1604942545;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=13PMHFUablDQUxTJtzyhQ2QgtAftLmN5nEFNPd4NdDM=;
- b=PJJyFkFNReSeE0CuqtE0dFMb9BDsqE+LYUMpZNB6sNkr9MTNdiIJ2uEmrVk7d0m+xe/o5h
- vHr7giuZzTERiyPcGBsCpbSb9sHy8noGqgTdozuQG21oXoiP0OlH8A4Y259XR4Ww7VJgod
- S3bH0CPTIyX9V7Ql6dQtVbsMtBkK2j4=
+ bh=gg/nebPBAd6muwJpmaK9eF+enW3wOYiULpgsiWey3IU=;
+ b=aEOKMOIbaaNZPAz0bG2LUyX9j5sHuAX9gaamFMKAuWCG1rM7hoFgxSNEV35sWh6slworb9
+ Co+Xuda9rrLUQFX2p/PLKqzEJNEC7klF6n5v6uKdgk/PbAzXmOeZhQxRaTVDhFF1X/EISF
+ nDNxpv5BFN+JpNov6Lr5e57yLqvyELw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-D4BwvVH8O_6O53T5mxPY1A-1; Mon, 09 Nov 2020 12:16:24 -0500
-X-MC-Unique: D4BwvVH8O_6O53T5mxPY1A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-595-TRx00fhHM3-LAA5sQmq8og-1; Mon, 09 Nov 2020 12:22:23 -0500
+X-MC-Unique: TRx00fhHM3-LAA5sQmq8og-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 409CB101964B;
- Mon,  9 Nov 2020 17:16:23 +0000 (UTC)
-Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B0CB25D9DD;
- Mon,  9 Nov 2020 17:16:19 +0000 (UTC)
-Date: Mon, 9 Nov 2020 12:16:18 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 00/44] Make qdev static property API usable by any QOM
- type
-Message-ID: <20201109171618.GA5733@habkost.net>
-References: <20201104160021.2342108-1-ehabkost@redhat.com>
- <20201106094511.GA23864@merkur.fritz.box>
- <20201106155013.GX5733@habkost.net>
- <20201106211034.GY5733@habkost.net>
- <ca99fc61-6cdd-117d-343e-8141e385522e@redhat.com>
- <20201109113404.GA24970@merkur.fritz.box>
- <3b711053-e67a-86fb-59e7-c06948dd8928@redhat.com>
- <20201109152125.GZ5733@habkost.net>
- <2300fd53-afa1-b957-b33b-cff2986fcb93@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3F7E8014D8
+ for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 17:22:21 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-53.ams2.redhat.com [10.36.112.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 973551002C10;
+ Mon,  9 Nov 2020 17:22:12 +0000 (UTC)
+Subject: Re: [PATCH-for-5.2 v3] configure: Check vhost-user is available for
+ vhost-user-blk-server
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20201109140730.2600017-1-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <50725a6d-f2b4-bf46-4f36-a4e7bf7f89fa@redhat.com>
+Date: Mon, 9 Nov 2020 18:22:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <2300fd53-afa1-b957-b33b-cff2986fcb93@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20201109140730.2600017-1-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -89,8 +84,9 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,149 +99,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 09, 2020 at 05:34:01PM +0100, Paolo Bonzini wrote:
-> On 09/11/20 16:21, Eduardo Habkost wrote:
-> > On Mon, Nov 09, 2020 at 03:15:26PM +0100, Paolo Bonzini wrote:
-> > > On 09/11/20 12:34, Kevin Wolf wrote:
-> > > > > If all properties were like this, it would be okay.  But the API in v2 is
-> > > > > the one that is most consistent with QOM in general. Here is how this change
-> > > > > would be a loss in term of consistency:
-> > > > > 
-> > > > > - you have the field properties split in two (with the property itself in
-> > > > > one place and the allow-set function in a different place), and also you'd
-> > > > > have some properties listed as array and some as function calls.
-> > > > 
-> > > > Why would you have properties defined as function calls for the same
-> > > > object that uses the array?
-> > > 
-> > > Because some properties would not be field properties, for example.  For
-> > > example, any non-scalar property would need to invoke visit_SomeQapiStruct
-> > > manually and would not be a field property.
-> > 
-> > Nothing prevents us from describing those properties inside the
-> > same property array.
+On 09/11/2020 15.07, Philippe Mathieu-Daudé wrote:
+> Check vhost-user is available when building vhost-user-blk-server.
 > 
-> Do you mean adding PropertyInfos for them?  Adding a once-only PropertyInfo
-> is worse than writing a custom getter/setter pair, because:
+> This fixes:
 > 
-> - without (DEFINE_)PROP_* you lose the type safety.
+>  $ ../configure \
+>       --disable-vhost-user --enable-vhost-user-blk-server && \
+>    make qemu-nbd
+>  ...
+>  [505/505] Linking target qemu-nbd
+>  FAILED: qemu-nbd
+>  cc  -o qemu-nbd qemu-nbd.p/qemu-nbd.c.o -Wl,--as-needed -Wl,--no-undefined -pie -Wl,--whole-archive libblockdev.fa libblock.fa libcrypto.fa libauthz.fa libqom.fa libio.fa -Wl,--no-whole-archive -Wl,--warn-common -Wl,-z,relro -Wl,-z,now -m64 -fstack-protector-strong -Wl,--start-group libqemuutil.a libblockdev.fa libblock.fa libcrypto.fa libauthz.fa libqom.fa libio.fa @block.syms -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -pthread -lgnutls -lutil -lm -lgthread-2.0 -lglib-2.0 -lbz2 -lgthread-2.0 -lglib-2.0 -lssh -lrbd -lrados -lcurl -lxml2 -lzstd -lacl -lgfapi -lglusterfs -lgfrpc -lgfxdr -luuid -laio /usr/lib64/libz.so -L/usr/lib64/iscsi -liscsi -lnettle -lgnutls -lpam -Wl,--end-group
+>  /usr/bin/ld: libblockdev.fa(block_export_vhost-user-blk-server.c.o): in function `vu_blk_process_vq':
+>  block/export/vhost-user-blk-server.c:203: undefined reference to `vu_get_queue'
+>  /usr/bin/ld: block/export/vhost-user-blk-server.c:208: undefined reference to `vu_queue_pop'
+>  /usr/bin/ld: libblockdev.fa(block_export_vhost-user-blk-server.c.o): in function `vu_blk_queue_set_started':
+>  block/export/vhost-user-blk-server.c:228: undefined reference to `vu_get_queue'
+>  /usr/bin/ld: libblockdev.fa(block_export_vhost-user-blk-server.c.o): in function `vu_blk_req_complete':
+>  block/export/vhost-user-blk-server.c:55: undefined reference to `vu_queue_push'
+>  /usr/bin/ld: block/export/vhost-user-blk-server.c:56: undefined reference to `vu_queue_notify'
+>  /usr/bin/ld: libblockdev.fa(block_export_vhost-user-blk-server.c.o): in function `vu_blk_queue_set_started':
+>  block/export/vhost-user-blk-server.c:229: undefined reference to `vu_set_queue_handler'
+>  /usr/bin/ld: libqemuutil.a(util_vhost-user-server.c.o): in function `vu_client_trip':
+>  util/vhost-user-server.c:176: undefined reference to `vu_dispatch'
+>  /usr/bin/ld: util/vhost-user-server.c:180: undefined reference to `vu_deinit'
+>  /usr/bin/ld: libqemuutil.a(util_vhost-user-server.c.o): in function `vu_accept':
+>  util/vhost-user-server.c:291: undefined reference to `vu_init'
+>  collect2: error: ld returned 1 exit status
+>  ninja: build stopped: subcommand failed.
+>  make: *** [Makefile:171: run-ninja] Error 1
 > 
-> - with (DEFINE_)PROP_* you have much more boilerplate to write
-
-I mean extending the API to let custom setters and getters appear
-on the Property array, not using the existing API.
-
+> Now we get:
 > 
-> > More precisely, it is
-> >    device_class_set_props(dc, foo);
-> > 
-> > which is supposed to become a one-line wrapper to
-> > object_class_add_field_properties().
+>  $ ../configure \
+>       --disable-vhost-user --enable-vhost-user-blk-server && \
+>  ERROR: --enable-vhost-user-blk-server requires --enable-vhost-user
 > 
-> You're right, I'm a few years late.  So that objection is withdrawn.
+> Fixes: bc15e44cb21 ("configure: introduce --enable-vhost-user-blk-server")
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Since v1:
+> - Addressed Thomas review comments
+> https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg02188.html
+> ---
+>  configure | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> > (There's also the possibility we let the class provide a default
-> > allow_set function, and both would become 100% the same)
-> 
-> That's a possibility too.  Though if we ever have a need for multiple
-> allow_set functions it would be somewhat complicated to add it back.
-> 
-> Instead of class-wide allow_set, we might as well have a "bool constructed"
-> field in Object and remove the function pointer altogether: just replace
-> prop->allow_set(obj) with just "!obj->constructed".
+> diff --git a/configure b/configure
+> index 805f7791503..3124be82da1 100755
+> --- a/configure
+> +++ b/configure
+> @@ -2375,6 +2375,10 @@ test "$vhost_user_fs" = "" && vhost_user_fs=$vhost_user
+>  if test "$vhost_user_fs" = "yes" && test "$vhost_user" = "no"; then
+>    error_exit "--enable-vhost-user-fs requires --enable-vhost-user"
+>  fi
+> +test "$vhost_user_blk_server" = "" && vhost_user_blk_server=$vhost_user
+> +if test "$vhost_user_blk_server" = "yes" && test "$vhost_user" = "no"; then
+> +  error_exit "--enable-vhost-user-blk-server requires --enable-vhost-user"
+> +fi
 
-That's a possibility, and maybe that could be the default
-allow_set behavior.  It may be a bit tricky to convert the
-existing backend objects to the new behavior in a gradual way,
-though.
+A little bit later in this file, we've got :
 
-> 
-> > > > I think having different ways for different things (class vs. object) is
-> > > > better than having different ways for the same things (class in qdev vs.
-> > > > class in non-qdev).
-> > > 
-> > > Right, but qdev's DEFINE_PROP_STRING would be easy to change to something
-> > > like
-> > > 
-> > > - DEFINE_PROP_STRING("name", ...),
-> > > + device_class_add_field_property(dc, "name", PROP_STRING(...));
-> > 
-> > I'm not worried about this direction of conversion (which is
-> > easy).  I'm worried about the function call => QAPI schema
-> > conversion.  Function calls are too flexible and requires parsing
-> > and executing C code.
-> 
-> Converting DEFINE_PROP_STRING to a schema also requires parsing C code,
-> since you can have handwritten Property literals (especially for custom
-> PropertyInfo).  Converting DEFINE_PROP_STRING it also requires matching the
-> array against calls to object_class_add_field_properties (which could be
-> hidden behind helpers such as device_class_set_props).  (Plus matching
-> class_init functions against TypeInfo).
+# libvhost-user is Linux-only
+test "$vhost_user_blk_server" = "" && vhost_user_blk_server=$linux
+if test "$vhost_user_blk_server" = "yes" && test "$linux" = "no"; then
+  error_exit "--enable-vhost-user-blk-server is only available on Linux"
+fi
 
-Parsing an array containing a handful of macros (a tiny subset of
-C) isn't even comparable to parsing and executing C code where
-object*_property_add*() calls can be buried deep in many levels
-of C function calls (which may or may not be conditional).
+I think it would be better to add the new code there instead.
+Also maybe better do something like:
 
-(Also, I don't think we should allow handwritten Property literals.)
+test "$vhost_user_blk_server" = "" && test "$vhost_user" = "yes" \
+ &&  vhost_user_blk_server=$linux
 
-> 
-> So, you don't save any parsing by using arrays.  (In fact I would probably
-> skip the parsing, and use your suggestion of *executing* C code: write the
-> QAPI schema generator in C, link into QEMU and run it just once to generate
-> the QOM schema).
+instead?
 
-If we do that with the existing code, we can't be sure the
-generated schema doesn't depend on configure flags or run time
-checks inside class_init.  Even locating the cases where this is
-happening is being a challenge because the API is too flexible.
-
-However, if we require the property list to be always evaluated
-at compile time, we can be sure that this method will be
-reliable.
-
-> 
-> QOM has been using function calls for many years, are there any cases of
-> misuse of that flexibility that you have in mind?  I can only think of two
-> *uses*, in fact.  One is eepro100_register_types is the only case I can
-> remember where types are registered dynamically.  The other is S390 CPU
-> features.  [...]
-
-The list of tricky dynamic properties is large and I don't think
-we even found all cases yet.  John documented many of them here:
-
-https://gitlab.com/jsnow/qemu/-/blob/cli_audit/docs/cli_audit.md
-
-Look, for example, for the sections named "Features" for CPU
-options.
-
-
->     [...]  In fact,
-> 
->   $ git grep \ object_class_property_add|grep -v '([a-z0-9_]*, \"'
-> 
-> shows some cases where property names are macros (an mst-ism :), but no
-> other case where properties are being defined dynamically.
-
-You are excluding instance-level object_property_add*() calls.
-Most of them are supposed to be class properties but were never
-converted.
-
-You are also ignoring the complexity of the code path that leads
-to the object*_property_add*() calls, which is the main problem
-on most cases.
-
--- 
-Eduardo
+ Thomas
 
 
