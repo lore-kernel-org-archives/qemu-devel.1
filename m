@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F491C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62758C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:15:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DF23206ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:15:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DF23206ED
+	by mail.kernel.org (Postfix) with ESMTPS id B7DD1206ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:15:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7DD1206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc7ws-0008La-GK
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:15:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40316)
+	id 1kc7xZ-0000db-Kn
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:15:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <remi@remlab.net>)
- id 1kc7sM-00034O-1R; Mon, 09 Nov 2020 09:10:30 -0500
-Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:60180
+ id 1kc7sN-00035b-5j; Mon, 09 Nov 2020 09:10:31 -0500
+Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:60182
  helo=ns207790.ip-94-23-215.eu)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <remi@remlab.net>)
- id 1kc7sK-0002nS-9B; Mon, 09 Nov 2020 09:10:29 -0500
+ id 1kc7sK-0002nT-8e; Mon, 09 Nov 2020 09:10:30 -0500
 Received: from basile.remlab.net (ip6-localhost [IPv6:::1])
- by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id 52E6D60105;
+ by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id 8D3516012C;
  Mon,  9 Nov 2020 15:10:22 +0100 (CET)
 From: remi.denis.courmont@huawei.com
 To: qemu-arm@nongnu.org
-Subject: [PATCH 06/17] target/arm: declare new AA64PFR0 bit-fields
-Date: Mon,  9 Nov 2020 16:10:09 +0200
-Message-Id: <20201109141020.27234-6-remi.denis.courmont@huawei.com>
+Subject: [PATCH 07/17] target/arm: add 64-bit S-EL2 to EL exception table
+Date: Mon,  9 Nov 2020 16:10:10 +0200
+Message-Id: <20201109141020.27234-7-remi.denis.courmont@huawei.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <5554493.MhkbZ0Pkbq@basile.remlab.net>
 References: <5554493.MhkbZ0Pkbq@basile.remlab.net>
@@ -74,41 +74,61 @@ Sender: "Qemu-devel"
 
 From: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
 
-Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.h | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+With the ARMv8.4-SEL2 extension, EL2 is a legal exception level in
+secure mode, though it can only be AArch64.
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index a1ee436853..a74055df22 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1849,6 +1849,12 @@ FIELD(ID_AA64PFR0, ADVSIMD, 20, 4)
- FIELD(ID_AA64PFR0, GIC, 24, 4)
- FIELD(ID_AA64PFR0, RAS, 28, 4)
- FIELD(ID_AA64PFR0, SVE, 32, 4)
-+FIELD(ID_AA64PFR0, SEL2, 36, 4)
-+FIELD(ID_AA64PFR0, MPAM, 40, 4)
-+FIELD(ID_AA64PFR0, AMU, 44, 4)
-+FIELD(ID_AA64PFR0, DIT, 48, 4)
-+FIELD(ID_AA64PFR0, CSV2, 56, 4)
-+FIELD(ID_AA64PFR0, CSV3, 60, 4)
+This patch adds the target EL for exceptions from 64-bit S-EL2.
+
+It also fixes the target EL to EL2 when HCR.{A,F,I}MO are set in secure
+mode. Those values were never used in practice as the effective value of
+HCR was always 0 in secure mode.
+
+Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
+---
+ target/arm/helper.c    | 10 +++++-----
+ target/arm/op_helper.c |  4 ++--
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 7c6795a04c..5c6b22c757 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -9005,13 +9005,13 @@ static const int8_t target_el_table[2][2][2][2][2][4] = {
+       {{/* 0   1   1   0 */{ 3,  3,  3, -1 },{ 3, -1, -1,  3 },},
+        {/* 0   1   1   1 */{ 3,  3,  3, -1 },{ 3, -1, -1,  3 },},},},},
+     {{{{/* 1   0   0   0 */{ 1,  1,  2, -1 },{ 1,  1, -1,  1 },},
+-       {/* 1   0   0   1 */{ 2,  2,  2, -1 },{ 1,  1, -1,  1 },},},
+-      {{/* 1   0   1   0 */{ 1,  1,  1, -1 },{ 1,  1, -1,  1 },},
+-       {/* 1   0   1   1 */{ 2,  2,  2, -1 },{ 1,  1, -1,  1 },},},},
++       {/* 1   0   0   1 */{ 2,  2,  2, -1 },{ 2,  2, -1,  1 },},},
++      {{/* 1   0   1   0 */{ 1,  1,  1, -1 },{ 1,  1,  1,  1 },},
++       {/* 1   0   1   1 */{ 2,  2,  2, -1 },{ 2,  2,  2,  1 },},},},
+      {{{/* 1   1   0   0 */{ 3,  3,  3, -1 },{ 3,  3, -1,  3 },},
+        {/* 1   1   0   1 */{ 3,  3,  3, -1 },{ 3,  3, -1,  3 },},},
+-      {{/* 1   1   1   0 */{ 3,  3,  3, -1 },{ 3,  3, -1,  3 },},
+-       {/* 1   1   1   1 */{ 3,  3,  3, -1 },{ 3,  3, -1,  3 },},},},},
++      {{/* 1   1   1   0 */{ 3,  3,  3, -1 },{ 3,  3,  3,  3 },},
++       {/* 1   1   1   1 */{ 3,  3,  3, -1 },{ 3,  3,  3,  3 },},},},},
+ };
  
- FIELD(ID_AA64PFR1, BT, 0, 4)
- FIELD(ID_AA64PFR1, SBSS, 4, 4)
-@@ -3881,6 +3887,11 @@ static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
- }
- 
-+static inline bool isar_feature_aa64_sel2(const ARMISARegisters *id)
-+{
-+    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SEL2) != 0;
-+}
-+
- static inline bool isar_feature_aa64_vh(const ARMISARegisters *id)
- {
-     return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, VH) != 0;
+ /*
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index b1065216b2..c3c3b30920 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -649,10 +649,10 @@ void HELPER(access_check_cp_reg)(CPUARMState *env, void *rip, uint32_t syndrome,
+         target_el = exception_target_el(env);
+         break;
+     case CP_ACCESS_TRAP_EL2:
+-        /* Requesting a trap to EL2 when we're in EL3 or S-EL0/1 is
++        /* Requesting a trap to EL2 when we're in EL3 is
+          * a bug in the access function.
+          */
+-        assert(!arm_is_secure(env) && arm_current_el(env) != 3);
++        assert(arm_current_el(env) != 3);
+         target_el = 2;
+         break;
+     case CP_ACCESS_TRAP_EL3:
 -- 
 2.29.2
 
