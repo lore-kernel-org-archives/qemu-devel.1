@@ -2,97 +2,89 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A622C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC79C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:57:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0C9920789
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:54:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E901020789
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:57:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3TbFGbg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0C9920789
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V7V/dn4O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E901020789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcARJ-0005po-2b
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 11:54:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56524)
+	id 1kcAUP-0007Ug-VP
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 11:57:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wainersm@redhat.com>)
- id 1kcAQM-0005PP-Ne
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:53:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60821)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kcATb-00070e-33
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:57:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27874)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <wainersm@redhat.com>)
- id 1kcAQJ-0002A8-Uw
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:53:45 -0500
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kcATY-0003LA-EZ
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:57:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604940820;
+ s=mimecast20190719; t=1604941023;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VTZZcaerATCb/c99JF8rvn/6Axz8Js/wxmKP24dujxQ=;
- b=P3TbFGbgXyRZ6DHYRQeG8KuehaCs9AhuWYHsWJK4Qhw6EIwL52VjrFjmKxNgyVq9aHYEYi
- EnBs9tfd5YIHtGbx3pl1yriNO9ti//oGV5WDyK5cPT/wm2cPZaQNUq//uOfVw/G/9Qclgu
- eEroMgE1JrrQku6LreyDur1aq8/Cc7E=
+ bh=tz7wesDdESI9Xp5DWYK+XUFRaKUdQGyEF5v91jwYI9o=;
+ b=V7V/dn4Oy2zmsGSdTcFKB6IFlUgXZINd7Kk2zai4Cl7lCyhclx+CteLmzGVwIimXVURxU7
+ BDRLl3W3Ja+fyi5a3g+ppuP8OaO06LOiIJcw547S73R0fTFf52nSOSQkPFmP5AfvwrvAND
+ pp7Ke2J5XD1XJFlAAI9vo7lUYGeJuJE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-qGgZSvjSOTKYsAKGcv-ACA-1; Mon, 09 Nov 2020 11:53:37 -0500
-X-MC-Unique: qGgZSvjSOTKYsAKGcv-ACA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-491-u92d63bNMIyYiWaQ1gmWOg-1; Mon, 09 Nov 2020 11:57:01 -0500
+X-MC-Unique: u92d63bNMIyYiWaQ1gmWOg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75D401084C85;
- Mon,  9 Nov 2020 16:53:35 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-120-220.rdu2.redhat.com
- [10.10.120.220])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7945F1002C10;
- Mon,  9 Nov 2020 16:53:31 +0000 (UTC)
-Subject: Re: [RFC PATCH-for-5.2] tests/acceptance: Disable Spartan-3A DSP
- 1800A test
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, qemu-devel@nongnu.org
-References: <20201109080747.2408489-1-f4bug@amsat.org>
- <a991b796-0d03-6a2a-1008-6e7d2edc9e54@redhat.com>
- <f7d65bef-846d-6880-937b-c3095bda9a09@amsat.org>
- <9cbf49af-ebc7-f4aa-b968-176925ce3a7c@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <13404d2c-4f82-8f08-142f-261348896042@redhat.com>
-Date: Mon, 9 Nov 2020 14:53:25 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 978421891E89
+ for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 16:57:00 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
+ [10.36.112.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C0CF55761;
+ Mon,  9 Nov 2020 16:57:00 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9C4871132BD6; Mon,  9 Nov 2020 17:56:58 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 4/6] qemu-option: clean up id vs. list->merge_lists
+References: <20201109133931.979563-1-pbonzini@redhat.com>
+ <20201109133931.979563-5-pbonzini@redhat.com>
+Date: Mon, 09 Nov 2020 17:56:58 +0100
+In-Reply-To: <20201109133931.979563-5-pbonzini@redhat.com> (Paolo Bonzini's
+ message of "Mon, 9 Nov 2020 08:39:29 -0500")
+Message-ID: <87wnyu4gf9.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <9cbf49af-ebc7-f4aa-b968-176925ce3a7c@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=wainersm@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=wainersm@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,89 +97,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Cleber Rosa <crosa@redhat.com>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On 11/9/20 7:16 AM, Thomas Huth wrote:
-> On 09/11/2020 10.09, Philippe Mathieu-Daudé wrote:
->> On 11/9/20 10:04 AM, Thomas Huth wrote:
->>> On 09/11/2020 09.07, Philippe Mathieu-Daudé wrote:
->>>> This test is regularly failing on CI :( Do not run it automatically.
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>> ---
->>>>   tests/acceptance/boot_linux_console.py | 1 +
->>>>   tests/acceptance/replay_kernel.py      | 1 +
->>>>   2 files changed, 2 insertions(+)
->>>>
->>>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
->>>> index 8f433a67f84..010e8790c0f 100644
->>>> --- a/tests/acceptance/boot_linux_console.py
->>>> +++ b/tests/acceptance/boot_linux_console.py
->>>> @@ -1025,6 +1025,7 @@ def test_m68k_mcf5208evb(self):
->>>>           tar_hash = 'ac688fd00561a2b6ce1359f9ff6aa2b98c9a570c'
->>>>           self.do_test_advcal_2018('07', tar_hash, 'sanity-clause.elf')
->>>>   
->>>> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeout')
->>>>       def test_microblaze_s3adsp1800(self):
->>>>           """
->>>>           :avocado: tags=arch:microblaze
->>>> diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
->>>> index 00c228382bd..c1f5fa4de71 100644
->>>> --- a/tests/acceptance/replay_kernel.py
->>>> +++ b/tests/acceptance/replay_kernel.py
->>>> @@ -280,6 +280,7 @@ def test_m68k_mcf5208evb(self):
->>>>           file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
->>>>           self.do_test_advcal_2018(file_path, 'sanity-clause.elf')
->>>>   
->>>> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeout')
->>>>       def test_microblaze_s3adsp1800(self):
->>>>           """
->>>>           :avocado: tags=arch:microblaze
->>> I think this is a recent regression - it hasn't been failing in the past. We
->>> should first try to find out why it is failing now before sending it to the
->>> @skipUnless nirvana... could you maybe add it to the "Known issues" at
->>> https://wiki.qemu.org/Planning/5.2 instead?
->> I agree it looks like a regression.
->>
->> I disagree we should keep broken tests failing the pipeline,
->> even if we are not using a Gating CI.
-> But what happens if you disable the test at this point in time now? I think
-> nobody is going to look into this issue anymore since nobody feels
-> responsible. Thus the bug simply get completely ignored. Please add it at
-> least the the "Known issues" section.
+> Forbid ids if the option is intended to be a singleton, as indicated by
+> list->merge_lists.
 
+Well, ->merge_lists need not imply singleton.  Perhaps we only ever use
+it that way.  Careful review is called for.
 
-Would make sense do the following?
+>                     This avoids that "./qemu-system-x86_64 -M q35,id=ff"
+> uses a "pc" machine type.
 
-1. Introduce a new tag (e.g. "regression") to mark tests which are 
-currently broken due regression bugs
+Just like any other QemuOptsList, "machine" may have any number of
+QemuOpts.  The ones with non-null ID happen to be ignored silently.
+Known[*] trap for the unwary.
 
-2. Filter those tests out of the regular acceptance jobs
+>                            Instead it errors out.  The affected options
+> are "qemu-img reopen -o",
 
-3. Add a new job to run only those tests
+reopen_opts in qemu-io-cmds.c
 
-  3.1. Use the allow_failure [1] property so that this job won't change 
-the overall testing status
+>                           "qemu-io open -o",
 
-Then if a bug is fixed and the test start to pass again, remove the 
-"regression" tag. Otherwise if the bug is still present on occasion of 
-QEMU release then it is definitively marked to skip.
+empty_opts in qemu-io.c
 
-[1] https://docs.gitlab.com/ee/ci/yaml/#allow_failure
+>                                              -rtc, -M, -boot, -name,
+> -m, -icount, -smp,
 
-- Wainer
+qemu_rtc_opts, qemu_machine_opts, qemu_boot_opts, qemu_name_opts,
+qemu_mem_opts, qemu_icount_opts, qemu_smp_opts in vl.c
+
+>                    -spice.
+
+qemu_spice_opts in spice-core.c.
+
+Are these all singletons?
+
+There's also machine_opts in qemu-config.c, but that's only to make
+query-command-line-options lie backward-compatibly.
 
 >
->   Thomas
+> qemu_opts_create's fail_if_exists parameter is now unnecessary:
+>
+> - it is unused if id is NULL
+>
+> - opts_parse only passes false if reached from qemu_opts_set_defaults,
+> in which case this patch enforces that id must be NULL
+>
+> - other callers that can pass a non-NULL id always set it to true
+>
+> Assert that it is true in the only case where "fail_if_exists" matters,
+> i.e. "id && !lists->merge_lists".  This means that if an id is present,
+> duplicates are always forbidden, which was already the status quo.
+
+Sounds like you're specializing the code (which might be good).
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  util/qemu-option.c | 27 ++++++++++++++-------------
+>  1 file changed, 14 insertions(+), 13 deletions(-)
+>
+> diff --git a/util/qemu-option.c b/util/qemu-option.c
+> index c88e159f18..91f4120ce1 100644
+> --- a/util/qemu-option.c
+> +++ b/util/qemu-option.c
+> @@ -619,7 +619,17 @@ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
+>  {
+>      QemuOpts *opts = NULL;
+>  
+> -    if (id) {
+> +    if (list->merge_lists) {
+> +        if (id) {
+> +            error_setg(errp, QERR_INVALID_PARAMETER, "id");
+> +            return NULL;
+> +        }
+> +        opts = qemu_opts_find(list, NULL);
+> +        if (opts) {
+> +            return opts;
+> +        }
+
+If lists>merge_lists, you no longer check id_wellformed().  Easy enough
+to fix: lift the check before this conditional.
+
+> +    } else if (id) {
+> +        assert(fail_if_exists);
+>          if (!id_wellformed(id)) {
+>              error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "id",
+>                         "an identifier");
+> @@ -629,17 +639,8 @@ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
+>          }
+>          opts = qemu_opts_find(list, id);
+>          if (opts != NULL) {
+> -            if (fail_if_exists && !list->merge_lists) {
+> -                error_setg(errp, "Duplicate ID '%s' for %s", id, list->name);
+> -                return NULL;
+> -            } else {
+> -                return opts;
+> -            }
+> -        }
+> -    } else if (list->merge_lists) {
+> -        opts = qemu_opts_find(list, NULL);
+> -        if (opts) {
+> -            return opts;
+> +            error_setg(errp, "Duplicate ID '%s' for %s", id, list->name);
+> +            return NULL;
+>          }
+>      }
+>      opts = g_malloc0(sizeof(*opts));
+
+Paths through the function before the patch:
+
+    id        fail_if_exists  merge_lists  |  return
+    null      don't care      false        |  new opts
+    null      don't care      true         |  existing or else new opts
+    non-null  false           don't care   |  existing or else new opts
+    non-null  true            true         |  existing or else new opts
+    non-null  true            false        |  new opts / fail if exist
+
+Too many cases.
+
+After the patch:
+
+    id        fail_if_exists  merge_lists  |  return
+    non-null  don't care      true         |  fail
+    null      don't care      true         |  existing or else new opts
+    non-null  false           false        |  abort
+    non-null  true            false        |  new opts / fail if exist
+    null      don't care      false        |  new opts
+
+Still too many :)
+
+I'm running out of time for today, and I still need to convince myself
+that the changes in behavior are all okay.
+
+> @@ -893,7 +894,7 @@ static QemuOpts *opts_parse(QemuOptsList *list, const char *params,
+>       * (if unlikely) future misuse:
+>       */
+>      assert(!defaults || list->merge_lists);
+> -    opts = qemu_opts_create(list, id, !defaults, errp);
+> +    opts = qemu_opts_create(list, id, !list->merge_lists, errp);
+>      g_free(id);
+>      if (opts == NULL) {
+>          return NULL;
+
+
+
+[*] Known to the QemuOpts cognoscenti, whose number could be
+embarrasingly close to one.
 
 
