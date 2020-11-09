@@ -2,95 +2,91 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34469C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:16:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE4ACC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:17:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C52820684
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:16:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4358C20684
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:17:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M+siDYkd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C52820684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FpN2CfgT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4358C20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc4Da-0001pL-D2
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 05:16:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38562)
+	id 1kc4F7-0002zM-0K
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 05:17:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kc4CE-0001FB-Av
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:14:46 -0500
-Received: from mail-ed1-x531.google.com ([2a00:1450:4864:20::531]:45721)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kc4CC-0004j9-Fz
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:14:45 -0500
-Received: by mail-ed1-x531.google.com with SMTP id q3so8097102edr.12
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 02:14:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=ByM42aUw1+jzz9v3Ni8eKcJn8vZiOQNwFUnfjsbie+w=;
- b=M+siDYkd9vm7h9QlTa0GeiBmbIydw2HsAPK+SFqD+EKYdmVDJjA7XyRyvrLXmx0R1L
- AOTgVXzbTi0Awbo2JxlOtpWn36K8xXa4lm4Ri3ZVWVvmEnsCfEsZsBRHdsU8W4sy6+jb
- v8KmbtHAmB0X1KNlpmVguB7nRhaM1WBxP6sXLrV6xS/y+delrksVsBl9xFnjvLTTNAp6
- 1zKGHPXiDRclJLsGIDAln2ghKsy2y54y8n5bjXUdIeH0OeRoIfCam30TFQp/HzcBYyrX
- StwDptN7gB/MQUW0meOLo6RR8pApxLBYweYf555xq7PUnQusiToGE1nsH6gycR0UgWaT
- mZrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=ByM42aUw1+jzz9v3Ni8eKcJn8vZiOQNwFUnfjsbie+w=;
- b=PsXKrbRhiIMZrspEyjc0+vk1rJDW4WFtvjTo8cBM0EWL2falRlR1bfsetJ3aIGh4pB
- X4KQlPozMw6A6SGUuy9IWKXuXrkfFpp342u1WR68n+fRu5NdK5iaBwB50sRHzBD47uRL
- vUuKGgT8cB08IAk5qZ/gMCyahEi/W42coVFogihTc+twwp5b3CRuO4JJ/fPyv8iWijMi
- h53rfHW2ghcN59jPUKiKFOpZPxnZ4gB2qZLLkZ+MdWfWMq00S0ONbm4+iJPMiQoPfQyI
- EH/birdjsl8WYMICOcoregff+eZLhIFYqYrMCw7EbgHahX1AXsG+S3v++4s0AGb7wBea
- z/mg==
-X-Gm-Message-State: AOAM533ljERukcetD8wSsUZLydXSGRCaqGZofmCfVaqJStxtdebQa5Lz
- ITdaj/sR20ihSJ80slozLkfbvvYrahgQU74N2ubLbg==
-X-Google-Smtp-Source: ABdhPJz01FCFh/ptnglmrg7bT7g55hnn4vzavQyTNAxJW/e9/AiD0CTHYoGh5v+ge38dFpyBOu3/pADWpYqZnN/kgUg=
-X-Received: by 2002:aa7:df82:: with SMTP id b2mr14078649edy.251.1604916882517; 
- Mon, 09 Nov 2020 02:14:42 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kc4E8-0002JA-9H
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:16:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43292)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kc4E6-0005UT-In
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:16:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604917001;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rYn1j7IAbTHYnx+J3mdvUo2hqlsEqhVRsJxMOrrUJOw=;
+ b=FpN2CfgTIy1fIJExoe/w6OfFKYVCgVpsaEO8jl16lJq1LOdvB+8A0lJY1UeeHbRWHji7T5
+ V4o74wHIHjtA4zgGQlcfpBZlbsQmhJ7aQyEbDquLXFSz5JyoDS3HQiqCwODWS98Ur6kFdJ
+ grpLOo5ja2QSIFjwZExfCi1XfmkGfig=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-448-Fg9_Qx6pPZqIJjNyZqELOA-1; Mon, 09 Nov 2020 05:16:37 -0500
+X-MC-Unique: Fg9_Qx6pPZqIJjNyZqELOA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D615185A0F0;
+ Mon,  9 Nov 2020 10:16:36 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-53.ams2.redhat.com [10.36.112.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 640995C22B;
+ Mon,  9 Nov 2020 10:16:24 +0000 (UTC)
+Subject: Re: [PATCH-for-6.0 v4 06/17] gitlab-ci: Update 'build-disabled' to
+ cover all configurable options
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20201108204535.2319870-1-philmd@redhat.com>
+ <20201108204535.2319870-7-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <79eedc40-e921-e806-f63a-60e4874797bf@redhat.com>
+Date: Mon, 9 Nov 2020 11:16:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20201030092324.GC99222@redhat.com>
- <CAFEAcA_8PKkfeninOXCzPdtY7WVHnC7Pkon758zXe7h9MzS+aw@mail.gmail.com>
- <20201030101013.GG99222@redhat.com>
- <CAFEAcA9crYaa8-guWkYFDYgEi8=gH3xaXraD7iWZMHM6vryAtw@mail.gmail.com>
- <c75f91b7-6972-9e48-efa9-49792fc011d2@redhat.com>
- <37a00b98-428b-d1ca-79c2-7846ccfda651@redhat.com>
- <de1d3c49-967b-bc96-220f-3deabc441dfa@redhat.com>
- <20201105155006.GP630142@redhat.com>
- <72985bcf-668d-7472-192f-502963d2b6ad@redhat.com>
- <CAFEAcA_dT_RQ8Pmk_S=zCSu1tUbptuP0+rtrsS55tEg+XD=S2Q@mail.gmail.com>
- <20201109101056.GC684242@redhat.com>
-In-Reply-To: <20201109101056.GC684242@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Nov 2020 10:14:30 +0000
-Message-ID: <CAFEAcA8o9X0Ebw_baDjPkTz7q9i8pHcxDBd9JhSJStVjW3s7kg@mail.gmail.com>
-Subject: Re: Migrating to the gitlab issue tracker
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::531;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x531.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20201108204535.2319870-7-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,49 +100,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Alistair Francis <alistair23@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Nov 2020 at 10:11, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
-wrote:
->
-> On Sun, Nov 08, 2020 at 11:58:28AM +0000, Peter Maydell wrote:
-> > On Sun, 8 Nov 2020 at 09:01, Thomas Huth <thuth@redhat.com> wrote:
-> > > I agree with Daniel. Please let's not clog the new bug tracker right =
-from
-> > > the start with hundreds of bugs - that only makes it harder to focus =
-on the
-> > > tickets that are really important. Let's use the migration instead to=
- start
-> > > as clean as possible again.
-> >
-> > I really don't like doing this kind of thing. It basically
-> > tells bug reporters "we don't care about your reports".
-> > We ought to at least triage them. Certainly for arm a
-> > lot of the reports in LP are real bug reports which we
-> > shouldn't just drop on the floor.
->
-> Mostly it is just a reflection of the reality we find ourselves in where
-> we have more bug reports than we have willing maintainer time to investig=
-ate
-> and resolve. Regardless of whether the bug are open or closed, there are =
-a
-> large number we clearly don't consider important, otherwise someone would
-> have already looked at them.
+On 08/11/2020 21.45, Philippe Mathieu-Daudé wrote:
+> Add these missing options to the 'build-disabled' job:
+>   --disable-auth-pam             (commit 8953caf3cd38)
+>   --disable-gcrypt               (commit 91bfcdb01d48)
+>   --disable-keyring              (commit 54e7aac05624)
+>   --disable-libudev              (commit 5c53015a480b)
+>   --disable-opengl               (commit da076ffed6b9)
+>   --disable-sparse               (commit 03b4fe7de226)
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  .gitlab-ci.yml | 7 +++++++
+>  1 file changed, 7 insertions(+)
+[...]
+> @@ -258,6 +264,7 @@ build-disabled:
+>        --disable-vhost-net
+>        --disable-vhost-scsi
+>        --disable-vhost-user
+> +      --disable-vhost-user-blk-server
+>        --disable-vhost-vdpa
+>        --disable-vhost-vsock
+>        --disable-virglrenderer
 
-Yeah, I agree with this. But there's a corollary: unless we
-somehow find more maintainer time in future to investigate
-bug reports, the new gitlab bug tracker is just going to quickly
-fill up with more unresolved bug reports, so why worry about
-whether it's empty at the start or not ?
+vhost-user-blk-server should get automatically disabled by
+--disable-vhost-user ... so maybe drop this hunk, so that we're able to
+detect problems with this logic in the future, too? (as we've just seen with
+the current build failures in the CI)
+... if you insist on keeping this hunk, I think you should at least mention
+it in the patch description (since you've mentioned all the other options there)
 
-thanks
--- PMM
+ Thomas
+
 
