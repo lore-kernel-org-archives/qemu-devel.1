@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB8A8C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E91AC388F7
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 212D4206ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:17:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 212D4206ED
+	by mail.kernel.org (Postfix) with ESMTPS id 25065206ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:18:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25065206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc7zZ-00039D-3V
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:17:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40466)
+	id 1kc80J-0003rf-T3
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:18:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40276)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <remi@remlab.net>)
- id 1kc7sj-0003Nj-3N; Mon, 09 Nov 2020 09:10:53 -0500
-Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:60188
+ id 1kc7sK-00031z-D0; Mon, 09 Nov 2020 09:10:28 -0500
+Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:60176
  helo=ns207790.ip-94-23-215.eu)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <remi@remlab.net>)
- id 1kc7sf-0002q5-Gb; Mon, 09 Nov 2020 09:10:52 -0500
+ id 1kc7sG-0002kk-65; Mon, 09 Nov 2020 09:10:28 -0500
 Received: from basile.remlab.net (ip6-localhost [IPv6:::1])
- by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id 5730D6038D;
- Mon,  9 Nov 2020 15:10:23 +0100 (CET)
+ by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id C6DE75FFA2;
+ Mon,  9 Nov 2020 15:10:21 +0100 (CET)
 From: remi.denis.courmont@huawei.com
 To: qemu-arm@nongnu.org
-Subject: [PATCH 10/17] target/arm: add ARMv8.4-SEL2 system registers
-Date: Mon,  9 Nov 2020 16:10:13 +0200
-Message-Id: <20201109141020.27234-10-remi.denis.courmont@huawei.com>
+Subject: [PATCH 04/17] target/arm: use arm_hcr_el2_eff() where applicable
+Date: Mon,  9 Nov 2020 16:10:07 +0200
+Message-Id: <20201109141020.27234-4-remi.denis.courmont@huawei.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <5554493.MhkbZ0Pkbq@basile.remlab.net>
 References: <5554493.MhkbZ0Pkbq@basile.remlab.net>
@@ -74,70 +74,103 @@ Sender: "Qemu-devel"
 
 From: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
 
-Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
----
- target/arm/cpu.h    |  2 ++
- target/arm/helper.c | 24 ++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+This will simplify accessing HCR conditionally in secure state.
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index c7f17fc099..7a03869d26 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -323,9 +323,11 @@ typedef struct CPUARMState {
-             uint64_t ttbr1_el[4];
-         };
-         uint64_t vttbr_el2; /* Virtualization Translation Table Base.  */
-+        uint64_t vsttbr_el2; /* Secure Virtualization Translation Table. */
-         /* MMU translation table base control. */
-         TCR tcr_el[4];
-         TCR vtcr_el2; /* Virtualization Translation Control.  */
-+        TCR vstcr_el2; /* Secure Virtualization Translation Control. */
-         uint32_t c2_data; /* MPU data cacheable bits.  */
-         uint32_t c2_insn; /* MPU instruction cacheable bits.  */
-         union { /* MMU domain access control register
+Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper.c | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
+
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 3df007a5dc..2263715ba4 100644
+index 817d4b1ca4..b5d6dc7daa 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -5721,6 +5721,27 @@ static const ARMCPRegInfo el2_v8_cp_reginfo[] = {
-     REGINFO_SENTINEL
- };
+@@ -4432,16 +4432,16 @@ static CPAccessResult aa64_cacheop_pou_access(CPUARMState *env,
  
-+static CPAccessResult sel2_access(CPUARMState *env, const ARMCPRegInfo *ri,
-+                                  bool isread)
-+{
-+    if (arm_current_el(env) == 3 || arm_is_secure_below_el3(env)) {
-+        return CP_ACCESS_OK;
-+    }
-+    return CP_ACCESS_TRAP_UNCATEGORIZED;
-+}
-+
-+static const ARMCPRegInfo el2_sec_cp_reginfo[] = {
-+    { .name = "VSTTBR_EL2", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 6, .opc2 = 0,
-+      .access = PL2_RW, .accessfn = sel2_access,
-+      .fieldoffset = offsetof(CPUARMState, cp15.vsttbr_el2) },
-+    { .name = "VSTCR_EL2", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 6, .opc2 = 2,
-+      .access = PL2_RW, .accessfn = sel2_access,
-+      .fieldoffset = offsetof(CPUARMState, cp15.vstcr_el2) },
-+    REGINFO_SENTINEL
-+};
-+
- static CPAccessResult nsacr_access(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    bool isread)
+ static int vae1_tlbmask(CPUARMState *env)
  {
-@@ -7733,6 +7754,9 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         if (arm_feature(env, ARM_FEATURE_V8)) {
-             define_arm_cp_regs(cpu, el2_v8_cp_reginfo);
+-    /* Since we exclude secure first, we may read HCR_EL2 directly. */
+-    if (arm_is_secure_below_el3(env)) {
+-        return ARMMMUIdxBit_SE10_1 |
+-               ARMMMUIdxBit_SE10_1_PAN |
+-               ARMMMUIdxBit_SE10_0;
+-    } else if ((env->cp15.hcr_el2 & (HCR_E2H | HCR_TGE))
+-               == (HCR_E2H | HCR_TGE)) {
++    uint64_t hcr = arm_hcr_el2_eff(env);
++
++    if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
+         return ARMMMUIdxBit_E20_2 |
+                ARMMMUIdxBit_E20_2_PAN |
+                ARMMMUIdxBit_E20_0;
++    } else if (arm_is_secure_below_el3(env)) {
++        return ARMMMUIdxBit_SE10_1 |
++               ARMMMUIdxBit_SE10_1_PAN |
++               ARMMMUIdxBit_SE10_0;
+     } else {
+         return ARMMMUIdxBit_E10_1 |
+                ARMMMUIdxBit_E10_1_PAN |
+@@ -9968,6 +9968,8 @@ static inline uint64_t regime_sctlr(CPUARMState *env, ARMMMUIdx mmu_idx)
+ static inline bool regime_translation_disabled(CPUARMState *env,
+                                                ARMMMUIdx mmu_idx)
+ {
++    uint64_t hcr_el2;
++
+     if (arm_feature(env, ARM_FEATURE_M)) {
+         switch (env->v7m.mpu_ctrl[regime_is_secure(env, mmu_idx)] &
+                 (R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK)) {
+@@ -9986,19 +9988,21 @@ static inline bool regime_translation_disabled(CPUARMState *env,
          }
-+        if (cpu_isar_feature(aa64_sel2, cpu)) {
-+            define_arm_cp_regs(cpu, el2_sec_cp_reginfo);
-+        }
-         /* RVBAR_EL2 is only implemented if EL2 is the highest EL */
-         if (!arm_feature(env, ARM_FEATURE_EL3)) {
-             ARMCPRegInfo rvbar = {
+     }
+ 
++    hcr_el2 = arm_hcr_el2_eff(env);
++
+     if (mmu_idx == ARMMMUIdx_Stage2) {
+         /* HCR.DC means HCR.VM behaves as 1 */
+-        return (env->cp15.hcr_el2 & (HCR_DC | HCR_VM)) == 0;
++        return (hcr_el2 & (HCR_DC | HCR_VM)) == 0;
+     }
+ 
+-    if (env->cp15.hcr_el2 & HCR_TGE) {
++    if (hcr_el2 & HCR_TGE) {
+         /* TGE means that NS EL0/1 act as if SCTLR_EL1.M is zero */
+         if (!regime_is_secure(env, mmu_idx) && regime_el(env, mmu_idx) == 1) {
+             return true;
+         }
+     }
+ 
+-    if ((env->cp15.hcr_el2 & HCR_DC) && arm_mmu_idx_is_stage1_of_2(mmu_idx)) {
++    if ((hcr_el2 & HCR_DC) && arm_mmu_idx_is_stage1_of_2(mmu_idx)) {
+         /* HCR.DC means SCTLR_EL1.M behaves as 0 */
+         return true;
+     }
+@@ -10349,7 +10353,7 @@ static hwaddr S1_ptw_translate(CPUARMState *env, ARMMMUIdx mmu_idx,
+             fi->s1ptw = true;
+             return ~0;
+         }
+-        if ((env->cp15.hcr_el2 & HCR_PTW) && (cacheattrs.attrs & 0xf0) == 0) {
++        if ((arm_hcr_el2_eff(env) & HCR_PTW) && (cacheattrs.attrs & 0xf0) == 0) {
+             /*
+              * PTW set and S1 walk touched S2 Device memory:
+              * generate Permission fault.
+@@ -10782,7 +10786,7 @@ static uint8_t convert_stage2_attrs(CPUARMState *env, uint8_t s2attrs)
+     uint8_t hihint = 0, lohint = 0;
+ 
+     if (hiattr != 0) { /* normal memory */
+-        if ((env->cp15.hcr_el2 & HCR_CD) != 0) { /* cache disabled */
++        if (arm_hcr_el2_eff(env) & HCR_CD) { /* cache disabled */
+             hiattr = loattr = 1; /* non-cacheable */
+         } else {
+             if (hiattr != 1) { /* Write-through or write-back */
+@@ -12099,7 +12103,7 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
+             }
+ 
+             /* Combine the S1 and S2 cache attributes. */
+-            if (env->cp15.hcr_el2 & HCR_DC) {
++            if (arm_hcr_el2_eff(env) & HCR_DC) {
+                 /*
+                  * HCR.DC forces the first stage attributes to
+                  *  Normal Non-Shareable,
 -- 
 2.29.2
 
