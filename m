@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11988C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA0AC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:35:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B47F206CB
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:33:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A4BE206CB
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:35:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxJvguv/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B47F206CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gcd9trn+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A4BE206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcEmd-0002c1-Bi
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 16:33:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33674)
+	id 1kcEoZ-0003wj-VC
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 16:35:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kcEg4-0003yA-Q7
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:26:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31012)
+ id 1kcEg7-00041t-Oy
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:26:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22699)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kcEg2-0005c3-Qb
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:26:16 -0500
+ id 1kcEg5-0005cl-1e
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:26:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604957173;
+ s=mimecast20190719; t=1604957176;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HrttNqAhwpG0xM9KyBcAIFaMWj5fSOHCWB5lN6j6duY=;
- b=UxJvguv/JqbE+XupvCqQmok0rBlMG5Nw4vSh5kb45CRj2+P+ZjKPsVcplUVEPnqyXu8/qc
- 2UJVhJpX1VBK/lKh1LAWmyOhDOYC+xGjcM7gdIWq8KjrIe+TGIy238h8zHhd4A+iMJyimn
- tiEMZRvE/ASpVMsRn7uSx69ICWsCqrM=
+ bh=HNZ23P3owjXbOa0F7aY0nEo1VFpb+WZS7l4fYOJpfss=;
+ b=gcd9trn+DL2TsdLGMjpCikyZk8LdmLb4LdRfWJRcATgahLvjLeUAF8IUZG5F+rU3ZHMzEs
+ f4GEw7N+8wlwkknWcp5Xz+KdUdsBy/enMjNya5Ms9M/o+uU9CzozzUuV9pYE8P86I1BTWb
+ fjwysqJmd5W27YmMMr0C7AkXQo1sDrI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-540-4GgTmPKWNZK-4qRrYmS3gQ-1; Mon, 09 Nov 2020 16:26:09 -0500
-X-MC-Unique: 4GgTmPKWNZK-4qRrYmS3gQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-152-l2vnL5qpMxaYh-KnK_MLPQ-1; Mon, 09 Nov 2020 16:26:13 -0500
+X-MC-Unique: l2vnL5qpMxaYh-KnK_MLPQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDD47879513
- for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 21:26:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1913879517
+ for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 21:26:12 +0000 (UTC)
 Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE1F77E72A;
- Mon,  9 Nov 2020 21:26:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E13060BF1;
+ Mon,  9 Nov 2020 21:26:12 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 5/8] qlit: Support all types of QNums
-Date: Mon,  9 Nov 2020 16:25:53 -0500
-Message-Id: <20201109212556.3934583-6-ehabkost@redhat.com>
+Subject: [PATCH 8/8] qom: Use qlit to represent property defaults
+Date: Mon,  9 Nov 2020 16:25:56 -0500
+Message-Id: <20201109212556.3934583-9-ehabkost@redhat.com>
 In-Reply-To: <20201109212556.3934583-1-ehabkost@redhat.com>
 References: <20201109212556.3934583-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -102,195 +102,402 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use QNumValue to represent QNums, so we can also support uint64_t
-and double QNum values.  Add new QLIT_QNUM_(INT|UINT|DOUBLE)
-macros for each case.
-
-The QLIT_QNUM() macro is being kept for compatibility with
-existing code, but becomes just a wrapper for QLIT_QNUM_INT().
+Using QLitObject lets us get rid of most of the
+.set_default_value functions, and just use
+object_property_set_default() directly.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/qapi/qmp/qlit.h | 11 +++++--
- qobject/qlit.c          |  4 +--
- tests/check-qjson.c     | 72 ++++++++++++++++++++++++++++++++++++++---
- 3 files changed, 78 insertions(+), 9 deletions(-)
+ include/hw/qdev-properties-system.h   |  2 +-
+ include/qom/field-property-internal.h |  4 ---
+ include/qom/field-property.h          | 26 ++++++++-----------
+ include/qom/property-types.h          | 21 +++++++---------
+ hw/core/qdev-properties-system.c      |  8 ------
+ qom/field-property.c                  | 27 ++++++++++++++------
+ qom/property-types.c                  | 36 ++++-----------------------
+ 7 files changed, 44 insertions(+), 80 deletions(-)
 
-diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
-index c0676d5daf..f9e356d31e 100644
---- a/include/qapi/qmp/qlit.h
-+++ b/include/qapi/qmp/qlit.h
-@@ -15,6 +15,7 @@
- #define QLIT_H
+diff --git a/include/hw/qdev-properties-system.h b/include/hw/qdev-properties-system.h
+index 0ac327ae60..a586424a33 100644
+--- a/include/hw/qdev-properties-system.h
++++ b/include/hw/qdev-properties-system.h
+@@ -65,7 +65,7 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
  
- #include "qobject.h"
-+#include "qnum.h"
+ #define DEFINE_PROP_UUID(_name, _state, _field) \
+     DEFINE_PROP(_name, _state, _field, qdev_prop_uuid, QemuUUID, \
+-                .set_default = true)
++                .defval = QLIT_QSTR("auto"))
  
- typedef struct QLitDictEntry QLitDictEntry;
- typedef struct QLitObject QLitObject;
-@@ -23,7 +24,7 @@ struct QLitObject {
-     QType type;
-     union {
-         bool qbool;
--        int64_t qnum;
-+        QNumValue qnum;
-         const char *qstr;
-         QLitDictEntry *qdict;
-         QLitObject *qlist;
-@@ -39,8 +40,14 @@ struct QLitDictEntry {
-     { .type = QTYPE_QNULL }
- #define QLIT_QBOOL(val) \
-     { .type = QTYPE_QBOOL, .value.qbool = (val) }
-+#define QLIT_QNUM_INT(val) \
-+    { .type = QTYPE_QNUM, .value.qnum = QNUM_VAL_INT(val) }
-+#define QLIT_QNUM_UINT(val) \
-+    { .type = QTYPE_QNUM, .value.qnum = QNUM_VAL_UINT(val) }
-+#define QLIT_QNUM_DOUBLE(val) \
-+    { .type = QTYPE_QNUM, .value.qnum = QNUM_VAL_DOUBLE(val) }
- #define QLIT_QNUM(val) \
--    { .type = QTYPE_QNUM, .value.qnum = (val) }
-+    QLIT_QNUM_INT(val)
- #define QLIT_QSTR(val) \
-     { .type = QTYPE_QSTRING, .value.qstr = (val) }
- #define QLIT_QDICT(val) \
-diff --git a/qobject/qlit.c b/qobject/qlit.c
-index be8332136c..ec11a39518 100644
---- a/qobject/qlit.c
-+++ b/qobject/qlit.c
-@@ -71,7 +71,7 @@ bool qlit_equal_qobject(const QLitObject *lhs, const QObject *rhs)
-     case QTYPE_QBOOL:
-         return lhs->value.qbool == qbool_get_bool(qobject_to(QBool, rhs));
-     case QTYPE_QNUM:
--        return lhs->value.qnum ==  qnum_get_int(qobject_to(QNum, rhs));
-+        return qnum_value_is_equal(&lhs->value.qnum, qnum_get_value(qobject_to(QNum, rhs)));
-     case QTYPE_QSTRING:
-         return (strcmp(lhs->value.qstr,
-                        qstring_get_str(qobject_to(QString, rhs))) == 0);
-@@ -94,7 +94,7 @@ QObject *qobject_from_qlit(const QLitObject *qlit)
-     case QTYPE_QNULL:
-         return QOBJECT(qnull());
-     case QTYPE_QNUM:
--        return QOBJECT(qnum_from_int(qlit->value.qnum));
-+        return QOBJECT(qnum_from_value(qlit->value.qnum));
-     case QTYPE_QSTRING:
-         return QOBJECT(qstring_from_str(qlit->value.qstr));
-     case QTYPE_QDICT: {
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 07a773e653..711030cffd 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -796,20 +796,23 @@ static void simple_number(void)
-     int i;
-     struct {
-         const char *encoded;
-+        QLitObject qlit;
-         int64_t decoded;
-         int skip;
-     } test_cases[] = {
--        { "0", 0 },
--        { "1234", 1234 },
--        { "1", 1 },
--        { "-32", -32 },
--        { "-0", 0, .skip = 1 },
-+        { "0",    QLIT_QNUM(0),    0, },
-+        { "1234", QLIT_QNUM(1234), 1234, },
-+        { "1",    QLIT_QNUM(1),    1, },
-+        { "-32",  QLIT_QNUM(-32),  -32, },
-+        { "-0",   QLIT_QNUM(0),    0, .skip = 1 },
-         { },
-     };
+ #define DEFINE_PROP_AUDIODEV(_n, _s, _f) \
+     DEFINE_PROP(_n, _s, _f, qdev_prop_audiodev, QEMUSoundCard)
+diff --git a/include/qom/field-property-internal.h b/include/qom/field-property-internal.h
+index 7aa27ce836..09877d9d6f 100644
+--- a/include/qom/field-property-internal.h
++++ b/include/qom/field-property-internal.h
+@@ -15,10 +15,6 @@ void field_prop_set_enum(Object *obj, Visitor *v, const char *name,
  
-     for (i = 0; test_cases[i].encoded; i++) {
-         QNum *qnum;
-         int64_t val;
-+        QNum *qlit_num;
-+        int64_t qlit_val;
+ void field_prop_set_default_value_enum(ObjectProperty *op,
+                                        const Property *prop);
+-void field_prop_set_default_value_int(ObjectProperty *op,
+-                                      const Property *prop);
+-void field_prop_set_default_value_uint(ObjectProperty *op,
+-                                       const Property *prop);
  
-         qnum = qobject_to(QNum,
-                           qobject_from_json(test_cases[i].encoded,
-@@ -817,6 +820,7 @@ static void simple_number(void)
-         g_assert(qnum);
-         g_assert(qnum_get_try_int(qnum, &val));
-         g_assert_cmpint(val, ==, test_cases[i].decoded);
-+
-         if (test_cases[i].skip == 0) {
-             QString *str;
+ void field_prop_get_int32(Object *obj, Visitor *v, const char *name,
+                           void *opaque, Error **errp);
+diff --git a/include/qom/field-property.h b/include/qom/field-property.h
+index bc866e1c93..b83b424a5e 100644
+--- a/include/qom/field-property.h
++++ b/include/qom/field-property.h
+@@ -6,6 +6,7 @@
  
-@@ -826,9 +830,66 @@ static void simple_number(void)
+ #include "qom/object.h"
+ #include "qapi/util.h"
++#include "qapi/qmp/qlit.h"
+ 
+ /**
+  * struct Property: definition of a field property
+@@ -29,21 +30,8 @@ struct Property {
+     const PropertyInfo *info;
+     ptrdiff_t    offset;
+     uint8_t      bitnr;
+-    /**
+-     * @set_default: true if the default value should be set from @defval,
+-     *    in which case @info->set_default_value must not be NULL
+-     *    (if false then no default value is set by the property system
+-     *     and the field retains whatever value it was given by instance_init).
+-     */
+-    bool         set_default;
+-    /**
+-     * @defval: default value for the property. This is used only if @set_default
+-     *     is true.
+-     */
+-    union {
+-        int64_t i;
+-        uint64_t u;
+-    } defval;
++    /** @defval: If not QNull, the default value for the property */
++    QLitObject defval;
+     /* private: */
+     int          arrayoffset;
+     const PropertyInfo *arrayinfo;
+@@ -63,7 +51,13 @@ struct PropertyInfo {
+     const QEnumLookup *enum_table;
+     /** @print: String formatting function, for the human monitor */
+     int (*print)(Object *obj, Property *prop, char *dest, size_t len);
+-    /** @set_default_value: Callback for initializing the default value */
++    /**
++     * @set_default_value: Optional callback for initializing the default value
++     *
++     * Most property types don't need to set this, as by default
++     * object_property_set_default() is called with the value at
++     * Property.defval.
++     */
+     void (*set_default_value)(ObjectProperty *op, const Property *prop);
+     /** @create: Optional callback for creation of property */
+     ObjectProperty *(*create)(ObjectClass *oc, const char *name,
+diff --git a/include/qom/property-types.h b/include/qom/property-types.h
+index 3a36e1fec5..36ca6f9e55 100644
+--- a/include/qom/property-types.h
++++ b/include/qom/property-types.h
+@@ -5,6 +5,7 @@
+ #define QOM_PROPERTY_TYPES_H
+ 
+ #include "qom/field-property.h"
++#include "qapi/qmp/qlit.h"
+ 
+ extern const PropertyInfo prop_info_bit;
+ extern const PropertyInfo prop_info_bit64;
+@@ -28,13 +29,14 @@ extern const PropertyInfo prop_info_link;
+         .info      = &(_prop),                                   \
+         .offset    = offsetof(_state, _field)                    \
+             + type_check(_type, typeof_field(_state, _field)),   \
++        .defval = QLIT_QNULL,                                    \
++        /* Note that __VA_ARGS__ can still override .defval */   \
+         __VA_ARGS__                                              \
          }
  
-         qobject_unref(qnum);
-+
-+        qlit_num = qobject_to(QNum,
-+                              qobject_from_qlit(&test_cases[i].qlit));
-+        g_assert(qlit_num);
-+        g_assert(qnum_get_try_int(qlit_num, &qlit_val));
-+        g_assert_cmpint(qlit_val, ==, test_cases[i].decoded);
-+
-+        qobject_unref(qlit_num);
-     }
+ #define DEFINE_PROP_SIGNED(_name, _state, _field, _defval, _prop, _type) \
+     DEFINE_PROP(_name, _state, _field, _prop, _type,                     \
+-                .set_default = true,                                     \
+-                .defval.i    = (_type)_defval)
++                .defval = QLIT_QNUM_INT(_defval))
+ 
+ #define DEFINE_PROP_SIGNED_NODEFAULT(_name, _state, _field, _prop, _type) \
+     DEFINE_PROP(_name, _state, _field, _prop, _type)
+@@ -50,13 +52,11 @@ extern const PropertyInfo prop_info_link;
+ #define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval)   \
+     DEFINE_PROP(_name, _state, _field, prop_info_bit, uint32_t, \
+                 .bitnr       = (_bit),                          \
+-                .set_default = true,                            \
+-                .defval.u    = (bool)_defval)
++                .defval = QLIT_QBOOL(_defval))
+ 
+ #define DEFINE_PROP_UNSIGNED(_name, _state, _field, _defval, _prop, _type) \
+     DEFINE_PROP(_name, _state, _field, _prop, _type,                       \
+-                .set_default = true,                                       \
+-                .defval.u  = (_type)_defval)
++                .defval = QLIT_QNUM_UINT(_defval))
+ 
+ #define DEFINE_PROP_UNSIGNED_NODEFAULT(_name, _state, _field, _prop, _type) \
+     DEFINE_PROP(_name, _state, _field, _prop, _type)
+@@ -72,8 +72,7 @@ extern const PropertyInfo prop_info_link;
+ #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval)   \
+     DEFINE_PROP(_name, _state, _field, prop_info_bit64, uint64_t, \
+                 .bitnr    = (_bit),                               \
+-                .set_default = true,                              \
+-                .defval.u  = (bool)_defval)
++                .defval = QLIT_QBOOL(_defval))
+ 
+ /**
+  * DEFINE_PROP_BOOL:
+@@ -84,8 +83,7 @@ extern const PropertyInfo prop_info_link;
+  */
+ #define DEFINE_PROP_BOOL(_name, _state, _field, _defval)     \
+     DEFINE_PROP(_name, _state, _field, prop_info_bool, bool, \
+-                .set_default = true,                         \
+-                .defval.u    = (bool)_defval)
++                .defval = QLIT_QBOOL(_defval))
+ 
+ #define PROP_ARRAY_LEN_PREFIX "len-"
+ 
+@@ -118,8 +116,7 @@ extern const PropertyInfo prop_info_link;
+                           _arrayfield, _arrayprop, _arraytype) \
+     DEFINE_PROP((PROP_ARRAY_LEN_PREFIX _name),                 \
+                 _state, _field, prop_info_arraylen, uint32_t,  \
+-                .set_default = true,                           \
+-                .defval.u = 0,                                 \
++                .defval = QLIT_QNUM_UINT(0),                   \
+                 .arrayinfo = &(_arrayprop),                    \
+                 .arrayfieldsize = sizeof(_arraytype),          \
+                 .arrayoffset = offsetof(_state, _arrayfield))
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index 8da68f076c..d9be5372f6 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -570,7 +570,6 @@ const PropertyInfo qdev_prop_blocksize = {
+                    " and " MAX_BLOCK_SIZE_STR,
+     .get   = field_prop_get_size32,
+     .set   = set_blocksize,
+-    .set_default_value = field_prop_set_default_value_uint,
+ };
+ 
+ /* --- Block device error handling policy --- */
+@@ -768,7 +767,6 @@ const PropertyInfo qdev_prop_pci_devfn = {
+     .print = print_pci_devfn,
+     .get   = field_prop_get_int32,
+     .set   = set_pci_devfn,
+-    .set_default_value = field_prop_set_default_value_int,
+ };
+ 
+ /* --- pci host address --- */
+@@ -1080,16 +1078,10 @@ static void set_uuid(Object *obj, Visitor *v, const char *name, void *opaque,
+     g_free(str);
  }
  
-+static void qlit_large_number(void)
+-static void set_default_uuid_auto(ObjectProperty *op, const Property *prop)
+-{
+-    object_property_set_default_str(op, UUID_VALUE_AUTO);
+-}
+-
+ const PropertyInfo qdev_prop_uuid = {
+     .name  = "str",
+     .description = "UUID (aka GUID) or \"" UUID_VALUE_AUTO
+         "\" for random value (default)",
+     .get   = get_uuid,
+     .set   = set_uuid,
+-    .set_default_value = set_default_uuid_auto,
+ };
+diff --git a/qom/field-property.c b/qom/field-property.c
+index 25a818bb69..727d7199ae 100644
+--- a/qom/field-property.c
++++ b/qom/field-property.c
+@@ -47,6 +47,20 @@ static ObjectPropertyAccessor *field_prop_setter(const PropertyInfo *info)
+     return info->set ? field_prop_set : NULL;
+ }
+ 
++static void field_prop_set_default_value(ObjectProperty *op,
++                                         Property *prop)
 +{
-+    QLitObject maxu64 = QLIT_QNUM_UINT(UINT64_MAX);
-+    QLitObject maxi64 = QLIT_QNUM(INT64_MAX);
-+    QLitObject mini64 = QLIT_QNUM(INT64_MIN);
-+    QLitObject gtu64  = QLIT_QNUM_DOUBLE(18446744073709552e3);
-+    QLitObject lti64  = QLIT_QNUM_DOUBLE(-92233720368547758e2);
-+    QNum *qnum;
-+    uint64_t val;
-+    int64_t ival;
++    if (qlit_type(&prop->defval) == QTYPE_QNULL) {
++        return;
++    }
 +
-+    qnum = qobject_to(QNum, qobject_from_qlit(&maxu64));
-+    g_assert(qnum);
-+    g_assert_cmpuint(qnum_get_uint(qnum), ==, UINT64_MAX);
-+    g_assert(!qnum_get_try_int(qnum, &ival));
-+
-+    qobject_unref(qnum);
-+
-+    qnum = qobject_to(QNum, qobject_from_qlit(&maxi64));
-+    g_assert(qnum);
-+    g_assert_cmpuint(qnum_get_uint(qnum), ==, INT64_MAX);
-+    g_assert_cmpint(qnum_get_int(qnum), ==, INT64_MAX);
-+
-+    qobject_unref(qnum);
-+
-+    qnum = qobject_to(QNum, qobject_from_qlit(&mini64));
-+    g_assert(qnum);
-+    g_assert(!qnum_get_try_uint(qnum, &val));
-+    g_assert_cmpuint(qnum_get_int(qnum), ==, INT64_MIN);
-+
-+    qobject_unref(qnum);
-+
-+    qnum = qobject_to(QNum, qobject_from_qlit(&gtu64));
-+    g_assert(qnum);
-+    g_assert_cmpfloat(qnum_get_double(qnum), ==, 18446744073709552e3);
-+    g_assert(!qnum_get_try_uint(qnum, &val));
-+    g_assert(!qnum_get_try_int(qnum, &ival));
-+
-+    qobject_unref(qnum);
-+
-+    qnum = qobject_to(QNum, qobject_from_qlit(&lti64));
-+    g_assert(qnum);
-+    g_assert_cmpfloat(qnum_get_double(qnum), ==, -92233720368547758e2);
-+    g_assert(!qnum_get_try_uint(qnum, &val));
-+    g_assert(!qnum_get_try_int(qnum, &ival));
-+
-+    qobject_unref(qnum);
++    if (prop->info->set_default_value) {
++        prop->info->set_default_value(op, prop);
++    } else {
++        object_property_set_default(op, qobject_from_qlit(&prop->defval));
++    }
 +}
 +
- static void large_number(void)
+ ObjectProperty *
+ object_property_add_field(Object *obj, const char *name, Property *prop,
+                           ObjectPropertyAllowSet allow_set)
+@@ -65,11 +79,9 @@ object_property_add_field(Object *obj, const char *name, Property *prop,
+     object_property_set_description(obj, name,
+                                     prop->info->description);
+ 
+-    if (prop->set_default) {
+-        prop->info->set_default_value(op, prop);
+-        if (op->init) {
+-            op->init(obj, op);
+-        }
++    field_prop_set_default_value(op, prop);
++    if (op->init) {
++        op->init(obj, op);
+     }
+ 
+     op->allow_set = allow_set;
+@@ -95,9 +107,8 @@ object_class_property_add_field(ObjectClass *oc, const char *name,
+                                        prop->info->release,
+                                        prop);
+     }
+-    if (prop->set_default) {
+-        prop->info->set_default_value(op, prop);
+-    }
++
++    field_prop_set_default_value(op, prop);
+     if (prop->info->description) {
+         object_class_property_set_description(oc, name,
+                                               prop->info->description);
+diff --git a/qom/property-types.c b/qom/property-types.c
+index f566c05ec2..8bed83c712 100644
+--- a/qom/property-types.c
++++ b/qom/property-types.c
+@@ -28,8 +28,11 @@ void field_prop_set_enum(Object *obj, Visitor *v, const char *name,
+ void field_prop_set_default_value_enum(ObjectProperty *op,
+                                        const Property *prop)
  {
-     const char *maxu64 = "18446744073709551615"; /* 2^64-1 */
-@@ -1472,6 +1533,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/literals/string/utf8", utf8_string);
+-    object_property_set_default_str(op,
+-        qapi_enum_lookup(prop->info->enum_table, prop->defval.i));
++    QObject *defval = qobject_from_qlit(&prop->defval);
++    const char *str = qapi_enum_lookup(prop->info->enum_table,
++                                       qnum_get_int(qobject_to(QNum, defval)));
++    object_property_set_default_str(op, str);
++    qobject_unref(defval);
+ }
  
-     g_test_add_func("/literals/number/simple", simple_number);
-+    g_test_add_func("/literals/number/qlit_large", qlit_large_number);
-     g_test_add_func("/literals/number/large", large_number);
-     g_test_add_func("/literals/number/float", float_number);
+ const PropertyInfo prop_info_enum = {
+@@ -80,17 +83,11 @@ static void prop_set_bit(Object *obj, Visitor *v, const char *name,
+     bit_prop_set(obj, prop, value);
+ }
  
+-static void set_default_value_bool(ObjectProperty *op, const Property *prop)
+-{
+-    object_property_set_default_bool(op, prop->defval.u);
+-}
+-
+ const PropertyInfo prop_info_bit = {
+     .name  = "bool",
+     .description = "on/off",
+     .get   = prop_get_bit,
+     .set   = prop_set_bit,
+-    .set_default_value = set_default_value_bool,
+ };
+ 
+ /* Bit64 */
+@@ -139,7 +136,6 @@ const PropertyInfo prop_info_bit64 = {
+     .description = "on/off",
+     .get   = prop_get_bit64,
+     .set   = prop_set_bit64,
+-    .set_default_value = set_default_value_bool,
+ };
+ 
+ /* --- bool --- */
+@@ -166,7 +162,6 @@ const PropertyInfo prop_info_bool = {
+     .name  = "bool",
+     .get   = get_bool,
+     .set   = set_bool,
+-    .set_default_value = set_default_value_bool,
+ };
+ 
+ /* --- 8bit integer --- */
+@@ -189,23 +184,10 @@ static void set_uint8(Object *obj, Visitor *v, const char *name, void *opaque,
+     visit_type_uint8(v, name, ptr, errp);
+ }
+ 
+-void field_prop_set_default_value_int(ObjectProperty *op,
+-                                      const Property *prop)
+-{
+-    object_property_set_default_int(op, prop->defval.i);
+-}
+-
+-void field_prop_set_default_value_uint(ObjectProperty *op,
+-                                       const Property *prop)
+-{
+-    object_property_set_default_uint(op, prop->defval.u);
+-}
+-
+ const PropertyInfo prop_info_uint8 = {
+     .name  = "uint8",
+     .get   = get_uint8,
+     .set   = set_uint8,
+-    .set_default_value = field_prop_set_default_value_uint,
+ };
+ 
+ /* --- 16bit integer --- */
+@@ -232,7 +214,6 @@ const PropertyInfo prop_info_uint16 = {
+     .name  = "uint16",
+     .get   = get_uint16,
+     .set   = set_uint16,
+-    .set_default_value = field_prop_set_default_value_uint,
+ };
+ 
+ /* --- 32bit integer --- */
+@@ -277,14 +258,12 @@ const PropertyInfo prop_info_uint32 = {
+     .name  = "uint32",
+     .get   = get_uint32,
+     .set   = set_uint32,
+-    .set_default_value = field_prop_set_default_value_uint,
+ };
+ 
+ const PropertyInfo prop_info_int32 = {
+     .name  = "int32",
+     .get   = field_prop_get_int32,
+     .set   = set_int32,
+-    .set_default_value = field_prop_set_default_value_int,
+ };
+ 
+ /* --- 64bit integer --- */
+@@ -329,14 +308,12 @@ const PropertyInfo prop_info_uint64 = {
+     .name  = "uint64",
+     .get   = get_uint64,
+     .set   = set_uint64,
+-    .set_default_value = field_prop_set_default_value_uint,
+ };
+ 
+ const PropertyInfo prop_info_int64 = {
+     .name  = "int64",
+     .get   = get_int64,
+     .set   = set_int64,
+-    .set_default_value = field_prop_set_default_value_int,
+ };
+ 
+ /* --- string --- */
+@@ -431,7 +408,6 @@ const PropertyInfo prop_info_size32 = {
+     .name  = "size",
+     .get = field_prop_get_size32,
+     .set = set_size32,
+-    .set_default_value = field_prop_set_default_value_uint,
+ };
+ 
+ /* --- support for array properties --- */
+@@ -494,7 +470,6 @@ const PropertyInfo prop_info_arraylen = {
+     .name = "uint32",
+     .get = get_uint32,
+     .set = set_prop_arraylen,
+-    .set_default_value = field_prop_set_default_value_uint,
+ };
+ 
+ /* --- 64bit unsigned int 'size' type --- */
+@@ -521,7 +496,6 @@ const PropertyInfo prop_info_size = {
+     .name  = "size",
+     .get = get_size,
+     .set = set_size,
+-    .set_default_value = field_prop_set_default_value_uint,
+ };
+ 
+ /* --- object link property --- */
 -- 
 2.28.0
 
