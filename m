@@ -2,80 +2,79 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C841C388F7
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 19:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C42C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 19:45:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D621E206A1
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 19:41:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0F8A206A1
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 19:45:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EYJZv3R6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D621E206A1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjLG61f5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0F8A206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcD2s-0002iR-Of
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 14:41:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39264)
+	id 1kcD6Q-0003mX-G3
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 14:45:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kcD1f-0002BG-9x
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 14:40:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48335)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kcD5h-0003MK-V5
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 14:44:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47766)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kcD1c-00019q-Ng
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 14:40:26 -0500
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kcD5b-0001VL-Fi
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 14:44:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604950822;
+ s=mimecast20190719; t=1604951069;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TAbcw1Q/KotuiE/b/MRTpoDbgnXm0Bnl6bvnEEV6JY4=;
- b=EYJZv3R6Z+7adSXKafd3cw5Mc+YQC4sjL+A1SW9VVAPg0yvp0V9Az5xs61Lr97b1rjul29
- pB5DkAE+mJcx4RN1zI/0hsTYix4fwymvaFA3h0FnRY81D52WVS3J1Bxct1ZDib1NyjpORm
- nr1ayqLSQky+3UEK3e8f9CfYNP1QeJ0=
+ bh=04zSg1wfjqeTTL4OfYZJDdptqJN4H0DhFzAZiKgAqek=;
+ b=SjLG61f5XfxbpmxiP5fBb6BpiLCIbQz9u7NBSqX3YKkvdf4BuM8mY7Wa37v8znqFJRUNZ6
+ F9i4JSRRgsqO93BEJ9u7DVNFGket3J6D6UUx+Xh65pGCSDglsrVY6sodFWEu/ts0evLIzb
+ F3upBE1VR5mXsrstpF2OKVSrIz3Tz+M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-s5-7iSnWMrireJjP6XqfjA-1; Mon, 09 Nov 2020 14:40:18 -0500
-X-MC-Unique: s5-7iSnWMrireJjP6XqfjA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-355-asS4GHdzPtu2oLTqwRZXCg-1; Mon, 09 Nov 2020 14:44:25 -0500
+X-MC-Unique: asS4GHdzPtu2oLTqwRZXCg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D211800688
- for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 19:40:17 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
- [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DB79C5D9CC;
- Mon,  9 Nov 2020 19:40:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4869F1132BD6; Mon,  9 Nov 2020 20:40:15 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 5/6] qemu-option: move help handling to
- get_opt_name_value
-References: <20201109133931.979563-1-pbonzini@redhat.com>
- <20201109133931.979563-6-pbonzini@redhat.com>
-Date: Mon, 09 Nov 2020 20:40:15 +0100
-In-Reply-To: <20201109133931.979563-6-pbonzini@redhat.com> (Paolo Bonzini's
- message of "Mon, 9 Nov 2020 08:39:30 -0500")
-Message-ID: <87lffa2uao.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2A3664087;
+ Mon,  9 Nov 2020 19:44:24 +0000 (UTC)
+Received: from work-vm (ovpn-114-198.ams2.redhat.com [10.36.114.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 38D3A7B40D;
+ Mon,  9 Nov 2020 19:44:20 +0000 (UTC)
+Date: Mon, 9 Nov 2020 19:44:17 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RFC PATCH for-QEMU-5.2] vfio: Make migration support experimental
+Message-ID: <20201109194417.GR3024@work-vm>
+References: <160494787833.1473.10514376876696596117.stgit@gimli.home>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <160494787833.1473.10514376876696596117.stgit@gimli.home>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -98,232 +97,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Neo Jia <cjia@nvidia.com>, Juan Quintela <quintela@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+* Alex Williamson (alex.williamson@redhat.com) wrote:
+> Per the proposed documentation for vfio device migration:
+> 
+>   Dirty pages are tracked when device is in stop-and-copy phase
+>   because if pages are marked dirty during pre-copy phase and
+>   content is transfered from source to destination, there is no
+>   way to know newly dirtied pages from the point they were copied
+>   earlier until device stops. To avoid repeated copy of same
+>   content, pinned pages are marked dirty only during
+>   stop-and-copy phase.
+> 
+> Essentially, since we don't have hardware dirty page tracking for
+> assigned devices at this point, we consider any page that is pinned
+> by an mdev vendor driver or pinned and mapped through the IOMMU to
+> be perpetually dirty.  In the worst case, this may result in all of
+> guest memory being considered dirty during every iteration of live
+> migration.  The current vfio implementation of migration has chosen
+> to mask device dirtied pages until the final stages of migration in
+> order to avoid this worst case scenario.
+> 
+> Allowing the device to implement a policy decision to prioritize
+> reduced migration data like this jeopardizes QEMU's overall ability
+> to implement any degree of service level guarantees during migration.
+> For example, any estimates towards achieving acceptable downtime
+> margins cannot be trusted when such a device is present.  The vfio
+> device should participate in dirty page tracking to the best of its
+> ability throughout migration, even if that means the dirty footprint
+> of the device impedes migration progress, allowing both QEMU and
+> higher level management tools to decide whether to continue the
+> migration or abort due to failure to achieve the desired behavior.
 
-> Right now, help options are parsed normally and then checked
-> specially in opt_validate, but only if coming from
-> qemu_opts_parse_noisily.  has_help_option does the check on its own.
->
-> Move the check from opt_validate to the parsing workhorse of QemuOpts,
-> get_opt_name_value.  This will come in handy in the next patch, which
-> will raise a warning for "-object memory-backend-ram,share" ("flag" option
-> with no =on/=off part) but not for "-object memory-backend-ram,help".
->
-> As a result:
->
-> - opts_parse and opts_do_parse do not return an error anymore
->   when help is requested; qemu_opts_parse_noisily does not have
->   to work around that anymore.
->
-> - various crazy ways to request help are not recognized anymore:
->   - "help=..."
->   - "nohelp" (sugar for "help=off")
->   - "?=..."
->   - "no?" (sugar for "?=off")
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+I don't feel particularly badly about the decision to squash it in
+during the stop-and-copy phase; for devices where the pinned memory
+is large, I don't think doing it during the main phase makes much sense;
+especially if you then have to deal with tracking changes in pinning.
+
+Having said that, I agree with marking it as experimental, because
+I'm dubious how useful it will be for the same reason, I worry
+about whether the downtime will be so large to make it pointless.
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> Link: https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg00807.html
+> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> Cc: Neo Jia <cjia@nvidia.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Juan Quintela <quintela@redhat.com>
+> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 > ---
->  util/qemu-option.c | 34 ++++++++++++++++++++--------------
->  1 file changed, 20 insertions(+), 14 deletions(-)
->
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index 91f4120ce1..0ddf1f7b45 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -496,8 +496,7 @@ static QemuOpt *opt_create(QemuOpts *opts, const char *name, char *value,
->      return opt;
->  }
+> 
+> Given that our discussion in the link above seems to be going in
+> circles, I'm afraid it seems necessary to both have a contigency
+> plan and to raise the visibility of the current behavior to
+> determine whether others agree that this is a sufficiently
+> troubling behavior to consider migration support experimental
+> at this stage.  Please voice your opinion or contribute patches
+> to resolve this before QEMU 5.2.  Thanks,
+> 
+> Alex
+> 
+>  hw/vfio/migration.c           |    2 +-
+>  hw/vfio/pci.c                 |    2 ++
+>  include/hw/vfio/vfio-common.h |    1 +
+>  3 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index 3ce285ea395d..cd44d465a50b 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -882,7 +882,7 @@ int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+>      Error *local_err = NULL;
+>      int ret = -ENOTSUP;
 >  
-> -static bool opt_validate(QemuOpt *opt, bool *help_wanted,
-> -                         Error **errp)
-> +static bool opt_validate(QemuOpt *opt, Error **errp)
->  {
->      const QemuOptDesc *desc;
->      const QemuOptsList *list = opt->opts->list;
-> @@ -505,9 +504,6 @@ static bool opt_validate(QemuOpt *opt, bool *help_wanted,
->      desc = find_desc_by_name(list->desc, opt->name);
->      if (!desc && !opts_accepts_any(list)) {
->          error_setg(errp, QERR_INVALID_PARAMETER, opt->name);
-> -        if (help_wanted && is_help_option(opt->name)) {
-> -            *help_wanted = true;
-> -        }
->          return false;
+> -    if (!container->dirty_pages_supported) {
+> +    if (!vbasedev->enable_migration || !container->dirty_pages_supported) {
+>          goto add_blocker;
 >      }
 >  
-> @@ -524,7 +520,7 @@ bool qemu_opt_set(QemuOpts *opts, const char *name, const char *value,
->  {
->      QemuOpt *opt = opt_create(opts, name, g_strdup(value), false);
->  
-> -    if (!opt_validate(opt, NULL, errp)) {
-> +    if (!opt_validate(opt, errp)) {
->          qemu_opt_del(opt);
->          return false;
->      }
-> @@ -760,10 +756,12 @@ void qemu_opts_print(QemuOpts *opts, const char *separator)
->  
->  static const char *get_opt_name_value(const char *params,
->                                        const char *firstname,
-> +                                      bool *help_wanted,
->                                        char **name, char **value)
->  {
->      const char *p;
->      size_t len;
-> +    bool is_help = false;
->  
->      len = strcspn(params, "=,");
->      if (params[len] != '=') {
-> @@ -780,6 +778,7 @@ static const char *get_opt_name_value(const char *params,
->                  *value = g_strdup("off");
->              } else {
->                  *value = g_strdup("on");
-> +                is_help = is_help_option(*name);
->              }
->          }
->      } else {
-> @@ -791,6 +790,9 @@ static const char *get_opt_name_value(const char *params,
->      }
->  
->      assert(!*p || *p == ',');
-> +    if (help_wanted && is_help) {
-> +        *help_wanted = true;
-> +    }
-
-Note [1] for later: we only ever set *help_wanted to true.
-
->      if (*p == ',') {
->          p++;
->      }
-
-Note [2] for later: we always set *name and *value, even when we set
-*help_wanted = true.
-
-> @@ -806,7 +808,10 @@ static bool opts_do_parse(QemuOpts *opts, const char *params,
->      QemuOpt *opt;
->  
->      for (p = params; *p;) {
-> -        p = get_opt_name_value(p, firstname, &option, &value);
-> +        p = get_opt_name_value(p, firstname, help_wanted, &option, &value);
-> +        if (help_wanted && *help_wanted) {
-> +            return false;
-
-Doesn't this leak @option and @value?  Remember, [2]
-get_opt_name_value() always sets *name and *value.
-
-> +        }
->          firstname = NULL;
->  
->          if (!strcmp(option, "id")) {
-> @@ -817,7 +822,7 @@ static bool opts_do_parse(QemuOpts *opts, const char *params,
->  
->          opt = opt_create(opts, option, value, prepend);
->          g_free(option);
-> -        if (!opt_validate(opt, help_wanted, errp)) {
-> +        if (!opt_validate(opt, errp)) {
->              qemu_opt_del(opt);
->              return false;
->          }
-> @@ -832,7 +837,7 @@ static char *opts_parse_id(const char *params)
->      char *name, *value;
->  
->      for (p = params; *p;) {
-> -        p = get_opt_name_value(p, NULL, &name, &value);
-> +        p = get_opt_name_value(p, NULL, NULL, &name, &value);
->          if (!strcmp(name, "id")) {
->              g_free(name);
->              return value;
-
-This is one of two callers that passes null to help_wanted.
-
-If both callers can pass non-null, we can simplify get_opt_name_value()
-slightly.
-
-This one could just as well pass &dummy.  Removes doubt that
-opts_parse_id() could parse differently than opts_do_parse().
-opts_parse() relies on the two parsing the same.
-
-> @@ -851,8 +856,7 @@ bool has_help_option(const char *params)
->      bool ret;
->  
->      for (p = params; *p;) {
-> -        p = get_opt_name_value(p, NULL, &name, &value);
-> -        ret = is_help_option(name);
-> +        p = get_opt_name_value(p, NULL, &ret, &name, &value);
-
-If @p doesn't contain a help request, &ret remains uninitialized.
-Remember, [1] get_opt_name_value() only ever sets *help_wanted to true.
-
-Suggest to make it set *help_wanted like this instead:
-
-       if (help_wanted) {
-           *help_wanted = is_help;
-       }
-
->          g_free(name);
->          g_free(value);
->          if (ret) {
-> @@ -937,11 +941,13 @@ QemuOpts *qemu_opts_parse_noisily(QemuOptsList *list, const char *params,
->      QemuOpts *opts;
->      bool help_wanted = false;
->  
-> -    opts = opts_parse(list, params, permit_abbrev, false, &help_wanted, &err);
-> -    if (err) {
-> +    opts = opts_parse(list, params, permit_abbrev, false,
-> +                      opts_accepts_any(list) ? NULL : &help_wanted,
-
-This recognizes help requests only when !opts_accepts_any().
-
-Recall my review of v1 on opt_validate()'s behavior before the patch:
-
-    * A request for help is recognized only when the option name is not
-      recognized.  Two cases:
-
-      - When @opts accepts anything, we ignore cries for help.
-
-You recreate this here.  Why here?
-
-opt_validate() has two callers: qemu_opt_set(), which passes null and is
-therefore unaffected, and opts_do_parse(), which is affected.
-
-opts_do_parse() is called by qemu_opts_do_parse(), which passes null and
-is therefore unaffected, and opts_parse().
-
-opts_parse() is called by qemu_opts_parse() and
-qemu_opts_set_defaults(), which pass null and are therefore unaffected,
-and qemu_opts_parse_noisily().
-
-Okay.  A more verbose commit message could've saved me the digging.
-
-      - Else, we recognize it only when there is no option named "help".
-
-You now recognize it even when there is an option named "help".  No
-change as long as no such option exists.  That's the case to the best of
-my knowledge.  But the argument belongs into the commit message.
-
-> +                      &err);
-> +    if (!opts) {
-> +        assert(!!err + !!help_wanted == 1);
-
-Either err or help_wanted.  This is logical inequality.  I'd write it as
-
-           assert(!err != !help_wanted);
-
-or maybe as
-
-           assert(!err ^ !help_wanted);
-
->          if (help_wanted) {
->              qemu_opts_print_help(list, true);
-> -            error_free(err);
->          } else {
->              error_report_err(err);
->          }
-
-I think we could pass &help_wanted unconditionally, then ignore the
-value of help_wanted if opts_accepts_any().
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 58c0ce8971e3..1349b900e513 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -3194,6 +3194,8 @@ static Property vfio_pci_dev_properties[] = {
+>                      VFIO_FEATURE_ENABLE_REQ_BIT, true),
+>      DEFINE_PROP_BIT("x-igd-opregion", VFIOPCIDevice, features,
+>                      VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
+> +    DEFINE_PROP_BOOL("x-enable-migration", VFIOPCIDevice,
+> +                     vbasedev.enable_migration, false),
+>      DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
+>      DEFINE_PROP_BOOL("x-balloon-allowed", VFIOPCIDevice,
+>                       vbasedev.ram_block_discard_allowed, false),
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index baeb4dcff102..2119872c8af1 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -123,6 +123,7 @@ typedef struct VFIODevice {
+>      bool needs_reset;
+>      bool no_mmap;
+>      bool ram_block_discard_allowed;
+> +    bool enable_migration;
+>      VFIODeviceOps *ops;
+>      unsigned int num_irqs;
+>      unsigned int num_regions;
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
