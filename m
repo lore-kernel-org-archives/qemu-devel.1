@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08B6C4741F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 13:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D62FDC4741F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 13:42:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18074206B2
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 13:42:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A0132068D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 13:42:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RW9ior+e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18074206B2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iVb4idcJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0132068D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc7Qu-0006fy-00
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 08:42:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58952)
+	id 1kc7RQ-0007tU-Bv
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 08:42:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kc7OY-0004se-7E
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 08:39:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30265)
+ id 1kc7OV-0004r6-RJ
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 08:39:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44905)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kc7OW-0000jY-8k
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 08:39:41 -0500
+ id 1kc7OS-0000iI-Ri
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 08:39:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604929179;
+ s=mimecast20190719; t=1604929176;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wbxehOKSDhrGNK6geBTGIUYU7aRINTLfEwPMIA62UFY=;
- b=RW9ior+eaG8eol/uKG6H97t5Fd6aD3zKPAG8Gpmkpmp2kM4sHuDRVLp54eUZw1lqIKsgQJ
- XCyWvCmyeULgzwYqgzYde1ebYiJDK07JG3mWwVMia/ZQ7a7OQPlLi51sFfFmFAKS4VoTsA
- +kVEGSBLcrl/8qITOcgXaSMPHAoXg2k=
+ bh=mCDwkoAWBs5TBvHw5DNhs4UXxWuEbUL+YWIMbOieb+c=;
+ b=iVb4idcJku6jGtKmJu8Vz8yt/jyQGAR5D6MVLc5ROV+M2qDarXkZqQmPK3eFojZjAWcI5Z
+ 8WW224ARiEUPE4cnPH3ETcxbD52PPuMVFi7alkJXdpSy9Cvk5Ax4/h0L9xaAURjrp9Pz7v
+ FqNTyr6gSqidhLg61WUAS5oSEMjSK5A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-1GkD06vrPIOYJajHZIefSA-1; Mon, 09 Nov 2020 08:39:38 -0500
-X-MC-Unique: 1GkD06vrPIOYJajHZIefSA-1
+ us-mta-500-QjgLzQqIPBWTVoahuYHA4w-1; Mon, 09 Nov 2020 08:39:34 -0500
+X-MC-Unique: QjgLzQqIPBWTVoahuYHA4w-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 086E9800683
- for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 13:39:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7F5D809DC9
+ for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 13:39:33 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C7E876EF40;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 59F656EF40;
  Mon,  9 Nov 2020 13:39:33 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/6] qemu-option: clean up id vs. list->merge_lists
-Date: Mon,  9 Nov 2020 08:39:29 -0500
-Message-Id: <20201109133931.979563-5-pbonzini@redhat.com>
+Subject: [PATCH v2 3/6] qemu-option: restrict qemu_opts_set to merge-lists
+ QemuOpts
+Date: Mon,  9 Nov 2020 08:39:28 -0500
+Message-Id: <20201109133931.979563-4-pbonzini@redhat.com>
 In-Reply-To: <20201109133931.979563-1-pbonzini@redhat.com>
 References: <20201109133931.979563-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,16 +74,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,82 +102,168 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Forbid ids if the option is intended to be a singleton, as indicated by
-list->merge_lists.  This avoids that "./qemu-system-x86_64 -M q35,id=ff"
-uses a "pc" machine type.  Instead it errors out.  The affected options
-are "qemu-img reopen -o", "qemu-io open -o", -rtc, -M, -boot, -name,
--m, -icount, -smp, -spice.
+qemu_opts_set is used to create default network backends and to
+parse sugar options -kernel, -initrd, -append, -bios and -dtb.
+Switch the former to qemu_opts_parse, so that qemu_opts_set
+is now only used on merge-lists QemuOptsList (for which it makes
+the most sense indeed)... except in the testcase, which is
+changed to use a merge-list QemuOptsList.
 
-qemu_opts_create's fail_if_exists parameter is now unnecessary:
-
-- it is unused if id is NULL
-
-- opts_parse only passes false if reached from qemu_opts_set_defaults,
-in which case this patch enforces that id must be NULL
-
-- other callers that can pass a non-NULL id always set it to true
-
-Assert that it is true in the only case where "fail_if_exists" matters,
-i.e. "id && !lists->merge_lists".  This means that if an id is present,
-duplicates are always forbidden, which was already the status quo.
+With this change we can remove the id parameter.  With the
+parameter always NULL, we know that qemu_opts_create cannot fail
+and can pass &error_abort to it.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- util/qemu-option.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ include/qemu/option.h  |  3 +--
+ softmmu/vl.c           | 19 +++++++------------
+ tests/test-qemu-opts.c | 24 +++++++++++++++++++++---
+ util/qemu-option.c     |  9 +++------
+ 4 files changed, 32 insertions(+), 23 deletions(-)
 
+diff --git a/include/qemu/option.h b/include/qemu/option.h
+index ac69352e0e..f73e0dc7d9 100644
+--- a/include/qemu/option.h
++++ b/include/qemu/option.h
+@@ -119,8 +119,7 @@ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
+                            int fail_if_exists, Error **errp);
+ void qemu_opts_reset(QemuOptsList *list);
+ void qemu_opts_loc_restore(QemuOpts *opts);
+-bool qemu_opts_set(QemuOptsList *list, const char *id,
+-                   const char *name, const char *value, Error **errp);
++bool qemu_opts_set(QemuOptsList *list, const char *name, const char *value, Error **errp);
+ const char *qemu_opts_id(QemuOpts *opts);
+ void qemu_opts_set_id(QemuOpts *opts, char *id);
+ void qemu_opts_del(QemuOpts *opts);
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index a71164494e..65607fe55e 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -3107,20 +3107,16 @@ void qemu_init(int argc, char **argv, char **envp)
+                 }
+                 break;
+             case QEMU_OPTION_kernel:
+-                qemu_opts_set(qemu_find_opts("machine"), NULL, "kernel", optarg,
+-                              &error_abort);
++                qemu_opts_set(qemu_find_opts("machine"), "kernel", optarg, &error_abort);
+                 break;
+             case QEMU_OPTION_initrd:
+-                qemu_opts_set(qemu_find_opts("machine"), NULL, "initrd", optarg,
+-                              &error_abort);
++                qemu_opts_set(qemu_find_opts("machine"), "initrd", optarg, &error_abort);
+                 break;
+             case QEMU_OPTION_append:
+-                qemu_opts_set(qemu_find_opts("machine"), NULL, "append", optarg,
+-                              &error_abort);
++                qemu_opts_set(qemu_find_opts("machine"), "append", optarg, &error_abort);
+                 break;
+             case QEMU_OPTION_dtb:
+-                qemu_opts_set(qemu_find_opts("machine"), NULL, "dtb", optarg,
+-                              &error_abort);
++                qemu_opts_set(qemu_find_opts("machine"), "dtb", optarg, &error_abort);
+                 break;
+             case QEMU_OPTION_cdrom:
+                 drive_add(IF_DEFAULT, 2, optarg, CDROM_OPTS);
+@@ -3230,8 +3226,7 @@ void qemu_init(int argc, char **argv, char **envp)
+                 }
+                 break;
+             case QEMU_OPTION_bios:
+-                qemu_opts_set(qemu_find_opts("machine"), NULL, "firmware", optarg,
+-                              &error_abort);
++                qemu_opts_set(qemu_find_opts("machine"), "firmware", optarg, &error_abort);
+                 break;
+             case QEMU_OPTION_singlestep:
+                 singlestep = 1;
+@@ -4258,9 +4253,9 @@ void qemu_init(int argc, char **argv, char **envp)
+ 
+     if (default_net) {
+         QemuOptsList *net = qemu_find_opts("net");
+-        qemu_opts_set(net, NULL, "type", "nic", &error_abort);
++        qemu_opts_parse(net, "nic", true, &error_abort);
+ #ifdef CONFIG_SLIRP
+-        qemu_opts_set(net, NULL, "type", "user", &error_abort);
++        qemu_opts_parse(net, "user", true, &error_abort);
+ #endif
+     }
+ 
+diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+index 297ffe79dd..322b32871b 100644
+--- a/tests/test-qemu-opts.c
++++ b/tests/test-qemu-opts.c
+@@ -84,11 +84,25 @@ static QemuOptsList opts_list_03 = {
+     },
+ };
+ 
++static QemuOptsList opts_list_04 = {
++    .name = "opts_list_04",
++    .head = QTAILQ_HEAD_INITIALIZER(opts_list_04.head),
++    .merge_lists = true,
++    .desc = {
++        {
++            .name = "str3",
++            .type = QEMU_OPT_STRING,
++        },
++        { /* end of list */ }
++    },
++};
++
+ static void register_opts(void)
+ {
+     qemu_add_opts(&opts_list_01);
+     qemu_add_opts(&opts_list_02);
+     qemu_add_opts(&opts_list_03);
++    qemu_add_opts(&opts_list_04);
+ }
+ 
+ static void test_find_unknown_opts(void)
+@@ -402,17 +416,21 @@ static void test_qemu_opts_set(void)
+     QemuOpts *opts;
+     const char *opt;
+ 
+-    list = qemu_find_opts("opts_list_01");
++    list = qemu_find_opts("opts_list_04");
+     g_assert(list != NULL);
+     g_assert(QTAILQ_EMPTY(&list->head));
+-    g_assert_cmpstr(list->name, ==, "opts_list_01");
++    g_assert_cmpstr(list->name, ==, "opts_list_04");
+ 
+     /* should not find anything at this point */
+     opts = qemu_opts_find(list, NULL);
+     g_assert(opts == NULL);
+ 
+     /* implicitly create opts and set str3 value */
+-    qemu_opts_set(list, NULL, "str3", "value", &error_abort);
++    qemu_opts_set(list, "str3", "first_value", &error_abort);
++    g_assert(!QTAILQ_EMPTY(&list->head));
++
++    /* set it again */
++    qemu_opts_set(list, "str3", "value", &error_abort);
+     g_assert(!QTAILQ_EMPTY(&list->head));
+ 
+     /* get the just created opts */
 diff --git a/util/qemu-option.c b/util/qemu-option.c
-index c88e159f18..91f4120ce1 100644
+index 59be4f9d21..c88e159f18 100644
 --- a/util/qemu-option.c
 +++ b/util/qemu-option.c
-@@ -619,7 +619,17 @@ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
- {
-     QemuOpts *opts = NULL;
+@@ -665,15 +665,12 @@ void qemu_opts_loc_restore(QemuOpts *opts)
+     loc_restore(&opts->loc);
+ }
  
--    if (id) {
-+    if (list->merge_lists) {
-+        if (id) {
-+            error_setg(errp, QERR_INVALID_PARAMETER, "id");
-+            return NULL;
-+        }
-+        opts = qemu_opts_find(list, NULL);
-+        if (opts) {
-+            return opts;
-+        }
-+    } else if (id) {
-+        assert(fail_if_exists);
-         if (!id_wellformed(id)) {
-             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "id",
-                        "an identifier");
-@@ -629,17 +639,8 @@ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
-         }
-         opts = qemu_opts_find(list, id);
-         if (opts != NULL) {
--            if (fail_if_exists && !list->merge_lists) {
--                error_setg(errp, "Duplicate ID '%s' for %s", id, list->name);
--                return NULL;
--            } else {
--                return opts;
--            }
--        }
--    } else if (list->merge_lists) {
--        opts = qemu_opts_find(list, NULL);
--        if (opts) {
--            return opts;
-+            error_setg(errp, "Duplicate ID '%s' for %s", id, list->name);
-+            return NULL;
-         }
-     }
-     opts = g_malloc0(sizeof(*opts));
-@@ -893,7 +894,7 @@ static QemuOpts *opts_parse(QemuOptsList *list, const char *params,
-      * (if unlikely) future misuse:
-      */
-     assert(!defaults || list->merge_lists);
--    opts = qemu_opts_create(list, id, !defaults, errp);
-+    opts = qemu_opts_create(list, id, !list->merge_lists, errp);
-     g_free(id);
-     if (opts == NULL) {
-         return NULL;
+-bool qemu_opts_set(QemuOptsList *list, const char *id,
+-                   const char *name, const char *value, Error **errp)
++bool qemu_opts_set(QemuOptsList *list, const char *name, const char *value, Error **errp)
+ {
+     QemuOpts *opts;
+ 
+-    opts = qemu_opts_create(list, id, 1, errp);
+-    if (!opts) {
+-        return false;
+-    }
++    assert(list->merge_lists);
++    opts = qemu_opts_create(list, NULL, 0, &error_abort);
+     return qemu_opt_set(opts, name, value, errp);
+ }
+ 
 -- 
 2.26.2
 
