@@ -2,104 +2,79 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 762D9C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D70EC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:38:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0D322074F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:35:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 898F2206CB
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:38:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRPrmLTt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D322074F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UnAhup7/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 898F2206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcA8S-0001qe-Rj
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 11:35:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50886)
+	id 1kcAC1-0005fK-Ch
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 11:38:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kcA7U-0001PH-0h
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:34:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32225)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kcAAo-0004pB-Nm
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:37:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46007)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kcA7P-0003bs-Li
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:34:14 -0500
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kcAAl-000504-Ua
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:37:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604939648;
+ s=mimecast20190719; t=1604939859;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LuTskqG7CeOvGvORNcuUc81r+cD1h1D/Rw69tQidb4w=;
- b=CRPrmLTtbD6MLhXbgwTAiCrwjMeXtbQd6/I33BOmd0DRd5n1I2TpeKRwr+wTiZce77d0vN
- mRJyvFZ/xHoJaWgaX4VfwFTfblIVGYDOg3W2zMAMP3ShQOCHZRQiJ824VlVXOIugTKrbPz
- 9S9d7fzXu7+YuoG06EJ1zKXG4iy4IwY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-SvGWh3eaNjy8VZYBi6M06Q-1; Mon, 09 Nov 2020 11:34:05 -0500
-X-MC-Unique: SvGWh3eaNjy8VZYBi6M06Q-1
-Received: by mail-wr1-f70.google.com with SMTP id t17so4558463wrm.13
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 08:34:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:references:from:subject:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=LuTskqG7CeOvGvORNcuUc81r+cD1h1D/Rw69tQidb4w=;
- b=V6nHT/lb63DZ+PNhlP1br0itu93BTHJnIrZeLSKD27sz3PhW9QZSTg4WCKNTSTcS3h
- 83VmN5l+ZtwMkTX+DbNdr1LUJICqW7IqTDPk7jwUUNWWLRljPf0AzdSqxoMIlpLFpOdU
- jBKsEDubgg2/bjfCtIe4W7MxFsIEH3RGn7RuU0gIqDIX6O7Q1dkljROPR+wBmUxiSFKn
- MN+kttSozZl0itfX1mukF1sTKR9LAcISqXlbeFxzUmO5Gfe2u7J2FmKDrvb4ZXUeKreh
- wUArPPEgt9lQbea8D5pLRF8JRFwCQN7hojp1lRr27tNtr48/2qy80p/f7bsxwHi0TxZ0
- b3Og==
-X-Gm-Message-State: AOAM533d6O62goSD+OoA+kZG0Ll+Q/j1qhLf6obnkmfws0aEeih5O/y6
- xbHOwfHCBoJ6KlZ1OHmrQyxic5VMQd+u8YY/pIzBjYlvR942X44B8Q98RbgI5EIoXgay9mMKQNd
- fkHDfIaXrqkZS4XE=
-X-Received: by 2002:a7b:cf1a:: with SMTP id l26mr20143wmg.18.1604939643730;
- Mon, 09 Nov 2020 08:34:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxBSkVQTmgpLtrGbJ1H7Qhrm/t+BIcrwvuzhgkmHXV8gIUKDSd28vx8U5gMyf+lDNo5x7PiHw==
-X-Received: by 2002:a7b:cf1a:: with SMTP id l26mr20110wmg.18.1604939643505;
- Mon, 09 Nov 2020 08:34:03 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id t15sm13110582wmn.19.2020.11.09.08.34.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 09 Nov 2020 08:34:02 -0800 (PST)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20201104160021.2342108-1-ehabkost@redhat.com>
- <20201106094511.GA23864@merkur.fritz.box> <20201106155013.GX5733@habkost.net>
- <20201106211034.GY5733@habkost.net>
- <ca99fc61-6cdd-117d-343e-8141e385522e@redhat.com>
- <20201109113404.GA24970@merkur.fritz.box>
- <3b711053-e67a-86fb-59e7-c06948dd8928@redhat.com>
- <20201109152125.GZ5733@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 00/44] Make qdev static property API usable by any QOM
- type
-Message-ID: <2300fd53-afa1-b957-b33b-cff2986fcb93@redhat.com>
-Date: Mon, 9 Nov 2020 17:34:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ bh=+g5hXVF/6tHVrSt/PoVz0WCJEPMqhhQeSGsCxE1qRto=;
+ b=UnAhup7/HbXl4hjc5WX1pQ7C2HspDDvykYD0NyU8FSl1ztpkBVr6Wx4GeKKEw8E0vcpI04
+ g9fLu54SJowAN06hisSBh9fvFFPAEpLCzXg5JYsm0k+uotVjHqBdrLR97hSCaQhQmVsZ0N
+ sMMO0rwtecA6FzO6Br7v/PFdWA/2K2E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-476-R9-dunfhNgWkHUo_U7Wo-A-1; Mon, 09 Nov 2020 11:37:35 -0500
+X-MC-Unique: R9-dunfhNgWkHUo_U7Wo-A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE2798C898C;
+ Mon,  9 Nov 2020 16:37:32 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
+ [10.10.119.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8086910074EA;
+ Mon,  9 Nov 2020 16:37:28 +0000 (UTC)
+Date: Mon, 9 Nov 2020 11:37:26 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Subject: Re: [PATCH v4 2/4] Jobs based on custom runners: build environment
+ docs and playbook
+Message-ID: <20201109163726.GC3874327@localhost.localdomain>
+References: <20201019015003.1527746-1-crosa@redhat.com>
+ <20201019015003.1527746-3-crosa@redhat.com>
+ <c0e7bd88bf64c0b22023810192fdb6e38d96fd97.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201109152125.GZ5733@habkost.net>
+In-Reply-To: <c0e7bd88bf64c0b22023810192fdb6e38d96fd97.camel@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="vOmOzSkFvhd7u8Ms"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -108,9 +83,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,100 +97,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>,
+ Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/11/20 16:21, Eduardo Habkost wrote:
-> On Mon, Nov 09, 2020 at 03:15:26PM +0100, Paolo Bonzini wrote:
->> On 09/11/20 12:34, Kevin Wolf wrote:
->>>> If all properties were like this, it would be okay.  But the API in v2 is
->>>> the one that is most consistent with QOM in general. Here is how this change
->>>> would be a loss in term of consistency:
->>>>
->>>> - you have the field properties split in two (with the property itself in
->>>> one place and the allow-set function in a different place), and also you'd
->>>> have some properties listed as array and some as function calls.
->>>
->>> Why would you have properties defined as function calls for the same
->>> object that uses the array?
->>
->> Because some properties would not be field properties, for example.  For
->> example, any non-scalar property would need to invoke visit_SomeQapiStruct
->> manually and would not be a field property.
-> 
-> Nothing prevents us from describing those properties inside the
-> same property array.
+--vOmOzSkFvhd7u8Ms
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Do you mean adding PropertyInfos for them?  Adding a once-only 
-PropertyInfo is worse than writing a custom getter/setter pair, because:
+On Tue, Oct 20, 2020 at 07:52:43PM +0200, Andrea Bolognani wrote:
+> On Sun, 2020-10-18 at 21:50 -0400, Cleber Rosa wrote:
+> > +++ b/scripts/ci/setup/build-environment.yml
+> > @@ -0,0 +1,233 @@
+> > +---
+> > +- name: Installation of basic packages to build QEMU
+> > +  hosts: all
+> > +  tasks:
+>=20
+> My Ansible-fu is a bit rusty at the moment, so please double-check my
+> claims and apologies in advance for the ones that I will get wrong O:-)
+>=20
+> > +    - name: Install basic packages to build QEMU on Ubuntu 18.04/20.04
+> > +      apt:
+> > +        update_cache: yes
+> > +        # Originally from tests/docker/dockerfiles/ubuntu1804.docker
+> > +        pkg:
+> > +          - ccache
+> > +          - clang
+>=20
+> Instead of using the 'apt' module here, and the equivalent module
+> further down, you could just do
+>=20
+>   package:
+>     name:
+>       - pkg1
+>       - pkg2
+>         ...
+>     state: present
+>=20
+> every single time and let Ansible take care of the differences for
+> you.
+>
 
-- without (DEFINE_)PROP_* you lose the type safety.
+I'm almost sure that this was a conscious decision.  I remeber it had
+to do with not being able to set `update_cache`, and failures on
+recently installed systems and containers that did not update the APT
+cache.  There may be something else, but I'll have to give it another
+round of testing.
 
-- with (DEFINE_)PROP_* you have much more boilerplate to write
+FIY, under the hood, package is not really a module, but an action
+plugin that forwards these very limited options to the set or detected
+package manager, so it brings uniformity in the playbook, but limits
+the control too.  IMO, it's very low impact to leave it AS IS.
 
-> More precisely, it is
->    device_class_set_props(dc, foo);
-> 
-> which is supposed to become a one-line wrapper to
-> object_class_add_field_properties().
+> > +      when: "ansible_facts['distribution'] =3D=3D 'Ubuntu'"
+>=20
+> Quoting the entire condition is not necessary, you can just have
+>=20
+>   when: ansible_facts['distribution'] =3D=3D 'Ubuntu'
+>=20
+> or, my preference,
+>=20
+>   when:
+>     - ansible_facts['distribution'] =3D=3D 'Ubuntu'
+>
 
-You're right, I'm a few years late.  So that objection is withdrawn.
+Yep, I've used the explicit lists when there was more than one
+condition, but having a standard style is better indeed.
 
-> (There's also the possibility we let the class provide a default
-> allow_set function, and both would become 100% the same)
+> which results in a nicer diff when you add/remove conditions.
+>=20
+> > +    - name: Install packages to build QEMU on Ubuntu 18.04/20.04 on no=
+n-s390x
+> > +      apt:
+> > +        update_cache: yes
+> > +        pkg:
+> > +         - libspice-server-dev
+> > +         - libxen-dev
+>=20
+> Indentation of list items is inconsistent here.
+>
 
-That's a possibility too.  Though if we ever have a need for multiple 
-allow_set functions it would be somewhat complicated to add it back.
+True.  Fixed, thanks!
 
-Instead of class-wide allow_set, we might as well have a "bool 
-constructed" field in Object and remove the function pointer altogether: 
-just replace prop->allow_set(obj) with just "!obj->constructed".
+> > +    - name: Install basic packages to build QEMU on FreeBSD 12.x
+> > +      pkgng:
+> > +        # Originally from packages on .cirrus.yml under the freebsd_12=
+_task
+> > +        name: bash,curl,cyrus-sasl,git,glib,gmake,gnutls,gsed,nettle,n=
+inja,perl5,pixman,pkgconf,png,usbredir
+>
+> See above for 'pkgng' vs 'package', but at the very least this should
+> be
+>=20
+>   pkgng:
+>     name:
+>       - bash
+>       - curl
+>         ...
+>=20
+> or each time the list is touched the resulting diff is going to be
+> unmanageable.
+>
 
->>> I think having different ways for different things (class vs. object) is
->>> better than having different ways for the same things (class in qdev vs.
->>> class in non-qdev).
->>
->> Right, but qdev's DEFINE_PROP_STRING would be easy to change to something
->> like
->>
->> - DEFINE_PROP_STRING("name", ...),
->> + device_class_add_field_property(dc, "name", PROP_STRING(...));
-> 
-> I'm not worried about this direction of conversion (which is
-> easy).  I'm worried about the function call => QAPI schema
-> conversion.  Function calls are too flexible and requires parsing
-> and executing C code.
+The documentation suggests a comma separated list of package names:
 
-Converting DEFINE_PROP_STRING to a schema also requires parsing C code, 
-since you can have handwritten Property literals (especially for custom 
-PropertyInfo).  Converting DEFINE_PROP_STRING it also requires matching 
-the array against calls to object_class_add_field_properties (which 
-could be hidden behind helpers such as device_class_set_props).  (Plus 
-matching class_init functions against TypeInfo).
+   https://docs.ansible.com/ansible/2.8/modules/pkgng_module.html#pkgng-mod=
+ule
 
-So, you don't save any parsing by using arrays.  (In fact I would 
-probably skip the parsing, and use your suggestion of *executing* C 
-code: write the QAPI schema generator in C, link into QEMU and run it 
-just once to generate the QOM schema).
+And the reason is that this module is not as smart as others, and will
+run one separate command for each individual package name value:
 
-QOM has been using function calls for many years, are there any cases of 
-misuse of that flexibility that you have in mind?  I can only think of 
-two *uses*, in fact.  One is eepro100_register_types is the only case I 
-can remember where types are registered dynamically.  The other is S390 
-CPU features.  In fact,
+   https://github.com/ansible/ansible/blob/v2.10.3/test/support/integration=
+/plugins/modules/pkgng.py#L214
 
-   $ git grep \ object_class_property_add|grep -v '([a-z0-9_]*, \"'
+It's a tradeoff indeed, but I think we're aligned with the docs.
 
-shows some cases where property names are macros (an mst-ism :), but no 
-other case where properties are being defined dynamically.
+> > +    - name: Enable PowerTools repo on CentOS 8
+> > +      ini_file:
+> > +        path: /etc/yum.repos.d/CentOS-PowerTools.repo
+> > +        section: PowerTools
+> > +        option: enabled
+> > +        value: "1"
+> > +      when:
+> > +        - "ansible_facts['distribution'] =3D=3D 'CentOS'"
+> > +        - "ansible_facts['distribution_major_version'] =3D=3D '8'"
+>=20
+> Another option would be to use
+>=20
+>   command: 'dnf config-manager --set-enabled Stream-PowerTools -y'
+>   args:
+>     warn: no
+>=20
+> but I have to admit the way you're doing it is very clever ;)
+>
 
-Paolo
+Yeah, that would require another package to be installed, and then the
+command executed... So I think this is cheaper and eaiser indeed.
+
+> --=20
+> Andrea Bolognani / Red Hat / Virtualization
+>=20
+
+Thanks for the review, I'll report on the additional points as soon as
+I test them.  If appropriate, I'll put notes on the v5.
+
+- Cleber.
+
+--vOmOzSkFvhd7u8Ms
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+pcEMACgkQZX6NM6Xy
+CfN+mBAAh1i8Rjzlp/JFOVlXinnXczgon1s/Zn6wK+j/YXh0faaf4LCRasbBlHxd
+ynQMTcd8ycT1kwFuRFN4YRx9WXC0H/TCese4i1TmjeMGCAC8tmOoKSGQ7FOZX/Sr
+UUAR5p1vyPgMz/DB/utLxJjukGsD/mIWPt4Zo36B2b1aUxN22jDzXAsCzpqxE/d9
+5Vo8aLgfKUbaxv06iJJCr+wHsGvGOziiNG+wXv9a08FONj2h1lFKJe6dghmNmbUm
+FJfgkdCbijllljzGdDEA70kPyLfZD9ewZWIKxfXGIwjXpMGskc+PrRKPks38xI/z
+QMjCc9ZdBtCNQ4XB1G/0yfbH3j8iqjzauIUYXHzuk6KaJ13jHIVRGMb/Ai/0gSaG
+bRXlKYJZq3m+nAtz1wVoVT3rkP5bfuY1FyLD2ZmOUmzW4J+9uQyzbiU+QMLbbXMj
+dX7BpJtA9ew9vrziGbDs7uvSJBR7Dxoddn2yqQkNnCM30/92+cC2SkcjKwkNf0rH
+HkEdllbzA4Li1rc4QW60LYaxpW/iET5BWcDVgLvZhB3svjl8I4xnr7dB6zZhhMcv
+vuRU3S3oQjjW/3IJ/BE7KYlyPgsJ9fdtYS13xYf2cjg+3Wa+NJkX1wFEgKTNKROB
+48GFS0xn62nKbwS7M6UbSfACIAA8F0qAQIBoVFU/Uy4i2koOOMc=
+=IgZY
+-----END PGP SIGNATURE-----
+
+--vOmOzSkFvhd7u8Ms--
 
 
