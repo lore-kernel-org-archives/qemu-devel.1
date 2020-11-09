@@ -2,89 +2,118 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E220C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 20:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0646CC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 20:33:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7CA9206D8
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 20:31:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5977220665
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 20:33:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J8m1ix3H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7CA9206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="s1MSaOFb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5977220665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcDp5-0002yT-NK
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 15:31:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50716)
+	id 1kcDrO-0004k3-EA
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 15:33:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kcDnc-0002Lb-46
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 15:30:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24334)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kcDnZ-0007Dp-V7
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 15:29:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604953797;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kMXJSBTGJNybytcSyrPT/t/N94qrIkuRMRD/A00Fdgg=;
- b=J8m1ix3HZ2ML0YvNkOB+Afgcburb+P50K7YEmzG+V76d4xWBVvjy3xA7syXinPbXXS4gEG
- 2MIpULn6EBJW4bGDR6ZvkKCws/8+X5qs2OvZfCnfMkZ6fHJwDmkcFg/ULE631lZYSLjLlM
- 85Rh+SNRjVSA4bCUebNKvvpf42/VSoY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-515-fsqXXJ98OcOns2BmMIpA_w-1; Mon, 09 Nov 2020 15:29:53 -0500
-X-MC-Unique: fsqXXJ98OcOns2BmMIpA_w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F5B0188C122;
- Mon,  9 Nov 2020 20:29:52 +0000 (UTC)
-Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D737410013D9;
- Mon,  9 Nov 2020 20:29:51 +0000 (UTC)
-Date: Mon, 9 Nov 2020 13:29:50 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [RFC PATCH for-QEMU-5.2] vfio: Make migration support experimental
-Message-ID: <20201109132950.6c2dfe02@w520.home>
-In-Reply-To: <20201109194417.GR3024@work-vm>
-References: <160494787833.1473.10514376876696596117.stgit@gimli.home>
- <20201109194417.GR3024@work-vm>
+ (Exim 4.90_1) (envelope-from <Michael.Roth@amd.com>)
+ id 1kcDqf-00041A-Cz
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 15:33:09 -0500
+Received: from mail-bgr052100138028.outbound.protection.outlook.com
+ ([52.100.138.28]:5715 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Michael.Roth@amd.com>)
+ id 1kcDqb-0007ei-TB
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 15:33:07 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fmmoeLgMQrFNbc9rpi0kpwQbgI8jNttaKmjC+BI9mbLWjIKjani/XrN5jpA0HY5nst5sBwHI/pc7vPwohiSXPvcGxickLjXh8k4PpVrHKgrcLBFnTTozFtFWfvIE3waZV5aIKXIWm55KJ/QPLa/37bwv+yYbmVzbp32snhfwNg6ixYZpiNykasW51Lu86C2svPDNAYZxXIKVjwdQG5OxYESs6gR7MFZXHQQf97wTwcDS0kDNMrmJj9dMO5FnedEyJAJBMCHV227t3Au+Kf81+c4hCmXUsp9dmvfdLPDQpYYFJb0syO72b3ok5BAxncbJHAHris9e4V6vuoH+723V7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kf/fHPicZgZkO5thQSCE2ipeIXs29RxbH2rLc2NdaH0=;
+ b=YAavWqnQNtDKFVjUYaTnE44+XDcWHMXtJm6HxQ2Q/buFwZHi1nmO8ec18pvZdGmOq6AQpc4bTKeIcFkACCTuYefkkWKoiaqimr7LcMq6JWaiHA0qZPhWRFfzNxV0oKdykN91bzgk1/7DJdieP8g3ZEBrvWTlGI6BgxMn83elps3PXKZbdYPtc+6Zol1cJolnRIwv1fseDs+FaFKNq7X6XaLDCVDYVq4Flz5Lfuh7KnkXtBcddMvsUCkpuzf4oy105WTWh8bqo2eNqE44Vg129M5SaOTrqf39KTDhXUHFb8WkecI97q6NnkkGz37xYlS901K8roKEj9LhClMq+4JtBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kf/fHPicZgZkO5thQSCE2ipeIXs29RxbH2rLc2NdaH0=;
+ b=s1MSaOFbFb6EBhuem0TuduG42q+6fGaqyQds9rE7BGFCFfG+deY84avUTSxYUDdt2pgv53Ljt1FHwnPhJiivIr8r4k/dlP64AtbPM1mCbCQc2Tap9c/XhonWaz+RB0XzVIVOXDBq91/HxjEuIN4pZOtVucm/OQvPo1iISryUHuk=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
+ by CH2PR12MB4072.namprd12.prod.outlook.com (2603:10b6:610:7e::16)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21; Mon, 9 Nov
+ 2020 20:18:00 +0000
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::f428:769b:3e9:8300]) by CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::f428:769b:3e9:8300%5]) with mapi id 15.20.3541.025; Mon, 9 Nov 2020
+ 20:18:00 +0000
+From: Michael Roth <michael.roth@amd.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL for-5.2 0/1] qemu-ga patch queue for hard-freeze
+Date: Mon,  9 Nov 2020 14:17:21 -0600
+Message-Id: <20201109201722.237150-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [165.204.77.11]
+X-ClientProxiedBy: SN6PR01CA0015.prod.exchangelabs.com (2603:10b6:805:b6::28)
+ To CH2PR12MB4133.namprd12.prod.outlook.com
+ (2603:10b6:610:7a::13)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=alex.williamson@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (165.204.77.11) by
+ SN6PR01CA0015.prod.exchangelabs.com (2603:10b6:805:b6::28) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3541.25 via Frontend Transport; Mon, 9 Nov 2020 20:17:59 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 8eb679f4-8016-49ec-4376-08d884ec8ddb
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4072:
+X-Microsoft-Antispam-PRVS: <CH2PR12MB4072946A2E3F55D011478E5795EA0@CH2PR12MB4072.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:376;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZddpH3Gsk9+EL7bizhR2OkWrvOQWbOFRgcuV8bv0+0w45RVcpnCwBnYu+sxXEUsRlUSkpXBoHhcT1w349RmbgoLhmSstPXX/1mQhE3NBYBOMBXSLwP/Vp+6CStHetXl2s9S++52A2ndH5d4tgwkL9PAcWNGdZltk81PRrYY/gIfPxztGg8365a6mPGQS3aUVD/QkcdI5aEE4Gq05EU/EsKF5Q/6ocXejldoM1ky3j/Pyi1t53z4fFw0J4O5Ygt+Qeqn39Fj7Fk4fI5CA/vjuMnu+fwc9rmrlkZnhMbXrWj0SfrUKzywS07OAwZnx8LXGxu68cuiCpn6QDndFvFWsveIpY5/SHCCem3QWDpxUCDgN7Fkzlxe1zuVYoVB3RN0dm1U4+rlI8iYINpKGVLOCMuNYO1DsubHsY8pc0U9xZ5wQxHDWq8r7F34OQ6LLm4ZfC2zdvPYDIkv1r/Sjp1nhMo6QTIn9uonRsGS9b91lt3D0Q1KL/pjZdada0fIGXNVxnI+7gjcNiqHomyO18jCOu6uxl/hzQxa5trRD6321+xkFqKIYCaHjJI6KVLlLIbyaYcd29mf7I9t5C7O8QVAxZ2tlmIycmU0FphqxtRl9flqt90JVAgtUz81ILhal3FzV1kayanFNMpte1eLqoZOFBC0IBpjuqo1rnTNU7282xMBL5H3Kqsx5hzlXfr/Rwr7z
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:5; SRV:;
+ IPV:NLI; SFV:SPM; H:CH2PR12MB4133.namprd12.prod.outlook.com; PTR:; CAT:OSPM;
+ SFS:(4636009)(136003)(366004)(396003)(39860400002)(376002)(346002)(6486002)(6666004)(1076003)(5660300002)(66556008)(8676002)(8936002)(6496006)(6916009)(66476007)(316002)(36756003)(186003)(2906002)(66946007)(44832011)(26005)(52116002)(956004)(4744005)(2616005)(4326008)(16526019)(83380400001)(86362001)(478600001)(23200700001);
+ DIR:OUT; SFP:1501; 
+X-MS-Exchange-AntiSpam-MessageData: 3LIKUZcxUMqVuzTMHFe4/lwGlb014Yw/VRAxtYU7BLfEP+iSEMyUVBhuPND33OQTB6wewKyyNUVFLgodiden/dUSi+dMfNixkpGd/ntdBzIu5CIfjV72GYXEpkeP9N9jp624vkyz7ltIEGpvh3rWodFYpikBl7kOn+GyWD7FurBMgUZvnb+jSi/gjKcOA0TNahFbyd4/OTu5xW3xJQKDyllJwpkyqVcYd1dtSRgeoxGUpaOW2ykE4s8ReMleumw6y/qHfAlz97MYTIl55FsJek9TXh21B0kc5gOmPqdJdANNr9y4vFYwKrpaw+DaDt2uahVpUoTJiDV1b2qZmP30VKpE1a4OWZCz7m3a4bpQUeGYL6ezAYIhPqASzPfESvNcV3gUu8jicloh+/Kz5PQUocgaHie3d1bnLqiw+XeBOOuPMF3aFuBwrsxwl2eSGu6jYH4u54J3cOwT48NomLc+E+7nhtJTL8ffKc0J4yIBWwQ+VD9wrhamRxljXN8/ny2QHlfpAzmZ9JNxEXMgesev8sr1ZTeay0P8XlyoPDjxA2+xdh6bHG/9JznpWcYaONA8VbSLwNaW14kl4Da/ldSRqkzRfTdWua7LWmkYBRW/0SNZ26FzLYF7mf279TO8OVdMsM/1XZT0iF5s1VQqqvtpIjOJmCn3JRhK6OTIoNjmS1ch3hxQOVjWPHl9hj0JVQmRsqHZwrDClkoymFSJTRFtdc87IiI/8LjHbdg/MEQERUmOzXMIUPOk5TOlpH0cRHEVyXR8JBMcv72OK0WzB1tfZWM1afv82l0iljJFrocA18cAm/76ADI95ds0MBLbFqw00sJ5k4WXWHVTrJpwMW0BM7phdRolTmUmtz0BS4MYWKeqGCJOk+ksruEY68nNEOH/QHTtcV6x572KVwp1WgqHeA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8eb679f4-8016-49ec-4376-08d884ec8ddb
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2020 20:18:00.3097 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PNnVnK7A4UXvqwx17eb6D2KqNm9e6v4oA3qBTqwuyZYV0gDfk0oX9it49rZvYdF2pkPI+6wS9J06d2/cHob4Bg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4072
+Received-SPF: none client-ip=52.100.138.28; envelope-from=Michael.Roth@amd.com;
+ helo=NAM04-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 15:33:03
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -8
+X-Spam_score: -0.9
+X-Spam_bar: /
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,154 +126,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Neo Jia <cjia@nvidia.com>, Juan Quintela <quintela@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Kirti Wankhede <kwankhede@nvidia.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Nov 2020 19:44:17 +0000
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+The following changes since commit 3493c36f0371777c62d1d72b205b0eb6117e2156:
 
-> * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > Per the proposed documentation for vfio device migration:
-> >=20
-> >   Dirty pages are tracked when device is in stop-and-copy phase
-> >   because if pages are marked dirty during pre-copy phase and
-> >   content is transfered from source to destination, there is no
-> >   way to know newly dirtied pages from the point they were copied
-> >   earlier until device stops. To avoid repeated copy of same
-> >   content, pinned pages are marked dirty only during
-> >   stop-and-copy phase.
-> >=20
-> > Essentially, since we don't have hardware dirty page tracking for
-> > assigned devices at this point, we consider any page that is pinned
-> > by an mdev vendor driver or pinned and mapped through the IOMMU to
-> > be perpetually dirty.  In the worst case, this may result in all of
-> > guest memory being considered dirty during every iteration of live
-> > migration.  The current vfio implementation of migration has chosen
-> > to mask device dirtied pages until the final stages of migration in
-> > order to avoid this worst case scenario.
-> >=20
-> > Allowing the device to implement a policy decision to prioritize
-> > reduced migration data like this jeopardizes QEMU's overall ability
-> > to implement any degree of service level guarantees during migration.
-> > For example, any estimates towards achieving acceptable downtime
-> > margins cannot be trusted when such a device is present.  The vfio
-> > device should participate in dirty page tracking to the best of its
-> > ability throughout migration, even if that means the dirty footprint
-> > of the device impedes migration progress, allowing both QEMU and
-> > higher level management tools to decide whether to continue the
-> > migration or abort due to failure to achieve the desired behavior. =20
->=20
-> I don't feel particularly badly about the decision to squash it in
-> during the stop-and-copy phase; for devices where the pinned memory
-> is large, I don't think doing it during the main phase makes much sense;
-> especially if you then have to deal with tracking changes in pinning.
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20201106' into staging (2020-11-06 13:43:28 +0000)
 
+are available in the Git repository at:
 
-AFAIK the kernel support for tracking changes in page pinning already
-exists, this is largely the vfio device in QEMU that decides when to
-start exposing the device dirty footprint to QEMU.  I'm a bit surprised
-by this answer though, we don't really know what the device memory
-footprint is.  It might be large, it might be nothing, but by not
-participating in dirty page tracking until the VM is stopped, we can't
-know what the footprint is and how it will affect downtime.  Is it
-really the place of a QEMU device driver to impose this sort of policy?
+  git://github.com/mdroth/qemu.git tags/qga-pull-2020-11-09-tag
 
+for you to fetch changes up to b1b9ab1c04d560f86d8da3dfca4d8b21de75fee6:
 
-> Having said that, I agree with marking it as experimental, because
-> I'm dubious how useful it will be for the same reason, I worry
-> about whether the downtime will be so large to make it pointless.
+  qga: fix missing closedir() in qmp_guest_get_disks() (2020-11-09 14:07:14 -0600)
 
+----------------------------------------------------------------
+qemu-ga patch queue for hard-freeze
 
-TBH I think that's the wrong reason to mark it experimental.  There's
-clearly demand for vfio device migration and even if the practical use
-cases are initially small, they will expand over time and hardware will
-get better.  My objection is that the current behavior masks the
-hardware and device limitations, leading to unrealistic expectations.
-If the user expects minimal downtime, configures convergence to account
-for that, QEMU thinks it can achieve it, and then the device marks
-everything dirty, that's not supportable.  OTOH if the vfio device
-participates in dirty tracking through pre-copy, then the practical use
-cases will find themselves as migrations will either be aborted because
-downtime tolerances cannot be achieved or downtimes will be configured
-to match reality.  Thanks,
+* fix leaked DIR* descriptor in guest-get-disks spotted by coverity
 
-Alex
+----------------------------------------------------------------
+Michael Roth (1):
+      qga: fix missing closedir() in qmp_guest_get_disks()
 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->=20
-> > Link: https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg00807.ht=
-ml
-> > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> > Cc: Neo Jia <cjia@nvidia.com>
-> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Cc: Juan Quintela <quintela@redhat.com>
-> > Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---
-> >=20
-> > Given that our discussion in the link above seems to be going in
-> > circles, I'm afraid it seems necessary to both have a contigency
-> > plan and to raise the visibility of the current behavior to
-> > determine whether others agree that this is a sufficiently
-> > troubling behavior to consider migration support experimental
-> > at this stage.  Please voice your opinion or contribute patches
-> > to resolve this before QEMU 5.2.  Thanks,
-> >=20
-> > Alex
-> >=20
-> >  hw/vfio/migration.c           |    2 +-
-> >  hw/vfio/pci.c                 |    2 ++
-> >  include/hw/vfio/vfio-common.h |    1 +
-> >  3 files changed, 4 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> > index 3ce285ea395d..cd44d465a50b 100644
-> > --- a/hw/vfio/migration.c
-> > +++ b/hw/vfio/migration.c
-> > @@ -882,7 +882,7 @@ int vfio_migration_probe(VFIODevice *vbasedev, Erro=
-r **errp)
-> >      Error *local_err =3D NULL;
-> >      int ret =3D -ENOTSUP;
-> > =20
-> > -    if (!container->dirty_pages_supported) {
-> > +    if (!vbasedev->enable_migration || !container->dirty_pages_support=
-ed) {
-> >          goto add_blocker;
-> >      }
-> > =20
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index 58c0ce8971e3..1349b900e513 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -3194,6 +3194,8 @@ static Property vfio_pci_dev_properties[] =3D {
-> >                      VFIO_FEATURE_ENABLE_REQ_BIT, true),
-> >      DEFINE_PROP_BIT("x-igd-opregion", VFIOPCIDevice, features,
-> >                      VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
-> > +    DEFINE_PROP_BOOL("x-enable-migration", VFIOPCIDevice,
-> > +                     vbasedev.enable_migration, false),
-> >      DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, fal=
-se),
-> >      DEFINE_PROP_BOOL("x-balloon-allowed", VFIOPCIDevice,
-> >                       vbasedev.ram_block_discard_allowed, false),
-> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-commo=
-n.h
-> > index baeb4dcff102..2119872c8af1 100644
-> > --- a/include/hw/vfio/vfio-common.h
-> > +++ b/include/hw/vfio/vfio-common.h
-> > @@ -123,6 +123,7 @@ typedef struct VFIODevice {
-> >      bool needs_reset;
-> >      bool no_mmap;
-> >      bool ram_block_discard_allowed;
-> > +    bool enable_migration;
-> >      VFIODeviceOps *ops;
-> >      unsigned int num_irqs;
-> >      unsigned int num_regions;
-> >  =20
+ qga/commands-posix.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
 
 
