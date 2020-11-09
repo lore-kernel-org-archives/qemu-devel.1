@@ -2,88 +2,87 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F6CC55ABD
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D7FC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:27:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C40CC20684
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:24:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91F07206E3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:27:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RiGWM7BT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C40CC20684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RMG9i1mx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91F07206E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc4Lr-0007RB-Ri
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 05:24:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40510)
+	id 1kc4OW-0000DN-I9
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 05:27:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thatlemon@gmail.com>)
- id 1kc4L4-0006zi-Dg; Mon, 09 Nov 2020 05:23:54 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43533)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <thatlemon@gmail.com>)
- id 1kc4L2-0007yW-LG; Mon, 09 Nov 2020 05:23:54 -0500
-Received: by mail-wr1-x442.google.com with SMTP id s8so977015wrw.10;
- Mon, 09 Nov 2020 02:23:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4K3U1NewmUjwvna+a3l1Z82sMILfAkInSo7TJ3mQ3Sw=;
- b=RiGWM7BTatbZ8IPS/bcB80pRu5PeB+W4jdrchp266WXB5XObBXkcxrBSk5x6EDRhMQ
- ffD1JdgckHQe6oXl1aDWSUPpDw0MaTlDwZ761DRiJJCWaUidOPwh9Cvl3sXWWF7DVRnk
- p2vnoEVueciMF4/7BMSHcAa7Qdv20akL/d0IHyNmWbhmeWNwP1jX5Ky8jqA1rz6/aKfv
- /R5dP+6cXMrsLX+YBCH4/BQ0l6/yayNF4kdzhHnbwZ0yhJVTW2++9723g5DurGewCPKx
- CrViPHfgRc+OzDaGfiJwhgHVgonvOKBnxE4qe481NYvO8CnqXXMOksuxEJMRVv5QusrB
- Uyrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4K3U1NewmUjwvna+a3l1Z82sMILfAkInSo7TJ3mQ3Sw=;
- b=oN/XIc1g41T4T84sD8vKSbogfbs46kgzASxEsEkMB93tFDKQqo7y/p97j7fVGQmtAF
- q10V5gY+oIP8lSd1DmVmDWkYXu958bXsPnOe5noWSXO4XoJ0p3LBh0jKqFmdlu1eeX1G
- nRyGIbj5GlO+Z5YFWocaWmfd2tlmdmlgVoQdtQk3YDy6xxWl292UeCiIy3w9T5j4tDMb
- 7BCyjpSUbe6+M/Vg1yNVm23d6Kulst0Q46xxrO9/pkcNpKpU99ops/z3QURVW90lCj/d
- 9a+N9f/Z9nxAWc0CFm08tSpNMKcmwbfCSsN1T8vcM/9gryfRHQMTcq1ngl6/ShGf2fSA
- fWCA==
-X-Gm-Message-State: AOAM533m7IqEqidiG1/Vs8ZnNvtA4w3w0815OdYTKsArXUo65UObnf66
- 6eJqIjohFvmqM1/yNsRgpGXZvhT5btKVgw==
-X-Google-Smtp-Source: ABdhPJxeltd9fMeObORBlD+8VXf70g1IsISgpnDBSJ75eCfLQ6JtkBVqzXip9/hGf6lrpRa3XewVuA==
-X-Received: by 2002:adf:e351:: with SMTP id n17mr17531931wrj.308.1604917430084; 
- Mon, 09 Nov 2020 02:23:50 -0800 (PST)
-Received: from localhost.localdomain ([151.33.227.77])
- by smtp.gmail.com with ESMTPSA id a9sm8344483wrp.21.2020.11.09.02.23.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Nov 2020 02:23:49 -0800 (PST)
-From: LemonBoy <thatlemon@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] ppc/translate: Fix unordered f64/f128 comparisons
-Date: Mon,  9 Nov 2020 11:21:47 +0100
-Message-Id: <20201109102147.31747-1-thatlemon@gmail.com>
-X-Mailer: git-send-email 2.27.0
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kc4NN-0008AR-RT
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:26:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43077)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kc4NL-0000Qu-W0
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:26:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604917574;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=Nr6JuLDtnOoAPCqii3oF3K6hcapB0tV+HvUjRdQa/0c=;
+ b=RMG9i1mxjwt4dFV7Gnssgac4RbHYv1RAbQn+ofWRT/8TERn4EzFmDbPnhDFO1Bb6fsxS3A
+ 6a5Z0IJputpUZ3p3flOSYOx1Eh5TO7Ap41kUTBnm7TEADeFoZhmLvwMMXrc2GCLiTtJb+a
+ qOiAz9NFqGYKdNaivHPwsnX88PhwX3Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-LkcIpr3aN6q8OWxCIF4x9w-1; Mon, 09 Nov 2020 05:26:07 -0500
+X-MC-Unique: LkcIpr3aN6q8OWxCIF4x9w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D81891009E21
+ for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 10:26:06 +0000 (UTC)
+Received: from redhat.com (ovpn-114-194.ams2.redhat.com [10.36.114.194])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E9D760E1C;
+ Mon,  9 Nov 2020 10:25:59 +0000 (UTC)
+Date: Mon, 9 Nov 2020 10:25:56 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: dtrace warnings for trace/trace-dtrace-hw_virtio.dtrace
+Message-ID: <20201109102556.GD684242@redhat.com>
+References: <87r1p2syo9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=thatlemon@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <87r1p2syo9.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,91 +95,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to the PowerISA v3.1 reference, Table 68 "Actions for xscmpudp
-- Part 1: Compare Unordered", whenever one of the two operands is a NaN
-the SO bit is set while the other three bits are cleared.
+On Mon, Nov 09, 2020 at 09:48:54AM +0100, Markus Armbruster wrote:
+> I get this on Fedora 32:
+> 
+> [12/8327] Generating trace-dtrace-hw_virtio.h with a custom command
+> Warning: /usr/bin/dtrace:trace/trace-dtrace-hw_virtio.dtrace:76: syntax error near:
+> probe vhost_vdpa_dev_start
+> 
+> Warning: Proceeding as if --no-pyparsing was given.
 
-Apply the same change to xscmpuqp.
+Patch is posted and reviewed but needs merging still:
 
-The respective ordered counterparts are unaffected.
+  https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg05608.html
 
-Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
----
- target/ppc/fpu_helper.c | 32 ++++++++++++++++++++++----------
- 1 file changed, 22 insertions(+), 10 deletions(-)
-
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 9b8c8b70b6..b07ff66375 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -2479,13 +2479,11 @@ void helper_##op(CPUPPCState *env, uint32_t opcode,                      \
-     if (float64_is_signaling_nan(xa->VsrD(0), &env->fp_status) ||        \
-         float64_is_signaling_nan(xb->VsrD(0), &env->fp_status)) {        \
-         vxsnan_flag = true;                                              \
--        cc = CRF_SO;                                                     \
-         if (fpscr_ve == 0 && ordered) {                                  \
-             vxvc_flag = true;                                            \
-         }                                                                \
-     } else if (float64_is_quiet_nan(xa->VsrD(0), &env->fp_status) ||     \
-                float64_is_quiet_nan(xb->VsrD(0), &env->fp_status)) {     \
--        cc = CRF_SO;                                                     \
-         if (ordered) {                                                   \
-             vxvc_flag = true;                                            \
-         }                                                                \
-@@ -2497,12 +2495,19 @@ void helper_##op(CPUPPCState *env, uint32_t opcode,                      \
-         float_invalid_op_vxvc(env, 0, GETPC());                          \
-     }                                                                    \
-                                                                          \
--    if (float64_lt(xa->VsrD(0), xb->VsrD(0), &env->fp_status)) {         \
-+    switch (float64_compare(xa->VsrD(0), xb->VsrD(0), &env->fp_status)) {\
-+    case float_relation_less:                                            \
-         cc |= CRF_LT;                                                    \
--    } else if (!float64_le(xa->VsrD(0), xb->VsrD(0), &env->fp_status)) { \
--        cc |= CRF_GT;                                                    \
--    } else {                                                             \
-+        break;                                                           \
-+    case float_relation_equal:                                           \
-         cc |= CRF_EQ;                                                    \
-+        break;                                                           \
-+    case float_relation_greater:                                         \
-+        cc |= CRF_GT;                                                    \
-+        break;                                                           \
-+    case float_relation_unordered:                                       \
-+        cc |= CRF_SO;                                                    \
-+        break;                                                           \
-     }                                                                    \
-                                                                          \
-     env->fpscr &= ~FP_FPCC;                                              \
-@@ -2545,12 +2550,19 @@ void helper_##op(CPUPPCState *env, uint32_t opcode,                     \
-         float_invalid_op_vxvc(env, 0, GETPC());                         \
-     }                                                                   \
-                                                                         \
--    if (float128_lt(xa->f128, xb->f128, &env->fp_status)) {             \
-+    switch (float128_compare(xa->f128, xb->f128, &env->fp_status)) {    \
-+    case float_relation_less:                                           \
-         cc |= CRF_LT;                                                   \
--    } else if (!float128_le(xa->f128, xb->f128, &env->fp_status)) {     \
--        cc |= CRF_GT;                                                   \
--    } else {                                                            \
-+        break;                                                          \
-+    case float_relation_equal:                                          \
-         cc |= CRF_EQ;                                                   \
-+        break;                                                          \
-+    case float_relation_greater:                                        \
-+        cc |= CRF_GT;                                                   \
-+        break;                                                          \
-+    case float_relation_unordered:                                      \
-+        cc |= CRF_SO;                                                   \
-+        break;                                                          \
-     }                                                                   \
-                                                                         \
-     env->fpscr &= ~FP_FPCC;                                             \
+Regards,
+Daniel
 -- 
-2.27.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
