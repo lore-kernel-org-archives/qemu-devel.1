@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62444C388F7
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:57:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79634C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:58:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 800F420678
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:57:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 800F420678
+	by mail.kernel.org (Postfix) with ESMTPS id E0DB220678
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:58:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DB220678
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc4rf-0003Xr-Gk
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 05:57:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47996)
+	id 1kc4sE-0004GC-TA
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 05:58:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kc4q9-0002S0-U3
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:56:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41948)
+ id 1kc4qA-0002Sc-EO
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:56:02 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41982)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kc4q7-0002bO-Ht
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:56:01 -0500
+ id 1kc4q8-0002cF-Ih
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:56:02 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kc4q5-0003Vk-CH
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 10:55:57 +0000
+ id 1kc4q7-0003cA-2W
+ for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 10:55:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5BA182E8131
- for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 10:55:57 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0C86F2E811E
+ for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 10:55:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Nov 2020 10:44:50 -0000
-From: Stefan Hajnoczi <1890360@bugs.launchpad.net>
+Date: Mon, 09 Nov 2020 10:41:27 -0000
+From: Stefan Hajnoczi <1681439@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
  assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr stefanha
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Commenters: a1xndr bugs-syssec janitor jnsnow kempniu stefanha
+ th-huth
+X-Launchpad-Bug-Reporter: =?utf-8?b?TWljaGHFgiBLxJlwaWXFhCAoa2VtcG5pdSk=?=
 X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
-References: <159659017753.10948.1930355246009105000.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160491869046.27687.5552243163676293716.malone@chaenomeles.canonical.com>
-Subject: [Bug 1890360] Re: Assertion failure in address_space_unmap through
- virtio-blk
+References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
+Message-Id: <160491848798.17714.1258973845848114882.malone@soybean.canonical.com>
+Subject: [Bug 1681439] Re: dma_blk_cb leaks memory map handles on misaligned IO
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
-X-Launchpad-Hash: 136d3c4fb6b185371c134e5c0db9c80bf93b20f5
+X-Launchpad-Hash: ecdac801bef95d5e054f83bc67906f3121a5786e
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:40:52
@@ -85,116 +85,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890360 <1890360@bugs.launchpad.net>
+Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix:
+Three points stand out:
 
-commit 7bd04a041addcdef6a03e6498aafaea55ca6e88b
-Author: Stefan Hajnoczi <stefanha@redhat.com>
-Date:   Thu Sep 17 10:44:54 2020 +0100
+1. The alignment code is buggy, as mentioned in comment 15.
 
-    virtio-blk: undo destructive iov_discard_*() operations
+2. The iov_discard_undo() API has been added to "qemu/iov.h" to undo the
+effect of iov_discard_front/back_undoable() calls before unmapping. You
+can use this API to restore the originally mapped iovecs.
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+3. The device must follow the spec when handling invalid inputs. If the
+spec is unclear then it's necessary to check actual hardware or infer
+the behavior from code that is considered reference material (Linux
+drivers, emulation code in BOCHS, etc).
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890360
+https://bugs.launchpad.net/bugs/1681439
 
 Title:
-  Assertion failure in address_space_unmap through virtio-blk
+  dma_blk_cb leaks memory map handles on misaligned IO
 
 Status in QEMU:
-  Fix Committed
+  Confirmed
 
 Bug description:
-  Hello,
-  Reproducer:
-  cat << EOF | ./i386-softmmu/qemu-system-i386 \
-  -drive id=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone \
-  -device virtio-blk,drive=3Dmydrive \
-  -nodefaults -nographic -qtest stdio
-  outl 0xcf8 0x80001010
-  outl 0xcfc 0xc001
-  outl 0xcf8 0x80001014
-  outl 0xcf8 0x80001004
-  outw 0xcfc 0x7
-  outl 0xc006 0x3aff9090
-  outl 0xcf8 0x8000100e
-  outl 0xcfc 0x41005e1e
-  write 0x3b00002 0x1 0x5e
-  write 0x3b00004 0x1 0x5e
-  write 0x3aff5e6 0x1 0x11
-  write 0x3aff5eb 0x1 0xc6
-  write 0x3aff5ec 0x1 0xc6
-  write 0x7 0x1 0xff
-  write 0x8 0x1 0xfb
-  write 0xc 0x1 0x11
-  write 0xe 0x1 0x5e
-  write 0x5e8 0x1 0x11
-  write 0x5ec 0x1 0xc6
-  outl 0x410e 0x10e
-  EOF
+  Maintainer Edit:
+
+  The functions in dma-helpers mismanage misaligned IO, badly enough to
+  cause an infinite loop where no progress can be made. This allows the
+  IDE state machine to get wedged such that cancelling DMA can fail;
+  because the DMA helpers have bodged the state of the DMA transfer. See
+  Comment #15 for the in-depth analysis.
+
+  I've updated the name of this bug to reflect the current status as I
+  understand it.
+
+  --js
 
   =
 
-  qemu-fuzz-i386: /exec.c:3623: void address_space_unmap(AddressSpace *, vo=
-id *, hwaddr, _Bool, hwaddr): Assertion `mr !=3D NULL' failed.
-  =3D=3D789=3D=3D ERROR: libFuzzer: deadly signal
-      #8  in __assert_fail /build/glibc-GwnBeO/glibc-2.30/assert/assert.c:1=
-01:3
-      #9  in address_space_unmap /exec.c:3623:9
-      #10 in dma_memory_unmap /include/sysemu/dma.h:145:5
-      #11 in virtqueue_unmap_sg /hw/virtio/virtio.c:690:9
-      #12 in virtqueue_fill /hw/virtio/virtio.c:843:5
-      #13 in virtqueue_push /hw/virtio/virtio.c:917:5
-      #14 in virtio_blk_req_complete /hw/block/virtio-blk.c:83:5
-      #15 in virtio_blk_handle_request /hw/block/virtio-blk.c:671:13
-      #16 in virtio_blk_handle_vq /hw/block/virtio-blk.c:780:17
-      #17 in virtio_queue_notify_aio_vq /hw/virtio/virtio.c:2324:15
-      #18 in virtio_queue_host_notifier_aio_read /hw/virtio/virtio.c:3495:9
-      #19 in aio_dispatch_handler /util/aio-posix.c:328:9
-      #20 in aio_dispatch_handlers /util/aio-posix.c:371:20
-      #21 in aio_dispatch /util/aio-posix.c:381:5
-      #22 in aio_ctx_dispatch /util/async.c:306:5
-      #23 in g_main_context_dispatch
+  Original report:
 
-  =
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
 
-  With -trace virtio\*
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
 
-  ...
-  [S +0.099667] OK
-  [R +0.099681] write 0x5ec 0x1 0xc6
-  OK
-  [S +0.099690] OK
-  [R +0.099700] outl 0x410e 0x10e
-  29575@1596590112.074339:virtio_queue_notify vdev 0x62d000030590 n 0 vq 0x=
-7f9b93fc9800
-  29575@1596590112.074423:virtio_blk_data_plane_start dataplane 0x60600000f=
-260
-  OK
-  [S +0.099833] OK
-  29575@1596590112.076459:virtio_queue_notify vdev 0x62d000030590 n 0 vq 0x=
-7f9b93fc9800
-  29575@1596590112.076642:virtio_blk_handle_read vdev 0x62d000030590 req 0x=
-611000043e80 sector 0 nsectors 0
-  29575@1596590112.076651:virtio_blk_req_complete vdev 0x62d000030590 req 0=
-x611000043e80 status 1
-  qemu-system-i386: /home/alxndr/Development/qemu/general-fuzz/exec.c:3623:=
- void address_space_unmap(AddressSpace *, void *, hwaddr, _Bool, hwaddr): A=
-ssertion `mr !=3D NULL' failed.
+  =C2=A0=C2=A0=C2=A0=C2=A0qemu-system-x86_64 \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-machine pc-i440fx-2.7,ac=
+cel=3Dkvm \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-m 3072 \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-drive file=3D/dev/lvm/qe=
+mu,format=3Draw,if=3Dide,discard=3Dunmap \
+  =C2=A0-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno=
+,vhost=3Don \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,ne=
+tdev=3Dhostnet0 \
+  =C2=A0-vnc :0
 
-  =
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
 
-  -Alex
+  QEMU was compiled using:
+
+  =C2=A0=C2=A0=C2=A0=C2=A0./configure --python=3D/usr/bin/python2.7 --targe=
+t-list=3Dx86_64-softmmu
+  =C2=A0=C2=A0=C2=A0=C2=A0make -j3
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890360/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
 
