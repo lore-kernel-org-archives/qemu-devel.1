@@ -2,49 +2,47 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF0DC388F9
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 03:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3682DC4742C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 03:07:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A0A4206F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 03:07:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0A4206F4
+	by mail.kernel.org (Postfix) with ESMTPS id B276A206E3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 03:07:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B276A206E3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbxWZ-0003mv-DR
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 22:07:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44752)
+	id 1kbxWa-0003pS-Q5
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 22:07:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44784)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kbxUr-0001aQ-BY; Sun, 08 Nov 2020 22:05:33 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2399)
+ id 1kbxUs-0001az-DL; Sun, 08 Nov 2020 22:05:34 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2396)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kbxUn-0006jI-Fq; Sun, 08 Nov 2020 22:05:33 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CTwpm0CzHz15SjP;
- Mon,  9 Nov 2020 11:05:20 +0800 (CST)
-Received: from localhost (10.174.186.67) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Mon, 9 Nov 2020
- 11:05:17 +0800
+ id 1kbxUo-0006ai-0Z; Sun, 08 Nov 2020 22:05:34 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CTwpY6Kx2z15SjR;
+ Mon,  9 Nov 2020 11:05:09 +0800 (CST)
+Received: from localhost (10.174.186.67) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Mon, 9 Nov 2020
+ 11:05:08 +0800
 From: Ying Fang <fangying1@huawei.com>
 To: <peter.maydell@linaro.org>
-Subject: [RFC PATCH v3 12/13] hw/acpi/aml-build: Build ACPI cpu cache
- hierarchy information
-Date: Mon, 9 Nov 2020 11:04:51 +0800
-Message-ID: <20201109030452.2197-13-fangying1@huawei.com>
+Subject: [RFC PATCH v3 00/13] hw/arm/virt: Introduce cpu and cache topology
+ support
+Date: Mon, 9 Nov 2020 11:04:39 +0800
+Message-ID: <20201109030452.2197-1-fangying1@huawei.com>
 X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20201109030452.2197-1-fangying1@huawei.com>
-References: <20201109030452.2197-1-fangying1@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -79,86 +77,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To build cache information, An AcpiCacheInfo structure is defined to
-hold the type 1 cache structure according to ACPI spec v6.3 5.2.29.2.
-A helper function build_cache_hierarchy is also introduced to encode
-the cache information.
+An accurate cpu topology may help improve the cpu scheduler's decision
+making when dealing with multi-core system. So cpu topology description
+is helpful to provide guest with the right view. Cpu cache information may
+also have slight impact on the sched domain, and even userspace software
+may check the cpu cache information to do some optimizations. Dario Faggioli's
+talk in [0] also shows the virtual topology may has impact on sched performace.
+Thus this patch series is posted to provide cpu and cache topology support
+for arm platform.
 
-Signed-off-by: Ying Fang <fangying1@huawei.com>
----
- hw/acpi/aml-build.c         | 26 ++++++++++++++++++++++++++
- include/hw/acpi/acpi-defs.h |  8 ++++++++
- include/hw/acpi/aml-build.h |  3 +++
- 3 files changed, 37 insertions(+)
+Both fdt and ACPI are introduced to present the cpu and cache topology.
+To describe the cpu topology via ACPI, a PPTT table is introduced according
+to the processor hierarchy node structure. To describe the cpu cache
+information, a default cache hierarchy is given and built according to the
+cache type structure defined by ACPI, it can be made configurable later.
 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index d1aa9fd716..1a38110149 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -1770,6 +1770,32 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms)
-                  table_data->len - slit_start, 1, NULL, NULL);
- }
- 
-+/* ACPI 6.3: 5.29.2 Cache type structure (Type 1) */
-+static void build_cache_head(GArray *tbl, uint32_t next_level)
-+{
-+    build_append_byte(tbl, 1);
-+    build_append_byte(tbl, 24);
-+    build_append_int_noprefix(tbl, 0, 2);
-+    build_append_int_noprefix(tbl, 0x7f, 4);
-+    build_append_int_noprefix(tbl, next_level, 4);
-+}
-+
-+static void build_cache_tail(GArray *tbl, AcpiCacheInfo *cache_info)
-+{
-+    build_append_int_noprefix(tbl, cache_info->size, 4);
-+    build_append_int_noprefix(tbl, cache_info->sets, 4);
-+    build_append_byte(tbl, cache_info->associativity);
-+    build_append_byte(tbl, cache_info->attributes);
-+    build_append_int_noprefix(tbl, cache_info->line_size, 2);
-+}
-+
-+void build_cache_hierarchy(GArray *tbl,
-+              uint32_t next_level, AcpiCacheInfo *cache_info)
-+{
-+    build_cache_head(tbl, next_level);
-+    build_cache_tail(tbl, cache_info);
-+}
-+
- /*
-  * ACPI 6.3: 5.2.29.1 Processor hierarchy node structure (Type 0)
-  */
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 38a42f409a..3df38ab449 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -618,4 +618,12 @@ struct AcpiIortRC {
- } QEMU_PACKED;
- typedef struct AcpiIortRC AcpiIortRC;
- 
-+typedef struct AcpiCacheInfo {
-+    uint32_t size;
-+    uint32_t sets;
-+    uint8_t  associativity;
-+    uint8_t  attributes;
-+    uint16_t line_size;
-+} AcpiCacheInfo;
-+
- #endif
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index 56474835a7..01078753a8 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -437,6 +437,9 @@ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
- 
- void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms);
- 
-+void build_cache_hierarchy(GArray *tbl,
-+              uint32_t next_level, AcpiCacheInfo *cache_info);
-+
- void build_socket_hierarchy(GArray *tbl, uint32_t parent, uint32_t id);
- 
- void build_processor_hierarchy(GArray *tbl, uint32_t flags,
+The RFC v1 was posted at [1], we tried to map the MPIDR register into cpu
+topology, however it is totally wrong. Andrew points it out that Linux kernel
+is goint to stop using MPIDR for topology information [2]. The root cause is
+the MPIDR register has been abused by ARM OEM manufactures. It is only used as
+an identifer for a specific cpu, not representation of the topology. Moreover
+this v2 is rebased on Andrew's latest branch shared [4].
+
+This patch series was initially based on the patches posted by Andrew Jones [3].
+I jumped in on it since some OS vendor cooperative partner are eager for it.
+Thanks for Andrew's contribution.
+
+After applying this patch series, launch a guest with virt-5.3 and cpu
+topology configured with sockets:cores:threads = 2:4:2, you will get the
+bellow messages with the lscpu command.
+
+-----------------------------------------
+Architecture:                    aarch64
+CPU op-mode(s):                  64-bit
+Byte Order:                      Little Endian
+CPU(s):                          16
+On-line CPU(s) list:             0-15
+Thread(s) per core:              2
+Core(s) per socket:              4
+Socket(s):                       2
+NUMA node(s):                    2
+Vendor ID:                       HiSilicon
+Model:                           0
+Model name:                      Kunpeng-920
+Stepping:                        0x1
+BogoMIPS:                        200.00
+L1d cache:                       512 KiB
+L1i cache:                       512 KiB
+L2 cache:                        4 MiB
+L3 cache:                        128 MiB
+NUMA node0 CPU(s):               0-7
+NUMA node1 CPU(s):               8-15
+
+
+changelog
+v2 -> v3:
+- Make use of possible_cpus->cpus[i].cpu to check against current online cpus
+
+v1 -> v2:
+- Rebased to the latest branch shared by Andrew Jones [4]
+- Stop mapping MPIDR into vcpu topology
+
+[0] https://kvmforum2020.sched.com/event/eE1y/virtual-topology-for-virtual-machines-friend-or-foe-dario-faggioli-suse
+[1] https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg06027.html
+[2] https://patchwork.kernel.org/project/linux-arm-kernel/patch/20200829130016.26106-1-valentin.schneider@arm.com/
+[3] https://patchwork.ozlabs.org/project/qemu-devel/cover/20180704124923.32483-1-drjones@redhat.com
+[4] https://github.com/rhdrjones/qemu/commits/virt-cpu-topology-refresh 
+
+Andrew Jones (5):
+  hw/arm/virt: Spell out smp.cpus and smp.max_cpus
+  hw/arm/virt: Remove unused variable
+  hw/arm/virt: Replace smp_parse with one that prefers cores
+  device_tree: Add qemu_fdt_add_path
+  hw/arm/virt: DT: add cpu-map
+
+Ying Fang (8):
+  hw: add compat machines for 5.3
+  hw/arm/virt-acpi-build: distinguish possible and present cpus
+  hw/acpi/aml-build: add processor hierarchy node structure
+  hw/arm/virt-acpi-build: add PPTT table
+  target/arm/cpu: Add cpu cache description for arm
+  hw/arm/virt: add fdt cache information
+  hw/acpi/aml-build: Build ACPI cpu cache hierarchy information
+  hw/arm/virt-acpi-build: Enable cpu and cache topology
+
+ device_tree.c                |  45 +++++-
+ hw/acpi/aml-build.c          |  68 +++++++++
+ hw/arm/virt-acpi-build.c     |  99 ++++++++++++-
+ hw/arm/virt.c                | 273 +++++++++++++++++++++++++++++++----
+ hw/core/machine.c            |   3 +
+ hw/i386/pc.c                 |   3 +
+ hw/i386/pc_piix.c            |  15 +-
+ hw/i386/pc_q35.c             |  14 +-
+ hw/ppc/spapr.c               |  15 +-
+ hw/s390x/s390-virtio-ccw.c   |  14 +-
+ include/hw/acpi/acpi-defs.h  |  14 ++
+ include/hw/acpi/aml-build.h  |  11 ++
+ include/hw/arm/virt.h        |   4 +-
+ include/hw/boards.h          |   3 +
+ include/hw/i386/pc.h         |   3 +
+ include/sysemu/device_tree.h |   1 +
+ target/arm/cpu.c             |  42 ++++++
+ target/arm/cpu.h             |  27 ++++
+ 18 files changed, 609 insertions(+), 45 deletions(-)
+
 -- 
 2.23.0
 
