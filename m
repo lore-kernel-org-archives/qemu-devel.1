@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E58BCC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC3C5C388F7
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:54:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 542842067D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:53:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 436C72067D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:54:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cwlbEwBR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 542842067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+TieaZN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 436C72067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcBMK-0007UN-Al
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:53:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40996)
+	id 1kcBMe-0007kI-6x
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:54:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kcB8O-0006mI-KA
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:39:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34984)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kcB8N-0006je-Oy
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:39:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50646)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kcB8K-0000TE-7j
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:39:16 -0500
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kcB8I-0000SZ-Qp
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:39:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604943551;
+ s=mimecast20190719; t=1604943548;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=q8g52wmoICf/sE92Ciwpuit7Bk1P+BBAtjZl2AdWs4g=;
- b=cwlbEwBR3v5MDRn0Yn44NidAE9TV/LpplKQ5iEetxp7s4i4PEMUXgdsBBLdh9ELioX3iqN
- cu7c4n4qGwu3NKemQymyprynUPytxDaUElfjxBojL07kGRikVNPXACUJ6Uy1C1QxRWAaRf
- zZuOw11CLdOVD1dHhP/9QYZg4NDtvFg=
+ bh=gV3O+veG/j6YuJCEpDTw636eQrEKVkxd0XpIpXfH/aM=;
+ b=H+TieaZNifH4MLpRUdYW3sce1QXUK1SpgBtW/8N9mhIfgtyH86FINpxzYv0IryVFPhoHKr
+ VaBcGlA5yNXDV+Xhj+2B7MNd9/agEFCpH7kbasRvneQNMouaO0jBNqt0mfcg4dmLOp1vkv
+ Z8+PGt8CXf+s/jPiZ1Ccs9tg1bHwmZY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-Yzq2uD53Nt6zqZQHGFZeGg-1; Mon, 09 Nov 2020 12:39:08 -0500
-X-MC-Unique: Yzq2uD53Nt6zqZQHGFZeGg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-327-zFwcHgGKNoS22Qh91rgA0Q-1; Mon, 09 Nov 2020 12:39:03 -0500
+X-MC-Unique: zFwcHgGKNoS22Qh91rgA0Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AFD41074646;
- Mon,  9 Nov 2020 17:39:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 779CC186840D;
+ Mon,  9 Nov 2020 17:39:02 +0000 (UTC)
 Received: from localhost (ovpn-113-179.ams2.redhat.com [10.36.113.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A0D4D5B4A9;
- Mon,  9 Nov 2020 17:39:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AD545C1D0;
+ Mon,  9 Nov 2020 17:39:01 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 11/15] block: Fix integer promotion error in bdrv_getlength()
-Date: Mon,  9 Nov 2020 18:38:35 +0100
-Message-Id: <20201109173839.2135984-12-mreitz@redhat.com>
+Subject: [PULL 09/15] block: Fixes nfs compiling error on msys2/mingw
+Date: Mon,  9 Nov 2020 18:38:33 +0100
+Message-Id: <20201109173839.2135984-10-mreitz@redhat.com>
 In-Reply-To: <20201109173839.2135984-1-mreitz@redhat.com>
 References: <20201109173839.2135984-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -80,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,45 +99,114 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Blake <eblake@redhat.com>
+From: Yonggang Luo <luoyonggang@gmail.com>
 
-Back in 2015, we attempted to fix error reporting for images that
-claimed to have more than INT64_MAX/512 sectors, but due to the type
-promotions caused by BDRV_SECTOR_SIZE being unsigned, this
-inadvertently forces all negative ret values to be slammed into -EFBIG
-rather than the original error.  While we're at it, we can avoid the
-confusing ?: by spelling the logic more directly.
+These compiling errors are fixed:
+../block/nfs.c:27:10: fatal error: poll.h: No such file or directory
+   27 | #include <poll.h>
+      |          ^~~~~~~~
+compilation terminated.
 
-Fixes: 4a9c9ea0d3
-Reported-by: Guoyi Tu <tu.guoyi@h3c.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20201105155122.60943-1-eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+../block/nfs.c:63:5: error: unknown type name 'blkcnt_t'
+   63 |     blkcnt_t st_blocks;
+      |     ^~~~~~~~
+../block/nfs.c: In function 'nfs_client_open':
+../block/nfs.c:550:27: error: 'struct _stat64' has no member named 'st_blocks'
+  550 |     client->st_blocks = st.st_blocks;
+      |                           ^
+../block/nfs.c: In function 'nfs_get_allocated_file_size':
+../block/nfs.c:751:41: error: 'struct _stat64' has no member named 'st_blocks'
+  751 |     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
+      |                                         ^
+../block/nfs.c: In function 'nfs_reopen_prepare':
+../block/nfs.c:805:31: error: 'struct _stat64' has no member named 'st_blocks'
+  805 |         client->st_blocks = st.st_blocks;
+      |                               ^
+../block/nfs.c: In function 'nfs_get_allocated_file_size':
+../block/nfs.c:752:1: error: control reaches end of non-void function [-Werror=return-type]
+  752 | }
+      | ^
+
+On msys2/mingw, there is no st_blocks in struct _stat64 yet, we disable the usage of it
+on msys2/mingw, and create a typedef long long blkcnt_t; for further implementation
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Message-Id: <20201105123116.674-2-luoyonggang@gmail.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ block/nfs.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index 56bacc9e9f..2fd932154e 100644
---- a/block.c
-+++ b/block.c
-@@ -5091,8 +5091,13 @@ int64_t bdrv_getlength(BlockDriverState *bs)
- {
-     int64_t ret = bdrv_nb_sectors(bs);
+diff --git a/block/nfs.c b/block/nfs.c
+index f86e660374..77905f516d 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -24,7 +24,9 @@
  
--    ret = ret > INT64_MAX / BDRV_SECTOR_SIZE ? -EFBIG : ret;
--    return ret < 0 ? ret : ret * BDRV_SECTOR_SIZE;
-+    if (ret < 0) {
-+        return ret;
-+    }
-+    if (ret > INT64_MAX / BDRV_SECTOR_SIZE) {
-+        return -EFBIG;
-+    }
-+    return ret * BDRV_SECTOR_SIZE;
+ #include "qemu/osdep.h"
+ 
++#if !defined(_WIN32)
+ #include <poll.h>
++#endif
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+@@ -58,7 +60,7 @@ typedef struct NFSClient {
+     bool has_zero_init;
+     AioContext *aio_context;
+     QemuMutex mutex;
+-    blkcnt_t st_blocks;
++    uint64_t st_blocks;
+     bool cache_used;
+     NFSServer *server;
+     char *path;
+@@ -545,7 +547,9 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
+     }
+ 
+     ret = DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
++#if !defined(_WIN32)
+     client->st_blocks = st.st_blocks;
++#endif
+     client->has_zero_init = S_ISREG(st.st_mode);
+     *strp = '/';
+     goto out;
+@@ -706,6 +710,7 @@ static int nfs_has_zero_init(BlockDriverState *bs)
+     return client->has_zero_init;
  }
  
- /* return 0 as number of sectors if no device present or error */
++#if !defined(_WIN32)
+ /* Called (via nfs_service) with QemuMutex held.  */
+ static void
+ nfs_get_allocated_file_size_cb(int ret, struct nfs_context *nfs, void *data,
+@@ -748,6 +753,7 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
+ 
+     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
+ }
++#endif
+ 
+ static int coroutine_fn
+ nfs_file_co_truncate(BlockDriverState *bs, int64_t offset, bool exact,
+@@ -800,7 +806,9 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
+                        nfs_get_error(client->context));
+             return ret;
+         }
++#if !defined(_WIN32)
+         client->st_blocks = st.st_blocks;
++#endif
+     }
+ 
+     return 0;
+@@ -869,7 +877,10 @@ static BlockDriver bdrv_nfs = {
+     .create_opts                    = &nfs_create_opts,
+ 
+     .bdrv_has_zero_init             = nfs_has_zero_init,
++/* libnfs does not provide the allocated filesize of a file on win32. */
++#if !defined(_WIN32)
+     .bdrv_get_allocated_file_size   = nfs_get_allocated_file_size,
++#endif
+     .bdrv_co_truncate               = nfs_file_co_truncate,
+ 
+     .bdrv_file_open                 = nfs_file_open,
 -- 
 2.28.0
 
