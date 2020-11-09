@@ -2,80 +2,82 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B484C4741F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 15:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E2BFC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 15:23:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F8DE206E3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 15:21:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CDDF2068D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 15:23:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xlk+XJJ/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F8DE206E3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y2CrOZRg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CDDF2068D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc8zQ-0004u0-I4
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 10:21:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57302)
+	id 1kc90h-0005h9-2B
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 10:23:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kc8yN-0004B4-CX
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 10:20:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55761)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kc8z9-0004qd-JJ
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 10:21:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56485)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kc8yL-00026M-My
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 10:20:47 -0500
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kc8z7-0002KV-Ns
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 10:21:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604935245;
+ s=mimecast20190719; t=1604935292;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=HT6hBuVzp9W4LUDZRfrwtaEdBqIM6yl4EVT8eQLmlik=;
- b=Xlk+XJJ/1HwW2nBa2mNqDo0wu0x75g1SaF6JPxQEJcqhsc3wK6PW248/S+m14j6IqLZziQ
- OM3OrPXvQ+TgBMpndPdoCyIk4s84IzWhZjqPlivgekeTJ0PgxpUra/+agclGgwHz5kqb10
- WmQd/FNQPVg78k+4T02Jbw4E45ypqSw=
+ bh=BJq3QX0+hxUogI0SOayImhXTwuU5HoIwKtzS3k0vXOo=;
+ b=Y2CrOZRgIL7zH0m7wBuhNfgvLgj574Ds5rkestqwzBFiBXmss/n8nmGDvYU/hFYnoRfmcG
+ 6DeEH8ENIum4jytButC07yYkE74mpTtQDpgVJWXHRYHGzjDcZjxou+iMDSFAVI3prtG3Vv
+ xgAiOs4bbKEuZQFPsQFb5L9B5tZPlLQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-JmmeDfAbMUCpOvrP-6eOPA-1; Mon, 09 Nov 2020 10:20:41 -0500
-X-MC-Unique: JmmeDfAbMUCpOvrP-6eOPA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-448-ecnfwUAqO62OzOfA7n99OA-1; Mon, 09 Nov 2020 10:21:31 -0500
+X-MC-Unique: ecnfwUAqO62OzOfA7n99OA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6DCB1868434;
- Mon,  9 Nov 2020 15:20:39 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 56A5B6EF6B;
- Mon,  9 Nov 2020 15:20:35 +0000 (UTC)
-Date: Mon, 9 Nov 2020 10:20:33 -0500
-From: Cleber Rosa <crosa@redhat.com>
-To: Erik Skultety <eskultet@redhat.com>
-Subject: Re: [PATCH v4 2/4] Jobs based on custom runners: build environment
- docs and playbook
-Message-ID: <20201109152033.GB3874327@localhost.localdomain>
-References: <20201019015003.1527746-1-crosa@redhat.com>
- <20201019015003.1527746-3-crosa@redhat.com>
- <20201019102741.GC495479@nautilus>
- <20201019202531.GB1617151@localhost.localdomain>
- <20201020061854.GD495479@nautilus>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F4251019627;
+ Mon,  9 Nov 2020 15:21:30 +0000 (UTC)
+Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB85E5C5B0;
+ Mon,  9 Nov 2020 15:21:26 +0000 (UTC)
+Date: Mon, 9 Nov 2020 10:21:25 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 00/44] Make qdev static property API usable by any QOM
+ type
+Message-ID: <20201109152125.GZ5733@habkost.net>
+References: <20201104160021.2342108-1-ehabkost@redhat.com>
+ <20201106094511.GA23864@merkur.fritz.box>
+ <20201106155013.GX5733@habkost.net>
+ <20201106211034.GY5733@habkost.net>
+ <ca99fc61-6cdd-117d-343e-8141e385522e@redhat.com>
+ <20201109113404.GA24970@merkur.fritz.box>
+ <3b711053-e67a-86fb-59e7-c06948dd8928@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201020061854.GD495479@nautilus>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <3b711053-e67a-86fb-59e7-c06948dd8928@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="XOIedfhf+7KOe/yw"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -98,88 +100,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>, Willian Rampazzo <wrampazz@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---XOIedfhf+7KOe/yw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, Nov 09, 2020 at 03:15:26PM +0100, Paolo Bonzini wrote:
+> On 09/11/20 12:34, Kevin Wolf wrote:
+> > > If all properties were like this, it would be okay.  But the API in v2 is
+> > > the one that is most consistent with QOM in general. Here is how this change
+> > > would be a loss in term of consistency:
+> > > 
+> > > - you have the field properties split in two (with the property itself in
+> > > one place and the allow-set function in a different place), and also you'd
+> > > have some properties listed as array and some as function calls.
+> > 
+> > Why would you have properties defined as function calls for the same
+> > object that uses the array?
+> 
+> Because some properties would not be field properties, for example.  For
+> example, any non-scalar property would need to invoke visit_SomeQapiStruct
+> manually and would not be a field property.
 
-On Tue, Oct 20, 2020 at 08:18:54AM +0200, Erik Skultety wrote:
-> On Mon, Oct 19, 2020 at 04:25:31PM -0400, Cleber Rosa wrote:
-> > On Mon, Oct 19, 2020 at 12:27:41PM +0200, Erik Skultety wrote:
-> > > ...
-> > >=20
-> > > > diff --git a/scripts/ci/setup/inventory b/scripts/ci/setup/inventor=
-y
-> > > > new file mode 100644
-> > > > index 0000000000..8bb7ba6b33
-> > > > --- /dev/null
-> > > > +++ b/scripts/ci/setup/inventory
-> > > > @@ -0,0 +1,2 @@
-> > > > +[local]
-> > >=20
-> > > Nit pick, is a group for localhost actually needed?
-> > >
-> >=20
-> > You're right, it's not needed... I just thought it gave the
-> > "localhost" entry some "shelter" and "context". :)
-> >=20
-> > And, I think a mostly "ini-like" file without a section triggers an OCD
-> > reaction in me.  I can remove it if it does something similar to you! :=
-)
-> >=20
-> > Thanks!
-> > - Cleber.
->=20
-> I understand, but even though it may be an ini-like config, "sections" ha=
-ve a
-> very distinct meaning in Ansible and that is grouping, so unless there ar=
-e
-> hosts to group, I'd keep the inventory in a form of a simple list of indi=
-vidual
-> hosts.
->
+Nothing prevents us from describing those properties inside the
+same property array.
 
-Fair enough.  Changing it for v5.
+> 
+> > I'm not entirely sure what you mean with allow-set. The only things I
+> > can find are related to link properties, specifically the check()
+> > callback of object_class_property_add_link(). If it's this, what would
+> > be the problem with just adding it to DEFINE_PROP_LINK instead of
+> > using a separate function call to define link properties?
+> 
+> Eduardo's series is adding allow-set functions to field properties as well.
+> If it's be specified in the function call to
+> object_class_add_field_properties, you'd have part of the property described
+> in the array and part in the object_class_add_field_properties.
+> 
+> > > - we would have different ways to handle device field properties (with
+> > > dc->props) compared to object properties.
+> > 
+> > You mean dynamic per-object properties, i.e. not class properties?
+> 
+> No, I mean that device properties would be handled as
+> 
+>    dc->props = foo;
 
-Thanks!
-- Cleber.
+More precisely, it is
+  device_class_set_props(dc, foo);
 
-> Regards,
-> Erik
+which is supposed to become a one-line wrapper to
+object_class_add_field_properties().
 
---XOIedfhf+7KOe/yw
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> while object properties would be handled as
+> 
+>    object_class_add_field_properties(oc, foo, prop_allow_set_always);
+> 
+> There would be two different preferred ways to do field properties in qdev
+> vs. non-qdev.
 
------BEGIN PGP SIGNATURE-----
+They should become exactly the same method, just with a different
+allow_set function.
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+pXkEACgkQZX6NM6Xy
-CfNxPRAA0epWJZ1VE0nx+om/2OFfrF9AFcc71im2GvVosz3g5rCwSI3e601Ab0lC
-QPErFUrTSUeZH6t2983VLpSgDVhOiuVzLOq+jg2ZkoildRlx7z7//3YtgeaLJ3I0
-RB7g+DQ3qrWf7Q4s8foPKHij1mu7wQz8p0NfMUALxoJsLmzT6HtYIkd491HDn5RC
-h+tg1W49J1+t8WpBBSQUihsvduiCcuBowYD3ji7qmtIoCYiV5t/ScXIYOpXmbv8R
-I29XZTgZ73WpmfNp70Ze8U6S2S2wPbRBMXY388KVusPaAZvJWs1LCQHWut3pig+M
-RLI3HIhXGgOiJNqSW2kk3SkD868GwT6tq8UxZf/6Frf4poWg8e04/bKK1XsP6dfT
-8PaT1AxT7iYRBMM33ndtDWPgLC+F9nW0+R6znv3YpxUfbgtwN/bpsjn6Pxqtc0e4
-g1jRQmnNXAkR1M2Jl4uePy1i1I8w8mujBviHdJbcTYQupbXhezLVMoKz8r/jH6Ug
-llw3vUpdXdQE3EJSULAVemy5P/l4/TGJdPivwbdjy0892axBr0dvWEfL30oy25of
-EZdDTvuia0KRG9uYmxPXoS4cgjLT0W9dan4dSbZYmzc3IygU6zP/NJBdMRKzZFJB
-CgNtBl4cznRJJySGSmJiz/Kt0GkfHYFhcX7xhD+dYHJ2uGfkZzI=
-=CPLk
------END PGP SIGNATURE-----
+(There's also the possibility we let the class provide a default
+allow_set function, and both would become 100% the same)
 
---XOIedfhf+7KOe/yw--
+> 
+> > I think having different ways for different things (class vs. object) is
+> > better than having different ways for the same things (class in qdev vs.
+> > class in non-qdev).
+> 
+> Right, but qdev's DEFINE_PROP_STRING would be easy to change to something
+> like
+> 
+> - DEFINE_PROP_STRING("name", ...),
+> + device_class_add_field_property(dc, "name", PROP_STRING(...));
+
+I'm not worried about this direction of conversion (which is
+easy).  I'm worried about the function call => QAPI schema
+conversion.  Function calls are too flexible and requires parsing
+and executing C code.  Requiring all property descriptions to be
+evaluated at compilation time is an intentional feature of the
+new API.
+
+> 
+> > > The choice to describe class properties as function calls was made in 2016
+> > > (commit 16bf7f522a, "qom: Allow properties to be registered against
+> > > classes", 2016-01-18); so far I don't see that it has been misused.
+> > 
+> > This was the obvious incremental step forward at the time because you
+> > just had to replace one function call with another function call. The
+> > commit message doesn't explain that not using data was a conscious
+> > decision. I think it would probably have been out of scope then.
+> > 
+> > > Also, I don't think it's any easier to write an introspection code generator
+> > > with DEFINE_PROP_*.  You would still have to parse the class init function
+> > > to find the reference to the array (and likewise the TypeInfo struct to find
+> > > the class init function).
+> > 
+> > I don't think we should parse any C code. In my opinion, both
+> > introspection and the array should eventually be generated by the QAPI
+> > generator from the schema.
+> 
+> That'd be a good plan, and I'd add generating the property description from
+> the doc comment.  (Though there's still the issue of how to add non-field
+> properties to the introspection.  Those would be harder to move to the QAPI
+> generator).
+> 
+> But at that point the array vs. function call would not change anything (if
+> anything the function call would be a tiny bit better), so that's another
+> reason to stay with the API that Eduardo has in v2.
+
+I don't agree the function call is a tiny bit better.  In the
+best case, I find it a tiny bit worse.
+
+-- 
+Eduardo
 
 
