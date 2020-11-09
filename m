@@ -2,73 +2,85 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86077C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8455EC55ABD
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:43:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02BBC20639
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:43:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02BBC20639
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=Huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id ECE7A20639
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:43:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OEnGLj1B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE7A20639
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcBC0-00032J-VN
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:43:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40018)
+	id 1kcBCE-0003ZP-Rg
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:43:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jonathan.cameron@huawei.com>)
- id 1kcB5f-0003c9-1p; Mon, 09 Nov 2020 12:36:27 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2050)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jonathan.cameron@huawei.com>)
- id 1kcB5c-0007zX-3D; Mon, 09 Nov 2020 12:36:26 -0500
-Received: from fraeml709-chm.china.huawei.com (unknown [172.18.147.201])
- by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4CVJ651KqXz67JVr;
- Tue, 10 Nov 2020 01:34:53 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml709-chm.china.huawei.com (10.206.15.37) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1913.5; Mon, 9 Nov 2020 18:36:14 +0100
-Received: from localhost (10.52.120.237) by lhreml710-chm.china.huawei.com
- (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Mon, 9 Nov 2020
- 17:36:13 +0000
-Date: Mon, 9 Nov 2020 17:36:08 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Ying Fang <fangying1@huawei.com>
-Subject: Re: [RFC PATCH v3 13/13] hw/arm/virt-acpi-build: Enable cpu and
- cache topology
-Message-ID: <20201109173608.00007d11@Huawei.com>
-In-Reply-To: <20201109030452.2197-14-fangying1@huawei.com>
-References: <20201109030452.2197-1-fangying1@huawei.com>
- <20201109030452.2197-14-fangying1@huawei.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kcB8A-0006bd-ER
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:39:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20321)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kcB81-0000Op-E5
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:39:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604943532;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gSpYS59Y4m3uZu2muHj0FSIVEK4b/Sj529YepX4aXxQ=;
+ b=OEnGLj1BYx/PCTZi1jqBRAVHum3VT9THOKkFf05eeu67oB9thN14l30KSqr0k0C9gyRnBz
+ zxor9YVsFJhKI66nkX1jx9WiGg/9UQxg5zcotPTNBVub9enmABPeibBrr9WfwZWlkeWQ7N
+ Cw+u+Kyr16NGSVQtrBI5t4cMWqlN6cY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-139-rodt8OuyM1eWqGgjzEmtiQ-1; Mon, 09 Nov 2020 12:38:49 -0500
+X-MC-Unique: rodt8OuyM1eWqGgjzEmtiQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AA7E5F9DE;
+ Mon,  9 Nov 2020 17:38:48 +0000 (UTC)
+Received: from localhost (ovpn-113-179.ams2.redhat.com [10.36.113.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 381EC5C1D0;
+ Mon,  9 Nov 2020 17:38:48 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 03/15] qcow2: Document and enforce the QCowL2Meta invariants
+Date: Mon,  9 Nov 2020 18:38:27 +0100
+Message-Id: <20201109173839.2135984-4-mreitz@redhat.com>
+In-Reply-To: <20201109173839.2135984-1-mreitz@redhat.com>
+References: <20201109173839.2135984-1-mreitz@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.52.120.237]
-X-ClientProxiedBy: lhreml748-chm.china.huawei.com (10.201.108.198) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=185.176.79.56;
- envelope-from=jonathan.cameron@huawei.com; helo=frasgout.his.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 12:36:15
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,213 +93,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com,
- zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, alistair.francis@wdc.com,
- imammedo@redhat.com, salil.mehta@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Nov 2020 11:04:52 +0800
-Ying Fang <fangying1@huawei.com> wrote:
+From: Alberto Garcia <berto@igalia.com>
 
-> A helper struct AcpiCacheOffset is introduced to describe the offset
-> of three level caches. The cache hierarchy is built according to
-> ACPI spec v6.3 5.2.29.2. Let's enable CPU cache topology now.
-> 
-> Signed-off-by: Ying Fang <fangying1@huawei.com>
-> ---
->  hw/acpi/aml-build.c         | 19 +++++++++-----
->  hw/arm/virt-acpi-build.c    | 52 ++++++++++++++++++++++++++++++++-----
->  include/hw/acpi/acpi-defs.h |  6 +++++
->  include/hw/acpi/aml-build.h |  7 ++---
->  4 files changed, 68 insertions(+), 16 deletions(-)
-> 
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 1a38110149..93a81fbaf5 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -1799,27 +1799,32 @@ void build_cache_hierarchy(GArray *tbl,
->  /*
->   * ACPI 6.3: 5.2.29.1 Processor hierarchy node structure (Type 0)
->   */
-> -void build_socket_hierarchy(GArray *tbl, uint32_t parent, uint32_t id)
-> +void build_socket_hierarchy(GArray *tbl, uint32_t parent,
-> +                            uint32_t offset, uint32_t id)
->  {
->      build_append_byte(tbl, 0);          /* Type 0 - processor */
-> -    build_append_byte(tbl, 20);         /* Length, no private resources */
-> +    build_append_byte(tbl, 24);         /* Length, with private resources */
->      build_append_int_noprefix(tbl, 0, 2);  /* Reserved */
->      build_append_int_noprefix(tbl, 1, 4);  /* Flags: Physical package */
->      build_append_int_noprefix(tbl, parent, 4);  /* Parent */
->      build_append_int_noprefix(tbl, id, 4);     /* ACPI processor ID */
-> -    build_append_int_noprefix(tbl, 0, 4);  /* Number of private resources */
-> +    build_append_int_noprefix(tbl, 1, 4);  /*  Number of private resources */
-> +    build_append_int_noprefix(tbl, offset, 4);  /* Private resources */
->  }
->  
-> -void build_processor_hierarchy(GArray *tbl, uint32_t flags,
-> -                               uint32_t parent, uint32_t id)
-> +void build_processor_hierarchy(GArray *tbl, uint32_t flags, uint32_t parent,
-> +                               AcpiCacheOffset offset, uint32_t id)
->  {
->      build_append_byte(tbl, 0);          /* Type 0 - processor */
-> -    build_append_byte(tbl, 20);         /* Length, no private resources */
-> +    build_append_byte(tbl, 32);         /* Length, with private resources */
->      build_append_int_noprefix(tbl, 0, 2);      /* Reserved */
->      build_append_int_noprefix(tbl, flags, 4);  /* Flags */
->      build_append_int_noprefix(tbl, parent, 4); /* Parent */
->      build_append_int_noprefix(tbl, id, 4);     /* ACPI processor ID */
-> -    build_append_int_noprefix(tbl, 0, 4);  /* Number of private resources */
-> +    build_append_int_noprefix(tbl, 3, 4);  /* Number of private resources */
-> +    build_append_int_noprefix(tbl, offset.l1d_offset, 4);/* Private resources */
-> +    build_append_int_noprefix(tbl, offset.l1i_offset, 4);/* Private resources */
-> +    build_append_int_noprefix(tbl, offset.l2_offset, 4); /* Private resources */
+The QCowL2Meta structure is used to store information about a part of
+a write request that touches clusters that need changes in their L2
+entries. This happens with newly-allocated clusters or subclusters.
 
-So this is an interesting corner of the ACPI spec.  Do we need to include
-the level 2 cache in the private resources or not?
+This structure has changed a bit since it was first created and its
+current documentation is not quite up-to-date.
 
-My reading is that it is optional and we have at least one obscure bug in Linux
-due to the ambiguity in the spec.  You won't hit that here for reasons found
-in that thread though (cache types are different).
+A write request can span a region consisting of a combination of
+clusters of different types, and qcow2_alloc_host_offset() can
+repeatedly call handle_copied() and handle_alloc() to add more
+clusters to the mix as long as they all are contiguous on the image
+file.
 
-https://lore.kernel.org/linux-acpi/20201105174233.1146-2-shiju.jose@huawei.com/
+Because of this a write request has a list of QCowL2Meta structures,
+one for each part of the request that needs changes in the L2
+metadata.
 
-So I suggest we make the only access to the l2 cache be via the l1 nodes
-as per the example in ACPI 6.3 Figure 5.13 "Cache Type Structure - Type 1 Example"
+Each one of them spans nb_clusters and has two copy-on-write regions
+located immediately before and after the middle region touched by that
+part of the write request. Even when those regions themselves are
+empty their offsets must be correct because they are used to know the
+location of the middle region.
 
-i.e. Drop the l2 entry here and reduced the Length to 28.
+This was not always the case but it is not a problem anymore
+because the only two places where QCowL2Meta structures are created
+(calculate_l2_meta() and qcow2_co_truncate()) ensure that the
+copy-on-write regions are correctly defined, and so do assertions like
+the ones in perform_cow().
 
-Thanks,
+The conditional initialization of the 'written_to' variable is
+therefore unnecessary and is removed by this patch.
 
-Jonathan
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20201007161323.4667-1-berto@igalia.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.h         | 19 +++++++++++--------
+ block/qcow2-cluster.c |  5 +++--
+ block/qcow2.c         | 19 +++++++++++++++----
+ 3 files changed, 29 insertions(+), 14 deletions(-)
 
->  }
->  
->  void build_smt_hierarchy(GArray *tbl, uint32_t parent, uint32_t id)
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 5784370257..ad49006b42 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -429,29 +429,69 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->                   "SRAT", table_data->len - srat_start, 3, NULL, NULL);
->  }
->  
-> -static void build_pptt(GArray *table_data, BIOSLinker *linker, MachineState *ms)
-> +static inline void arm_acpi_cache_info(CPUCacheInfo *cpu_cache,
-> +                                       AcpiCacheInfo *acpi_cache)
->  {
-> +    acpi_cache->size = cpu_cache->size;
-> +    acpi_cache->sets = cpu_cache->sets;
-> +    acpi_cache->associativity = cpu_cache->associativity;
-> +    acpi_cache->attributes = cpu_cache->attributes;
-> +    acpi_cache->line_size = cpu_cache->line_size;
-> +}
-> +
-> +static void build_pptt(GArray *table_data, BIOSLinker *linker,
-> +                       VirtMachineState *vms)
-> +{
-> +    MachineState *ms = MACHINE(vms);
->      int pptt_start = table_data->len;
->      int uid = 0, cpus = 0, socket;
->      unsigned int smp_cores = ms->smp.cores;
->      unsigned int smp_threads = ms->smp.threads;
-> +    AcpiCacheOffset offset;
-> +    ARMCPU *cpu = ARM_CPU(qemu_get_cpu(cpus));
-> +    AcpiCacheInfo cache_info;
->  
->      acpi_data_push(table_data, sizeof(AcpiTableHeader));
->  
->      for (socket = 0; cpus < ms->possible_cpus->len; socket++) {
-> -        uint32_t socket_offset = table_data->len - pptt_start;
-> +        uint32_t l3_offset = table_data->len - pptt_start;
-> +        uint32_t socket_offset;
->          int core;
->  
-> -        build_socket_hierarchy(table_data, 0, socket);
-> +        /* L3 cache type structure */
-> +        arm_acpi_cache_info(cpu->caches.l3_cache, &cache_info);
-> +        build_cache_hierarchy(table_data, 0, &cache_info);
-> +
-> +        socket_offset = table_data->len - pptt_start;
-> +        build_socket_hierarchy(table_data, 0, l3_offset, socket);
->  
->          for (core = 0; core < smp_cores; core++) {
->              uint32_t core_offset = table_data->len - pptt_start;
->              int thread;
->  
-> +            /* L2 cache tpe structure */
-> +            offset.l2_offset = table_data->len - pptt_start;
-> +            arm_acpi_cache_info(cpu->caches.l2_cache, &cache_info);
-> +            build_cache_hierarchy(table_data, 0, &cache_info);
-> +
-> +            /* L1d cache type structure */
-> +            offset.l1d_offset = table_data->len - pptt_start;
-> +            arm_acpi_cache_info(cpu->caches.l1d_cache, &cache_info);
-> +            build_cache_hierarchy(table_data, offset.l2_offset, &cache_info);
-> +
-> +            /* L1i cache type structure */
-> +            offset.l1i_offset = table_data->len - pptt_start;
-> +            arm_acpi_cache_info(cpu->caches.l1i_cache, &cache_info);
-> +            build_cache_hierarchy(table_data, offset.l2_offset, &cache_info);
-> +
-> +            core_offset = table_data->len - pptt_start;
->              if (smp_threads <= 1) {
-> -                build_processor_hierarchy(table_data, 2, socket_offset, uid++);
-> +                build_processor_hierarchy(table_data, 2, socket_offset,
-> +                                          offset, uid++);
->               } else {
-> -                build_processor_hierarchy(table_data, 0, socket_offset, core);
-> +
-> +                build_processor_hierarchy(table_data, 0, socket_offset,
-> +                                          offset, core);
->                  for (thread = 0; thread < smp_threads; thread++) {
->                      build_smt_hierarchy(table_data, core_offset, uid++);
->                  }
-> @@ -727,7 +767,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->  
->      if (cpu_topology_enabled) {
->          acpi_add_table(table_offsets, tables_blob);
-> -        build_pptt(tables_blob, tables->linker, ms);
-> +        build_pptt(tables_blob, tables->linker, vms);
->      }
->  
->      acpi_add_table(table_offsets, tables_blob);
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index 3df38ab449..e48b7fa506 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -626,4 +626,10 @@ typedef struct AcpiCacheInfo {
->      uint16_t line_size;
->  } AcpiCacheInfo;
->  
-> +typedef struct AcpiCacheOffset {
-> +    uint32_t l1d_offset;
-> +    uint32_t l1i_offset;
-> +    uint32_t l2_offset;
-> +} AcpiCacheOffset;
-> +
->  #endif
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 01078753a8..a15ccb2c91 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -440,10 +440,11 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms);
->  void build_cache_hierarchy(GArray *tbl,
->                uint32_t next_level, AcpiCacheInfo *cache_info);
->  
-> -void build_socket_hierarchy(GArray *tbl, uint32_t parent, uint32_t id);
-> +void build_socket_hierarchy(GArray *tbl, uint32_t parent,
-> +                            uint32_t offset, uint32_t id);
->  
-> -void build_processor_hierarchy(GArray *tbl, uint32_t flags,
-> -                               uint32_t parent, uint32_t id);
-> +void build_processor_hierarchy(GArray *tbl, uint32_t flags, uint32_t parent,
-> +                               AcpiCacheOffset offset, uint32_t id);
->  
->  void build_smt_hierarchy(GArray *tbl, uint32_t parent, uint32_t id);
->  
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 125ea9679b..2e0272a7b8 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -435,17 +435,18 @@ typedef struct Qcow2COWRegion {
+ 
+ /**
+  * Describes an in-flight (part of a) write request that writes to clusters
+- * that are not referenced in their L2 table yet.
++ * that need to have their L2 table entries updated (because they are
++ * newly allocated or need changes in their L2 bitmaps)
+  */
+ typedef struct QCowL2Meta
+ {
+-    /** Guest offset of the first newly allocated cluster */
++    /** Guest offset of the first updated cluster */
+     uint64_t offset;
+ 
+-    /** Host offset of the first newly allocated cluster */
++    /** Host offset of the first updated cluster */
+     uint64_t alloc_offset;
+ 
+-    /** Number of newly allocated clusters */
++    /** Number of updated clusters */
+     int nb_clusters;
+ 
+     /** Do not free the old clusters */
+@@ -458,14 +459,16 @@ typedef struct QCowL2Meta
+     CoQueue dependent_requests;
+ 
+     /**
+-     * The COW Region between the start of the first allocated cluster and the
+-     * area the guest actually writes to.
++     * The COW Region immediately before the area the guest actually
++     * writes to. This (part of the) write request starts at
++     * cow_start.offset + cow_start.nb_bytes.
+      */
+     Qcow2COWRegion cow_start;
+ 
+     /**
+-     * The COW Region between the area the guest actually writes to and the
+-     * end of the last allocated cluster.
++     * The COW Region immediately after the area the guest actually
++     * writes to. This (part of the) write request ends at cow_end.offset
++     * (which must always be set even when cow_end.nb_bytes is 0).
+      */
+     Qcow2COWRegion cow_end;
+ 
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index aa87d3e99b..485b4cb92e 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1049,6 +1049,8 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+     qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+ 
+     assert(l2_index + m->nb_clusters <= s->l2_slice_size);
++    assert(m->cow_end.offset + m->cow_end.nb_bytes <=
++           m->nb_clusters << s->cluster_bits);
+     for (i = 0; i < m->nb_clusters; i++) {
+         uint64_t offset = cluster_offset + ((uint64_t)i << s->cluster_bits);
+         /* if two concurrent writes happen to the same unallocated cluster
+@@ -1070,8 +1072,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+         if (has_subclusters(s) && !m->prealloc) {
+             uint64_t l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
+             unsigned written_from = m->cow_start.offset;
+-            unsigned written_to = m->cow_end.offset + m->cow_end.nb_bytes ?:
+-                m->nb_clusters << s->cluster_bits;
++            unsigned written_to = m->cow_end.offset + m->cow_end.nb_bytes;
+             int first_sc, last_sc;
+             /* Narrow written_from and written_to down to the current cluster */
+             written_from = MAX(written_from, i << s->cluster_bits);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 4274806a2a..1b0733238b 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2361,15 +2361,26 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
+             continue;
+         }
+ 
+-        /* The data (middle) region must be immediately after the
+-         * start region */
++        /*
++         * The write request should start immediately after the first
++         * COW region. This does not always happen because the area
++         * touched by the request can be larger than the one defined
++         * by @m (a single request can span an area consisting of a
++         * mix of previously unallocated and allocated clusters, that
++         * is why @l2meta is a list).
++         */
+         if (l2meta_cow_start(m) + m->cow_start.nb_bytes != offset) {
++            /* In this case the request starts before this region */
++            assert(offset < l2meta_cow_start(m));
++            assert(m->cow_start.nb_bytes == 0);
+             continue;
+         }
+ 
+-        /* The end region must be immediately after the data (middle)
+-         * region */
++        /* The write request should end immediately before the second
++         * COW region (see above for why it does not always happen) */
+         if (m->offset + m->cow_end.offset != offset + bytes) {
++            assert(offset + bytes > m->offset + m->cow_end.offset);
++            assert(m->cow_end.nb_bytes == 0);
+             continue;
+         }
+ 
+-- 
+2.28.0
 
 
