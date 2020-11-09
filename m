@@ -2,90 +2,83 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D52C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:24:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 587B3C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:27:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F80C206CB
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:24:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QPKo8H8n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F80C206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 29C3D206CB
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:27:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29C3D206CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcEe9-0002yC-9A
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 16:24:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33006)
+	id 1kcEhC-00056J-3P
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 16:27:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kcEdJ-0002S1-M5
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:23:25 -0500
-Received: from mail-ej1-x636.google.com ([2a00:1450:4864:20::636]:46847)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kcEfb-0003i5-P8
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:25:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57818)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kcEdH-00058j-Nz
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:23:25 -0500
-Received: by mail-ej1-x636.google.com with SMTP id w13so14377479eju.13
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 13:23:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Eb69py+1VtB49iDeziIImU4NeTWuuWDI27RfF1OmVUs=;
- b=QPKo8H8nF64IcAF2VIf0M5e1DDh0X10gGlWm27rWEq4usVul6qcsPV/YQsC/gGKKG4
- Gb7Jszt25g6Zcp8Vj51NUopCgEwcAzJqfngav8rH3xoPYHkYImY8Pr+7APzMzPnFga7u
- 24avW4y4ErVpvorHEQmDPI55DAvHm3fHP5udxNKbmQGGleCF9YASXFMhXDKcGeeTu1Mx
- CDu1+JZxF7IEjkZX7JbQnIIz6Wp34BQR424+VBNN58cx1p8IAeLOBI9GFv4ypymfd8nf
- oCeQGy/RAVl2JSGzbPlGYoiTgzp2Zs3uHhvvU7MU1bW8xWztA2FbPQ04DY+rtQKWC/Hy
- nW3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Eb69py+1VtB49iDeziIImU4NeTWuuWDI27RfF1OmVUs=;
- b=l7ME4UkzQ7vgvG9K/4trD9dKiUxjLUb94t7G9pEz3FWuPya8CSfjl3fbLt3Q9UR1XB
- Da1ReUMsuoNtW0u3ZQ35dGz6w5rgzVFneftGTgEO1TpMRSZyvpV52JvCtDA92A9l6m+z
- r1w27kT8LAbZFQIstP44Nk8zE6/8aoft+tD7rrQoF+Il0uelRBfpcpQo3W9B92Ul6LmR
- TDBweDpt+ZxoZVDJcoPmIAEhk8u0l+iPsu+LUNuL/FhdQtuNINWqZVyyqG37MA5gNtGp
- TKy33c9S8AOwWWpFUv9CfOq4H8nRIeenUDQfcv4aqa98X34Vdd/kFuKUNmB9gImMPbeF
- 9X/w==
-X-Gm-Message-State: AOAM530ZXhPhYhw1hkNsosizV4+ZhPCpNnU7815ZLBmyji53wgwCLxjJ
- TYjUaXlnTO+eSLYhRvhjrzfVajYgD3cDNFlbWs9Jlg==
-X-Google-Smtp-Source: ABdhPJy2+R2/EMUt+riXuc+BsAsKUZ8d80Q9HI2mCgcT7PESMUUQc/hdJXUEQyznAUTmkqMnamCv0Jd0LKXIiMevzwo=
-X-Received: by 2002:a17:906:6896:: with SMTP id
- n22mr17814506ejr.56.1604957001788; 
- Mon, 09 Nov 2020 13:23:21 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kcEfY-0005Xn-Kd
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:25:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kcEfW-0006jV-7s
+ for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 21:25:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 33DC02E809C
+ for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 21:25:42 +0000 (UTC)
 MIME-Version: 1.0
-References: <20201109201722.237150-1-michael.roth@amd.com>
-In-Reply-To: <20201109201722.237150-1-michael.roth@amd.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Nov 2020 21:23:08 +0000
-Message-ID: <CAFEAcA8D9v8Uk+FfMkdikBSPTMqTjN2FSDuntcD1C0mp9eUamA@mail.gmail.com>
-Subject: Re: [PULL for-5.2 0/1] qemu-ga patch queue for hard-freeze
-To: Michael Roth <michael.roth@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::636;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x636.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 09 Nov 2020 21:18:56 -0000
+From: Peter Maydell <1706296@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee bonzini dgilbert-h pmaydell
+ programmingkidx rjones-redhat th-huth
+X-Launchpad-Bug-Reporter: Richard Jones (rjones-redhat)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
+Message-Id: <160495673682.18034.1521997677207513087.malone@wampee.canonical.com>
+Subject: [Bug 1706296] Re: Booting NT 4 disk causes
+ /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
+ (!qemu_mutex_iothread_locked())
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
+X-Launchpad-Hash: cdc8dbee86e0a0f52fb0f981a614c00a9331d3b9
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 11:16:03
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,36 +87,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1706296 <1706296@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Nov 2020 at 20:18, Michael Roth <michael.roth@amd.com> wrote:
->
-> The following changes since commit 3493c36f0371777c62d1d72b205b0eb6117e2156:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20201106' into staging (2020-11-06 13:43:28 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/mdroth/qemu.git tags/qga-pull-2020-11-09-tag
->
-> for you to fetch changes up to b1b9ab1c04d560f86d8da3dfca4d8b21de75fee6:
->
->   qga: fix missing closedir() in qmp_guest_get_disks() (2020-11-09 14:07:14 -0600)
->
-> ----------------------------------------------------------------
-> qemu-ga patch queue for hard-freeze
->
-> * fix leaked DIR* descriptor in guest-get-disks spotted by coverity
->
-> ----------------------------------------------------------------
+With the original repro command line, the guest now crashes "cleanly",
+ie without triggering a QEMU assert. If you give the guest a CPU type it
+recognizes, eg '-cpu pentium' (as noted in comment 7) then it boots OK,
+at least to the point of user control in the installer. So I think this
+is fixed.
 
-Applied, thanks.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1706296
+
+Title:
+  Booting NT 4 disk causes
+  /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion
+  failed: (!qemu_mutex_iothread_locked())
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Grab the NT 4 disk from
+  https://archive.org/details/Microsoft_Windows_NT_Server_Version_4.0_227-0=
+75
+  -385_CD-KEY_419-1343253_1996
+
+  Try to boot it as follows:
+
+  qemu-system-x86_64 -hda disk.img -cdrom Microsoft_Windows_NT_Server_Versi=
+on_4.0_227-075-385_CD-KEY_419-1343253_1996.iso -m 2048 -boot d -machine pc,=
+accel=3Dtcg
+  WARNING: Image format was not specified for 'disk.img' and probing guesse=
+d raw.
+           Automatically detecting the format is dangerous for raw images, =
+write operations on block 0 will be restricted.
+           Specify the 'raw' format explicitly to remove the restrictions.
+  **
+  ERROR:/home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion=
+ failed: (!qemu_mutex_iothread_locked())
+  Aborted (core dumped)
+
+  The stack trace in the failing thread is:
+
+  Thread 4 (Thread 0x7fffb0418700 (LWP 21979)):
+  #0  0x00007fffdd89b64b in raise () at /lib64/libc.so.6
+  #1  0x00007fffdd89d450 in abort () at /lib64/libc.so.6
+  #2  0x00007fffdff8c75d in g_assertion_message () at /lib64/libglib-2.0.so=
+.0
+  #3  0x00007fffdff8c7ea in g_assertion_message_expr ()
+      at /lib64/libglib-2.0.so.0
+  #4  0x00005555557a7d00 in qemu_mutex_lock_iothread ()
+      at /home/rjones/d/qemu/cpus.c:1580
+  #5  0x00005555557cb429 in io_writex (env=3Denv@entry=3D0x555556751400, io=
+tlbentry=3D0x55555675b678, =
+
+      iotlbentry@entry=3D0x5aaaaae40c918, val=3Dval@entry=3D8, addr=3Daddr@=
+entry=3D2148532220, retaddr=3D0, retaddr@entry=3D93825011136120, size=3Dsiz=
+e@entry=3D4)
+      at /home/rjones/d/qemu/accel/tcg/cputlb.c:795
+  #6  0x00005555557ce0f7 in io_writel (retaddr=3D93825011136120, addr=3D214=
+8532220, val=3D8, index=3D255, mmu_idx=3D21845, env=3D0x555556751400)
+      at /home/rjones/d/qemu/softmmu_template.h:265
+  #7  0x00005555557ce0f7 in helper_le_stl_mmu (env=3Denv@entry=3D0x55555675=
+1400, addr=3Daddr@entry=3D2148532220, val=3Dval@entry=3D8, oi=3D<optimized =
+out>, retaddr=3D93825011136120, retaddr@entry=3D0) at /home/rjones/d/qemu/s=
+oftmmu_template.h:300
+  #8  0x000055555587c0a4 in cpu_stl_kernel_ra (env=3D0x555556751400, ptr=3D=
+2148532220, v=3D8, retaddr=3D0) at /home/rjones/d/qemu/include/exec/cpu_lds=
+t_template.h:182
+  #9  0x0000555555882610 in do_interrupt_protected (is_hw=3D<optimized out>=
+, next_eip=3D<optimized out>, error_code=3D2, is_int=3D<optimized out>, int=
+no=3D<optimized out>, env=3D0x555556751400) at /home/rjones/d/qemu/target/i=
+386/seg_helper.c:758
+  #10 0x0000555555882610 in do_interrupt_all (cpu=3Dcpu@entry=3D0x555556749=
+170, intno=3D<optimized out>, is_int=3D<optimized out>, error_code=3D2, nex=
+t_eip=3D<optimized out>, is_hw=3Dis_hw@entry=3D0) at /home/rjones/d/qemu/ta=
+rget/i386/seg_helper.c:1252
+  #11 0x00005555558839d3 in x86_cpu_do_interrupt (cs=3D0x555556749170)
+      at /home/rjones/d/qemu/target/i386/seg_helper.c:1298
+  #12 0x00005555557d2ccb in cpu_handle_exception (ret=3D<synthetic pointer>=
+, cpu=3D0x5555566a4590) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:465
+  #13 0x00005555557d2ccb in cpu_exec (cpu=3Dcpu@entry=3D0x555556749170)
+      at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:670
+  #14 0x00005555557a855a in tcg_cpu_exec (cpu=3D0x555556749170)
+      at /home/rjones/d/qemu/cpus.c:1270
+  #15 0x00005555557a855a in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
+>)
+      at /home/rjones/d/qemu/cpus.c:1365
+  #16 0x00007fffddc3d36d in start_thread () at /lib64/libpthread.so.0
+  #17 0x00007fffdd975b9f in clone () at /lib64/libc.so.6
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1706296/+subscriptions
 
