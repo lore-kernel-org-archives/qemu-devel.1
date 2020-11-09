@@ -2,89 +2,90 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC79C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B97C388F7
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:05:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E901020789
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 16:57:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D998021D46
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 17:05:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V7V/dn4O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E901020789
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jDdA2soq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D998021D46
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcAUP-0007Ug-VP
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 11:57:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57248)
+	id 1kcAc3-0004c0-Vz
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 12:05:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kcATb-00070e-33
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:57:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27874)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kcAYl-0001LQ-IB
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:02:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40188)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kcATY-0003LA-EZ
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 11:57:06 -0500
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kcAYa-00055o-Qs
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 12:02:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604941023;
+ s=mimecast20190719; t=1604941334;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tz7wesDdESI9Xp5DWYK+XUFRaKUdQGyEF5v91jwYI9o=;
- b=V7V/dn4Oy2zmsGSdTcFKB6IFlUgXZINd7Kk2zai4Cl7lCyhclx+CteLmzGVwIimXVURxU7
- BDRLl3W3Ja+fyi5a3g+ppuP8OaO06LOiIJcw547S73R0fTFf52nSOSQkPFmP5AfvwrvAND
- pp7Ke2J5XD1XJFlAAI9vo7lUYGeJuJE=
+ bh=Ziv47dXeWxWaSV9EdZ3y0qxoZUrUiSBmxTLORMomZy0=;
+ b=jDdA2soqecvykaikDUmc243JrTB12myw93/C3lKQEBRa75Uc3p+CSFhddXpvgcFx17pmlk
+ 7TarwVe0vhURFtTVNqSDtZGFIbkSkVIsKq/jdpbD5aX8VULGTHQlCqonkkAT7nukukVdQ2
+ TjVTMAgAVSV23HA/J6nhjikHDNo0JbM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-u92d63bNMIyYiWaQ1gmWOg-1; Mon, 09 Nov 2020 11:57:01 -0500
-X-MC-Unique: u92d63bNMIyYiWaQ1gmWOg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-432-X-s5-Fa5M_-JsMiVNE5Drw-1; Mon, 09 Nov 2020 12:02:10 -0500
+X-MC-Unique: X-s5-Fa5M_-JsMiVNE5Drw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 978421891E89
- for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 16:57:00 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
- [10.36.112.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C0CF55761;
- Mon,  9 Nov 2020 16:57:00 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9C4871132BD6; Mon,  9 Nov 2020 17:56:58 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 4/6] qemu-option: clean up id vs. list->merge_lists
-References: <20201109133931.979563-1-pbonzini@redhat.com>
- <20201109133931.979563-5-pbonzini@redhat.com>
-Date: Mon, 09 Nov 2020 17:56:58 +0100
-In-Reply-To: <20201109133931.979563-5-pbonzini@redhat.com> (Paolo Bonzini's
- message of "Mon, 9 Nov 2020 08:39:29 -0500")
-Message-ID: <87wnyu4gf9.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75EA8879512;
+ Mon,  9 Nov 2020 17:02:09 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-53.ams2.redhat.com [10.36.112.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B23005B4CB;
+ Mon,  9 Nov 2020 17:02:01 +0000 (UTC)
+Subject: Re: [PATCH] qtest: Update references to parse_escape() in comments
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20201109162621.18885-1-peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <376a9acb-6f8d-7820-8a9e-fdf99394b3b7@redhat.com>
+Date: Mon, 9 Nov 2020 18:02:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201109162621.18885-1-peter.maydell@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,157 +98,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> Forbid ids if the option is intended to be a singleton, as indicated by
-> list->merge_lists.
-
-Well, ->merge_lists need not imply singleton.  Perhaps we only ever use
-it that way.  Careful review is called for.
-
->                     This avoids that "./qemu-system-x86_64 -M q35,id=ff"
-> uses a "pc" machine type.
-
-Just like any other QemuOptsList, "machine" may have any number of
-QemuOpts.  The ones with non-null ID happen to be ignored silently.
-Known[*] trap for the unwary.
-
->                            Instead it errors out.  The affected options
-> are "qemu-img reopen -o",
-
-reopen_opts in qemu-io-cmds.c
-
->                           "qemu-io open -o",
-
-empty_opts in qemu-io.c
-
->                                              -rtc, -M, -boot, -name,
-> -m, -icount, -smp,
-
-qemu_rtc_opts, qemu_machine_opts, qemu_boot_opts, qemu_name_opts,
-qemu_mem_opts, qemu_icount_opts, qemu_smp_opts in vl.c
-
->                    -spice.
-
-qemu_spice_opts in spice-core.c.
-
-Are these all singletons?
-
-There's also machine_opts in qemu-config.c, but that's only to make
-query-command-line-options lie backward-compatibly.
-
->
-> qemu_opts_create's fail_if_exists parameter is now unnecessary:
->
-> - it is unused if id is NULL
->
-> - opts_parse only passes false if reached from qemu_opts_set_defaults,
-> in which case this patch enforces that id must be NULL
->
-> - other callers that can pass a non-NULL id always set it to true
->
-> Assert that it is true in the only case where "fail_if_exists" matters,
-> i.e. "id && !lists->merge_lists".  This means that if an id is present,
-> duplicates are always forbidden, which was already the status quo.
-
-Sounds like you're specializing the code (which might be good).
-
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 09/11/2020 17.26, Peter Maydell wrote:
+> In commit 61030280ca2d67bd in 2018 we renamed the parse_escape()
+> function to parse_interpolation(), but we didn't catch the references
+> to this function in doc comments in libqtest.h. Update them.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  util/qemu-option.c | 27 ++++++++++++++-------------
->  1 file changed, 14 insertions(+), 13 deletions(-)
->
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index c88e159f18..91f4120ce1 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -619,7 +619,17 @@ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
->  {
->      QemuOpts *opts = NULL;
->  
-> -    if (id) {
-> +    if (list->merge_lists) {
-> +        if (id) {
-> +            error_setg(errp, QERR_INVALID_PARAMETER, "id");
-> +            return NULL;
-> +        }
-> +        opts = qemu_opts_find(list, NULL);
-> +        if (opts) {
-> +            return opts;
-> +        }
+> Side note: ideally we would document somewhere the accepted
+> %-escapes rather than requiring people to read the source code
+> to parse_interpolation to determine them... "The argument to %p
+> is qobject_unref()ed" is particularly non-obvious.
+> ---
+>  tests/qtest/libqos/libqtest.h | 18 +++++++++---------
+>  tests/qtest/libqtest-single.h |  2 +-
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/tests/qtest/libqos/libqtest.h b/tests/qtest/libqos/libqtest.h
+> index 5c959f18535..724f65aa947 100644
+> --- a/tests/qtest/libqos/libqtest.h
+> +++ b/tests/qtest/libqos/libqtest.h
+> @@ -88,7 +88,7 @@ void qtest_quit(QTestState *s);
+>   * @fds: array of file descriptors
+>   * @fds_num: number of elements in @fds
+>   * @fmt: QMP message to send to qemu, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   *
+>   * Sends a QMP message to QEMU with fds and returns the response.
+> @@ -101,7 +101,7 @@ QDict *qtest_qmp_fds(QTestState *s, int *fds, size_t fds_num,
+>   * qtest_qmp:
+>   * @s: #QTestState instance to operate on.
+>   * @fmt: QMP message to send to qemu, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   *
+>   * Sends a QMP message to QEMU and returns the response.
+> @@ -113,7 +113,7 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
+>   * qtest_qmp_send:
+>   * @s: #QTestState instance to operate on.
+>   * @fmt: QMP message to send to qemu, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   *
+>   * Sends a QMP message to QEMU and leaves the response in the stream.
+> @@ -138,7 +138,7 @@ void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
+>   * @fds: array of file descriptors
+>   * @fds_num: number of elements in @fds
+>   * @fmt: QMP message to send to QEMU, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   * @ap: QMP message arguments
+>   *
+> @@ -152,7 +152,7 @@ QDict *qtest_vqmp_fds(QTestState *s, int *fds, size_t fds_num,
+>   * qtest_vqmp:
+>   * @s: #QTestState instance to operate on.
+>   * @fmt: QMP message to send to QEMU, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   * @ap: QMP message arguments
+>   *
+> @@ -167,7 +167,7 @@ QDict *qtest_vqmp(QTestState *s, const char *fmt, va_list ap)
+>   * @fds: array of file descriptors
+>   * @fds_num: number of elements in @fds
+>   * @fmt: QMP message to send to QEMU, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   * @ap: QMP message arguments
+>   *
+> @@ -181,7 +181,7 @@ void qtest_qmp_vsend_fds(QTestState *s, int *fds, size_t fds_num,
+>   * qtest_qmp_vsend:
+>   * @s: #QTestState instance to operate on.
+>   * @fmt: QMP message to send to QEMU, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   * @ap: QMP message arguments
+>   *
+> @@ -636,7 +636,7 @@ void qtest_add_abrt_handler(GHookFunc fn, const void *data);
+>   * qtest_qmp_assert_success:
+>   * @qts: QTestState instance to operate on
+>   * @fmt: QMP message to send to qemu, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   *
+>   * Sends a QMP message to QEMU and asserts that a 'return' key is present in
+> @@ -683,7 +683,7 @@ void qtest_qmp_device_add_qdict(QTestState *qts, const char *drv,
+>   * @driver: Name of the device that should be added
+>   * @id: Identification string
+>   * @fmt: QMP message to send to qemu, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   *
+>   * Generic hot-plugging test via the device_add QMP command.
+> diff --git a/tests/qtest/libqtest-single.h b/tests/qtest/libqtest-single.h
+> index 176979a2ce9..0d7f568678e 100644
+> --- a/tests/qtest/libqtest-single.h
+> +++ b/tests/qtest/libqtest-single.h
+> @@ -47,7 +47,7 @@ static inline void qtest_end(void)
+>  /**
+>   * qmp:
+>   * @fmt...: QMP message to send to qemu, formatted like
+> - * qobject_from_jsonf_nofail().  See parse_escape() for what's
+> + * qobject_from_jsonf_nofail().  See parse_interpolation() for what's
+>   * supported after '%'.
+>   *
+>   * Sends a QMP message to QEMU and returns the response.
+> 
 
-If lists>merge_lists, you no longer check id_wellformed().  Easy enough
-to fix: lift the check before this conditional.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> +    } else if (id) {
-> +        assert(fail_if_exists);
->          if (!id_wellformed(id)) {
->              error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "id",
->                         "an identifier");
-> @@ -629,17 +639,8 @@ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
->          }
->          opts = qemu_opts_find(list, id);
->          if (opts != NULL) {
-> -            if (fail_if_exists && !list->merge_lists) {
-> -                error_setg(errp, "Duplicate ID '%s' for %s", id, list->name);
-> -                return NULL;
-> -            } else {
-> -                return opts;
-> -            }
-> -        }
-> -    } else if (list->merge_lists) {
-> -        opts = qemu_opts_find(list, NULL);
-> -        if (opts) {
-> -            return opts;
-> +            error_setg(errp, "Duplicate ID '%s' for %s", id, list->name);
-> +            return NULL;
->          }
->      }
->      opts = g_malloc0(sizeof(*opts));
-
-Paths through the function before the patch:
-
-    id        fail_if_exists  merge_lists  |  return
-    null      don't care      false        |  new opts
-    null      don't care      true         |  existing or else new opts
-    non-null  false           don't care   |  existing or else new opts
-    non-null  true            true         |  existing or else new opts
-    non-null  true            false        |  new opts / fail if exist
-
-Too many cases.
-
-After the patch:
-
-    id        fail_if_exists  merge_lists  |  return
-    non-null  don't care      true         |  fail
-    null      don't care      true         |  existing or else new opts
-    non-null  false           false        |  abort
-    non-null  true            false        |  new opts / fail if exist
-    null      don't care      false        |  new opts
-
-Still too many :)
-
-I'm running out of time for today, and I still need to convince myself
-that the changes in behavior are all okay.
-
-> @@ -893,7 +894,7 @@ static QemuOpts *opts_parse(QemuOptsList *list, const char *params,
->       * (if unlikely) future misuse:
->       */
->      assert(!defaults || list->merge_lists);
-> -    opts = qemu_opts_create(list, id, !defaults, errp);
-> +    opts = qemu_opts_create(list, id, !list->merge_lists, errp);
->      g_free(id);
->      if (opts == NULL) {
->          return NULL;
-
-
-
-[*] Known to the QemuOpts cognoscenti, whose number could be
-embarrasingly close to one.
+... and queued for my next pull request.
 
 
