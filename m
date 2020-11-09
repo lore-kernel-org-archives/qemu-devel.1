@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 248BFC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F491C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:15:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C03B206ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:14:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C03B206ED
+	by mail.kernel.org (Postfix) with ESMTPS id 9DF23206ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:15:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DF23206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc7w0-0007Xv-GL
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:14:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40282)
+	id 1kc7ws-0008La-GK
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:15:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40316)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <remi@remlab.net>)
- id 1kc7sK-000323-Gf; Mon, 09 Nov 2020 09:10:28 -0500
-Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:60172
+ id 1kc7sM-00034O-1R; Mon, 09 Nov 2020 09:10:30 -0500
+Received: from poy.remlab.net ([2001:41d0:2:5a1a::]:60180
  helo=ns207790.ip-94-23-215.eu)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <remi@remlab.net>)
- id 1kc7sG-0002kg-3x; Mon, 09 Nov 2020 09:10:28 -0500
+ id 1kc7sK-0002nS-9B; Mon, 09 Nov 2020 09:10:29 -0500
 Received: from basile.remlab.net (ip6-localhost [IPv6:::1])
- by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id 3F5725FE42;
- Mon,  9 Nov 2020 15:10:21 +0100 (CET)
+ by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id 52E6D60105;
+ Mon,  9 Nov 2020 15:10:22 +0100 (CET)
 From: remi.denis.courmont@huawei.com
 To: qemu-arm@nongnu.org
-Subject: [PATCH 02/17] target/arm: add arm_is_el2_enabled() helper
-Date: Mon,  9 Nov 2020 16:10:05 +0200
-Message-Id: <20201109141020.27234-2-remi.denis.courmont@huawei.com>
+Subject: [PATCH 06/17] target/arm: declare new AA64PFR0 bit-fields
+Date: Mon,  9 Nov 2020 16:10:09 +0200
+Message-Id: <20201109141020.27234-6-remi.denis.courmont@huawei.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <5554493.MhkbZ0Pkbq@basile.remlab.net>
 References: <5554493.MhkbZ0Pkbq@basile.remlab.net>
@@ -74,48 +74,41 @@ Sender: "Qemu-devel"
 
 From: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
 
-This checks if EL2 is enabled (meaning EL2 registers take effects) in
-the current security context.
-
 Signed-off-by: Rémi Denis-Courmont <remi.denis.courmont@huawei.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ target/arm/cpu.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index c18a916766..adaded6bab 100644
+index a1ee436853..a74055df22 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -2040,6 +2040,17 @@ static inline bool arm_is_secure(CPUARMState *env)
-     return arm_is_secure_below_el3(env);
+@@ -1849,6 +1849,12 @@ FIELD(ID_AA64PFR0, ADVSIMD, 20, 4)
+ FIELD(ID_AA64PFR0, GIC, 24, 4)
+ FIELD(ID_AA64PFR0, RAS, 28, 4)
+ FIELD(ID_AA64PFR0, SVE, 32, 4)
++FIELD(ID_AA64PFR0, SEL2, 36, 4)
++FIELD(ID_AA64PFR0, MPAM, 40, 4)
++FIELD(ID_AA64PFR0, AMU, 44, 4)
++FIELD(ID_AA64PFR0, DIT, 48, 4)
++FIELD(ID_AA64PFR0, CSV2, 56, 4)
++FIELD(ID_AA64PFR0, CSV3, 60, 4)
+ 
+ FIELD(ID_AA64PFR1, BT, 0, 4)
+ FIELD(ID_AA64PFR1, SBSS, 4, 4)
+@@ -3881,6 +3887,11 @@ static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
  }
  
-+/* Return true if the current security state has AArch64 EL2 or AArch32 Hyp.
-+ * This corresponds to the pseudocode EL2Enabled()
-+  */
-+static inline bool arm_is_el2_enabled(CPUARMState *env)
++static inline bool isar_feature_aa64_sel2(const ARMISARegisters *id)
 +{
-+    if (arm_feature(env, ARM_FEATURE_EL2)) {
-+        return !arm_is_secure_below_el3(env);
-+    }
-+    return false;
++    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SEL2) != 0;
 +}
 +
- #else
- static inline bool arm_is_secure_below_el3(CPUARMState *env)
+ static inline bool isar_feature_aa64_vh(const ARMISARegisters *id)
  {
-@@ -2050,6 +2061,11 @@ static inline bool arm_is_secure(CPUARMState *env)
- {
-     return false;
- }
-+
-+static inline bool arm_is_el2_enabled(CPUARMState *env)
-+{
-+    return false;
-+}
- #endif
- 
- /**
+     return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, VH) != 0;
 -- 
 2.29.2
 
