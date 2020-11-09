@@ -2,92 +2,80 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B46A6C4741F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 13:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1407C4741F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 13:24:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 348EC20663
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 13:11:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H8bkzlaT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 348EC20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CB4D12083B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 13:23:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB4D12083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc6xZ-0005Vi-7M
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 08:11:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48824)
+	id 1kc79K-00089k-Nm
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 08:23:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kc6wg-0004wO-LR
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 08:10:54 -0500
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:42287)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kc76J-0007N7-PS
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 08:20:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59050)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kc6wZ-0007NG-SB
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 08:10:54 -0500
-Received: by mail-ej1-x644.google.com with SMTP id i19so12149204ejx.9
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 05:10:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=ftFoZ+uZmH3wDSM3hDnWljMNS89Iorvh0uGunD681GM=;
- b=H8bkzlaTQcQD5pQxoqyqJPXgTDZTWRPzn2atdCKdyQg/3R9CkrSy7xTEuh2dWR2b6D
- qjbQNyTkcydSSNwJElzGpLejJTo6VkUnrcqfItKK29fXzpmIY0WugiNQqVTDkXfSgp12
- qQHEd9ru0lQBmIirbM6e1v712B5IrMKBa8oqjXz4eYSYShr9viRkUNOdR/zikuDdcZvK
- yD0jQ+Rnd4zSraQk+2R4GyCHIJSbUg9ci8vkvpEjGwpmT29XDKJ5xWeKrgA7DPvTlb8l
- Wi3ts68iwcG9vGtALFc44Fc+C0ZaVt4Y0Gc3fqFB2CW9z5ozzcW/RahIiYzuLkWCYV+c
- AO1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=ftFoZ+uZmH3wDSM3hDnWljMNS89Iorvh0uGunD681GM=;
- b=fMk8yHkaFF/eYsA/7e6bcX/WvYbx0K6QU/3GF0wc4uKqx4ch47+pMjsCQcHpEJ9AMC
- B05i9c9kiy5G2KWWMJmXRwCpECy6WehcIPFcKecaahHuOif+OB3ZLHvgsqaJENjkkfws
- bsJOYNipVqa1hBGGAwWeJOl9njXSQ4R+31d+DPcGITD44D0EsXcZQ4Zykgl2fXGYhbGH
- Xd4QHO4IscqZFSXsr1VC9XgEwpS1N/EwPG9o4+5+p6SpUtHAq5UrQCBBrO8Rq1148BK4
- g38DWwFtUUDWg3bWuQFMAO/DNe0dlGdc0Ki++6pJbtXGAxcCH1++wIa6yKaQb2iA+ce4
- Spag==
-X-Gm-Message-State: AOAM533ay4dYdz96FcEYF7JygMZBpfG48kOnJTWLkNTtr5bvNUG33pJV
- dOmhd0WiKy4tsAnK6Y3PLXEt5+/m/untANNrGmFxbQ==
-X-Google-Smtp-Source: ABdhPJxMMwP28LUWtSWVVRKnGjIGgCfgMby6BeyRIil9rPc3d67rUow16uEwC4ypGIVHHyToldNqKpGGrkHhrTLImjw=
-X-Received: by 2002:a17:906:7254:: with SMTP id
- n20mr14192338ejk.382.1604927445937; 
- Mon, 09 Nov 2020 05:10:45 -0800 (PST)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kc76D-0002UP-C6
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 08:20:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kc76A-000772-B1
+ for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 13:20:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 509F52E811E
+ for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 13:20:42 +0000 (UTC)
 MIME-Version: 1.0
-References: <20201104165254.24822-1-alex.bennee@linaro.org>
-In-Reply-To: <20201104165254.24822-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Nov 2020 13:10:34 +0000
-Message-ID: <CAFEAcA8vjXHFEripcd69F++j7V_ZHkK8Y+RJ7WN942JbJ3JCpQ@mail.gmail.com>
-Subject: Re: [PATCH v2] docs: add some notes on the sbsa-ref machine
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Date: Mon, 09 Nov 2020 13:14:11 -0000
+From: Christian Schoenebeck <1687270@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: manuel-reimer schoenebeck th-huth
+X-Launchpad-Bug-Reporter: Manuel Reimer (manuel-reimer)
+X-Launchpad-Bug-Modifier: Christian Schoenebeck (schoenebeck)
+References: <20170430094752.26847.19558.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160492765107.18639.3731421848887984478.malone@wampee.canonical.com>
+Subject: [Bug 1687270] Re: Can't write to 9p shared folder with qemu 2.9.0
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e39939c02bd86af4202bc6e2123a7708215ec8ea"; Instance="production"
+X-Launchpad-Hash: 45ed43fd3a257555353101ae697933c6242de912
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:40:52
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,44 +84,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Graeme Gregory <graeme@nuviainc.com>,
- Shashi Mallela <shashi.mallela@linaro.org>, Leif Lindholm <leif@nuviainc.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>
+Reply-To: Bug 1687270 <1687270@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 4 Nov 2020 at 16:53, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
->
-> We should at least document what this machine is about.
->
-> Reviewed-by: Graeme Gregory <graeme@nuviainc.com>
-> Cc: Leif Lindholm <leif@nuviainc.com>
-> Cc: Shashi Mallela <shashi.mallela@linaro.org>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> ---
-> v2
->   - reworded command line bit as per Leif
->   - s/cortex-a57 cpus/AArch64 CPUs/
->   - dropped the trailing .'s
-> ---
->  docs/system/arm/sbsa.rst   | 32 ++++++++++++++++++++++++++++++++
+Independent of the tracker transition, some feedback to your report:
+from what you described so far, the most common cause for the behaviour
+you described is a simple file permission issue on host side. Please
+check which user your qemu process is running with there, then ensure
+that the files you want to be able to access from guest by 9p has the
+appropriate file permissions for that user on host side.
 
-This filename...
+If the problem still persists there, then please provide more details
+about your configuration, especially an output of some files and their
+permissions on host side.
 
-> --- a/docs/system/target-arm.rst
-> +++ b/docs/system/target-arm.rst
-> @@ -79,6 +79,7 @@ undocumented; you can get a complete list by running
->     arm/mps2
->     arm/musca
->     arm/realview
-> +   arm/sbsa-ref
+-- =
 
-...doesn't match the name you used here, so the docs don't
-build. I've fixed this nit in target-arm.next.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1687270
 
--- PMM
+Title:
+  Can't write to 9p shared folder with qemu 2.9.0
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  When running a virtual machine with qemu 2.9.0 with this parameter for
+  sharing a folder:
+
+  -virtfs
+  local,id=3Dfsdev1,path=3D$HOME/git,security_model=3Dnone,mount_tag=3Dgit
+
+  then the folder is shared to the VM but in some subfolders I can't
+  delete files. The guest system then reports that the file, I want to
+  delete, is "no file or folder".
+
+  I've downgraded to 2.8.0 now, which re-enables deleting my files.
+
+  Is this a known bug which will be fixed with a future version?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1687270/+subscriptions
 
