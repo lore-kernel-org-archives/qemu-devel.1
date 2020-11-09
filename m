@@ -2,73 +2,98 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53984C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A23BC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:44:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C7D9206CB
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:41:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C7D9206CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7E8042067C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 21:44:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="afKRJHuS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E8042067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kcEuM-0006jK-6u
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 16:41:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36440)
+	id 1kcExg-0007jn-Er
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 16:44:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kcEtL-0006DD-MY
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:39:59 -0500
-Resent-Date: Mon, 09 Nov 2020 16:39:59 -0500
-Resent-Message-Id: <E1kcEtL-0006DD-MY@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21396)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kcEtI-0007GE-AB
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:39:59 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1604957989; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=DLeSmQqvNxpkiY/nx2zydGnguMWtrjTYMTdTzc7lVfUC/B2OnA7dzTr3scoJMhNQxakIXSvSlCIky2wkBKAsXKXTkjJLVgZzoLR1rI6X4U36EP7kPXjEG0CeucB8q5KHp769Q5cYQCPXU+ZWxezbOuqFGUdKpsolSQZvPUB3KxA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1604957989;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=9uR25DYWk6tlwo8C8eOUtJeSbrxpLeckRUQG+BZiFQk=; 
- b=k4unyZ+Nt5rrXIS4ZLUHmS/cCNsLZyMzfftmpKdNdubVD8LF+KYiZgv7rXNs7C3i6i9IkqC+UqI+ljTCNmvnRrFgq36eX9LyGIhe/vjz4yqcmdTrRLxXfD/wqVltDLEPXL3dVp4CVVlIuhvc66639D9+IFSNPzM3DBHDqdWmBpk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1604957987700737.0033268737639;
- Mon, 9 Nov 2020 13:39:47 -0800 (PST)
-Message-ID: <160495798642.32285.17713378637940035517@b92d57cec08d>
-Subject: Re: [PATCH 0/8] qom: Use qlit to represent property defaults
-In-Reply-To: <20201109212556.3934583-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kcEwG-0007Hd-Ib
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:43:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25488)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kcEwC-0007af-AL
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 16:42:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604958174;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=+jcj7EA/HdXtGImWzQ1zn+JILnAtpHF0j9yHIlriuuI=;
+ b=afKRJHuSvjfdQR6DgmoAycp/8h+ovFTRBnVaZjxIZUebJDp+CZjvPZedrgQg7hPgWQf2EZ
+ 30oZz+NQejfNNG6F3DAACQmN44ArEkhZL51NgcT8X0BmBwbyhRVTj622vRMJU/2HSp0Wwy
+ v6F/yt6lTDUudItHy/Hy/4QuWOA5gEg=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-U1tlmgqSMSuxkEtHQJYcxw-1; Mon, 09 Nov 2020 16:42:51 -0500
+X-MC-Unique: U1tlmgqSMSuxkEtHQJYcxw-1
+Received: by mail-pg1-f197.google.com with SMTP id j13so7379354pgp.11
+ for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 13:42:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=+jcj7EA/HdXtGImWzQ1zn+JILnAtpHF0j9yHIlriuuI=;
+ b=sy+TDtZ9JW2XeZwOOAAvk65Yp2rboEE1iUe7s4xUsnZ/gxnLrtzkgFUz5s6xvHAo8o
+ fXUB65+c60D1RRQcouAgMTxvjWZMgyuMtdd/EvX5suwOphY/WwnCaquWfm83hF1h0+Ln
+ lNe7V5YlVtAmKQh2NffG6+E6OPUJC3KDOQ+4g3365cGnsEwfZiMIVuc+acabP5uwv/Dp
+ RvC0R4Z8zrz2AKwegQSnYpL0KGUgriVsRdIydKPx1WTsx6t4PvWso9lPgNAe5InjfKNu
+ Y97Lqdxvs44shdLn177PKOTVhyOQz8xUO+vl3O/ZmA21htRIZFCQoj/aqw9acgMj/6nB
+ exwQ==
+X-Gm-Message-State: AOAM530F6MmFcGkrpqsWZ/B/TkPNDXe24EtcSoMjuqygCMUCBriy1xyT
+ FRIEuWsZ+Pqr/pqQN1q1xzZZlgKUON7aOik7kKvhOXDexPVfBEM5VUKK24mxem6hZBMUn3U5WAY
+ qyTX6AltNhZsvSEin/XrXhRGl5lrvlLc=
+X-Received: by 2002:a65:6086:: with SMTP id t6mr14213872pgu.146.1604958170794; 
+ Mon, 09 Nov 2020 13:42:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwmXLXlDQLhOIgm227fhYvTWod3DCgJuVDGShyCdm7dFi16y859TV2O4K8SrS4OMxszW9XlEDitiVs808eiu6E=
+X-Received: by 2002:a65:6086:: with SMTP id t6mr14213861pgu.146.1604958170495; 
+ Mon, 09 Nov 2020 13:42:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ehabkost@redhat.com
-Date: Mon, 9 Nov 2020 13:39:47 -0800 (PST)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 16:39:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20201109133931.979563-1-pbonzini@redhat.com>
+ <20201109133931.979563-7-pbonzini@redhat.com>
+ <87h7py2ppj.fsf@dusky.pond.sub.org>
+In-Reply-To: <87h7py2ppj.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 9 Nov 2020 22:42:37 +0100
+Message-ID: <CABgObfaZESSsvTvSR_BUdRWQ-UPtoFyP7r1RPET2kzvjbWiE3w@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] qemu-option: warn for short-form boolean options
+To: Markus Armbruster <armbru@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="000000000000a1d8dc05b3b37136"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,68 +107,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com, armbru@redhat.com
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTEwOTIxMjU1Ni4zOTM0
-NTgzLTEtZWhhYmtvc3RAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDExMDkyMTI1NTYuMzkzNDU4My0xLWVoYWJr
-b3N0QHJlZGhhdC5jb20KU3ViamVjdDogW1BBVENIIDAvOF0gcW9tOiBVc2UgcWxpdCB0byByZXBy
-ZXNlbnQgcHJvcGVydHkgZGVmYXVsdHMKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
-c3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
-KiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAxMTA5MjEyNTU2LjM5MzQ1ODMtMS1laGFi
-a29zdEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDExMDkyMTI1NTYuMzkzNDU4My0xLWVoYWJr
-b3N0QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1MTQxMTVlIHFv
-bTogVXNlIHFsaXQgdG8gcmVwcmVzZW50IHByb3BlcnR5IGRlZmF1bHRzCjJjYTM1NjEgcW9tOiBN
-YWtlIG9iamVjdF9wcm9wZXJ0eV9zZXRfZGVmYXVsdCgpIHB1YmxpYwo0YzI2MWFlIHFsaXQ6IHFs
-aXRfdHlwZSgpIGZ1bmN0aW9uCjhiNjAxYzQgcWxpdDogU3VwcG9ydCBhbGwgdHlwZXMgb2YgUU51
-bXMKMmQ1ZjFhZiBxbnVtOiBxbnVtX3ZhbHVlX2lzX2VxdWFsKCkgZnVuY3Rpb24KYmU3NGM0OSBx
-bnVtOiBRTnVtVmFsdWUgdHlwZSBmb3IgUU51bSB2YWx1ZSBsaXRlcmFscwo4N2IwZWRjIHFudW06
-IE1ha2UgcW51bV9nZXRfZG91YmxlKCkgZ2V0IGNvbnN0IHBvaW50ZXIKYWI0YjUxMCBxb2JqZWN0
-OiBJbmNsdWRlIEFQSSBkb2NzIGluIGRvY3MvZGV2ZWwvcW9iamVjdC5odG1sCgo9PT0gT1VUUFVU
-IEJFR0lOID09PQoxLzggQ2hlY2tpbmcgY29tbWl0IGFiNGI1MTBjMGUyMiAocW9iamVjdDogSW5j
-bHVkZSBBUEkgZG9jcyBpbiBkb2NzL2RldmVsL3FvYmplY3QuaHRtbCkKV0FSTklORzogYWRkZWQs
-IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
-PwojMjM6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
-LCAyMDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS84IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CjIvOCBDaGVja2luZyBjb21taXQgODdiMGVkY2I1MGE3IChxbnVtOiBNYWtlIHFudW1fZ2V0X2Rv
-dWJsZSgpIGdldCBjb25zdCBwb2ludGVyKQozLzggQ2hlY2tpbmcgY29tbWl0IGJlNzRjNDk3OGYw
-NSAocW51bTogUU51bVZhbHVlIHR5cGUgZm9yIFFOdW0gdmFsdWUgbGl0ZXJhbHMpCjQvOCBDaGVj
-a2luZyBjb21taXQgMmQ1ZjFhZjg0NjQ2IChxbnVtOiBxbnVtX3ZhbHVlX2lzX2VxdWFsKCkgZnVu
-Y3Rpb24pCjUvOCBDaGVja2luZyBjb21taXQgOGI2MDFjNDQyNjZlIChxbGl0OiBTdXBwb3J0IGFs
-bCB0eXBlcyBvZiBRTnVtcykKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2NDogRklM
-RTogcW9iamVjdC9xbGl0LmM6NzQ6CisgICAgICAgIHJldHVybiBxbnVtX3ZhbHVlX2lzX2VxdWFs
-KCZsaHMtPnZhbHVlLnFudW0sIHFudW1fZ2V0X3ZhbHVlKHFvYmplY3RfdG8oUU51bSwgcmhzKSkp
-OwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNTQgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
-NS84IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo2LzggQ2hlY2tpbmcgY29tbWl0IDRjMjYx
-YWU0YzNmMiAocWxpdDogcWxpdF90eXBlKCkgZnVuY3Rpb24pCjcvOCBDaGVja2luZyBjb21taXQg
-MmNhMzU2MWVlNjkwIChxb206IE1ha2Ugb2JqZWN0X3Byb3BlcnR5X3NldF9kZWZhdWx0KCkgcHVi
-bGljKQo4LzggQ2hlY2tpbmcgY29tbWl0IDUxNDExNWU1OTdmMSAocW9tOiBVc2UgcWxpdCB0byBy
-ZXByZXNlbnQgcHJvcGVydHkgZGVmYXVsdHMpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBh
-IGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxNDg6IEZJTEU6IGluY2x1ZGUvcW9tL3By
-b3BlcnR5LXR5cGVzLmg6MzM6CisgICAgICAgIC8qIE5vdGUgdGhhdCBfX1ZBX0FSR1NfXyBjYW4g
-c3RpbGwgb3ZlcnJpZGUgLmRlZnZhbCAqLyAgIFwKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
-cywgMzI1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIw
-MTEwOTIxMjU1Ni4zOTM0NTgzLTEtZWhhYmtvc3RAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0
-Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+--000000000000a1d8dc05b3b37136
+Content-Type: text/plain; charset="UTF-8"
+
+Il lun 9 nov 2020, 22:19 Markus Armbruster <armbru@redhat.com> ha scritto:
+
+> This function now warns, except for "help" and "?".  The exception
+> applies even when we treat "help" and "?" as sugar for "help=on" and
+> "?=on" because opts_accepts_any().
+>
+
+Right, because again help_wanted will be false for non-validated
+QemuOptsList.
+
+Summary: only qemu_opts_parse_noisily() warns.  This is airtight only if
+> all user input flows through qemu_opts_parse_noisily().
+
+
+HMP doesn't. But that's too hard to change now, and it's not considered as
+much of a stable interface as the command line.
+
+Anyway I am not going to push this for 5.2. Thanks for the speedy reviews
+anyway!
+
+Paolo
+
+--000000000000a1d8dc05b3b37136
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il lun 9 nov 2020, 22:19 Markus Armbruster &lt;<a href=
+=3D"mailto:armbru@redhat.com">armbru@redhat.com</a>&gt; ha scritto:<br></di=
+v><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:=
+1px #ccc solid;padding-left:1ex">This function now warns, except for &quot;=
+help&quot; and &quot;?&quot;.=C2=A0 The exception<br>
+applies even when we treat &quot;help&quot; and &quot;?&quot; as sugar for =
+&quot;help=3Don&quot; and<br>
+&quot;?=3Don&quot; because opts_accepts_any().<br></blockquote></div></div>=
+<div dir=3D"auto"><br></div><div dir=3D"auto">Right, because again help_wan=
+ted will be false for non-validated QemuOptsList.</div><div dir=3D"auto"><b=
+r></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"g=
+mail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-l=
+eft:1ex">Summary: only qemu_opts_parse_noisily() warns.=C2=A0 This is airti=
+ght only if<br>
+all user input flows through qemu_opts_parse_noisily().</blockquote></div><=
+/div><div dir=3D"auto"><br></div><div dir=3D"auto">HMP doesn&#39;t. But tha=
+t&#39;s too hard to change now, and it&#39;s not considered as much of a st=
+able interface as the command line.</div><div dir=3D"auto"><br></div><div d=
+ir=3D"auto">Anyway I am not going to push this for 5.2. Thanks for the spee=
+dy reviews anyway!</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo=
+</div></div>
+
+--000000000000a1d8dc05b3b37136--
+
 
