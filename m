@@ -2,111 +2,64 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B93C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02226C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:17:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1980E206ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:17:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LoB9g+Zm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1980E206ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 58ECC206ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 09:17:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58ECC206ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc3Ip-0005Aa-2m
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:17:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53598)
+	id 1kc3Iv-0005HR-9T
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 04:17:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kc3BN-00059k-O1
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:09:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50297)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kc3BL-0007As-Uf
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:09:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604912987;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LBX00fUtgNFIVUH8PiEVFNdlldoPk7nWKF4IpHuZdfI=;
- b=LoB9g+Zmw1weqeHbw6D8cnZa9WFOcYjh4mIvDrdYCugOznuWhS/dON8SIPe1wVzBoJsbsX
- 7j99mVLTcRnxyCrEUSfXhiu9tWk7r/+ZIC8+6MvK2whOejDGXec6h7NH+yj+sfM1I9+MUP
- iTj8FqxgISNrqWYO6F2K42oNcw4HsOg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-569-3FTBm0m7Owm-_8qtBFxEbw-1; Mon, 09 Nov 2020 04:09:45 -0500
-X-MC-Unique: 3FTBm0m7Owm-_8qtBFxEbw-1
-Received: by mail-ed1-f69.google.com with SMTP id c2so2447191edw.21
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 01:09:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=LBX00fUtgNFIVUH8PiEVFNdlldoPk7nWKF4IpHuZdfI=;
- b=jHjvEy0czEUfuzFtc93W1uA0WaXCSSOMTtjjUAti9UVdoXfANYk33giRH2Oev7fh/H
- VRhDFumURrgCoWbx2hNsvCs0ysndI6RFNHz1TMMYck79ECfFtirvDfEF8ZK9xq144aMj
- CrOF/kzT6wvOgP2B131FxIRZsMX1u4JGczaBsteabow0+MezzWzrjYWMH0HvMl4vk7wV
- 9CE9WtyEW3z7eZEuFpBry6jPYt6wgF+tx/scpsCz+wsy8ZEgpOJFPWhm5WYmvI9rXhBd
- tNcpcanaJzwurPTWP4lj58uPbQsh6JlrmVcvkfKGFL5CFCwUql+kWODXziNvbaDwORDZ
- Nytw==
-X-Gm-Message-State: AOAM532gnwEOXsP0bYGjChR/V1wtOHyHm64abx9j6cuTJQJ0bhnvlR9h
- MG0ulDinMfwZn5YWS4gkWVUP1Ey6PpO0Tj5qqtk3ulPxiuILZAzddXg0w0J4GO9zkbQ582VMA2y
- QwhqBifa0hRgbG9U=
-X-Received: by 2002:a17:906:c298:: with SMTP id
- r24mr14027691ejz.76.1604912984378; 
- Mon, 09 Nov 2020 01:09:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy57r1PLWAZqBd1c+NehszR+uDXWOpb4AxlKuKUdLHznYltkv3uoy0vwp8G9cO7pnBNJbsr8g==
-X-Received: by 2002:a17:906:c298:: with SMTP id
- r24mr14027677ejz.76.1604912984173; 
- Mon, 09 Nov 2020 01:09:44 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id k23sm8325206ejo.108.2020.11.09.01.09.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 09 Nov 2020 01:09:43 -0800 (PST)
-Subject: Re: [PATCH] meson: Clarify the confusing vhost-user vs. vhost-kernel
- output
-To: Thomas Huth <thuth@redhat.com>, Michael Tsirkin <mst@redhat.com>,
- qemu-devel@nongnu.org
-References: <20201109085906.87921-1-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <db279473-2610-8599-100f-a7fdf3fc22a4@redhat.com>
-Date: Mon, 9 Nov 2020 10:09:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ (Exim 4.90_1) (envelope-from <jinzeyu@huawei.com>)
+ id 1kc3Ay-0004Rd-Qz
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:09:24 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:2082)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jinzeyu@huawei.com>)
+ id 1kc3Av-0006yB-Py
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 04:09:24 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CV4tW0hf3zhhsv;
+ Mon,  9 Nov 2020 17:09:07 +0800 (CST)
+Received: from localhost (10.174.186.67) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Mon, 9 Nov 2020
+ 17:09:04 +0800
+From: Zeyu Jin <jinzeyu@huawei.com>
+To: <quintela@redhat.com>, <dgilbert@redhat.com>
+Subject: [RFC PATCH 5/6] migration: Add compress_level sanity check
+Date: Mon, 9 Nov 2020 17:08:49 +0800
+Message-ID: <20201109090850.2424-6-jinzeyu@huawei.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20201109090850.2424-1-jinzeyu@huawei.com>
+References: <20201109090850.2424-1-jinzeyu@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20201109085906.87921-1-thuth@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.186.67]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=jinzeyu@huawei.com;
+ helo=szxga06-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 04:09:11
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -120,46 +73,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Ying Fang <fangying1@huawei.com>, qemu-devel@nongnu.org,
+ Zeyu Jin <jinzeyu@huawei.com>, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/11/20 09:59, Thomas Huth wrote:
-> The configuration summary prints a line with "vhost-user: YES/NO",
-> but the value is currently the vhost-kernel setting instead which
-> looks wrong. Print the kernel setting in a separate line and switch
-> the "vhost-user:" line to CONFIG_VHOST_USER instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   meson.build | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/meson.build b/meson.build
-> index b473620321..61d883bc07 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -2098,11 +2098,12 @@ summary_info += {'madvise':           config_host.has_key('CONFIG_MADVISE')}
->   summary_info += {'posix_madvise':     config_host.has_key('CONFIG_POSIX_MADVISE')}
->   summary_info += {'posix_memalign':    config_host.has_key('CONFIG_POSIX_MEMALIGN')}
->   summary_info += {'libcap-ng support': config_host.has_key('CONFIG_LIBCAP_NG')}
-> +summary_info += {'vhost-kernel support': config_host.has_key('CONFIG_VHOST_KERNEL')}
->   summary_info += {'vhost-net support': config_host.has_key('CONFIG_VHOST_NET')}
->   summary_info += {'vhost-crypto support': config_host.has_key('CONFIG_VHOST_CRYPTO')}
->   summary_info += {'vhost-scsi support': config_host.has_key('CONFIG_VHOST_SCSI')}
->   summary_info += {'vhost-vsock support': config_host.has_key('CONFIG_VHOST_VSOCK')}
-> -summary_info += {'vhost-user support': config_host.has_key('CONFIG_VHOST_KERNEL')}
-> +summary_info += {'vhost-user support': config_host.has_key('CONFIG_VHOST_USER')}
->   summary_info += {'vhost-user-fs support': config_host.has_key('CONFIG_VHOST_USER_FS')}
->   summary_info += {'vhost-vdpa support': config_host.has_key('CONFIG_VHOST_VDPA')}
->   summary_info += {'Trace backends':    config_host['TRACE_BACKENDS']}
-> 
+Zlib compression has level from 1 to 9. However Zstd compression has level
+from 1 to 22 (level >= 20 not recommanded). Let's do sanity check here
+to make sure a vaild compress_level is given by user.
 
-Queued, thanks.
+Signed-off-by: Zeyu Jin <jinzeyu@huawei.com>
+Signed-off-by: Ying Fang <fangying1@huawei.com>
+---
+ migration/migration.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
-Paolo
+diff --git a/migration/migration.c b/migration/migration.c
+index 2c68012029..6fc0c3b532 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1235,16 +1235,40 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+     }
+ }
+ 
++static bool compress_level_check(MigrationParameters *params, Error **errp)
++{
++    switch (params->compress_method) {
++    case COMPRESS_METHOD_ZLIB:
++        if (params->compress_level > 9 || params->compress_level < 1) {
++            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "compress_level",
++                           "a value in the range of 0 to 9 for Zlib method");
++            return false;
++        }
++        break;
++#ifdef CONFIG_ZSTD
++    case COMPRESS_METHOD_ZSTD:
++        if (params->compress_level > 19 || params->compress_level < 1) {
++            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "compress_level",
++                        "a value in the range of 1 to 19 for Zstd method");
++            return false;
++        }
++        break;
++#endif
++    default:
++        error_setg(errp, "Checking compress_level failed for unknown reason");
++        return false;
++    }
++
++    return true;
++}
++
+ /*
+  * Check whether the parameters are valid. Error will be put into errp
+  * (if provided). Return true if valid, otherwise false.
+  */
+ static bool migrate_params_check(MigrationParameters *params, Error **errp)
+ {
+-    if (params->has_compress_level &&
+-        (params->compress_level > 9)) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "compress_level",
+-                   "is invalid, it should be in the range of 0 to 9");
++    if (params->has_compress_level && !compress_level_check(params, errp)) {
+         return false;
+     }
+ 
+-- 
+2.23.0
 
 
