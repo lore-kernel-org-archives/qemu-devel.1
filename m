@@ -2,89 +2,124 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 072E5C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 15:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC5AC388F7
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 15:20:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 570A32074F
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 15:19:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3284206E3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 15:20:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HDRjhO2h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 570A32074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tD4a/UF5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3284206E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc8x8-0002xy-5c
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 10:19:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56568)
+	id 1kc8yF-0003vs-QK
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 10:20:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kc8v9-0001iS-Dw
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 10:17:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36283)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kc8v7-0000na-89
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 10:17:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604935042;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=/Hw8bHhYVEjHbDd7A9BxKPiLcj/7xFL+ZeyxKAyLexI=;
- b=HDRjhO2hlHert5YuFHxNld1qi5ViPK38Nywx1mDD4bfNOnGqwcMH+wHmb4VrCvejSF0zAj
- 0tNcANoLA0dajHHMeZ6LLlkkto4I6OyRx5+kq11q5LJzmmwNhO9bqI+0zQTtGjl1u29EVo
- laXP0Wix28WbfgSgHp125eYAWyO1WPY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-_ZELLAtmOd21zGPNXPT97g-1; Mon, 09 Nov 2020 10:17:18 -0500
-X-MC-Unique: _ZELLAtmOd21zGPNXPT97g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68FEC809DF1;
- Mon,  9 Nov 2020 15:17:17 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F56F1002C1D;
- Mon,  9 Nov 2020 15:17:02 +0000 (UTC)
-Date: Mon, 9 Nov 2020 10:17:01 -0500
-From: Cleber Rosa <crosa@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v4 1/4] Jobs based on custom runners: documentation and
- configuration placeholder
-Message-ID: <20201109151701.GA3874327@localhost.localdomain>
-References: <20201019015003.1527746-1-crosa@redhat.com>
- <20201019015003.1527746-2-crosa@redhat.com>
- <0cafdc10-b979-5a47-516b-24a51663ff6b@redhat.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kc8xG-0003Fl-SQ; Mon, 09 Nov 2020 10:19:38 -0500
+Received: from mail-eopbgr30094.outbound.protection.outlook.com
+ ([40.107.3.94]:52990 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kc8xD-0001YP-7l; Mon, 09 Nov 2020 10:19:37 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Da1YYspnJuFza1mRqQmSSv9FsaqE3e5G90dqEV1ewSy/GLw0hHy6AgzJB6oqWTuX02sZ28eJ7jV59EiNWw16bJgCseopOdQUtaTvjaYbKbEOuWLCwxborJeuaWctXBjqf4Noa1rW54vRSw0yiTMNHm8GMZBYK/2OgaXQIWWrbfkJYuN89fwUUpvEWcSrQsHRIxMgH1Mf220zDvpL7GR+sou4gV2z+m5HOtaCl+5T1lIm/oNo5Z4CnIgyzexwf4/A9qTfW3oZOEgpa0/6Gh86PvxTi1K1cnan9TsAtBMgmY81mIeI2U3JxcMRqUhu8R8qQ1pGpS4UpIncEjCiXm/GTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4a1UEaBQplOh24M8favTmaGgDMBxb/oUR1CCFfdox1s=;
+ b=bVA0xhqmgFcgBtQ8AC9zf76sFBMqpO6xajJf3/Ue0SInM09ElxLxrPbRs9jCfhDdtLMEpkyqKmVsTzamuR94rISNmDCY/7Mlcv9TY1tG9YiWZXE3Jf7+t1C79NRuX804eic+OJWcwFahR52F2O+KRe2RAKHzqbzgn/qAjlcnt2q6DreRkJf75bDgIUdWomK5+exfndU7cTLBosz9sXjwpWFA2fw/jXG8xGNBZ4m0u/is4MSr9prpafPkjkFtrXEHnGYYZpf4imeTpeXZ+l/7hzJ7zJH1BOyw4vYh/APuwBjCu9NnUOGUOimnZur1wUdlmGjVbjEAdPZBnalCNvmfpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4a1UEaBQplOh24M8favTmaGgDMBxb/oUR1CCFfdox1s=;
+ b=tD4a/UF5aW08YN67JOwrrh4UU4p+PaMe0ad4ANUSdPHxV4AtocCmMGQ6hDmGbgP8mkm68A45DuYxjM9q6mCES+as67LXJ9k6Qt5hcBUmZFpMnx83fSCBcDK/IbP9SHgNedgaZreQi/29picybS9UQIhjWzIdJZLoExbe97454BA=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5448.eurprd08.prod.outlook.com (2603:10a6:20b:106::10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21; Mon, 9 Nov
+ 2020 15:19:25 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.032; Mon, 9 Nov 2020
+ 15:19:25 +0000
+Subject: Re: [PATCH v2 0/7] block: permission update fix & refactor
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, berto@igalia.com, den@openvz.org
+References: <20201106124241.16950-1-vsementsov@virtuozzo.com>
+ <cdf7dea8-67d1-b0e1-b8f0-8e6333f586c7@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <631680d8-6f3b-941d-8d32-683b1290a059@virtuozzo.com>
+Date: Mon, 9 Nov 2020 18:19:23 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+In-Reply-To: <cdf7dea8-67d1-b0e1-b8f0-8e6333f586c7@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [185.215.60.85]
+X-ClientProxiedBy: AM8P189CA0020.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:218::25) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <0cafdc10-b979-5a47-516b-24a51663ff6b@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="huq684BweRXVnRxX"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.85) by
+ AM8P189CA0020.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:218::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3541.21 via Frontend Transport; Mon, 9 Nov 2020 15:19:24 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: bffcc5cd-d5f2-43d6-3f28-08d884c2d7b8
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5448:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB544832331A26BE7D76ACF272C1EA0@AM7PR08MB5448.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gFx+fk3St9uH2ZDlnxKFoKhOJUL7bhGpvvQUAYhlNaLrxJzwsiNwBVUtVsWpywkSf4clqWAt7aSvfxWLOuUHpiGKrQFCam6vDY9L6CiR3IOtMyPxoZzup58WpI3V8JsZlovDzbTrjMhVb1X5PCemm9LhvZ5Z4NdOi/rQPG33obawQkuGZ2ow8EFzjG6izSTbTq4CPa+49CsccOVn6PI7oADlvHKT23QsPcB/Dl/ye9E4Fw6yjPm+YqsSL+m8bBc5MfBSF5YB00r+BAwuC8cNEMNoRfsiqi6AwNhn5AFWhUCawqUX4Ox3a/YTnoVVANmbOvFm3sr4agxvvU8ui1mrG2/SFSmhR16/ECmVoos1Ji65BxJBk4A4ryBHE0nO4c60TsTmEzGdAm9Hsnu6n73KjfA4LT2vIPGNzEpKytqQnGjrqY6jEKEu1bc6hXRJ8/lgWUyMCPCu74vaPxVA+2ia4w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(136003)(39840400004)(346002)(366004)(376002)(107886003)(16576012)(31686004)(316002)(6486002)(15650500001)(36756003)(16526019)(186003)(2906002)(83380400001)(4326008)(478600001)(66556008)(66946007)(66476007)(5660300002)(2616005)(956004)(966005)(26005)(52116002)(53546011)(8936002)(86362001)(8676002)(31696002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: hggSIpyi03AcovQLHwOqs1G8emqncKQ1UpM38zryoO7+d7UNwHZnseS6JIxwe2b9ZDhL5QoWOGYVXYkx5GuM6U3o9dNQUXEG9h3QU1PfL5nbcEyAztOovXSjEhtY0OSNcytBdvplcb2qOPDRmvfibSYfWjtXrkyrNExFoTTZI6aBKSk/b8Z8JX8BEdK8soR2Fc7Gghrzr2nrKw5vXls119DjjR289FfFC2C7E8T+3JxRMTQMwRR0tpaJK4bWiHfpWmdd8p02ejxqQ6tAv+ls8yEUyO5/kXyfrxdLi8Zwh8cJKaC9DR8wVjOS2p895T3vQU0iCh/Uh8PAGOJKIrJCN4sIckwkeUWGbrRx73kyj2MnnP45FqvU7DLNCOf8tg8s0i32ydVp9PUy2h8Pi06CrxjKxyIDglmULKr1imlPdDOAnNC5GzpDbBinYiYm4feasurG9Z3T2ySVtBpjoI6P0jocwcrTFcfKU9Yoy2DDUhNo5pKC2eiyh+mgURMpO34ZlHU25ufkqrfpbhmgFs5j+blA5J8KEKDyn2DvqyBF9eHicQnQtOfcc04JM7YdOk5JxAeCcsycTDY4/xE7rwi+R15WeXK62fPcwh3316u2Xf0idU5UOYA/bGXArzY7hf0FsLMCIVcrE9OjESKu1oOFKw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bffcc5cd-d5f2-43d6-3f28-08d884c2d7b8
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2020 15:19:25.4217 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X3knWeXoomLqjZ+vtFVTvSj8UMXOOsrYtHb+2FAbWe/f7w9h759Hy9kMOjDOrgyQc9jmzlEY3tPDA2B2sgm1IdRE17U5tA/EV3sK8Bodkzo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5448
+Received-SPF: pass client-ip=40.107.3.94;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 10:19:32
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,174 +132,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---huq684BweRXVnRxX
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+09.11.2020 17:41, Max Reitz wrote:
+> On 06.11.20 13:42, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all!
+>>
+>> These series supersedes "Fix nested permission update" and includes one
+>> more fix (patch 01) and more improvements.
+>>
+>> I think patch 01 is good to have in 5.2, 02 is probably OK for 5.2 and
+>> the others are OK for next release. Still all may be taken to 5.2, up to
+>> block maintainers.
+>>
+>> Actually the series is a first part of my work announced in
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg08386.html
+>> to bring correct order to permission update (topological sort),
+>> update permission only on updated graph (and rollback graph changes),
+>> get rid of .active fields in block jobs.
+>>
+>> Supersedes: <20201031123502.4558-1-vsementsov@virtuozzo.com>
+>>
+>> v2: all new except for 03:, which uses suggestions by Albert and more
+>> strict version of bdrv_replace_node.
+> 
+> Thanks, I took 1 through 3 to my block branch:
+> 
+> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+> 
+> and 4 through 7 to my block-next branch (squashing in the fix for 4, and fixing up the resulting conflict in 7):
+> 
+> https://git.xanclic.moe/XanClic/qemu/commits/branch/block-next
+> 
+> Max
+> 
 
-On Wed, Oct 21, 2020 at 08:45:18AM +0200, Thomas Huth wrote:
-> On 19/10/2020 03.50, Cleber Rosa wrote:
-> > As described in the included documentation, the "custom runner" jobs
-> > extend the GitLab CI jobs already in place.
-> >=20
-> > Those jobs are intended to run on hardware and/or Operating Systems
-> > not provided by GitLab's shared runners.
-> >=20
-> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> > ---
-> >  .gitlab-ci.d/custom-runners.yml | 14 +++++++++
-> >  .gitlab-ci.yml                  |  1 +
-> >  docs/devel/ci.rst               | 54 +++++++++++++++++++++++++++++++++
-> >  docs/devel/index.rst            |  1 +
-> >  4 files changed, 70 insertions(+)
-> >  create mode 100644 .gitlab-ci.d/custom-runners.yml
-> >  create mode 100644 docs/devel/ci.rst
-> >=20
-> > diff --git a/.gitlab-ci.d/custom-runners.yml b/.gitlab-ci.d/custom-runn=
-ers.yml
-> > new file mode 100644
-> > index 0000000000..3004da2bda
-> > --- /dev/null
-> > +++ b/.gitlab-ci.d/custom-runners.yml
-> > @@ -0,0 +1,14 @@
-> > +# The CI jobs defined here require GitLab runners installed and
-> > +# registered on machines that match their operating system names,
-> > +# versions and architectures.  This is in contrast to the other CI
-> > +# jobs that are intended to run on GitLab's "shared" runners.
-> > +
-> > +# Different than the default approach on "shared" runners, based on
-> > +# containers, the custom runners have no such *requirement*, as those
-> > +# jobs should be capable of running on operating systems with no
-> > +# compatible container implementation, or no support from
-> > +# gitlab-runner.  To avoid problems that gitlab-runner can cause while
-> > +# reusing the GIT repository, let's enable the recursive submodule
-> > +# strategy.
-> > +variables:
-> > +  GIT_SUBMODULE_STRATEGY: recursive
-> > diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> > index 8ffd415ca5..b33c433fd7 100644
-> > --- a/.gitlab-ci.yml
-> > +++ b/.gitlab-ci.yml
-> > @@ -18,6 +18,7 @@ include:
-> >    - local: '/.gitlab-ci.d/opensbi.yml'
-> >    - local: '/.gitlab-ci.d/containers.yml'
-> >    - local: '/.gitlab-ci.d/crossbuilds.yml'
-> > +  - local: '/.gitlab-ci.d/custom-runners.yml'
-> > =20
-> >  .native_build_job_template: &native_build_job_definition
-> >    stage: build
-> > diff --git a/docs/devel/ci.rst b/docs/devel/ci.rst
-> > new file mode 100644
-> > index 0000000000..41a4bbddad
-> > --- /dev/null
-> > +++ b/docs/devel/ci.rst
-> > @@ -0,0 +1,54 @@
-> > +=3D=3D
-> > +CI
-> > +=3D=3D
-> > +
-> > +QEMU has configurations enabled for a number of different CI services.
-> > +The most up to date information about them and their status can be
-> > +found at::
-> > +
-> > +   https://wiki.qemu.org/Testing/CI
-> > +
-> > +Jobs on Custom Runners
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +Besides the jobs run under the various CI systems listed before, there
-> > +are a number additional jobs that will run before an actual merge.
-> > +These use the same GitLab CI's service/framework already used for all
-> > +other GitLab based CI jobs, but rely on additional systems, not the
-> > +ones provided by GitLab as "shared runners".
-> > +
-> > +The architecture of GitLab's CI service allows different machines to
-> > +be set up with GitLab's "agent", called gitlab-runner, which will take
-> > +care of running jobs created by events such as a push to a branch.
-> > +Here, the combination of a machine, properly configured with GitLab's
-> > +gitlab-runner, is called a "custom runner" here.
->=20
-> Nit: Remove one of the two "here" in the above sentence.
->=20
-> > +The GitLab CI jobs definition for the custom runners are located under=
-::
-> > +
-> > +  .gitlab-ci.d/custom-runners.yml
-> > +
-> > +Current Jobs
-> > +------------
-> > +
-> > +The current CI jobs based on custom runners have the primary goal of
-> > +catching and preventing regressions on a wider number of host systems
-> > +than the ones provided by GitLab's shared runners.
-> > +
-> > +Also, the mechanics of reliability, capacity and overall maintanance
->=20
-> s/maintanance/maintenance/
->
+Thank you!
 
-Oopsie... thanks.
-
-> > +of the machines provided by the QEMU project itself for those jobs
-> > +will be evaluated.
->=20
-> I'm not sure what this sentence is really good for... of course new stuff
-> has to prove its usefulness first, but that's always the case and does no=
-t
-> need to be mentioned in the documentation, I think? ... maybe that senten=
-ce
-> is better something for the patch description instead of (hopefully)
-> long-lasting documentation here?
->
-
-I think the statement attempts to set the tone here, and answer a
-question that I've seen more than once...  It certainly feels a bit
-out of place here, but I also think the commit message would be too
-transient and almost invisible.  I expect a lot will change in the CI
-and in its docs, so I don't think this exact sentence will be too long
-lasting.
-
-Let me know if that convinces you it deserves to be in the docs, if not
-I'll gladly moved it to the commit message.
-
-Thanks!
-- Cleber
-
---huq684BweRXVnRxX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+pXWsACgkQZX6NM6Xy
-CfPMCBAAs6CGTilUw/hI3uHmx5jsS7VbQVpZtz3Yu2b3LvIlssgtWdlec2S5/dMz
-CqsMxTSbtYa/HH3VUFs0OVFDqEIN/i2R5jQDu1eraKv12YOX82uqWl8GQBBiA1iQ
-SnR54bRGXohLgIYCzohajO+tvDIYnhMlGisS9R/v7Tere9Vb/cEQEub4/aaCh7cl
-T2pXQqmMFfjUePHkkN555Aq58tSP4yK2uRwAL5noe5nUyrWlA7WCL2yvawpL7r1m
-apKhOXWMYXhLoVQ+YnHyEVF9pkSS3ZWkGmUq0TpggtH4CvMT7v0XJIlcgHngoDIX
-MoIuOEr+w4U+e1cXtHm1gvFwHrmcyyB8Tjjhods8DRxyaft9lqhyeq6RR+tlG6HS
-rJeS/u88teHD7Jwzd+NrEBjNuwdTkHEtoVKAcr6THJnPaULAyrYJqojvL0BQCAZD
-tOvlYG9Ku+BcnUvaN7eeqWr/sswADVAg9wnhqgkGP+XDU8oAHA1tAV9gs3gfXSb2
-9Eeb0CCb4M+G8NfdtiORNADpvEW8vZg2GTpx3Ikxjh3Mncq0NYZ4eDS9hPzS90xx
-rY+/l3q9e/UcF+Bg2naCuLn15aQ2fV186hGRoG0VoR6ry0WvUO32VYYDeoiZLDrf
-l8wL/W01UElg/FJTRzdJ+s9d7pbQ/cKTSiRNfIApmiKZkbD3oBc=
-=fRK2
------END PGP SIGNATURE-----
-
---huq684BweRXVnRxX--
-
+-- 
+Best regards,
+Vladimir
 
