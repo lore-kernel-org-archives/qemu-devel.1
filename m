@@ -2,78 +2,101 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1C84C388F7
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56207C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:49:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAEA320674
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:48:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7DF320674
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 10:49:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tc241hG1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAEA320674
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S6w6aPdJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7DF320674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc4jJ-0006bO-SM
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 05:48:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45466)
+	id 1kc4kA-0007So-Ol
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 05:49:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kc4iT-00064i-Af
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:48:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37418)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kc4jG-0006gw-Fi
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:48:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20789)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kc4iR-0008AO-DK
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:48:04 -0500
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kc4jC-0008QP-TQ
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 05:48:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604918882;
+ s=mimecast20190719; t=1604918930;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5xhQO0ta8Zk7YojdbHZFj2vc+4a/lBAf0TXONvmSYBs=;
- b=Tc241hG1kJuEeofbWlWp2f/BXZ2qHtlLSZeHUqFDdEFL1P9PiUlEb454XRFGU8VTj7+KpC
- Wp7qTy3ET8PubDLydne6xkResh5qk2kDXmng70yzK8Ct/A5j2YbCq2LcD+ONXOFVbL008+
- wum8twR6iB/Ts2GVMJimBzKR+rl0bkE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-4D-q5n4QNqulbb6oiE2qdQ-1; Mon, 09 Nov 2020 05:47:57 -0500
-X-MC-Unique: 4D-q5n4QNqulbb6oiE2qdQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B2481074653;
- Mon,  9 Nov 2020 10:47:55 +0000 (UTC)
-Received: from gondolin (ovpn-113-28.ams2.redhat.com [10.36.113.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C3AF175125;
- Mon,  9 Nov 2020 10:47:43 +0000 (UTC)
-Date: Mon, 9 Nov 2020 11:47:40 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 6/7] qom: Add FIELD_PTR, a type-safe wrapper for
- object_field_prop_ptr()
-Message-ID: <20201109114740.19e727d9.cohuck@redhat.com>
-In-Reply-To: <20201104172512.2381656-7-ehabkost@redhat.com>
-References: <20201104172512.2381656-1-ehabkost@redhat.com>
- <20201104172512.2381656-7-ehabkost@redhat.com>
-Organization: Red Hat GmbH
+ bh=xjIW7SNSQYr8EJyuUd9g1avOYFsF3nB3CS3kzOxLyyk=;
+ b=S6w6aPdJoKOyPphg350VgmTdQTj7RQi5Iw7WQwgzc0uDjji807qzcXnE49eXB/UzKn0Pb+
+ cHmgfE0+NwZy7m1j/L1nLtFuYHA6uOHhIdQ4yoivRYrUHyORIGSkL6/BdWcb9xtJPsu9ET
+ YzA5SKav4uGK9VWaj0S49vRQdpKZbls=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-572-7dfwd-t8MHeWVbfsxN6VLg-1; Mon, 09 Nov 2020 05:48:45 -0500
+X-MC-Unique: 7dfwd-t8MHeWVbfsxN6VLg-1
+Received: by mail-ed1-f69.google.com with SMTP id y99so2559164ede.3
+ for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 02:48:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xjIW7SNSQYr8EJyuUd9g1avOYFsF3nB3CS3kzOxLyyk=;
+ b=W0/L98VhE4WHouspG646qxtPZwNgoROWizB4AMxAWfmO0ERv8UFws5s33pE85peSwc
+ ozvxVzuFRD3kEz6ZmJasctIt8nvyhkuu/i/QK+yGqOJpDtfeS7rRJRckaRVd4iO5Rp4N
+ JIrbDdSh3y9ItuDpHhiNMUOKZ7cZHxTr49CC51ckEbjql8RkAFAL++aTQXJgay7yz5E0
+ t4Cdq3WZPp7rVYrqxkwZLDSvb9w0yUTZlG6EQN1n1cOHRnN55EY+wJGtAgByc2Z2TBBJ
+ 7HIWetHvyTqySs7YUDM5+v5X8qCYHLstGv349FlmsVwWWklB27hY/JkKVzOVRuPVA5lC
+ YSGg==
+X-Gm-Message-State: AOAM530IIZHKUyxvDxK90jU7QD22+ZI59wAf8WgzlH6STTIhbLWi8tbY
+ 5Xu3kai+oouW53dFgCbKIbR1FpyEoynGSpgSOirksSfbHSenBIshVFzk0ogJXsFgSASFY8EMOx8
+ S97p9bXWl/c/03Sk=
+X-Received: by 2002:aa7:d493:: with SMTP id b19mr14195403edr.279.1604918923958; 
+ Mon, 09 Nov 2020 02:48:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwGyjQcEQHuJsGmMR3q+M3Aam01DGov0mbzg5FjFye+7zH2MQwsAALof2H5gUNEjktm/dAhgg==
+X-Received: by 2002:aa7:d493:: with SMTP id b19mr14195386edr.279.1604918923751; 
+ Mon, 09 Nov 2020 02:48:43 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id j9sm6432834edv.92.2020.11.09.02.48.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Nov 2020 02:48:43 -0800 (PST)
+Subject: Re: [PATCH 1/3] accel: Only include TCG stubs in user-mode only builds
+To: Claudio Fontana <cfontana@suse.de>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20201109094547.2456385-1-f4bug@amsat.org>
+ <20201109094547.2456385-2-f4bug@amsat.org>
+ <e9837717-b010-077e-2d68-0f03300793c4@suse.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <49ae582b-1b4d-9a0e-118c-fb4bcb714bdd@redhat.com>
+Date: Mon, 9 Nov 2020 11:48:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <e9837717-b010-077e-2d68-0f03300793c4@suse.de>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -82,8 +105,9 @@ X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,66 +120,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>, "Daniel P.
- Berrange" <berrange@redhat.com>, xen-devel@lists.xenproject.org,
- Matthew Rosato <mjrosato@linux.ibm.com>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-s390x@nongnu.org,
- Paul Durrant <paul@xen.org>, David Hildenbrand <david@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <laurent@vivier.eu>, kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed,  4 Nov 2020 12:25:11 -0500
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On 09/11/20 10:55, Claudio Fontana wrote:
+> Ciao Philippe,
+> 
+> I thought that the pattern used by Paolo was, recurse always, and put
+> the check inside the recursed dir meson.build . Paolo did you indeed
+> intend meson use this way?
 
-> Introduce a FIELD_PTR macro that will ensure the size of the area
-> we are accessing has the correct size, and will return a pointer
-> of the correct type.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Paul Durrant <paul@xen.org>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: David Hildenbrand <david@redhat.com>
-> Cc: Matthew Rosato <mjrosato@linux.ibm.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> Cc: xen-devel@lists.xenproject.org
-> Cc: qemu-block@nongnu.org
-> Cc: qemu-s390x@nongnu.org
-> ---
->  include/qom/field-property.h     | 21 ++++++++++-
->  backends/tpm/tpm_util.c          |  6 ++--
->  hw/block/xen-block.c             |  4 +--
->  hw/core/qdev-properties-system.c | 50 +++++++++++++-------------
->  hw/s390x/css.c                   |  4 +--
->  hw/s390x/s390-pci-bus.c          |  4 +--
->  hw/vfio/pci-quirks.c             |  4 +--
->  qom/field-property.c             |  3 +-
->  qom/property-types.c             | 60 +++++++++++++++++---------------
->  9 files changed, 89 insertions(+), 67 deletions(-)
+Generally yeah, I preferred to recurse always.  In this specific case, 
+however, an even bigger qualm with the patch is that the patch content 
+does not match the commit message.
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+I also don't understand why it's useful, because patch 2 makes 
+everything conditional on CONFIG_SOFTMMU.
+
+Paolo
 
 
