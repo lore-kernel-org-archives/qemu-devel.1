@@ -7,40 +7,41 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1C5C388F9
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 03:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 763F6C388F9
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 03:13:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E0BE206B7
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 03:12:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E0BE206B7
+	by mail.kernel.org (Postfix) with ESMTPS id 10C82206B7
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 03:13:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10C82206B7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kbxbK-0003An-Gy
-	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 22:12:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44854)
+	id 1kbxcc-0004kK-5O
+	for qemu-devel@archiver.kernel.org; Sun, 08 Nov 2020 22:13:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kbxUw-0001kq-02; Sun, 08 Nov 2020 22:05:38 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2445)
+ id 1kbxUt-0001bl-53; Sun, 08 Nov 2020 22:05:35 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:2081)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kbxUp-0006io-M2; Sun, 08 Nov 2020 22:05:37 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CTwpg60gZzLvWb;
- Mon,  9 Nov 2020 11:05:15 +0800 (CST)
-Received: from localhost (10.174.186.67) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Mon, 9 Nov 2020
- 11:05:15 +0800
+ id 1kbxUn-0006fu-HB; Sun, 08 Nov 2020 22:05:34 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CTwpk1YCczhj8m;
+ Mon,  9 Nov 2020 11:05:18 +0800 (CST)
+Received: from localhost (10.174.186.67) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Mon, 9 Nov 2020
+ 11:05:14 +0800
 From: Ying Fang <fangying1@huawei.com>
 To: <peter.maydell@linaro.org>
-Subject: [RFC PATCH v3 10/13] target/arm/cpu: Add cpu cache description for arm
-Date: Mon, 9 Nov 2020 11:04:49 +0800
-Message-ID: <20201109030452.2197-11-fangying1@huawei.com>
+Subject: [RFC PATCH v3 08/13] hw/acpi/aml-build: add processor hierarchy node
+ structure
+Date: Mon, 9 Nov 2020 11:04:47 +0800
+Message-ID: <20201109030452.2197-9-fangying1@huawei.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20201109030452.2197-1-fangying1@huawei.com>
 References: <20201109030452.2197-1-fangying1@huawei.com>
@@ -49,15 +50,15 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.186.67]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191; envelope-from=fangying1@huawei.com;
- helo=szxga05-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 22:05:18
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=fangying1@huawei.com;
+ helo=szxga06-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/08 22:05:17
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
 X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,135 +72,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: drjones@redhat.com, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+Cc: Henglong Fan <fanhenglong@huawei.com>, drjones@redhat.com,
+ zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
  shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, alistair.francis@wdc.com,
  Ying Fang <fangying1@huawei.com>, imammedo@redhat.com, salil.mehta@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add the CPUCacheInfo structure to hold cpu cache information for ARM cpus.
-A classic three level cache topology is used here. The default cache
-capacity is given and userspace can overwrite these values.
+Add the processor hierarchy node structures to build ACPI information
+for cpu topology. Three helpers are introduced:
 
+(1) build_socket_hierarchy for socket description structure
+(2) build_processor_hierarchy for processor description structure
+(3) build_smt_hierarchy for thread (logic processor) description structure
+
+We split the processor hierarchy node structure descriptions into
+three helpers even if there are some identical code snippets between
+them. The reason is that the private resources are variable among
+different topology level. This will make the ACPI PPTT table much
+more readable and easy to construct.
+
+Cc: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Ying Fang <fangying1@huawei.com>
+Signed-off-by: Henglong Fan <fanhenglong@huawei.com>
 ---
- target/arm/cpu.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- target/arm/cpu.h | 27 +++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
+ hw/acpi/aml-build.c         | 37 +++++++++++++++++++++++++++++++++++++
+ include/hw/acpi/aml-build.h |  7 +++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 056319859f..f1bac7452c 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -27,6 +27,7 @@
- #include "qapi/visitor.h"
- #include "cpu.h"
- #include "internals.h"
-+#include "qemu/units.h"
- #include "exec/exec-all.h"
- #include "hw/qdev-properties.h"
- #if !defined(CONFIG_USER_ONLY)
-@@ -997,6 +998,45 @@ uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz)
-     return (Aff1 << ARM_AFF1_SHIFT) | Aff0;
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 3792ba96ce..d1aa9fd716 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1770,6 +1770,43 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms)
+                  table_data->len - slit_start, 1, NULL, NULL);
  }
  
-+static CPUCaches default_cache_info = {
-+    .l1d_cache = &(CPUCacheInfo) {
-+    .type = DATA_CACHE,
-+        .level = 1,
-+        .size = 64 * KiB,
-+        .line_size = 64,
-+        .associativity = 4,
-+        .sets = 256,
-+        .attributes = 0x02,
-+    },
-+    .l1i_cache = &(CPUCacheInfo) {
-+        .type = INSTRUCTION_CACHE,
-+        .level = 1,
-+        .size = 64 * KiB,
-+        .line_size = 64,
-+        .associativity = 4,
-+        .sets = 256,
-+        .attributes = 0x04,
-+    },
-+    .l2_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 2,
-+        .size = 512 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .sets = 1024,
-+        .attributes = 0x0a,
-+    },
-+    .l3_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 3,
-+        .size = 65536 * KiB,
-+        .line_size = 64,
-+        .associativity = 15,
-+        .sets = 2048,
-+        .attributes = 0x0a,
-+    },
-+};
++/*
++ * ACPI 6.3: 5.2.29.1 Processor hierarchy node structure (Type 0)
++ */
++void build_socket_hierarchy(GArray *tbl, uint32_t parent, uint32_t id)
++{
++    build_append_byte(tbl, 0);          /* Type 0 - processor */
++    build_append_byte(tbl, 20);         /* Length, no private resources */
++    build_append_int_noprefix(tbl, 0, 2);  /* Reserved */
++    build_append_int_noprefix(tbl, 1, 4);  /* Flags: Physical package */
++    build_append_int_noprefix(tbl, parent, 4);  /* Parent */
++    build_append_int_noprefix(tbl, id, 4);     /* ACPI processor ID */
++    build_append_int_noprefix(tbl, 0, 4);  /* Number of private resources */
++}
 +
- static void cpreg_hashtable_data_destroy(gpointer data)
- {
-     /*
-@@ -1841,6 +1881,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         }
-     }
- 
-+    cpu->caches = default_cache_info;
++void build_processor_hierarchy(GArray *tbl, uint32_t flags,
++                               uint32_t parent, uint32_t id)
++{
++    build_append_byte(tbl, 0);          /* Type 0 - processor */
++    build_append_byte(tbl, 20);         /* Length, no private resources */
++    build_append_int_noprefix(tbl, 0, 2);      /* Reserved */
++    build_append_int_noprefix(tbl, flags, 4);  /* Flags */
++    build_append_int_noprefix(tbl, parent, 4); /* Parent */
++    build_append_int_noprefix(tbl, id, 4);     /* ACPI processor ID */
++    build_append_int_noprefix(tbl, 0, 4);  /* Number of private resources */
++}
 +
-     qemu_init_vcpu(cs);
-     cpu_reset(cs);
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index cfff1b5c8f..dbc33a9802 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -746,6 +746,30 @@ typedef enum ARMPSCIState {
- 
- typedef struct ARMISARegisters ARMISARegisters;
- 
-+/* Cache information type */
-+enum CacheType {
-+    DATA_CACHE,
-+    INSTRUCTION_CACHE,
-+    UNIFIED_CACHE
-+};
++void build_smt_hierarchy(GArray *tbl, uint32_t parent, uint32_t id)
++{
++    build_append_byte(tbl, 0);            /* Type 0 - processor */
++    build_append_byte(tbl, 20);           /* Length, no private resources */
++    build_append_int_noprefix(tbl, 0, 2); /* Reserved */
++    build_append_int_noprefix(tbl, 0x0e, 4);    /* Processor is a thread */
++    build_append_int_noprefix(tbl, parent , 4); /* Parent */
++    build_append_int_noprefix(tbl, id, 4);      /* ACPI processor ID */
++    build_append_int_noprefix(tbl, 0, 4);       /* Num of private resources */
++}
 +
-+typedef struct CPUCacheInfo {
-+    enum CacheType type;      /* Cache Type*/
-+    uint8_t level;
-+    uint32_t size;            /* Size in bytes */
-+    uint16_t line_size;       /* Line size in bytes */
-+    uint8_t associativity;    /* Cache associativity */
-+    uint32_t sets;            /* Number of sets */
-+    uint8_t attributes;       /* Cache attributest  */
-+} CPUCacheInfo;
-+
-+typedef struct CPUCaches {
-+        CPUCacheInfo *l1d_cache;
-+        CPUCacheInfo *l1i_cache;
-+        CPUCacheInfo *l2_cache;
-+        CPUCacheInfo *l3_cache;
-+} CPUCaches;
-+
- /**
-  * ARMCPU:
-  * @env: #CPUARMState
-@@ -987,6 +1011,9 @@ struct ARMCPU {
+ /* build rev1/rev3/rev5.1 FADT */
+ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+                 const char *oem_id, const char *oem_table_id)
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index fe0055fffb..56474835a7 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -437,6 +437,13 @@ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
  
-     /* Generic timer counter frequency, in Hz */
-     uint64_t gt_cntfrq_hz;
-+
-+    /* CPU cache information */
-+    CPUCaches caches;
- };
+ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms);
  
- unsigned int gt_cntfrq_period_ns(ARMCPU *cpu);
++void build_socket_hierarchy(GArray *tbl, uint32_t parent, uint32_t id);
++
++void build_processor_hierarchy(GArray *tbl, uint32_t flags,
++                               uint32_t parent, uint32_t id);
++
++void build_smt_hierarchy(GArray *tbl, uint32_t parent, uint32_t id);
++
+ void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+                 const char *oem_id, const char *oem_table_id);
+ 
 -- 
 2.23.0
 
