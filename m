@@ -2,107 +2,75 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF82C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 11:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD7BC56201
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 11:03:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CEF4206ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 11:02:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iv2yoaVL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CEF4206ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 626E620897
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 11:03:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 626E620897
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc4wF-0005oq-Gb
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 06:02:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49024)
+	id 1kc4x8-0006bm-Bh
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 06:03:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kc4ue-0005Fa-Oh
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 06:00:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51914)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kc4uc-00049W-AC
- for qemu-devel@nongnu.org; Mon, 09 Nov 2020 06:00:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604919637;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/sOppP10Sa/qTnfGqyHwycKQciZf+IsnM4V5VBK2iIg=;
- b=Iv2yoaVLDMVEPYVvU399oSfDpdvFNcAkImI1o9zilWT/bW/JI4mJXXj4yFaKYiuOtiHC2I
- XxDyWD8ry4tkPUehI1JyzP28Di92eKHBn1CPQaha8l9pDklaq6KMC6p000GcYfvIcWzJzN
- ZO6pIwNIL23X/b3CN3/8FSmBNJSRqTw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-Q_9qCO8OO6q6n4ODVPpclA-1; Mon, 09 Nov 2020 06:00:35 -0500
-X-MC-Unique: Q_9qCO8OO6q6n4ODVPpclA-1
-Received: by mail-wm1-f70.google.com with SMTP id y1so1832525wma.5
- for <qemu-devel@nongnu.org>; Mon, 09 Nov 2020 03:00:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=/sOppP10Sa/qTnfGqyHwycKQciZf+IsnM4V5VBK2iIg=;
- b=h6zeLtvROL346zAYZb/I65/G7jRMQGd2iy4JOGuMoo/hdzHDN++hKu/DsCeb5fK4qB
- 6XTcPjYNsz2dOY4pP/OOqvIOXzFT6OWNzs1VK/59aMq5nq8fTaRByEtZs0IOIlhvr1Bz
- itXZ1bITHlNJydNgmSrp0TGyOJY1bCgX/qOmmZPJeYiYJriOFyyfUU8eWZOLNo3q2mIY
- EbV3mHD1fmqRVqD+gzKuxoyv2it29xT3KJ4Hrn2qaOm2vtSHW5rorb7xe2kQ/ZTWiLZZ
- lMTC9b5j0kL1wViDAb9qHAMcWbI+JmfVcchYYHcpx8EqBD1ARkz2Ia7TniJmlPH8MAOW
- Gppg==
-X-Gm-Message-State: AOAM533gtbtQiDnk6RMp0aXNwZ8qHFfsnuIYoHQ7mEtC2q9firyPbMvu
- uJlJ04ht9LC4hUdkp6+aAJ3+bi4oTeYj24dVHLSs3HaFBQHXkFj1alfHymJJxsjY7ZX49OhdiE1
- JCLzvWgsrvYNSOos=
-X-Received: by 2002:adf:dd51:: with SMTP id u17mr17627706wrm.139.1604919634500; 
- Mon, 09 Nov 2020 03:00:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy2sV6a2YPF/vmA9gce91JV2AgFgT+nSvkhXPUPfNDipX3KBHkjl3uhCx/vsDjWjAvKIev/YQ==
-X-Received: by 2002:adf:dd51:: with SMTP id u17mr17627683wrm.139.1604919634306; 
- Mon, 09 Nov 2020 03:00:34 -0800 (PST)
-Received: from [192.168.1.36] (234.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.234])
- by smtp.gmail.com with ESMTPSA id o184sm12185715wmo.37.2020.11.09.03.00.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 09 Nov 2020 03:00:33 -0800 (PST)
-Subject: Re: [PATCH-for-5.2 1/5] hw/usb/hcd-xhci: Make xhci base model abstract
-To: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>
-References: <20201107111307.262263-1-philmd@redhat.com>
- <20201107111307.262263-2-philmd@redhat.com>
- <20201109095127.dt7rzwqcrtx6k7n5@sirius.home.kraxel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a241f626-9798-933e-d5b4-1190b3da6746@redhat.com>
-Date: Mon, 9 Nov 2020 12:00:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <20201109095127.dt7rzwqcrtx6k7n5@sirius.home.kraxel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
+ id 1kc4vv-0005dz-JH; Mon, 09 Nov 2020 06:01:59 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2052)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <salil.mehta@huawei.com>)
+ id 1kc4vs-0004dx-GF; Mon, 09 Nov 2020 06:01:59 -0500
+Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.56])
+ by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CV7NT3FwTzQpqk;
+ Mon,  9 Nov 2020 19:01:45 +0800 (CST)
+Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
+ dggeme756-chm.china.huawei.com (10.3.19.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Mon, 9 Nov 2020 19:01:50 +0800
+Received: from lhreml703-chm.china.huawei.com ([10.201.68.198]) by
+ lhreml703-chm.china.huawei.com ([10.201.68.198]) with mapi id 15.01.1913.007; 
+ Mon, 9 Nov 2020 11:01:48 +0000
+From: Salil Mehta <salil.mehta@huawei.com>
+To: fangying <fangying1@huawei.com>, "peter.maydell@linaro.org"
+ <peter.maydell@linaro.org>
+Subject: RE: [RFC PATCH v3 03/13] hw/arm/virt: Replace smp_parse with one that
+ prefers cores
+Thread-Topic: [RFC PATCH v3 03/13] hw/arm/virt: Replace smp_parse with one
+ that prefers cores
+Thread-Index: AQHWtkUun+VWhAgXfUKxCOZCM20erKm/oYXw
+Date: Mon, 9 Nov 2020 11:01:48 +0000
+Message-ID: <f2b0f9ab3e7c4e4a82a1f003ca1d67e4@huawei.com>
+References: <20201109030452.2197-1-fangying1@huawei.com>
+ <20201109030452.2197-4-fangying1@huawei.com>
+In-Reply-To: <20201109030452.2197-4-fangying1@huawei.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 00:04:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.28.252]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.188;
+ envelope-from=salil.mehta@huawei.com; helo=szxga02-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 05:45:32
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,52 +84,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Miroslav Rezanina <mrezanin@redhat.com>, qemu-devel@nongnu.org
+Cc: "drjones@redhat.com" <drjones@redhat.com>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "alistair.francis@wdc.com" <alistair.francis@wdc.com>,
+ "imammedo@redhat.com" <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Thomas who wrote the test.
+> From: fangying
+> Sent: Monday, November 9, 2020 3:05 AM
+> To: peter.maydell@linaro.org
+> Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org; drjones@redhat.com;
+> imammedo@redhat.com; shannon.zhaosl@gmail.com; alistair.francis@wdc.com;
+> Zhanghailiang <zhang.zhanghailiang@huawei.com>; Salil Mehta
+> <salil.mehta@huawei.com>
+> Subject: [RFC PATCH v3 03/13] hw/arm/virt: Replace smp_parse with one tha=
+t
+> prefers cores
+>=20
+> From: Andrew Jones <drjones@redhat.com>
+>=20
+> The virt machine type has never used the CPU topology parameters, other
+> than number of online CPUs and max CPUs. When choosing how to allocate
+> those CPUs the default has been to assume cores. In preparation for
+> using the other CPU topology parameters let's use an smp_parse that
+> prefers cores over sockets. We can also enforce the topology matches
+> max_cpus check because we have no legacy to preserve.
 
-On 11/9/20 10:51 AM, Gerd Hoffmann wrote:
-> On Sat, Nov 07, 2020 at 12:13:03PM +0100, Philippe Mathieu-DaudÃ© wrote:
->> The TYPE_XHCI model is abstract and can not be used as it.
->> It is meant to be overloaded by children classes. Restore
->> it as abstract type.
-> 
-> Breaks "make check".
-> 
-> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} QTEST_QEMU_IMG=./qemu-img G_TEST_DBUS_DAEMON=/home/kraxel/projects/qemu/tests/dbus-vmstate-daemon.sh QTEST_QEMU_BINARY=./qemu-system-x86_64 tests/qtest/usb-hcd-xhci-test --tap -k
-> **
-> ERROR:../../qom/object.c:506:object_initialize_with_type: assertion failed: (type->abstract == false)
 
-Well I suppose the test was always incorrect but working,
-and 8ddab8dd3d8 revealed the problem. Testing the correct
-device should fix the test:
+Hi Andrew,
+I am wondering if we need to take care of other levels of processor
+hierarchy as well in ARM64 like 'clusters'/'Dies'?
 
--- >8 --
-diff --git a/tests/qtest/usb-hcd-xhci-test.c
-b/tests/qtest/usb-hcd-xhci-test.c
-index 10ef9d2a91a..09f5ad71158 100644
---- a/tests/qtest/usb-hcd-xhci-test.c
-+++ b/tests/qtest/usb-hcd-xhci-test.c
-@@ -18,7 +18,7 @@ static void test_xhci_init(void)
+Thanks
 
- static void test_xhci_hotplug(void)
- {
--    usb_test_hotplug(global_qtest, "xhci", "1", NULL);
-+    usb_test_hotplug(global_qtest, "nec-usb-xhci", "1", NULL);
- }
 
- static void test_usb_uas_hotplug(void)
----
-
-I'll respin including the fix.
-
-> 
-> take care,
->   Gerd
-> 
+>=20
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  hw/arm/virt.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 76 insertions(+)
+>=20
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index ea24b576c6..ba902b53ba 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -78,6 +78,8 @@
+>  #include "hw/virtio/virtio-iommu.h"
+>  #include "hw/char/pl011.h"
+>  #include "qemu/guest-random.h"
+> +#include "qapi/qmp/qerror.h"
+> +#include "sysemu/replay.h"
+>=20
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -2444,6 +2446,79 @@ static int virt_kvm_type(MachineState *ms, const c=
+har
+> *type_str)
+>      return requested_pa_size > 40 ? requested_pa_size : 0;
+>  }
+>=20
+> +/*
+> + * Unlike smp_parse() in hw/core/machine.c, we prefer cores over sockets=
+,
+> + * e.g. '-smp 8' creates 1 socket with 8 cores.  Whereas '-smp 8' with
+> + * hw/core/machine.c's smp_parse() creates 8 sockets, each with 1 core.
+> + * Additionally, we can enforce the topology matches max_cpus check,
+> + * because we have no legacy to preserve.
+> + */
+> +static void virt_smp_parse(MachineState *ms, QemuOpts *opts)
+> +{
+> +    if (opts) {
+> +        unsigned cpus    =3D qemu_opt_get_number(opts, "cpus", 0);
+> +        unsigned sockets =3D qemu_opt_get_number(opts, "sockets", 0);
+> +        unsigned cores   =3D qemu_opt_get_number(opts, "cores", 0);
+> +        unsigned threads =3D qemu_opt_get_number(opts, "threads", 0);
+> +
+> +        /*
+> +         * Compute missing values; prefer cores over sockets and
+> +         * sockets over threads.
+> +         */
+> +        if (cpus =3D=3D 0 || cores =3D=3D 0) {
+> +            sockets =3D sockets > 0 ? sockets : 1;
+> +            threads =3D threads > 0 ? threads : 1;
+> +            if (cpus =3D=3D 0) {
+> +                cores =3D cores > 0 ? cores : 1;
+> +                cpus =3D cores * threads * sockets;
+> +            } else {
+> +                ms->smp.max_cpus =3D qemu_opt_get_number(opts, "maxcpus"=
+, cpus);
+> +                cores =3D ms->smp.max_cpus / (sockets * threads);
+> +            }
+> +        } else if (sockets =3D=3D 0) {
+> +            threads =3D threads > 0 ? threads : 1;
+> +            sockets =3D cpus / (cores * threads);
+> +            sockets =3D sockets > 0 ? sockets : 1;
+> +        } else if (threads =3D=3D 0) {
+> +            threads =3D cpus / (cores * sockets);
+> +            threads =3D threads > 0 ? threads : 1;
+> +        } else if (sockets * cores * threads < cpus) {
+> +            error_report("cpu topology: "
+> +                         "sockets (%u) * cores (%u) * threads (%u) < "
+> +                         "smp_cpus (%u)",
+> +                         sockets, cores, threads, cpus);
+> +            exit(1);
+> +        }
+> +
+> +        ms->smp.max_cpus =3D qemu_opt_get_number(opts, "maxcpus", cpus);
+> +
+> +        if (ms->smp.max_cpus < cpus) {
+> +            error_report("maxcpus must be equal to or greater than smp")=
+;
+> +            exit(1);
+> +        }
+> +
+> +        if (sockets * cores * threads !=3D ms->smp.max_cpus) {
+> +            error_report("cpu topology: "
+> +                         "sockets (%u) * cores (%u) * threads (%u)"
+> +                         "!=3D maxcpus (%u)",
+> +                         sockets, cores, threads,
+> +                         ms->smp.max_cpus);
+> +            exit(1);
+> +        }
+> +
+> +        ms->smp.cpus =3D cpus;
+> +        ms->smp.cores =3D cores;
+> +        ms->smp.threads =3D threads;
+> +        ms->smp.sockets =3D sockets;
+> +    }
+> +
+> +    if (ms->smp.cpus > 1) {
+> +        Error *blocker =3D NULL;
+> +        error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED, "smp");
+> +        replay_add_blocker(blocker);
+> +    }
+> +}
+> +
+>  static void virt_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+> @@ -2469,6 +2544,7 @@ static void virt_machine_class_init(ObjectClass *oc=
+, void
+> *data)
+>      mc->cpu_index_to_instance_props =3D virt_cpu_index_to_props;
+>      mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a15");
+>      mc->get_default_cpu_node_id =3D virt_get_default_cpu_node_id;
+> +    mc->smp_parse =3D virt_smp_parse;
+>      mc->kvm_type =3D virt_kvm_type;
+>      assert(!mc->get_hotplug_handler);
+>      mc->get_hotplug_handler =3D virt_machine_get_hotplug_handler;
+> --
+> 2.23.0
 
 
