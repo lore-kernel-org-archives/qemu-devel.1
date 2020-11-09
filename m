@@ -2,72 +2,89 @@ Return-Path: <SRS0=6joO=EP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62FF4C388F7
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68498C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:50:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7819206E3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:48:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7819206E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C5DF520853
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Nov 2020 14:50:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bB96R7AU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5DF520853
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kc8TO-0001fa-UJ
-	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:48:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46488)
+	id 1kc8V6-0003aJ-L7
+	for qemu-devel@archiver.kernel.org; Mon, 09 Nov 2020 09:50:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kc8II-0007Wn-RB; Mon, 09 Nov 2020 09:37:18 -0500
-Resent-Date: Mon, 09 Nov 2020 09:37:18 -0500
-Resent-Message-Id: <E1kc8II-0007Wn-RB@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21315)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kc8IE-0003GA-N2; Mon, 09 Nov 2020 09:37:18 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1604932609; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=mM1rCcU4OQZS8bWcu1RwLlX2O825RGiJFtE6Kqo53iSMVZjBqACVFkQBGL9srj8g1Zhm7U5fjitqdBzcPS5LBYWxoYEvx/AIGa6+VyHalRYSdLsYwJe3JkNwBSDUfzbfJscEFdfiMVCnt2OD5LXzgYL6j1p/BdQOPYR7pHu54A8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1604932609;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=qlel+Q6B3i8qxZn5+EaYfnqIP7SzhGeZIMFDA3DRvqU=; 
- b=KBs6Pg8oGpsbpsVaJSD6UBmJDAJBX7ysg15ptw0+vjpGTbKEYT7CNgYK86GrHQXyYPD7fnxL+FxWoLAYrmGUUMycyrRNin0DnYszbtJrZ7hwKVZ7766k0U+SDkV/pst7uOPy7pqUP7I/sXoqcENbrt1sw6ImpnpiMbWMIfHc1z0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1604932608773490.77488936727116;
- Mon, 9 Nov 2020 06:36:48 -0800 (PST)
-Message-ID: <160493260768.17418.8183707424618388678@b92d57cec08d>
-Subject: Re: [PATCHv2 00/17] ARM Secure EL2 extension
-In-Reply-To: <5554493.MhkbZ0Pkbq@basile.remlab.net>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kc8TF-0001vC-Oi
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 09:48:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23534)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kc8TD-0007Cj-UY
+ for qemu-devel@nongnu.org; Mon, 09 Nov 2020 09:48:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604933315;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=/LI3HylCuUP+xPFl85tb9asfa2LlUywI2YGj898N46w=;
+ b=bB96R7AUSxWuSEcU+brLNP/S4UrX9EcX+hC5ll8y9qjG12mWXpJJOrs6YcSraMzBovNkcz
+ NZP6CeKg7po3RFbQnGp1JW3c34hAOCe5tw2eeXhbDC+OyFpGtIbBCwmy2esfVm/SSCiIF6
+ C2981Izu9DBqFtOsfoVh6WPcSOSoGd4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-kYcTrlG_N-yqbKD70-pbtQ-1; Mon, 09 Nov 2020 09:48:33 -0500
+X-MC-Unique: kYcTrlG_N-yqbKD70-pbtQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 859B06D250
+ for <qemu-devel@nongnu.org>; Mon,  9 Nov 2020 14:48:32 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-103.ams2.redhat.com
+ [10.36.112.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 92A8D1007628;
+ Mon,  9 Nov 2020 14:48:31 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0DA161132BD6; Mon,  9 Nov 2020 15:48:30 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 1/6] qemu-option: simplify search for end of key
+References: <20201109133931.979563-1-pbonzini@redhat.com>
+ <20201109133931.979563-2-pbonzini@redhat.com>
+Date: Mon, 09 Nov 2020 15:48:30 +0100
+In-Reply-To: <20201109133931.979563-2-pbonzini@redhat.com> (Paolo Bonzini's
+ message of "Mon, 9 Nov 2020 08:39:26 -0500")
+Message-ID: <878sba7fi9.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: remi.denis.courmont@huawei.com
-Date: Mon, 9 Nov 2020 06:36:48 -0800 (PST)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 08:54:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/09 01:25:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,139 +97,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS81NTU0NDkzLk1oa2JaMFBrYnFA
-YmFzaWxlLnJlbWxhYi5uZXQvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21l
-IGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1h
-dGlvbjoKCk1lc3NhZ2UtaWQ6IDU1NTQ0OTMuTWhrYlowUGticUBiYXNpbGUucmVtbGFiLm5ldApT
-dWJqZWN0OiBbUEFUQ0h2MiAwMC8xN10gQVJNIFNlY3VyZSBFTDIgZXh0ZW5zaW9uClR5cGU6IHNl
-cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
-IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIw
-MTAyMjExMTMwMi44MTA1LTEtcGFua2FqLmd1cHRhLmxpbnV4QGdtYWlsLmNvbSAtPiBwYXRjaGV3
-LzIwMjAxMDIyMTExMzAyLjgxMDUtMS1wYW5rYWouZ3VwdGEubGludXhAZ21haWwuY29tCiAtIFt0
-YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDExMDYyMzUxMDkuNzA2Ni0xLXBldGVyLm1heWRl
-bGxAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMjAxMTA2MjM1MTA5LjcwNjYtMS1wZXRlci5tYXlk
-ZWxsQGxpbmFyby5vcmcKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy81NTU0NDkzLk1oa2Ja
-MFBrYnFAYmFzaWxlLnJlbWxhYi5uZXQgLT4gcGF0Y2hldy81NTU0NDkzLk1oa2JaMFBrYnFAYmFz
-aWxlLnJlbWxhYi5uZXQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkNjdkZGE4IHRh
-cmdldC9hcm06IHJlZmFjdG9yIHZhZTFfdGxibWFzaygpCmMzYmZhMzggdGFyZ2V0L2FybTogZW5h
-YmxlIFNlY3VyZSBFTDIgaW4gbWF4IENQVQo3OTRiZjlmIHRhcmdldC9hcm06IGFkZCBBUk12OC40
-LVNFTDIgZXh0ZW5zaW9uCjU1MWUxZTkgdGFyZ2V0L2FybTogc2V0IEhQRkFSX0VMMi5OUyBvbiBz
-ZWN1cmUgc3RhZ2UgMiBmYXVsdHMKMmEzMWQ1ZCB0YXJnZXQvYXJtOiBoYW5kbGUgVk1JRCBjaGFu
-Z2UgaW4gc2VjdXJlIHN0YXRlCmY5YjEwNzIgdGFyZ2V0L2FybTogc2VjdXJlIHN0YWdlIDIgdHJh
-bnNsYXRpb24gcmVnaW1lCmNmOGY1NzggdGFyZ2V0L2FybTogZG8gUzFfcHR3X3RyYW5zbGF0ZSgp
-IGJlZm9yZSBhZGRyZXNzIHNwYWNlIGxvb2t1cAphYzc3YWVmIHRhcmdldC9hcm06IGFkZCBBUk12
-OC40LVNFTDIgc3lzdGVtIHJlZ2lzdGVycwo4MjgxYjMwIHRhcmdldC9hcm06IGFkZCBNTVUgc3Rh
-Z2UgMSBmb3IgU2VjdXJlIEVMMgpmYjI5M2M1IHRhcmdldC9hcm06IHJldHVybiB0aGUgc3RhZ2Ug
-MiBpbmRleCBmb3Igc3RhZ2UgMQpkNThiNTZlIHRhcmdldC9hcm06IGFkZCA2NC1iaXQgUy1FTDIg
-dG8gRUwgZXhjZXB0aW9uIHRhYmxlCmU1ZmRmMjYgdGFyZ2V0L2FybTogZGVjbGFyZSBuZXcgQUE2
-NFBGUjAgYml0LWZpZWxkcwpkNjg0ZWE0IHRhcmdldC9hcm06IGZhY3RvciBNRENSX0VMMiBjb21t
-b24gaGFuZGxpbmcKMmY3OWExNCB0YXJnZXQvYXJtOiB1c2UgYXJtX2hjcl9lbDJfZWZmKCkgd2hl
-cmUgYXBwbGljYWJsZQo4NDBjOGRhIHRhcmdldC9hcm06IHVzZSBhcm1faXNfZWwyX2VuYWJsZWQo
-KSB3aGVyZSBhcHBsaWNhYmxlCjRjZGI1YTMgdGFyZ2V0L2FybTogYWRkIGFybV9pc19lbDJfZW5h
-YmxlZCgpIGhlbHBlcgowNjAxMTMxIHRhcmdldC9hcm06IHJlbW92ZSByZWR1bmRhbnQgdGVzdHMK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTcgQ2hlY2tpbmcgY29tbWl0IDA2MDExMzE5ZDFjZiAo
-dGFyZ2V0L2FybTogcmVtb3ZlIHJlZHVuZGFudCB0ZXN0cykKMi8xNyBDaGVja2luZyBjb21taXQg
-NGNkYjVhM2Q4YTJmICh0YXJnZXQvYXJtOiBhZGQgYXJtX2lzX2VsMl9lbmFibGVkKCkgaGVscGVy
-KQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUg
-bGluZQojMjE6IEZJTEU6IHRhcmdldC9hcm0vY3B1Lmg6MjA0MzoKKy8qIFJldHVybiB0cnVlIGlm
-IHRoZSBjdXJyZW50IHNlY3VyaXR5IHN0YXRlIGhhcyBBQXJjaDY0IEVMMiBvciBBQXJjaDMyIEh5
-cC4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBhbGlnbiB0aGUgKiBvbiBlYWNoIGxp
-bmUKIzIzOiBGSUxFOiB0YXJnZXQvYXJtL2NwdS5oOjIwNDU6CisgKiBUaGlzIGNvcnJlc3BvbmRz
-IHRvIHRoZSBwc2V1ZG9jb2RlIEVMMkVuYWJsZWQoKQorICAqLwoKdG90YWw6IDAgZXJyb3JzLCAy
-IHdhcm5pbmdzLCAyOCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzE3IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjMvMTcgQ2hlY2tpbmcgY29tbWl0IDg0MGM4ZGEwZmFjYSAodGFyZ2V0L2FybTog
-dXNlIGFybV9pc19lbDJfZW5hYmxlZCgpIHdoZXJlIGFwcGxpY2FibGUpCjQvMTcgQ2hlY2tpbmcg
-Y29tbWl0IDJmNzlhMTRjYzUyMSAodGFyZ2V0L2FybTogdXNlIGFybV9oY3JfZWwyX2VmZigpIHdo
-ZXJlIGFwcGxpY2FibGUpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4MDogRklM
-RTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxMDM1NjoKKyAgICAgICAgaWYgKChhcm1faGNyX2VsMl9l
-ZmYoZW52KSAmIEhDUl9QVFcpICYmIChjYWNoZWF0dHJzLmF0dHJzICYgMHhmMCkgPT0gMCkgewoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA3OSBsaW5lcyBjaGVja2VkCgpQYXRjaCA0LzE3
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMTcgQ2hlY2tpbmcgY29tbWl0IGQ2ODRlYTRi
-YTgzZiAodGFyZ2V0L2FybTogZmFjdG9yIE1EQ1JfRUwyIGNvbW1vbiBoYW5kbGluZykKNi8xNyBD
-aGVja2luZyBjb21taXQgZTVmZGYyNjkzYTZjICh0YXJnZXQvYXJtOiBkZWNsYXJlIG5ldyBBQTY0
-UEZSMCBiaXQtZmllbGRzKQo3LzE3IENoZWNraW5nIGNvbW1pdCBkNThiNTZlY2Y3M2YgKHRhcmdl
-dC9hcm06IGFkZCA2NC1iaXQgUy1FTDIgdG8gRUwgZXhjZXB0aW9uIHRhYmxlKQpXQVJOSU5HOiBC
-bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzA6IEZJ
-TEU6IHRhcmdldC9hcm0vaGVscGVyLmM6OTAwODoKKyAgICAgICB7LyogMSAgIDAgICAwICAgMSAq
-L3sgMiwgIDIsICAyLCAtMSB9LHsgMiwgIDIsIC0xLCAgMSB9LH0sfSwKCldBUk5JTkc6IEJsb2Nr
-IGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMzMTogRklMRTog
-dGFyZ2V0L2FybS9oZWxwZXIuYzo5MDA5OgorICAgICAge3svKiAxICAgMCAgIDEgICAwICoveyAx
-LCAgMSwgIDEsIC0xIH0seyAxLCAgMSwgIDEsICAxIH0sfSwKCldBUk5JTkc6IEJsb2NrIGNvbW1l
-bnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMzMjogRklMRTogdGFyZ2V0
-L2FybS9oZWxwZXIuYzo5MDEwOgorICAgICAgIHsvKiAxICAgMCAgIDEgICAxICoveyAyLCAgMiwg
-IDIsIC0xIH0seyAyLCAgMiwgIDIsICAxIH0sfSx9LH0sCgpXQVJOSU5HOiBCbG9jayBjb21tZW50
-cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzc6IEZJTEU6IHRhcmdldC9h
-cm0vaGVscGVyLmM6OTAxMzoKKyAgICAgIHt7LyogMSAgIDEgICAxICAgMCAqL3sgMywgIDMsICAz
-LCAtMSB9LHsgMywgIDMsICAzLCAgMyB9LH0sCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
-YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzg6IEZJTEU6IHRhcmdldC9hcm0vaGVs
-cGVyLmM6OTAxNDoKKyAgICAgICB7LyogMSAgIDEgICAxICAgMSAqL3sgMywgIDMsICAzLCAtMSB9
-LHsgMywgIDMsICAzLCAgMyB9LH0sfSx9LH0sCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
-YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNTE6IEZJTEU6IHRhcmdldC9hcm0vb3Bf
-aGVscGVyLmM6NjUyOgorICAgICAgICAvKiBSZXF1ZXN0aW5nIGEgdHJhcCB0byBFTDIgd2hlbiB3
-ZSdyZSBpbiBFTDMgaXMKCnRvdGFsOiAwIGVycm9ycywgNiB3YXJuaW5ncywgMzAgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggNy8xNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo4LzE3IENoZWNraW5n
-IGNvbW1pdCBmYjI5M2M1YzI1N2IgKHRhcmdldC9hcm06IHJldHVybiB0aGUgc3RhZ2UgMiBpbmRl
-eCBmb3Igc3RhZ2UgMSkKOS8xNyBDaGVja2luZyBjb21taXQgODI4MWIzMDA4Yzg1ICh0YXJnZXQv
-YXJtOiBhZGQgTU1VIHN0YWdlIDEgZm9yIFNlY3VyZSBFTDIpCjEwLzE3IENoZWNraW5nIGNvbW1p
-dCBhYzc3YWVmNTFkMzQgKHRhcmdldC9hcm06IGFkZCBBUk12OC40LVNFTDIgc3lzdGVtIHJlZ2lz
-dGVycykKMTEvMTcgQ2hlY2tpbmcgY29tbWl0IGNmOGY1NzhmYjhiOCAodGFyZ2V0L2FybTogZG8g
-UzFfcHR3X3RyYW5zbGF0ZSgpIGJlZm9yZSBhZGRyZXNzIHNwYWNlIGxvb2t1cCkKMTIvMTcgQ2hl
-Y2tpbmcgY29tbWl0IGY5YjEwNzJhMjMwMiAodGFyZ2V0L2FybTogc2VjdXJlIHN0YWdlIDIgdHJh
-bnNsYXRpb24gcmVnaW1lKQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
-CiMxODogRklMRTogdGFyZ2V0L2FybS9jcHUuaDoxNzE6CisjZGVmaW5lIFZUQ1JfTlNXXkkoMXUg
-PDwgMjkpJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTk6IEZJ
-TEU6IHRhcmdldC9hcm0vY3B1Lmg6MTcyOgorI2RlZmluZSBWVENSX05TQV5JKDF1IDw8IDMwKSQK
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIwOiBGSUxFOiB0YXJn
-ZXQvYXJtL2NwdS5oOjE3MzoKKyNkZWZpbmUgVlNUQ1JfU1deSVZUQ1JfTlNXJAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjE6IEZJTEU6IHRhcmdldC9hcm0vY3B1
-Lmg6MTc0OgorI2RlZmluZSBWU1RDUl9TQV5JVlRDUl9OU0EkCgpXQVJOSU5HOiBCbG9jayBjb21t
-ZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzkwOiBGSUxFOiB0YXJn
-ZXQvYXJtL2ludGVybmFscy5oOjk4MzoKKyAgICAgICAgLyogTm90ZTogU2VjdXJlIHN0YWdlIDIg
-bm9taW5hbGx5IHNoYXJlcyBmaWVsZHMgZnJvbSBWVENSX0VMMiwgYnV0CgpFUlJPUjogYnJhY2Vz
-IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM0MDU6IEZJ
-TEU6IHRhcmdldC9hcm0vaW50ZXJuYWxzLmg6MTIwMDoKKyAgICAgICAgaWYgKHMyX21tdV9pZHgg
-IT0gTlVMTCkKWy4uLl0KCnRvdGFsOiA1IGVycm9ycywgMSB3YXJuaW5ncywgMzU1IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDEyLzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxMy8xNyBDaGVj
-a2luZyBjb21taXQgMmEzMWQ1ZGYwODAyICh0YXJnZXQvYXJtOiBoYW5kbGUgVk1JRCBjaGFuZ2Ug
-aW4gc2VjdXJlIHN0YXRlKQoxNC8xNyBDaGVja2luZyBjb21taXQgNTUxZTFlOTcxMzcxICh0YXJn
-ZXQvYXJtOiBzZXQgSFBGQVJfRUwyLk5TIG9uIHNlY3VyZSBzdGFnZSAyIGZhdWx0cykKMTUvMTcg
-Q2hlY2tpbmcgY29tbWl0IDc5NGJmOWY2MWNiYyAodGFyZ2V0L2FybTogYWRkIEFSTXY4LjQtU0VM
-MiBleHRlbnNpb24pCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24g
-YSBzZXBhcmF0ZSBsaW5lCiMxMDE6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmM6MzM5NjoKKyAg
-ICAgICAgLyogVGhlIEFUUzEyTlNPKiBvcGVyYXRpb25zIG11c3QgdHJhcCB0byBFTDMgb3IgRUwy
-IGlmIGV4ZWN1dGVkIGluCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAo
-Y3R4OlZ4VikKIzExOTogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzozNjY4OgorICAgIGlmIChh
-cm1fY3VycmVudF9lbChlbnYpID09IDMgJiYgIShlbnYtPmNwMTUuc2NyX2VsMyAmIChTQ1JfTlN8
-U0NSX0VFTDIpKSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDEz
-NyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8xNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-MTYvMTcgQ2hlY2tpbmcgY29tbWl0IGMzYmZhMzgwODNkZSAodGFyZ2V0L2FybTogZW5hYmxlIFNl
-Y3VyZSBFTDIgaW4gbWF4IENQVSkKMTcvMTcgQ2hlY2tpbmcgY29tbWl0IGQ2N2RkYTg0NDNjMSAo
-dGFyZ2V0L2FybTogcmVmYWN0b3IgdmFlMV90bGJtYXNrKCkpCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
-YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzU1NTQ0OTMuTWhrYlowUGticUBiYXNpbGUu
-cmVtbGFiLm5ldC90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
-bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> Use strcspn to find an equal or comma value, and pass the result directly
+> to get_opt_name to avoid another strchr.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  util/qemu-option.c | 35 +++++++++++++----------------------
+>  1 file changed, 13 insertions(+), 22 deletions(-)
+>
+> diff --git a/util/qemu-option.c b/util/qemu-option.c
+> index acefbc23fa..ab3b58599e 100644
+> --- a/util/qemu-option.c
+> +++ b/util/qemu-option.c
+> @@ -38,27 +38,19 @@
+>  #include "qemu/help_option.h"
+>  
+>  /*
+> - * Extracts the name of an option from the parameter string (p points at the
+> + * Extracts the name of an option from the parameter string (@p points at the
+>   * first byte of the option name)
+>   *
+> - * The option name is delimited by delim (usually , or =) or the string end
+> - * and is copied into option. The caller is responsible for free'ing option
+> - * when no longer required.
+> + * The option name is @len characters long and is copied into @option. The
+> + * caller is responsible for free'ing @option when no longer required.
+>   *
+>   * The return value is the position of the delimiter/zero byte after the option
+> - * name in p.
+> + * name in @p.
+>   */
+> -static const char *get_opt_name(const char *p, char **option, char delim)
+> +static const char *get_opt_name(const char *p, char **option, size_t len)
+>  {
+> -    char *offset = strchr(p, delim);
+> -
+> -    if (offset) {
+> -        *option = g_strndup(p, offset - p);
+> -        return offset;
+> -    } else {
+> -        *option = g_strdup(p);
+> -        return p + strlen(p);
+> -    }
+> +    *option = g_strndup(p, len);
+> +    return p + len;
+>  }
+
+Hardly anything left; I believe this can be simplified further.  Not a
+reason to delay this series.
+
+>  
+>  /*
+> @@ -769,12 +761,11 @@ static const char *get_opt_name_value(const char *params,
+>                                        const char *firstname,
+>                                        char **name, char **value)
+>  {
+> -    const char *p, *pe, *pc;
+> -
+> -    pe = strchr(params, '=');
+> -    pc = strchr(params, ',');
+> +    const char *p;
+> +    size_t len;
+>  
+> -    if (!pe || (pc && pc < pe)) {
+> +    len = strcspn(params, "=,");
+> +    if (params[len] != '=') {
+>          /* found "foo,more" */
+>          if (firstname) {
+>              /* implicitly named first option */
+> @@ -782,7 +773,7 @@ static const char *get_opt_name_value(const char *params,
+>              p = get_opt_value(params, value);
+>          } else {
+>              /* option without value, must be a flag */
+> -            p = get_opt_name(params, name, ',');
+> +            p = get_opt_name(params, name, len);
+>              if (strncmp(*name, "no", 2) == 0) {
+>                  memmove(*name, *name + 2, strlen(*name + 2) + 1);
+>                  *value = g_strdup("off");
+> @@ -792,7 +783,7 @@ static const char *get_opt_name_value(const char *params,
+>          }
+>      } else {
+>          /* found "foo=bar,more" */
+> -        p = get_opt_name(params, name, '=');
+> +        p = get_opt_name(params, name, len);
+>          assert(*p == '=');
+>          p++;
+>          p = get_opt_value(p, value);
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
 
